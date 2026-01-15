@@ -20,6 +20,29 @@ description: |
 
 Unit testing validates individual functions, methods, and classes in isolation by mocking all external dependencies.
 
+---
+
+## Workflows
+
+For guided, step-by-step execution of unit testing tasks, use the appropriate workflow:
+
+| Workflow | Purpose | When to Use |
+|----------|---------|-------------|
+| [Setup](workflows/setup-unit-test.md) | Initialize test infrastructure | New project or missing test setup |
+| [Writing](workflows/writing-unit-test.md) | Write new unit tests | Creating tests for components |
+| [Reviewing](workflows/reviewing-unit-test.md) | Review existing tests | Code review, quality audit |
+| [Running](workflows/running-unit-test.md) | Execute tests | Running tests, analyzing results |
+| [Debugging](workflows/debugging-unit-test.md) | Fix failing tests | Tests failing, need diagnosis |
+| [Optimizing](workflows/optimizing-unit-test.md) | Improve test performance | Slow tests, maintainability |
+
+**Workflow Instructions:**
+1. Load the appropriate workflow file before starting the task
+2. Follow each step in order, completing checkpoints before proceeding
+3. Load referenced knowledge files from `references/` as directed by the workflow
+4. After completing the task, re-read relevant reference files to verify compliance
+
+---
+
 ## Knowledge Base Structure
 
 ```
@@ -28,7 +51,9 @@ references/
 │   ├── knowledge.md     # Testing philosophy and test pyramid
 │   ├── rules.md         # Mandatory testing rules (AAA, naming, coverage)
 │   ├── assertions.md    # Assertion patterns and matchers
-│   └── examples.md      # Comprehensive examples by category
+│   ├── examples.md      # Comprehensive examples by category
+│   ├── detect-open-handles.md   # Open handle detection and cleanup
+│   └── performance-optimization.md  # Jest runtime optimization
 │
 ├── nestjs/              # NestJS component testing
 │   ├── services.md      # Service/usecase testing patterns
@@ -82,6 +107,13 @@ references/
 
 ### Examples
 - Read `references/common/examples.md` for comprehensive patterns
+
+### Optimize Test Performance
+1. Read `references/common/performance-optimization.md` - Worker config, caching, CI optimization
+2. Read `references/common/detect-open-handles.md` - Fix open handles preventing clean exit
+
+### Debug Open Handles
+- Read `references/common/detect-open-handles.md` - Detection commands, common handle types, cleanup patterns
 
 ---
 
