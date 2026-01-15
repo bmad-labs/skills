@@ -11,12 +11,13 @@
   "plugins": [
     {
       "name": "bmad-skills",
-      "description": "Collection of skills including skill creation tools and MCP server development guides",
+      "description": "Collection of skills including skill creation, MCP server development, and E2E testing guides",
       "source": "./",
       "strict": false,
       "skills": [
         "./skills/skill-creator",
-        "./skills/mcp-builder"
+        "./skills/mcp-builder",
+        "./skills/typescript-e2e-testing"
       ]
     }
   ]
