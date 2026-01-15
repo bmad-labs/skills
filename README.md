@@ -22,16 +22,60 @@ bmad-skills/
 └── README.md                # This file
 ```
 
-## Using Skills
+## Installation
 
-### Installing a Skill
+### Method 1: Install via Plugin Marketplace (Recommended)
 
-To use a skill in Claude Code, add it to your project's `.claude/settings.json`:
+This method installs the entire plugin with all skills automatically detected.
+
+**Step 1: Add the marketplace**
+```bash
+/plugin marketplace add thuantan2060/bmad-skills
+```
+
+**Step 2: Install the plugin**
+```bash
+/plugin install bmad-skills@bmad-skills
+```
+
+**Step 3: Verify installation**
+```bash
+# Open the plugin manager to see installed plugins
+/plugin
+
+# Or ask Claude: "What skills are available?"
+```
+
+### Method 2: Install via settings.json
+
+Add to your project's `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "bmad-skills": {
+      "source": {
+        "source": "github",
+        "repo": "thuantan2060/bmad-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "bmad-skills@bmad-skills": true
+  }
+}
+```
+
+### Method 3: Install Individual Skills (Manual)
+
+Add individual skills to your project's `.claude/settings.json`:
 
 ```json
 {
   "skills": [
-    "github:bmad-labs/skills/skills/skill-name"
+    "github:thuantan2060/bmad-skills/skills/mcp-builder",
+    "github:thuantan2060/bmad-skills/skills/typescript-e2e-testing",
+    "github:thuantan2060/bmad-skills/skills/typescript-unit-testing"
   ]
 }
 ```
@@ -46,6 +90,28 @@ Or install from a local path during development:
 }
 ```
 
+### Troubleshooting
+
+If skills are not detected after installation:
+
+1. **Clear the plugin cache:**
+   ```bash
+   rm -rf ~/.claude/plugins/cache
+   ```
+
+2. **Restart Claude Code** (exit and run `claude` again)
+
+3. **Verify skills are loaded:**
+   - Ask Claude: "What skills are available?"
+   - Or run `/plugin` and check the **Errors** tab
+
+4. **Check plugin structure:**
+   ```bash
+   claude plugin validate .
+   ```
+
+## Using Skills
+
 ### Invoking a Skill
 
 Once installed, you can invoke skills using the slash command format:
@@ -54,7 +120,7 @@ Once installed, you can invoke skills using the slash command format:
 /skill-name [arguments]
 ```
 
-Or simply describe what you need - Claude will automatically use relevant skills.
+Or simply describe what you need - Claude will automatically use relevant skills based on their descriptions.
 
 ## Creating New Skills
 
