@@ -20,6 +20,25 @@ description: |
 
 E2E testing validates complete workflows from user perspective, using real infrastructure via Docker.
 
+---
+
+## Workflows
+
+For comprehensive step-by-step guidance, use the appropriate workflow:
+
+| Workflow | When to Use |
+|----------|-------------|
+| [Setup E2E Test](workflows/setup-e2e-test.md) | Setting up E2E infrastructure for a new or existing project |
+| [Writing E2E Test](workflows/writing-e2e-test.md) | Creating new E2E test cases with proper GWT pattern |
+| [Review E2E Test](workflows/review-e2e-test.md) | Reviewing existing tests for quality and correctness |
+| [Running E2E Test](workflows/running-e2e-test.md) | Executing tests with proper verification |
+| [Debugging E2E Test](workflows/debugging-e2e-test.md) | Systematically fixing failing tests |
+| [Optimize E2E Test](workflows/optimize-e2e-test.md) | Improving test suite performance |
+
+**Important**: Each workflow includes instructions to load relevant knowledge from the `references/` folder before and after completing tasks.
+
+---
+
 ## Knowledge Base Structure
 
 ```
@@ -72,12 +91,16 @@ references/
 
 ## Quick Reference by Task
 
+> **Tip**: For detailed step-by-step guidance, use the [Workflows](#workflows) section above.
+
 ### Setup New E2E Structure
+**Workflow**: [Setup E2E Test](workflows/setup-e2e-test.md)
 1. Read `references/common/knowledge.md` - Understand E2E fundamentals
 2. Read `references/common/nestjs-setup.md` - Project setup
 3. Read technology-specific `docker-setup.md` files as needed
 
 ### Write Test Cases
+**Workflow**: [Writing E2E Test](workflows/writing-e2e-test.md)
 1. **MANDATORY**: Read `references/common/rules.md` - GWT pattern, timeouts
 2. Read `references/common/test-case-creation-guide.md` - Templates
 3. Read technology-specific files:
@@ -87,10 +110,29 @@ references/
    - **Redis**: `references/redis/rules.md` → `test-helper.md`
    - **API**: `references/api/rules.md` → `test-helper.md`
 
+### Review Test Quality
+**Workflow**: [Review E2E Test](workflows/review-e2e-test.md)
+1. Read `references/common/rules.md` - Check against mandatory patterns
+2. Read `references/common/best-practices.md` - Quality standards
+3. Read technology-specific `rules.md` files
+
+### Run E2E Tests
+**Workflow**: [Running E2E Test](workflows/running-e2e-test.md)
+1. Verify Docker infrastructure is running
+2. Run tests sequentially with `npm run test:e2e`
+3. Follow failure protocol if tests fail
+
 ### Debug Failing Tests
+**Workflow**: [Debugging E2E Test](workflows/debugging-e2e-test.md)
 1. Read `references/common/debugging.md`
 2. Create `_e2e-failures.md` tracking file
 3. Fix ONE test at a time
+
+### Optimize Test Performance
+**Workflow**: [Optimize E2E Test](workflows/optimize-e2e-test.md)
+1. Read `references/common/best-practices.md` - Performance patterns
+2. Read `references/kafka/performance.md` for Kafka tests
+3. Measure baseline before making changes
 
 ### Examples
 - Read `references/common/examples.md` for general patterns
