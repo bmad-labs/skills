@@ -1,0 +1,23 @@
+{
+  "name": "bmad-skills",
+  "owner": {
+    "name": "thuantan2060",
+    "email": "thuantan2060@gmail.com"
+  },
+  "metadata": {
+    "description": "BMAD Skills Marketplace - Custom skills for Claude Code",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "bmad-skills",
+      "description": "Collection of skills including skill creation tools and MCP server development guides",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/skill-creator",
+        "./skills/mcp-builder"
+      ]
+    }
+  ]
+}
