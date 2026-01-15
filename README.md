@@ -81,6 +81,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 |-------|-------------|----------|
 | [skill-creator](skills/skill-creator) | Guide for creating effective skills that extend Claude's capabilities | Development |
 | [mcp-builder](skills/mcp-builder) | Guide for creating high-quality MCP servers for LLM integrations | Development |
+| [typescript-e2e-testing](skills/typescript-e2e-testing) | Comprehensive E2E testing for TypeScript/NestJS with Kafka, PostgreSQL, MongoDB, Redis | Development |
 
 ## License
 
