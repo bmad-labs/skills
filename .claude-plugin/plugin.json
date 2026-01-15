@@ -1,0 +1,11 @@
+{
+  "name": "bmad-skills",
+  "description": "Collection of skills including skill creation, MCP server development, E2E testing, and unit testing guides for TypeScript/NestJS projects",
+  "version": "1.0.0",
+  "author": {
+    "name": "thuantan2060",
+    "email": "thuantan2060@gmail.com"
+  },
+  "repository": "https://github.com/thuantan2060/bmad-skills",
+  "license": "MIT"
+}

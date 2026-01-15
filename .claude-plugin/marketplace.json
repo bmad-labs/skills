@@ -11,14 +11,8 @@
   "plugins": [
     {
       "name": "bmad-skills",
-      "description": "Collection of skills including skill creation, MCP server development, and E2E testing guides",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/mcp-builder",
-        "./skills/typescript-e2e-testing",
-        "./skills/typescript-unit-testing"
-      ]
+      "description": "Collection of skills including MCP server development, E2E testing, and unit testing guides for TypeScript/NestJS projects",
+      "source": "./"
     }
   ]
 }
