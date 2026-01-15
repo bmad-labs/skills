@@ -81,6 +81,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 |-------|-------------|----------|
 | [mcp-builder](skills/mcp-builder) | Guide for creating high-quality MCP servers for LLM integrations | Development |
 | [typescript-e2e-testing](skills/typescript-e2e-testing) | Comprehensive E2E testing for TypeScript/NestJS with Kafka, PostgreSQL, MongoDB, Redis | Development |
+| [typescript-unit-testing](skills/typescript-unit-testing) | Unit testing for TypeScript/NestJS with Jest, DeepMocked, mongodb-memory-server, pg-mem, Kafka, Redis | Development |
 
 ## License
 

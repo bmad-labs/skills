@@ -16,7 +16,8 @@
       "strict": false,
       "skills": [
         "./skills/mcp-builder",
-        "./skills/typescript-e2e-testing"
+        "./skills/typescript-e2e-testing",
+        "./skills/typescript-unit-testing"
       ]
     }
   ]
