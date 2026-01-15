@@ -15,7 +15,6 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/skill-creator",
         "./skills/mcp-builder",
         "./skills/typescript-e2e-testing"
       ]
