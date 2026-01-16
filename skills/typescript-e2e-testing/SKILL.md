@@ -1,26 +1,56 @@
 ---
 name: typescript-e2e-testing
 description: |
-  E2E (end-to-end) and integration testing skill for TypeScript/NestJS projects using Jest, real infrastructure via Docker, and GWT pattern.
+  Complete E2E (end-to-end) and integration testing skill for TypeScript/NestJS projects using Jest, real infrastructure via Docker, and GWT pattern.
 
-  ALWAYS use this skill when:
-  - User asks to write, create, add, or generate e2e tests or integration tests
-  - User asks to test API endpoints, workflows, or complete features end-to-end
-  - User mentions "e2e test", "e2e-spec", ".e2e-spec.ts", "integration test", or "end-to-end"
-  - User is working on any file ending in .e2e-spec.ts or located in test/e2e/ directory
-  - User asks to set up Docker infrastructure for testing (Kafka, PostgreSQL, MongoDB, Redis)
-  - User asks to test with real databases, message brokers, or external services
-  - User asks about GWT (Given-When-Then) pattern for tests
-  - User asks to debug flaky tests or test isolation issues
-  - User asks to configure docker-compose for testing
-  - User mentions supertest, MSW, nock, or testing HTTP endpoints
-  - User asks to test Kafka consumers/producers, event-driven workflows
-  - User mentions testing with Redpanda, PostgreSQL containers, MongoDB containers
-  - User asks about test timeouts, waitForMessages, or polling strategies
+  ALWAYS use this skill when user needs to:
 
-  Covers: NestJS E2E setup, Jest e2e configuration, docker-compose.e2e.yml, GWT pattern, supertest, Kafka testing with real brokers, PostgreSQL/MongoDB/Redis integration, MSW/nock mocking, test isolation, flaky test debugging
+  **SETUP** - Initialize or configure E2E testing infrastructure:
+  - Set up E2E testing for a new project
+  - Configure docker-compose for testing (Kafka, PostgreSQL, MongoDB, Redis)
+  - Create jest-e2e.config.ts or E2E Jest configuration
+  - Set up test helpers for database, Kafka, or Redis
+  - Configure .env.e2e environment variables
+  - Create test/e2e directory structure
 
-  Keywords: e2e, end-to-end, integration test, e2e-spec.ts, test/e2e, Jest, supertest, NestJS, Kafka, Redpanda, PostgreSQL, MongoDB, Redis, docker-compose, GWT pattern, Given-When-Then, real infrastructure, test isolation, flaky test, MSW, nock, waitForMessages
+  **WRITE** - Create or add E2E/integration tests:
+  - Write, create, add, or generate e2e tests or integration tests
+  - Test API endpoints, workflows, or complete features end-to-end
+  - Test with real databases, message brokers, or external services
+  - Test Kafka consumers/producers, event-driven workflows
+  - Working on any file ending in .e2e-spec.ts or in test/e2e/ directory
+  - Use GWT (Given-When-Then) pattern for tests
+
+  **REVIEW** - Audit or evaluate E2E tests:
+  - Review existing E2E tests for quality
+  - Check test isolation and cleanup patterns
+  - Audit GWT pattern compliance
+  - Evaluate assertion quality and specificity
+  - Check for anti-patterns (multiple WHEN actions, conditional assertions)
+
+  **RUN** - Execute or analyze E2E test results:
+  - Run E2E tests
+  - Start/stop Docker infrastructure for testing
+  - Analyze E2E test results
+  - Verify Docker services are healthy
+  - Interpret test output and failures
+
+  **DEBUG** - Fix failing or flaky E2E tests:
+  - Fix failing E2E tests
+  - Debug flaky tests or test isolation issues
+  - Troubleshoot connection errors (database, Kafka, Redis)
+  - Fix timeout issues or async operation failures
+  - Diagnose race conditions or state leakage
+  - Debug Kafka message consumption issues
+
+  **OPTIMIZE** - Improve E2E test performance:
+  - Speed up slow E2E tests
+  - Optimize Docker infrastructure startup
+  - Replace fixed waits with smart polling
+  - Reduce beforeEach cleanup time
+  - Improve test parallelization where safe
+
+  Keywords: e2e, end-to-end, integration test, e2e-spec.ts, test/e2e, Jest, supertest, NestJS, Kafka, Redpanda, PostgreSQL, MongoDB, Redis, docker-compose, GWT pattern, Given-When-Then, real infrastructure, test isolation, flaky test, MSW, nock, waitForMessages, fix e2e, debug e2e, run e2e, review e2e, optimize e2e, setup e2e
 ---
 
 # E2E Testing Skill
@@ -41,6 +71,28 @@ For comprehensive step-by-step guidance, use the appropriate workflow:
 | [Running E2E Test](workflows/running-e2e-test.md) | Executing tests with proper verification |
 | [Debugging E2E Test](workflows/debugging-e2e-test.md) | Systematically fixing failing tests |
 | [Optimize E2E Test](workflows/optimize-e2e-test.md) | Improving test suite performance |
+
+## Workflow Selection Guide
+
+**IMPORTANT**: Before starting any E2E testing task, identify the user's intent and load the appropriate workflow.
+
+### Detect User Intent → Select Workflow
+
+| User Says / Wants | Workflow to Load | File |
+|-------------------|------------------|------|
+| "Set up E2E tests", "configure docker-compose", "add E2E to project", "create test helpers" | **Setup** | `workflows/setup-e2e-test.md` |
+| "Write E2E tests", "add integration tests", "test this endpoint", "create e2e-spec" | **Writing** | `workflows/writing-e2e-test.md` |
+| "Review E2E tests", "check test quality", "audit tests", "is this test correct?" | **Reviewing** | `workflows/review-e2e-test.md` |
+| "Run E2E tests", "execute tests", "start docker and test", "check if tests pass" | **Running** | `workflows/running-e2e-test.md` |
+| "Fix E2E tests", "debug tests", "tests are failing", "flaky test", "connection error" | **Debugging** | `workflows/debugging-e2e-test.md` |
+| "Speed up E2E tests", "optimize tests", "tests are slow", "reduce test time" | **Optimizing** | `workflows/optimize-e2e-test.md` |
+
+### Workflow Execution Protocol
+
+1. **ALWAYS load the workflow file first** - Read the full workflow before taking action
+2. **Follow each step in order** - Complete checkpoints before proceeding
+3. **Load knowledge files as directed** - Each workflow specifies which `references/` files to read
+4. **Verify compliance after completion** - Re-read relevant reference files to ensure quality
 
 **Important**: Each workflow includes instructions to load relevant knowledge from the `references/` folder before and after completing tasks.
 
