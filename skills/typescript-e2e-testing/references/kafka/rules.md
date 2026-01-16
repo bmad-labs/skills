@@ -4,11 +4,39 @@
 
 | Rule | Requirement |
 |------|-------------|
+| Topic creation | Use Admin to create topics - NEVER rely on auto-create |
 | Kafka waits | Use smart polling (10-20s timeout, 50ms interval) |
 | Consumer isolation | Use `fromBeginning: false`, clear buffer between tests |
 | Consumer group | Unique per test suite: `${baseId}-e2e-${Date.now()}` |
 | Microservice config | `{ inheritAppConfig: true }` |
 | Startup wait | 5s after `startAllMicroservices()` |
+
+## Topic Management Rules
+
+### NEVER Rely on Auto-Create
+
+Auto-create causes intermittent test failures due to timing issues. Topics may not be ready when tests start.
+
+```typescript
+// ❌ WRONG: Relying on auto-create
+const producer = kafka.producer({ allowAutoTopicCreation: true });
+await producer.send({ topic: 'my-topic', messages: [...] }); // Topic may not exist!
+
+// ✅ CORRECT: Explicit topic creation with Admin
+beforeAll(async () => {
+  await kafkaHelper.connect();
+  await kafkaHelper.createTopicIfNotExists(inputTopic, 1);  // Create first
+  await kafkaHelper.createTopicIfNotExists(outputTopic, 1);
+  // Then subscribe and start app
+});
+```
+
+### Setup Order
+
+1. Initialize KafkaTestHelper and connect
+2. Create topics with Admin (createTopicIfNotExists)
+3. Subscribe to output topics
+4. Start application
 
 ## Isolation Rules
 
@@ -85,6 +113,10 @@ await producer.send({
 ## NestJS Kafka Setup Rules
 
 ```typescript
+// ✅ REQUIRED: Create topics BEFORE starting app
+await kafkaHelper.createTopicIfNotExists(inputTopic, 1);
+await kafkaHelper.createTopicIfNotExists(outputTopic, 1);
+
 // ✅ REQUIRED: Generate unique consumer group
 const uniqueGroupId = `${configService.get('KAFKA_GROUP_ID')}-e2e-${Date.now()}`;
 
@@ -98,7 +130,7 @@ app.connectMicroservice({
     },
     consumer: {
       groupId: uniqueGroupId,
-      allowAutoTopicCreation: true,
+      // ❌ DON'T use allowAutoTopicCreation - create topics with Admin instead
     },
     subscribe: { fromBeginning: false }, // NOT fromBeginning!
   },
@@ -148,9 +180,9 @@ async waitForMessages(topic: string, count: number, timeoutMs: number = 10000) {
 
 | Issue | Solution |
 |-------|----------|
+| Topic doesn't exist / timing issues | Use `createTopicIfNotExists()` in beforeAll - NEVER auto-create |
 | Consumer not ready | Wait 5s after `startAllMicroservices()` |
 | Wrong broker address | Use `localhost:9094` for external access |
-| Topic doesn't exist | Use `ensureTopicExists()` before test |
 | Slow rebalancing | Optimize consumer config (sessionTimeout: 6000) |
 | Messages from previous runs | Use `fromBeginning: false`, clear buffer |
 
@@ -169,6 +201,11 @@ mockHttpService.post.mockReturnValueOnce(of({ status: 500 })); // attempt 3
 
 ## Checklist
 
+**Topic Management:**
+- [ ] Create topics with Admin in `beforeAll` (createTopicIfNotExists)
+- [ ] NEVER rely on auto-create
+- [ ] Use unique topic names per suite: `topic-${Date.now()}`
+
 **Setup:**
 - [ ] Unique consumer group ID per suite
 - [ ] `fromBeginning: false` in subscribe options
@@ -179,7 +216,7 @@ mockHttpService.post.mockReturnValueOnce(of({ status: 500 })); // attempt 3
 **Test Isolation:**
 - [ ] Clear message buffer in `beforeEach`
 - [ ] 2s grace period after buffer clearing
-- [ ] NO topic deletion/recreation
+- [ ] NO topic deletion/recreation between tests
 
 **Assertions:**
 - [ ] Use smart polling (waitForMessages)
