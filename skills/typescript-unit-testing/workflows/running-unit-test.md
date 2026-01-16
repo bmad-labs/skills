@@ -37,14 +37,14 @@ Before running tests, review the following reference files if troubleshooting is
 
 **Why**: Test output can be verbose. Direct terminal output bloats agent context.
 
-**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID to prevent conflicts.
 
 ```bash
 # Initialize session (once at start)
 export UT_SESSION=$(date +%s)-$$
 
-# Standard pattern for all test runs
-npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+# Standard pattern for all test runs - redirect to file only (no console)
+npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1
 
 # Read only summary
 tail -50 /tmp/ut-${UT_SESSION}-output.log
@@ -94,18 +94,18 @@ rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
 
 **Actions:**
 
-1. Execute test command (output to temp file):
+1. Execute test command (output to temp file only, no console):
    ```bash
    # Standard run
-   npm test -- [path/to/file.spec.ts] 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   npm test -- [path/to/file.spec.ts] > /tmp/ut-${UT_SESSION}-output.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-output.log
 
    # With verbose output
-   npm test -- [path/to/file.spec.ts] --verbose 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   npm test -- [path/to/file.spec.ts] --verbose > /tmp/ut-${UT_SESSION}-output.log 2>&1
    tail -100 /tmp/ut-${UT_SESSION}-output.log
 
    # Specific test only
-   npm test -- -t "test name" 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   npm test -- -t "test name" > /tmp/ut-${UT_SESSION}-output.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-output.log
    ```
 
@@ -161,9 +161,9 @@ rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
 
 **Actions:**
 
-1. Execute coverage command (output to temp file):
+1. Execute coverage command (output to temp file only, no console):
    ```bash
-   npm run test:cov -- [path/to/file.spec.ts] 2>&1 | tee /tmp/ut-${UT_SESSION}-coverage.log
+   npm run test:cov -- [path/to/file.spec.ts] > /tmp/ut-${UT_SESSION}-coverage.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-coverage.log
    ```
 
@@ -237,8 +237,8 @@ No action required.
    - Status: PENDING
    EOF
 
-   # Fix ONE test at a time
-   npm test -- -t "[first test name]" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+   # Fix ONE test at a time (no console output)
+   npm test -- -t "[first test name]" > /tmp/ut-${UT_SESSION}-debug.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-debug.log
    ```
 
@@ -325,7 +325,7 @@ No action required.
 
 ## Common Commands Reference
 
-**All commands output to temp files with unique session ID.**
+**All commands redirect output to temp files only (no console output).**
 
 ```bash
 # Initialize session (once at start)
@@ -334,12 +334,12 @@ export UT_SESSION=$(date +%s)-$$
 
 | Task | Command |
 |------|---------|
-| Run all tests | `npm test 2>&1 \| tee /tmp/ut-${UT_SESSION}-output.log && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
-| Run single file | `npm test -- path/to/file.spec.ts 2>&1 \| tee /tmp/ut-${UT_SESSION}-output.log && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
-| Run single test | `npm test -- -t "should return user" 2>&1 \| tee /tmp/ut-${UT_SESSION}-output.log && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
+| Run all tests | `npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1 && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
+| Run single file | `npm test -- path/to/file.spec.ts > /tmp/ut-${UT_SESSION}-output.log 2>&1 && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
+| Run single test | `npm test -- -t "should return user" > /tmp/ut-${UT_SESSION}-output.log 2>&1 && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
 | Get failure details | `grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log` |
-| Coverage | `npm run test:cov 2>&1 \| tee /tmp/ut-${UT_SESSION}-coverage.log && tail -50 /tmp/ut-${UT_SESSION}-coverage.log` |
-| Verbose output | `npm test -- --verbose 2>&1 \| tee /tmp/ut-${UT_SESSION}-output.log && tail -100 /tmp/ut-${UT_SESSION}-output.log` |
+| Coverage | `npm run test:cov > /tmp/ut-${UT_SESSION}-coverage.log 2>&1 && tail -50 /tmp/ut-${UT_SESSION}-coverage.log` |
+| Verbose output | `npm test -- --verbose > /tmp/ut-${UT_SESSION}-output.log 2>&1 && tail -100 /tmp/ut-${UT_SESSION}-output.log` |
 | Clear cache | `npx jest --clearCache` |
 | Cleanup | `rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md` |
 

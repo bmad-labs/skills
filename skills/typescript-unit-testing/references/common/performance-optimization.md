@@ -327,8 +327,8 @@ npm install --save-dev jest-slow-test-reporter
 ### Built-in Timing
 
 ```bash
-# Verbose output includes timing (output to temp file)
-npm test -- --verbose 2>&1 | tee /tmp/ut-${UT_SESSION}-timing.log
+# Verbose output includes timing (no console output)
+npm test -- --verbose > /tmp/ut-${UT_SESSION}-timing.log 2>&1
 tail -50 /tmp/ut-${UT_SESSION}-timing.log
 
 # Find slowest tests
@@ -363,25 +363,25 @@ sort -t'(' -k2 -rn /tmp/ut-${UT_SESSION}-timing.log | head -20
 
 ## Quick Diagnosis
 
-**Output to temp files to avoid context bloat.** Use unique session ID.
+**Redirect to temp files only (no console output).** Use unique session ID.
 
 ```bash
 # Initialize session (once at start)
 export UT_SESSION=$(date +%s)-$$
 
-# Check overall timing
-npm test -- --verbose 2>&1 | tee /tmp/ut-${UT_SESSION}-perf.log
+# Check overall timing (no console output)
+npm test -- --verbose > /tmp/ut-${UT_SESSION}-perf.log 2>&1
 tail -50 /tmp/ut-${UT_SESSION}-perf.log
 
 # Check for slow tests
 grep -E "^\s+✓.*\(\d+.*ms\)" /tmp/ut-${UT_SESSION}-perf.log | sort -t'(' -k2 -rn | head -10
 
-# Check for open handles
-npm test -- --detectOpenHandles 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+# Check for open handles (no console output)
+npm test -- --detectOpenHandles > /tmp/ut-${UT_SESSION}-handles.log 2>&1
 tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
-# Check memory usage
-node --expose-gc node_modules/.bin/jest --runInBand --logHeapUsage 2>&1 | tee /tmp/ut-${UT_SESSION}-memory.log
+# Check memory usage (no console output)
+node --expose-gc node_modules/.bin/jest --runInBand --logHeapUsage > /tmp/ut-${UT_SESSION}-memory.log 2>&1
 tail -50 /tmp/ut-${UT_SESSION}-memory.log
 
 # Cleanup

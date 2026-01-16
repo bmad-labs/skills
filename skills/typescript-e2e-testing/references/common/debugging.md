@@ -10,8 +10,8 @@
 # Initialize session (once at start of debugging)
 export E2E_SESSION=$(date +%s)-$$
 
-# Standard pattern - capture output to temp file
-npm run test:e2e -- -t "{test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+# Standard pattern - redirect to temp file only (no console output)
+npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
 
 # Read summary only
 tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
@@ -98,19 +98,19 @@ rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 
 ## Command Line Debugging
 
-**All commands output to temp files for context efficiency.**
+**All commands redirect to temp files only (no console output).**
 
 ### Node Inspector
 
 ```bash
-# Basic debug mode (output to temp file)
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+# Basic debug mode (requires console for interactive debugging)
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand
 
 # With specific test file
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand test/e2e/user.e2e-spec.ts 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand test/e2e/user.e2e-spec.ts
 
 # With test name pattern
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "should create user" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "should create user"
 ```
 
 Open Chrome → `chrome://inspect` to connect.
@@ -118,27 +118,27 @@ Open Chrome → `chrome://inspect` to connect.
 ### Verbose Output
 
 ```bash
-# Verbose output - capture then read summary
-npm run test:e2e -- --verbose 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+# Verbose output - redirect then read summary (no console output)
+npm run test:e2e -- --verbose > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
 tail -100 /tmp/e2e-${E2E_SESSION}-debug.log
 
-npm run test:e2e -- --verbose --expand 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+npm run test:e2e -- --verbose --expand > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
 tail -100 /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 ### Single Test Execution
 
 ```bash
-# Run specific file (output to temp file)
-npm run test:e2e -- test/e2e/user.e2e-spec.ts 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+# Run specific file (no console output)
+npm run test:e2e -- test/e2e/user.e2e-spec.ts > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run tests matching pattern
-npm run test:e2e -- -t "should create user" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+npm run test:e2e -- -t "should create user" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run single describe block
-npm run test:e2e -- -t "User API" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+npm run test:e2e -- -t "User API" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
@@ -314,8 +314,8 @@ List ALL failing tests from the initial run. Work through them one by one.
 **Run ONLY the specific test, NEVER the full suite:**
 
 ```bash
-# Run only the failing test (output to temp file)
-npm run test:e2e -- -t "should create user and publish event" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+# Run only the failing test (no console output)
+npm run test:e2e -- -t "should create user and publish event" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
 tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
 
 # Check for errors in output
@@ -335,13 +335,11 @@ grep -i "error\|fail" /tmp/e2e-${E2E_SESSION}-debug.log
 **Run the SAME test 3-5 times to ensure stability:**
 
 ```bash
-# Run the fixed test multiple times (capture results)
-rm -f /tmp/e2e-${E2E_SESSION}-verify.log
+# Run the fixed test multiple times (no console output)
 for i in {1..5}; do
-  echo "=== Run $i ===" >> /tmp/e2e-${E2E_SESSION}-verify.log
-  npm run test:e2e -- -t "should create user" 2>&1 | tail -15 >> /tmp/e2e-${E2E_SESSION}-verify.log
+  npm run test:e2e -- -t "should create user" > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1
+  if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
-cat /tmp/e2e-${E2E_SESSION}-verify.log
 ```
 
 ### Step 5: Update Tracking and Move to Next
@@ -360,7 +358,7 @@ cat /tmp/e2e-${E2E_SESSION}-verify.log
 **Only after ALL individual tests pass:**
 
 ```bash
-npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 

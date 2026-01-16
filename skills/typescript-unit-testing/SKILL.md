@@ -169,7 +169,7 @@ references/
 ## Core Principles
 
 ### 0. Context Efficiency (Temp File Output)
-**ALWAYS redirect unit test output to temp files**. Test output can be verbose and bloats agent context.
+**ALWAYS redirect unit test output to temp files, NOT console**. Test output can be verbose and bloats agent context.
 
 **IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
 
@@ -177,8 +177,8 @@ references/
 # Initialize session (once at start of testing session)
 export UT_SESSION=$(date +%s)-$$
 
-# Standard pattern - run and capture to temp file
-npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+# Standard pattern - redirect output to temp file (NO console output)
+npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1
 
 # Read summary only (last 50 lines)
 tail -50 /tmp/ut-${UT_SESSION}-output.log
@@ -356,13 +356,13 @@ When unit tests fail:
 3. **Select ONE failing test** - work on only this test
 4. **Run ONLY that test** (never full suite):
    ```bash
-   npm test -- -t "test name" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+   npm test -- -t "test name" > /tmp/ut-${UT_SESSION}-debug.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-debug.log
    ```
 5. **Fix the issue** - analyze error, make targeted fix
 6. **Verify fix** - run same test 3-5 times:
    ```bash
-   for i in {1..5}; do npm test -- -t "test name" 2>&1 | tail -10; done
+   for i in {1..5}; do npm test -- -t "test name" > /tmp/ut-${UT_SESSION}-run$i.log 2>&1 && echo "Run $i: PASS" || echo "Run $i: FAIL"; done
    ```
 7. **Mark as FIXED** in tracking file
 8. **Move to next failing test** - repeat steps 3-7

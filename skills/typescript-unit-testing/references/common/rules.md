@@ -10,8 +10,8 @@
 # Initialize session (once at start of testing session)
 export UT_SESSION=$(date +%s)-$$
 
-# Standard pattern - run and capture to temp file
-npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+# Standard pattern - redirect to temp file only (no console output)
+npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1
 
 # Read summary only (last 50 lines)
 tail -50 /tmp/ut-${UT_SESSION}-output.log
