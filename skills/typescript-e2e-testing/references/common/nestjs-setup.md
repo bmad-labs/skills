@@ -81,17 +81,17 @@ export default config;
 # Initialize session (once at start)
 export E2E_SESSION=$(date +%s)-$$
 
-# Run all E2E tests
-npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+# Run all E2E tests (no console output)
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
-# Run specific test
-npm run test:e2e -- -t "test name" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+# Run specific test (no console output)
+npm run test:e2e -- -t "test name" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Get failure details
 grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
 
-# Debug mode
-npm run test:e2e:debug 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+# Debug mode (requires console for interactive debugging)
+npm run test:e2e:debug
 
 # Cleanup when done
 rm -f /tmp/e2e-${E2E_SESSION}-*.log

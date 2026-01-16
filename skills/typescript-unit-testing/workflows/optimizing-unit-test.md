@@ -35,20 +35,20 @@ Before optimizing, load and review the following reference files:
 
 **Why**: Performance optimization requires multiple test runs. Direct output bloats agent context.
 
-**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID to prevent conflicts.
 
 ```bash
 # Initialize session (once at start of optimization)
 export UT_SESSION=$(date +%s)-$$
 
-# Capture timing data
-time npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-timing.log
+# Capture timing data (no console output)
+{ time npm test > /tmp/ut-${UT_SESSION}-timing.log 2>&1 ; } 2>> /tmp/ut-${UT_SESSION}-timing.log
 
 # Read summary only
 tail -50 /tmp/ut-${UT_SESSION}-timing.log
 
 # Extract timing info
-grep -E "Time:|Duration:|passed|failed" /tmp/ut-${UT_SESSION}-timing.log
+grep -E "Time:|Duration:|passed|failed|real|user|sys" /tmp/ut-${UT_SESSION}-timing.log
 
 # Cleanup when done
 rm -f /tmp/ut-${UT_SESSION}-*.log
@@ -67,9 +67,9 @@ rm -f /tmp/ut-${UT_SESSION}-*.log
 
 **Actions:**
 
-1. Run tests with timing and open handle detection (output to temp file):
+1. Run tests with timing and open handle detection (no console output):
    ```bash
-   npm test -- --verbose --detectOpenHandles --forceExit 2>&1 | tee /tmp/ut-${UT_SESSION}-baseline.log
+   npm test -- --verbose --detectOpenHandles --forceExit > /tmp/ut-${UT_SESSION}-baseline.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-baseline.log
    ```
 
@@ -609,15 +609,15 @@ npm test -- --testPathPattern="unit"
 
 **Actions:**
 
-1. Re-run performance measurement with open handle detection (output to temp file):
+1. Re-run performance measurement with open handle detection (no console output):
    ```bash
-   npm test -- --verbose --detectOpenHandles 2>&1 | tee /tmp/ut-${UT_SESSION}-optimized.log
+   npm test -- --verbose --detectOpenHandles > /tmp/ut-${UT_SESSION}-optimized.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-optimized.log
    ```
 
 2. Verify clean exit (no --forceExit needed):
    ```bash
-   npm test -- --verbose 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   npm test -- --verbose > /tmp/ut-${UT_SESSION}-output.log 2>&1
    tail -30 /tmp/ut-${UT_SESSION}-output.log
    # Should exit cleanly without hanging
    ```

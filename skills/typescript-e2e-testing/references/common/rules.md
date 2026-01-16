@@ -19,8 +19,8 @@
 # Initialize session (once at start)
 export E2E_SESSION=$(date +%s)-$$
 
-# Standard pattern
-npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+# Standard pattern - redirect to temp file only (no console output)
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Get failures
 grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
@@ -152,21 +152,21 @@ app.connectMicroservice(kafkaConfig, { inheritAppConfig: true });
 **Workflow:**
 1. Create `/tmp/e2e-${E2E_SESSION}-failures.md` tracking file with ALL failing tests
 2. Select ONE failing test
-3. Run ONLY that test (never full suite):
+3. Run ONLY that test (never full suite, no console output):
    ```bash
-   npm run test:e2e -- -t "test name" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+   npm run test:e2e -- -t "test name" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
    tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
    ```
 4. Analyze failures: `grep -B 2 -A 15 "FAIL\|Error:" /tmp/e2e-${E2E_SESSION}-debug.log`
 5. Fix and verify with 3-5 runs of SAME test:
    ```bash
-   for i in {1..5}; do npm run test:e2e -- -t "test name" 2>&1 | tail -10; done
+   for i in {1..5}; do npm run test:e2e -- -t "test name" > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1 && echo "Run $i: PASS" || echo "Run $i: FAIL"; done
    ```
 6. Mark as FIXED in tracking file
 7. Move to next failing test - repeat steps 2-6
 8. Run full suite ONLY ONCE after ALL individual tests pass:
    ```bash
-   npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+   npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
    ```
 9. Delete tracking file: `rm /tmp/e2e-${E2E_SESSION}-failures.md`
 

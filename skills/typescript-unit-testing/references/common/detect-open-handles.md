@@ -21,16 +21,16 @@ export UT_SESSION=$(date +%s)-$$
 ### Basic Detection
 
 ```bash
-# Detect open handles (runs tests serially)
-npm test -- --detectOpenHandles 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+# Detect open handles (runs tests serially, no console output)
+npm test -- --detectOpenHandles > /tmp/ut-${UT_SESSION}-handles.log 2>&1
 tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Detect with force exit (for debugging)
-npm test -- --detectOpenHandles --forceExit 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+npm test -- --detectOpenHandles --forceExit > /tmp/ut-${UT_SESSION}-handles.log 2>&1
 tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Single file detection
-npm test -- --detectOpenHandles path/to/file.spec.ts 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+npm test -- --detectOpenHandles path/to/file.spec.ts > /tmp/ut-${UT_SESSION}-handles.log 2>&1
 tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Extract handle details
@@ -310,12 +310,12 @@ export default {
 ### 1. Isolate the Problem
 
 ```bash
-# Run single file (output to temp file)
-npm test -- --detectOpenHandles path/to/suspect.spec.ts 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+# Run single file (no console output)
+npm test -- --detectOpenHandles path/to/suspect.spec.ts > /tmp/ut-${UT_SESSION}-handles.log 2>&1
 tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
-# Run single test (output to temp file)
-npm test -- --detectOpenHandles -t "test name" 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+# Run single test (no console output)
+npm test -- --detectOpenHandles -t "test name" > /tmp/ut-${UT_SESSION}-handles.log 2>&1
 tail -100 /tmp/ut-${UT_SESSION}-handles.log
 ```
 

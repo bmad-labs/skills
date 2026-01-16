@@ -21,21 +21,21 @@ Improve E2E test suite performance, reliability, and maintainability without sac
 
 **Why**: Performance optimization requires multiple test runs. Direct output bloats agent context.
 
-**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID to prevent conflicts.
 
 **Standard Pattern**:
 ```bash
 # Initialize session (once at start of optimization)
 export E2E_SESSION=$(date +%s)-$$
 
-# Capture timing data
-time npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-timing.log
+# Capture timing data (no console output)
+{ time npm run test:e2e > /tmp/e2e-${E2E_SESSION}-timing.log 2>&1 ; } 2>> /tmp/e2e-${E2E_SESSION}-timing.log
 
 # Read summary only
 tail -50 /tmp/e2e-${E2E_SESSION}-timing.log
 
 # Extract timing info
-grep -E "Time:|Duration:|passed|failed" /tmp/e2e-${E2E_SESSION}-timing.log
+grep -E "Time:|Duration:|passed|failed|real|user|sys" /tmp/e2e-${E2E_SESSION}-timing.log
 
 # Cleanup when done
 rm -f /tmp/e2e-${E2E_SESSION}-*.log
@@ -70,28 +70,28 @@ rm -f /tmp/e2e-${E2E_SESSION}-*.log
 
 **Goal**: Measure current test suite performance.
 
-**Actions** (all output to temp files):
+**Actions** (all redirect to temp files only, no console):
 
 1. **Run Full Suite with Timing**:
 ```bash
-time npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-baseline.log
+{ time npm run test:e2e > /tmp/e2e-${E2E_SESSION}-baseline.log 2>&1 ; } 2>> /tmp/e2e-${E2E_SESSION}-baseline.log
 tail -50 /tmp/e2e-${E2E_SESSION}-baseline.log
 ```
 
 2. **Capture Metrics**:
 ```bash
 # Extract timing summary
-grep -E "Time:|Tests:|passed|failed|Duration" /tmp/e2e-${E2E_SESSION}-baseline.log
+grep -E "Time:|Tests:|passed|failed|Duration|real|user|sys" /tmp/e2e-${E2E_SESSION}-baseline.log
 ```
 
 3. **Identify Bottlenecks**:
 ```bash
-# Run with verbose timing (capture to temp file)
-npm run test:e2e -- --verbose 2>&1 | tee /tmp/e2e-${E2E_SESSION}-baseline.log
+# Run with verbose timing (no console output)
+npm run test:e2e -- --verbose > /tmp/e2e-${E2E_SESSION}-baseline.log 2>&1
 tail -100 /tmp/e2e-${E2E_SESSION}-baseline.log
 
 # Profile specific file
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts --verbose 2>&1 | tee /tmp/e2e-${E2E_SESSION}-timing.log
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts --verbose > /tmp/e2e-${E2E_SESSION}-timing.log 2>&1
 tail -50 /tmp/e2e-${E2E_SESSION}-timing.log
 ```
 
@@ -492,39 +492,36 @@ Recommended Refactoring:
 
 **Goal**: Ensure optimizations don't break tests.
 
-**Verification Process** (all output to temp files):
+**Verification Process** (all redirect to temp files only, no console):
 
 1. **Run Full Suite**:
 ```bash
-npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-optimized.log
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-optimized.log 2>&1
 tail -50 /tmp/e2e-${E2E_SESSION}-optimized.log
 ```
 
 2. **Compare Performance**:
 ```bash
 # Extract timing from both logs
-echo "=== BASELINE ===" && grep -E "Time:|Duration:" /tmp/e2e-${E2E_SESSION}-baseline.log
-echo "=== OPTIMIZED ===" && grep -E "Time:|Duration:" /tmp/e2e-${E2E_SESSION}-optimized.log
+echo "=== BASELINE ===" && grep -E "Time:|Duration:|real|user|sys" /tmp/e2e-${E2E_SESSION}-baseline.log
+echo "=== OPTIMIZED ===" && grep -E "Time:|Duration:|real|user|sys" /tmp/e2e-${E2E_SESSION}-optimized.log
 ```
 
 3. **Run Multiple Times for Stability**:
 ```bash
-rm -f /tmp/e2e-${E2E_SESSION}-stability.log
 for i in {1..3}; do
-  echo "=== Run $i ===" >> /tmp/e2e-${E2E_SESSION}-stability.log
-  { time npm run test:e2e 2>&1 | tail -20; } >> /tmp/e2e-${E2E_SESSION}-stability.log 2>&1
+  npm run test:e2e > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1
+  if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
-cat /tmp/e2e-${E2E_SESSION}-stability.log
 ```
 
 4. **Check for Flakiness**:
 ```bash
 # Run 10 times to detect intermittent failures
-rm -f /tmp/e2e-${E2E_SESSION}-flaky.log
 for i in {1..10}; do
-  npm run test:e2e 2>&1 | tail -5 >> /tmp/e2e-${E2E_SESSION}-flaky.log || echo "FAILED on run $i" >> /tmp/e2e-${E2E_SESSION}-flaky.log
+  npm run test:e2e > /tmp/e2e-${E2E_SESSION}-flaky$i.log 2>&1
+  if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
-grep -E "passed|failed|FAILED" /tmp/e2e-${E2E_SESSION}-flaky.log
 ```
 
 **Present to User**:

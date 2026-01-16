@@ -42,14 +42,14 @@ Before debugging, load and review the following reference files:
 
 **Why**: Test output can be verbose. Direct terminal output bloats agent context.
 
-**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID to prevent conflicts.
 
 ```bash
 # Initialize session (once at start of debugging)
 export UT_SESSION=$(date +%s)-$$
 
-# Run test and capture output
-npm test -- -t "{test name}" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+# Run test and capture output (no console output)
+npm test -- -t "{test name}" > /tmp/ut-${UT_SESSION}-debug.log 2>&1
 
 # Read only summary
 tail -50 /tmp/ut-${UT_SESSION}-debug.log
@@ -75,9 +75,9 @@ rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
 
 **Actions:**
 
-1. Run the failing test in isolation (output to temp file):
+1. Run the failing test in isolation (output to temp file only, no console):
    ```bash
-   npm test -- -t "[exact test name]" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+   npm test -- -t "[exact test name]" > /tmp/ut-${UT_SESSION}-debug.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-debug.log
    ```
 
@@ -265,25 +265,24 @@ rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
 
 **Actions:**
 
-1. Run the fixed test multiple times (output to temp file):
+1. Run the fixed test multiple times (output to temp file only, no console):
    ```bash
    rm -f /tmp/ut-${UT_SESSION}-verify.log
    for i in {1..5}; do
-     echo "=== Run $i ===" >> /tmp/ut-${UT_SESSION}-verify.log
-     npm test -- -t "[test name]" 2>&1 | tail -15 >> /tmp/ut-${UT_SESSION}-verify.log
+     npm test -- -t "[test name]" > /tmp/ut-${UT_SESSION}-run$i.log 2>&1
+     if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
    done
-   cat /tmp/ut-${UT_SESSION}-verify.log
    ```
 
 2. Run related tests to check for regressions:
    ```bash
-   npm test -- [path/to/file.spec.ts] 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   npm test -- [path/to/file.spec.ts] > /tmp/ut-${UT_SESSION}-output.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-output.log
    ```
 
 3. Run full test suite ONLY ONCE after ALL individual tests pass:
    ```bash
-   npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1
    tail -50 /tmp/ut-${UT_SESSION}-output.log
    ```
 
@@ -365,8 +364,8 @@ console.log('Returns:', mockService.method.mock.results);
 ### Step Through with Debugger
 
 ```bash
-# Run Jest with debugger (output to temp file)
-node --inspect-brk node_modules/.bin/jest --runInBand -t "[test name]" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+# Run Jest with debugger (this requires console for interactive debugging)
+node --inspect-brk node_modules/.bin/jest --runInBand -t "[test name]"
 ```
 
 Then attach VS Code debugger or Chrome DevTools.
