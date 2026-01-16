@@ -27,6 +27,37 @@ Before optimizing, load and review the following reference files:
 - Document performance improvements
 - Don't sacrifice test quality for speed
 - **CRITICAL**: Ensure no open handles remain after tests complete
+- **ALWAYS output test results to temp files** - Avoids context bloat
+
+---
+
+## Context Efficiency: Temp File Output
+
+**Why**: Performance optimization requires multiple test runs. Direct output bloats agent context.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+```bash
+# Initialize session (once at start of optimization)
+export UT_SESSION=$(date +%s)-$$
+
+# Capture timing data
+time npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-timing.log
+
+# Read summary only
+tail -50 /tmp/ut-${UT_SESSION}-timing.log
+
+# Extract timing info
+grep -E "Time:|Duration:|passed|failed" /tmp/ut-${UT_SESSION}-timing.log
+
+# Cleanup when done
+rm -f /tmp/ut-${UT_SESSION}-*.log
+```
+
+**Temp File Locations** (with `${UT_SESSION}` unique per agent):
+- `/tmp/ut-${UT_SESSION}-baseline.log` - Baseline run
+- `/tmp/ut-${UT_SESSION}-optimized.log` - Optimized run
+- `/tmp/ut-${UT_SESSION}-timing.log` - Timing data
 
 ---
 
@@ -36,19 +67,20 @@ Before optimizing, load and review the following reference files:
 
 **Actions:**
 
-1. Run tests with timing and open handle detection:
+1. Run tests with timing and open handle detection (output to temp file):
    ```bash
-   npm test -- --verbose --detectOpenHandles --forceExit
+   npm test -- --verbose --detectOpenHandles --forceExit 2>&1 | tee /tmp/ut-${UT_SESSION}-baseline.log
+   tail -50 /tmp/ut-${UT_SESSION}-baseline.log
    ```
 
 2. Check for open handles specifically:
    ```bash
-   npm test -- --detectOpenHandles 2>&1 | grep -A 20 "open handle"
+   grep -A 20 "open handle" /tmp/ut-${UT_SESSION}-baseline.log
    ```
 
 3. Identify slow tests (use Jest's built-in timing):
    ```bash
-   npm test -- --verbose 2>&1 | grep -E "^\s*\d+.*ms$"
+   grep -E "^\s*\d+.*ms$" /tmp/ut-${UT_SESSION}-baseline.log
    ```
 
 4. Document baseline metrics:
@@ -577,18 +609,26 @@ npm test -- --testPathPattern="unit"
 
 **Actions:**
 
-1. Re-run performance measurement with open handle detection:
+1. Re-run performance measurement with open handle detection (output to temp file):
    ```bash
-   npm test -- --verbose --detectOpenHandles
+   npm test -- --verbose --detectOpenHandles 2>&1 | tee /tmp/ut-${UT_SESSION}-optimized.log
+   tail -50 /tmp/ut-${UT_SESSION}-optimized.log
    ```
 
 2. Verify clean exit (no --forceExit needed):
    ```bash
-   npm test -- --verbose
+   npm test -- --verbose 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   tail -30 /tmp/ut-${UT_SESSION}-output.log
    # Should exit cleanly without hanging
    ```
 
 3. Compare with baseline:
+   ```bash
+   echo "=== BASELINE ===" && grep -E "Time:|passed|failed" /tmp/ut-${UT_SESSION}-baseline.log
+   echo "=== OPTIMIZED ===" && grep -E "Time:|passed|failed" /tmp/ut-${UT_SESSION}-optimized.log
+   ```
+
+4. Document comparison:
    ```
    **Performance Improvement:**
 

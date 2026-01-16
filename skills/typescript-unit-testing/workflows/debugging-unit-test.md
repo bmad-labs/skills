@@ -22,8 +22,50 @@ Before debugging, load and review the following reference files:
 - Diagnose before fixing
 - Isolate the problem systematically
 - Fix root cause, not symptoms
+- **ALWAYS fix ONE test at a time** - Run only `-t "test name"`, never full suite
+- **NEVER run full suite while debugging** - Only after ALL individual tests pass
 - Verify fix doesn't break other tests
-- Document the issue and resolution
+- **ALWAYS output test results to temp files** - Avoids context bloat
+
+### Critical: One-by-One Fixing Rule
+
+```
+❌ WRONG: Run full suite → See 5 failures → Run full suite again → Still 5 failures → ...
+✅ RIGHT: Run full suite → See 5 failures → Fix test 1 only → Verify → Fix test 2 only → ... → Run full suite ONCE
+```
+
+**WHY**: Full suite runs waste time and pollute output. Each failing test adds noise, making debugging harder.
+
+---
+
+## Context Efficiency: Temp File Output
+
+**Why**: Test output can be verbose. Direct terminal output bloats agent context.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+```bash
+# Initialize session (once at start of debugging)
+export UT_SESSION=$(date +%s)-$$
+
+# Run test and capture output
+npm test -- -t "{test name}" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+
+# Read only summary
+tail -50 /tmp/ut-${UT_SESSION}-debug.log
+
+# Get failure details
+grep -B 5 -A 20 "FAIL\|Error:" /tmp/ut-${UT_SESSION}-debug.log
+
+# Cleanup when done
+rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
+```
+
+**Temp File Locations** (with `${UT_SESSION}` unique per agent):
+- `/tmp/ut-${UT_SESSION}-debug.log` - Debug runs
+- `/tmp/ut-${UT_SESSION}-output.log` - General test output
+- `/tmp/ut-${UT_SESSION}-verify.log` - Verification runs
+- `/tmp/ut-${UT_SESSION}-failures.md` - Tracking file
 
 ---
 
@@ -33,25 +75,29 @@ Before debugging, load and review the following reference files:
 
 **Actions:**
 
-1. Run the failing test in isolation:
+1. Run the failing test in isolation (output to temp file):
    ```bash
-   npm test -- -t "[exact test name]"
+   npm test -- -t "[exact test name]" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+   tail -50 /tmp/ut-${UT_SESSION}-debug.log
    ```
 
-2. Capture the complete error output:
-   - Error message
-   - Expected vs received values
-   - Stack trace
-   - Line numbers
-
-3. Document the failure:
+2. Extract error details:
+   ```bash
+   grep -B 5 -A 20 "FAIL\|Error:" /tmp/ut-${UT_SESSION}-debug.log
    ```
-   **Failure Information:**
-   - Test: [test name]
+
+3. Document the failure in tracking file:
+   ```bash
+   cat > /tmp/ut-${UT_SESSION}-failures.md << 'EOF'
+   # Unit Test Failures
+
+   ## Test 1: "[test name]"
    - File: [path/to/file.spec.ts:line]
    - Error: [error type]
    - Expected: [expected value]
    - Received: [received value]
+   - Status: IN_PROGRESS
+   EOF
    ```
 
 **Checkpoint:** Failure consistently reproduced.
@@ -219,27 +265,34 @@ Before debugging, load and review the following reference files:
 
 **Actions:**
 
-1. Run the fixed test:
+1. Run the fixed test multiple times (output to temp file):
    ```bash
-   npm test -- -t "[test name]"
+   rm -f /tmp/ut-${UT_SESSION}-verify.log
+   for i in {1..5}; do
+     echo "=== Run $i ===" >> /tmp/ut-${UT_SESSION}-verify.log
+     npm test -- -t "[test name]" 2>&1 | tail -15 >> /tmp/ut-${UT_SESSION}-verify.log
+   done
+   cat /tmp/ut-${UT_SESSION}-verify.log
    ```
 
 2. Run related tests to check for regressions:
    ```bash
-   npm test -- [path/to/file.spec.ts]
+   npm test -- [path/to/file.spec.ts] 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   tail -50 /tmp/ut-${UT_SESSION}-output.log
    ```
 
-3. Run full test suite if change could have wider impact:
+3. Run full test suite ONLY ONCE after ALL individual tests pass:
    ```bash
-   npm test
+   npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   tail -50 /tmp/ut-${UT_SESSION}-output.log
    ```
 
-4. Verify results:
-   ```
-   **Verification Results:**
-   - Fixed test: [PASS/FAIL]
-   - Related tests: [X] passed, [Y] failed
-   - Full suite: [X] passed, [Y] failed
+4. Update tracking file:
+   ```markdown
+   ## Test 1: "[test name]"
+   - Status: FIXED ✅
+   - Root Cause: [description]
+   - Fix: [what was changed]
    ```
 
 **Checkpoint:** Fix verified, no regressions.
@@ -312,8 +365,8 @@ console.log('Returns:', mockService.method.mock.results);
 ### Step Through with Debugger
 
 ```bash
-# Run Jest with debugger
-node --inspect-brk node_modules/.bin/jest --runInBand -t "[test name]"
+# Run Jest with debugger (output to temp file)
+node --inspect-brk node_modules/.bin/jest --runInBand -t "[test name]" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
 ```
 
 Then attach VS Code debugger or Chrome DevTools.
