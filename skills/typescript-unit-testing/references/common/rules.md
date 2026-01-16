@@ -11,6 +11,20 @@
 | Coverage | 80%+ for new code |
 | Logger | `.setLogger(new MockLoggerService())` |
 
+## What NOT to Unit Test
+
+Do NOT create unit tests for:
+
+| Type | Reason |
+|------|--------|
+| **Interfaces** | Type definitions only, no runtime behavior |
+| **Enums** | Static value mappings, no logic to test |
+| **Constants** | Static values, no behavior |
+| **Type aliases** | Type definitions only |
+| **DTOs** (plain) | Data structures without logic |
+
+Only test files containing **executable logic** (classes with methods, functions with behavior).
+
 ## AAA Pattern (Mandatory)
 
 ALL unit tests MUST follow Arrange-Act-Assert:

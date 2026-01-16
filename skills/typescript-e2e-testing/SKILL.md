@@ -1,19 +1,26 @@
 ---
 name: typescript-e2e-testing
 description: |
-  Comprehensive E2E testing skill for TypeScript/NestJS projects. Provides setup, writing, running, and debugging capabilities for end-to-end tests with real infrastructure.
+  E2E (end-to-end) and integration testing skill for TypeScript/NestJS projects using Jest, real infrastructure via Docker, and GWT pattern.
 
-  Use this skill when:
-  - Setting up E2E test structure with Jest for a TypeScript/NestJS project
-  - Writing E2E test cases following GWT (Given-When-Then) pattern
-  - Configuring infrastructure (Kafka, PostgreSQL, MongoDB, Redis) via docker-compose
-  - Running and debugging E2E tests
-  - Troubleshooting flaky or failing E2E tests
-  - Testing REST APIs, GraphQL, gRPC endpoints
-  - Mocking external APIs with MSW or nock
-  - Optimizing E2E test performance
+  ALWAYS use this skill when:
+  - User asks to write, create, add, or generate e2e tests or integration tests
+  - User asks to test API endpoints, workflows, or complete features end-to-end
+  - User mentions "e2e test", "e2e-spec", ".e2e-spec.ts", "integration test", or "end-to-end"
+  - User is working on any file ending in .e2e-spec.ts or located in test/e2e/ directory
+  - User asks to set up Docker infrastructure for testing (Kafka, PostgreSQL, MongoDB, Redis)
+  - User asks to test with real databases, message brokers, or external services
+  - User asks about GWT (Given-When-Then) pattern for tests
+  - User asks to debug flaky tests or test isolation issues
+  - User asks to configure docker-compose for testing
+  - User mentions supertest, MSW, nock, or testing HTTP endpoints
+  - User asks to test Kafka consumers/producers, event-driven workflows
+  - User mentions testing with Redpanda, PostgreSQL containers, MongoDB containers
+  - User asks about test timeouts, waitForMessages, or polling strategies
 
-  Keywords: e2e, end-to-end, integration test, Jest, supertest, NestJS, Kafka, PostgreSQL, MongoDB, Redis, docker-compose, GWT pattern
+  Covers: NestJS E2E setup, Jest e2e configuration, docker-compose.e2e.yml, GWT pattern, supertest, Kafka testing with real brokers, PostgreSQL/MongoDB/Redis integration, MSW/nock mocking, test isolation, flaky test debugging
+
+  Keywords: e2e, end-to-end, integration test, e2e-spec.ts, test/e2e, Jest, supertest, NestJS, Kafka, Redpanda, PostgreSQL, MongoDB, Redis, docker-compose, GWT pattern, Given-When-Then, real infrastructure, test isolation, flaky test, MSW, nock, waitForMessages
 ---
 
 # E2E Testing Skill
