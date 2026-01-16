@@ -10,9 +10,52 @@ Systematically debug failing E2E tests by identifying root causes and applying t
 
 - **ALWAYS load debugging reference before starting**
 - **ALWAYS create tracking file for multiple failures**
-- **ALWAYS fix ONE test at a time**
+- **ALWAYS fix ONE test at a time** - Run only `-t "test name"`, never full suite
+- **NEVER run full suite while debugging** - Only after ALL individual tests pass
 - **NEVER change multiple things simultaneously**
 - **ALWAYS verify fix with multiple runs before moving on**
+- **ALWAYS output test results to temp files** - Avoids context bloat from verbose output
+
+### Critical: One-by-One Fixing Rule
+
+```
+❌ WRONG: Run full suite → See 5 failures → Run full suite again → Still 5 failures → ...
+✅ RIGHT: Run full suite → See 5 failures → Fix test 1 only → Verify → Fix test 2 only → ... → Run full suite ONCE
+```
+
+**WHY**: Full suite runs waste time and pollute output. Each failing test adds noise, making debugging harder.
+
+---
+
+## Context Efficiency: Temp File Output
+
+**Why**: E2E test output can be extremely verbose. Direct terminal output bloats agent context.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+**Standard Pattern**:
+```bash
+# Initialize session (once at start of debugging)
+export E2E_SESSION=$(date +%s)-$$
+
+# Run test and capture output
+npm run test:e2e -- -t "{test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+
+# Read only summary
+tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
+
+# Get failure details
+grep -B 5 -A 20 "FAIL\|Error:" /tmp/e2e-${E2E_SESSION}-debug.log
+
+# Cleanup when done
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
+```
+
+**Temp File Locations** (with `${E2E_SESSION}` unique per agent):
+- Debug output: `/tmp/e2e-${E2E_SESSION}-debug.log`
+- Isolation runs: `/tmp/e2e-${E2E_SESSION}-isolation.log`
+- Verification runs: `/tmp/e2e-${E2E_SESSION}-verify.log`
+- Failures tracking: `/tmp/e2e-${E2E_SESSION}-failures.md`
 
 ---
 
@@ -41,7 +84,7 @@ Systematically debug failing E2E tests by identifying root causes and applying t
 
 1. **Create or Update Tracking File**:
 ```markdown
-<!-- _e2e-failures.md -->
+<!-- /tmp/e2e-${E2E_SESSION}-failures.md -->
 # E2E Test Failures - {date}
 
 ## Test 1: "{test name}"
@@ -142,28 +185,33 @@ Debugging approach for this type:
 
 **Goal**: Reproduce the failure in isolation.
 
-**Isolation Steps**:
+**Isolation Steps** (all output to temp files):
 
 1. **Run Test Alone**:
 ```bash
-npm run test:e2e -- -t "{exact test name}"
+npm run test:e2e -- -t "{exact test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-isolation.log
+tail -30 /tmp/e2e-${E2E_SESSION}-isolation.log
 ```
 
 2. **Run Multiple Times**:
 ```bash
+rm -f /tmp/e2e-${E2E_SESSION}-isolation.log
 for i in {1..5}; do
-  echo "Run $i:"
-  npm run test:e2e -- -t "{test name}"
+  echo "=== Run $i ===" >> /tmp/e2e-${E2E_SESSION}-isolation.log
+  npm run test:e2e -- -t "{test name}" 2>&1 | tail -15 >> /tmp/e2e-${E2E_SESSION}-isolation.log
 done
+cat /tmp/e2e-${E2E_SESSION}-isolation.log
 ```
 
 3. **Run in Different Contexts**:
 ```bash
 # Just this file
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts 2>&1 | tee /tmp/e2e-${E2E_SESSION}-isolation.log
+tail -50 /tmp/e2e-${E2E_SESSION}-isolation.log
 
 # With the test before it
-npm run test:e2e -- -t "{prev test name}" -t "{failing test name}"
+npm run test:e2e -- -t "{prev test name}" -t "{failing test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-isolation.log
+tail -30 /tmp/e2e-${E2E_SESSION}-isolation.log
 ```
 
 **Present to User**:
@@ -197,12 +245,13 @@ Likely Cause: {hypothesis}
 # Check infrastructure
 docker-compose -f docker-compose.e2e.yml ps
 
-# Check specific service logs
-docker logs postgres-e2e --tail 100
-docker logs kafka-e2e --tail 100
+# Check specific service logs (limited output)
+docker logs postgres-e2e --tail 50
+docker logs kafka-e2e --tail 50
 
-# Run with extended timeout
-npm run test:e2e -- -t "{test}" --testTimeout=60000
+# Run with extended timeout (output to temp file)
+npm run test:e2e -- -t "{test}" --testTimeout=60000 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 **Common Causes**:
@@ -403,25 +452,29 @@ Rationale: {why this fixes the issue}
 
 **Goal**: Confirm the fix works reliably.
 
-**Verification Process**:
+**Verification Process** (all output to temp files):
 
 1. **Run Fixed Test Multiple Times**:
 ```bash
+rm -f /tmp/e2e-${E2E_SESSION}-verify.log
 for i in {1..5}; do
-  echo "=== Run $i ==="
-  npm run test:e2e -- -t "{test name}"
+  echo "=== Run $i ===" >> /tmp/e2e-${E2E_SESSION}-verify.log
+  npm run test:e2e -- -t "{test name}" 2>&1 | tail -15 >> /tmp/e2e-${E2E_SESSION}-verify.log
 done
+cat /tmp/e2e-${E2E_SESSION}-verify.log
 ```
 
 2. **Run With Related Tests**:
 ```bash
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts 2>&1 | tee /tmp/e2e-${E2E_SESSION}-verify.log
+tail -50 /tmp/e2e-${E2E_SESSION}-verify.log
 ```
 
 3. **Check for Regressions**:
 ```bash
 # Run full suite (only if all were passing before)
-npm run test:e2e
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 **Present to User**:
@@ -469,7 +522,7 @@ Fix incomplete. Additional issues:
 
 3. **Delete Tracking File** when all fixed:
 ```bash
-rm _e2e-failures.md
+rm /tmp/e2e-${E2E_SESSION}-failures.md
 ```
 
 **Present to User**:
@@ -515,28 +568,30 @@ npm run test:e2e
 }
 ```
 
-### Command Line Debugging
+### Command Line Debugging (all output to temp files)
 ```bash
-# Node inspector
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "{test}"
+# Node inspector (output to temp file)
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "{test}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
 
-# Verbose output
-npm run test:e2e -- -t "{test}" --verbose
+# Verbose output (capture then read summary)
+npm run test:e2e -- -t "{test}" --verbose 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+tail -100 /tmp/e2e-${E2E_SESSION}-debug.log
 
-# With logging
-DEBUG=* npm run test:e2e -- -t "{test}"
+# With logging (output to temp file)
+DEBUG=* npm run test:e2e -- -t "{test}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+tail -100 /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 ### Log Analysis
 ```bash
-# Real-time log watching
-tail -f logs/e2e-test.log
+# View application logs (limited)
+tail -100 logs/e2e-test.log
 
-# Search for errors
-grep -i "error\|fail\|exception" logs/e2e-test.log
+# Search for errors in test output
+grep -i "error\|fail\|exception" /tmp/e2e-${E2E_SESSION}-debug.log
 
 # Context around error
-grep -B5 -A10 "FAIL" logs/e2e-test.log
+grep -B5 -A10 "FAIL" /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 ---

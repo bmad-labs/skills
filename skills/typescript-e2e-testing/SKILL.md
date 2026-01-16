@@ -184,7 +184,7 @@ references/
 ### Debug Failing Tests
 **Workflow**: [Debugging E2E Test](workflows/debugging-e2e-test.md)
 1. Read `references/common/debugging.md`
-2. Create `_e2e-failures.md` tracking file
+2. Create `/tmp/e2e-failures.md` tracking file
 3. Fix ONE test at a time
 
 ### Optimize Test Performance
@@ -200,6 +200,35 @@ references/
 ---
 
 ## Core Principles
+
+### 0. Context Efficiency (Temp File Output)
+**ALWAYS redirect E2E test output to temp files**. E2E output is verbose and bloats agent context.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+```bash
+# Generate unique session ID at start of debugging session
+export E2E_SESSION=$(date +%s)-$$
+
+# Standard pattern - run and capture to temp file
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+
+# Read summary only (last 50 lines)
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# Get failure details
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
+
+# Cleanup when done
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
+```
+
+**Temp Files** (with `${E2E_SESSION}` unique per agent):
+- `/tmp/e2e-${E2E_SESSION}-output.log` - Full test output
+- `/tmp/e2e-${E2E_SESSION}-failures.log` - Filtered failure output
+- `/tmp/e2e-${E2E_SESSION}-failures.md` - Tracking file for one-by-one fixing
+- `/tmp/e2e-${E2E_SESSION}-debug.log` - Debug runs
+- `/tmp/e2e-${E2E_SESSION}-verify.log` - Verification runs
 
 ### 1. Real Infrastructure
 Test against actual services via Docker. Never mock databases or message brokers for E2E tests.
@@ -298,16 +327,32 @@ const config: Config = {
 
 ## Failure Resolution Protocol
 
+**CRITICAL: Fix ONE test at a time. NEVER run full suite repeatedly while fixing.**
+
 When E2E tests fail:
 
-1. **Create tracking file**: `_e2e-failures.md`
-2. **Fix ONE test at a time**
-3. **Run individual test**: `npm run test:e2e -- -t "test name"`
-4. **Verify fix**: Run same test 3-5 times
-5. **Update tracking file**: Mark as FIXED
-6. **Repeat** for next failing test
-7. **Run full suite** only after all individual tests pass
-8. **Delete tracking file**
+1. **Initialize session** (once at start):
+   ```bash
+   export E2E_SESSION=$(date +%s)-$$
+   ```
+2. **Create tracking file**: `/tmp/e2e-${E2E_SESSION}-failures.md` with all failing tests
+3. **Select ONE failing test** - work on only this test
+4. **Run ONLY that test** (never full suite):
+   ```bash
+   npm run test:e2e -- -t "test name" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+   tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
+   ```
+5. **Fix the issue** - analyze error, make targeted fix
+6. **Verify fix** - run same test 3-5 times:
+   ```bash
+   for i in {1..5}; do npm run test:e2e -- -t "test name" 2>&1 | tail -10; done
+   ```
+7. **Mark as FIXED** in tracking file
+8. **Move to next failing test** - repeat steps 3-7
+9. **Run full suite ONLY ONCE** after ALL individual tests pass
+10. **Cleanup**: `rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md`
+
+**WHY**: Running full suite wastes time and context. Each failing test pollutes output, making debugging harder.
 
 ---
 
@@ -359,19 +404,33 @@ expect(messages[0].value).toMatchObject({ id: event.id });
 
 ## Debugging Commands
 
+**All commands output to temp files with unique session ID.**
+
 ```bash
-# Run specific test
-npm run test:e2e -- -t "should create user"
+# Initialize session (once at start)
+export E2E_SESSION=$(date +%s)-$$
+
+# Run specific test (output to temp file)
+npm run test:e2e -- -t "should create user" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run specific file
-npm run test:e2e -- test/e2e/user.e2e-spec.ts
+npm run test:e2e -- test/e2e/user.e2e-spec.ts 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# Run full suite
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# Get failure details from last run
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
 
 # Debug with breakpoints
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
 
-# View logs
-tail -f logs/e2e-test.log
-grep -i error logs/e2e-test.log
+# View application logs (limited)
+tail -100 logs/e2e-test.log
+grep -i error logs/e2e-test.log | tail -50
+
+# Cleanup session files
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ```
 
 ---
