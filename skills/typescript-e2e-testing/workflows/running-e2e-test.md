@@ -11,7 +11,50 @@ Execute E2E tests reliably with proper infrastructure setup, environment configu
 - **ALWAYS verify infrastructure is running before tests**
 - **ALWAYS run tests sequentially (maxWorkers: 1)**
 - **NEVER run full suite when individual tests are failing**
+- **NEVER run full suite repeatedly while debugging** - Fix one test at a time
 - **ALWAYS review logs when tests fail**
+- **ALWAYS output test results to temp files** - Avoids context bloat from verbose output
+
+### Critical: One-by-One Fixing Rule
+
+**When tests fail, NEVER keep running the full suite.** Instead:
+1. Note all failing tests in `/tmp/e2e-${E2E_SESSION}-failures.md`
+2. Fix ONE test at a time using `-t "test name"`
+3. Verify each fix with 3-5 runs of that specific test
+4. Only run full suite ONCE after ALL individual tests pass
+
+---
+
+## Context Efficiency: Temp File Output
+
+**Why**: E2E test output can be extremely verbose (thousands of lines). Direct terminal output bloats agent context and reduces efficiency.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+```bash
+# Initialize session (once at start of E2E work)
+export E2E_SESSION=$(date +%s)-$$
+
+# Standard pattern for all test runs
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+
+# Then read only what's needed:
+# - Last 50 lines for summary
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# - Search for failures
+grep -A 10 "FAIL\|Error\|✕" /tmp/e2e-${E2E_SESSION}-output.log
+
+# Cleanup when done
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
+```
+
+**Temp File Locations** (with `${E2E_SESSION}` unique per agent):
+- Full output: `/tmp/e2e-${E2E_SESSION}-output.log`
+- Filtered failures: `/tmp/e2e-${E2E_SESSION}-failures.log`
+- Tracking file: `/tmp/e2e-${E2E_SESSION}-failures.md`
+- Debug runs: `/tmp/e2e-${E2E_SESSION}-debug.log`
+- Verification: `/tmp/e2e-${E2E_SESSION}-verify.log`
 
 ---
 
@@ -140,27 +183,38 @@ Select option:
 
 **Goal**: Run tests with appropriate configuration.
 
-**Execution Commands**:
+**Execution Commands** (all output to temp file):
 
 ```bash
-# Standard run
-npm run test:e2e {scope}
+# Standard run - output to temp file
+npm run test:e2e {scope} 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
 
 # Verbose output
-npm run test:e2e {scope} -- --verbose
+npm run test:e2e {scope} -- --verbose 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
 
 # With coverage
-npm run test:e2e {scope} -- --coverage
+npm run test:e2e {scope} -- --coverage 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
 
 # Force sequential (if not in config)
-npm run test:e2e {scope} -- --runInBand
+npm run test:e2e {scope} -- --runInBand 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
 
 # With specific timeout
-npm run test:e2e {scope} -- --testTimeout=60000
+npm run test:e2e {scope} -- --testTimeout=60000 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
-**During Execution, Monitor**:
-- Test output in terminal
+**After Execution, Read Results**:
+```bash
+# Get summary (last 50 lines)
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# If failures exist, get failure details
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log > /tmp/e2e-${E2E_SESSION}-failures.log && cat /tmp/e2e-${E2E_SESSION}-failures.log
+
+# Count passed/failed
+grep -c "✓\|✕" /tmp/e2e-${E2E_SESSION}-output.log
+```
+
+**During Execution, Monitor** (in separate terminal if needed):
 - Docker container logs (for issues)
 - Application logs
 
@@ -170,10 +224,11 @@ npm run test:e2e {scope} -- --testTimeout=60000
 
 Command: {command}
 Scope: {scope description}
+Output: /tmp/e2e-${E2E_SESSION}-output.log
 
-Starting test execution...
+Test execution complete. Reading results...
 
-{real-time output}
+{summary from tail -50}
 ```
 
 ---
@@ -211,12 +266,17 @@ Passed: {x}
 Failed: {y}
 Duration: {time}
 
-Next Steps:
-1. Load references/common/debugging.md
-2. Create _e2e-failures.md tracking file
-3. Fix ONE test at a time
+⚠️ STOP: Do NOT run full suite again!
 
-[I] Investigate first failure / [T] Create tracking file / [L] View logs
+Next Steps:
+1. Create /tmp/e2e-${E2E_SESSION}-failures.md with ALL failing tests listed
+2. Select FIRST failing test
+3. Run ONLY that test: npm run test:e2e -- -t "{test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+4. Fix and verify with 3-5 runs
+5. Move to next test
+6. Run full suite ONLY ONCE after all individual tests pass
+
+[I] Investigate first failure / [T] Create tracking file
 ```
 
 3. **Infrastructure Error**:
@@ -241,7 +301,9 @@ Fix Steps:
 
 ### Step 5: Handle Failures (If Any)
 
-**Goal**: Systematically address test failures.
+**Goal**: Systematically address test failures ONE AT A TIME.
+
+**CRITICAL**: Do NOT run full suite again. Fix each test individually.
 
 **Reference**: Load `references/common/debugging.md` for detailed debugging steps.
 
@@ -249,7 +311,7 @@ Fix Steps:
 
 1. **Create Tracking File**:
 ```markdown
-<!-- _e2e-failures.md -->
+<!-- /tmp/e2e-${E2E_SESSION}-failures.md -->
 # E2E Test Failures - {date}
 
 ## Test: "{test name}"
@@ -264,28 +326,31 @@ Fix Steps:
 {description}
 ```
 
-2. **Isolate Failing Test**:
+2. **Isolate Failing Test** (output to temp file):
 ```bash
 # Run only the failing test
-npm run test:e2e -- -t "{exact test name}"
+npm run test:e2e -- -t "{exact test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+
+# Read the result
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 3. **Analyze Logs**:
 ```bash
-# View application logs
-tail -f logs/e2e-test.log
+# Search for errors in test output
+grep -i "error\|fail\|exception" /tmp/e2e-${E2E_SESSION}-output.log
 
-# Search for errors
-grep -i "error" logs/e2e-test.log
+# View application logs (last 100 lines)
+tail -100 logs/e2e-test.log
 
-# View Docker logs
-docker-compose -f docker-compose.e2e.yml logs -f
+# View Docker logs (last 50 lines per service)
+docker-compose -f docker-compose.e2e.yml logs --tail=50
 ```
 
 4. **Debug if Needed**:
 ```bash
-# With Node inspector
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "{test name}"
+# With Node inspector (output to temp file)
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "{test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 **Present to User**:
@@ -313,23 +378,29 @@ Recommended Actions:
 
 **Verification Process**:
 
-1. **Run Fixed Test Multiple Times**:
+1. **Run Fixed Test Multiple Times** (output to temp file):
 ```bash
-# Run 5 times to verify stability
+# Run 5 times to verify stability, capture results
 for i in {1..5}; do
-  npm run test:e2e -- -t "{test name}"
+  echo "=== Run $i ===" >> /tmp/e2e-${E2E_SESSION}-verify.log
+  npm run test:e2e -- -t "{test name}" 2>&1 | tail -20 >> /tmp/e2e-${E2E_SESSION}-verify.log
 done
+
+# Check results
+cat /tmp/e2e-${E2E_SESSION}-verify.log
 ```
 
-2. **Run Related Tests**:
+2. **Run Related Tests** (output to temp file):
 ```bash
 # Run the entire file
-npm run test:e2e -- {file}
+npm run test:e2e -- {file} 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 3. **Run Full Suite (Only When All Individual Tests Pass)**:
 ```bash
-npm run test:e2e
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 **Present to User**:
@@ -363,7 +434,7 @@ docker-compose -f docker-compose.e2e.yml down
 
 2. Delete tracking file if all fixed:
 ```bash
-rm _e2e-failures.md
+rm /tmp/e2e-${E2E_SESSION}-failures.md
 ```
 
 3. Review and commit any test fixes
@@ -387,27 +458,32 @@ Cleanup Options:
 
 ## Quick Command Reference
 
+**All test commands output to temp file for context efficiency.**
+
 ```bash
 # Start infrastructure
 npm run docker:e2e
 
-# Run all E2E tests
-npm run test:e2e
+# Run all E2E tests (output to temp file)
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run specific file
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run specific test
-npm run test:e2e -- -t "{test name}"
+npm run test:e2e -- -t "{test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run with verbose output
-npm run test:e2e -- --verbose
+npm run test:e2e -- --verbose 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -100 /tmp/e2e-${E2E_SESSION}-output.log
+
+# Get failure details from last run
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run with debugging
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
 
-# View logs
-tail -f logs/e2e-test.log
+# View application logs
+tail -100 logs/e2e-test.log
 
 # Stop infrastructure
 docker-compose -f docker-compose.e2e.yml down

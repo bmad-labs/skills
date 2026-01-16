@@ -73,6 +73,30 @@ export default config;
 }
 ```
 
+### Running Tests (Context Efficient)
+
+**ALWAYS redirect output to temp files with unique session ID:**
+
+```bash
+# Initialize session (once at start)
+export E2E_SESSION=$(date +%s)-$$
+
+# Run all E2E tests
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# Run specific test
+npm run test:e2e -- -t "test name" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# Get failure details
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
+
+# Debug mode
+npm run test:e2e:debug 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+
+# Cleanup when done
+rm -f /tmp/e2e-${E2E_SESSION}-*.log
+```
+
 ## Test Setup Pattern
 
 ### Global Setup (setup.ts)

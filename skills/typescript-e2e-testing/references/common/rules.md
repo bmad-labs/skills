@@ -9,6 +9,25 @@
 | Logger | File logging via `.env.e2e` - DO NOT mock, DO NOT console.log |
 | Log file | `logs/e2e-test.log` - clean before each test run |
 | Test structure | MUST follow GWT pattern (Given-When-Then) |
+| **Output** | **ALWAYS redirect to temp files** - prevents context bloat |
+
+## Context Efficiency Rule
+
+**CRITICAL**: All test execution MUST output to temp files with unique session ID.
+
+```bash
+# Initialize session (once at start)
+export E2E_SESSION=$(date +%s)-$$
+
+# Standard pattern
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# Get failures
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
+
+# Cleanup when done
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
+```
 
 ## Environment Configuration
 
@@ -67,9 +86,15 @@ app.useLogger(app.get(CustomLoggerService));
 
 **Viewing Logs:**
 ```bash
-npm run e2e:logs           # Tail logs in real-time
-cat logs/e2e-test.log      # View complete log
-grep -i error logs/e2e-test.log  # Search for errors
+# View test output (from temp file)
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+
+# Get failure details
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
+
+# View application logs (limited)
+tail -100 logs/e2e-test.log
+grep -i error logs/e2e-test.log | tail -20
 ```
 
 ## Mock Rules
@@ -117,18 +142,35 @@ app.connectMicroservice(kafkaConfig, { inheritAppConfig: true });
 
 ## Failure Handling Rules
 
-**CRITICAL:** Fix ONE test at a time. NEVER fix multiple simultaneously.
+**CRITICAL:** Fix ONE test at a time. NEVER run full suite repeatedly while debugging.
+
+```
+❌ WRONG: Run full suite → See 5 failures → Run full suite again → Still failures → ...
+✅ RIGHT: Run full suite → See 5 failures → Fix test 1 → Verify → Fix test 2 → ... → Full suite ONCE
+```
 
 **Workflow:**
-1. Create `_e2e-failures.md` tracking file
+1. Create `/tmp/e2e-${E2E_SESSION}-failures.md` tracking file with ALL failing tests
 2. Select ONE failing test
-3. Run ONLY that test: `npm run test:e2e -- -t "test name"`
-4. Analyze logs: `grep -A 20 "FAIL" logs/e2e-test.log`
-5. Fix and re-run SAME test to verify
-6. Mark as fixed in tracking file
-7. Repeat for next test
-8. Run full suite ONLY after ALL individual tests pass
-9. Delete tracking file when complete
+3. Run ONLY that test (never full suite):
+   ```bash
+   npm run test:e2e -- -t "test name" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+   tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
+   ```
+4. Analyze failures: `grep -B 2 -A 15 "FAIL\|Error:" /tmp/e2e-${E2E_SESSION}-debug.log`
+5. Fix and verify with 3-5 runs of SAME test:
+   ```bash
+   for i in {1..5}; do npm run test:e2e -- -t "test name" 2>&1 | tail -10; done
+   ```
+6. Mark as FIXED in tracking file
+7. Move to next failing test - repeat steps 2-6
+8. Run full suite ONLY ONCE after ALL individual tests pass:
+   ```bash
+   npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+   ```
+9. Delete tracking file: `rm /tmp/e2e-${E2E_SESSION}-failures.md`
+
+**WHY**: Full suite runs waste time and context. Each failing test pollutes output.
 
 ## Checklist
 

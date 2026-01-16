@@ -1,5 +1,36 @@
 # E2E Test Debugging Guide
 
+## Context Efficiency: Temp File Output
+
+**CRITICAL**: Always redirect E2E test output to temp files. E2E output is verbose and bloats agent context.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+```bash
+# Initialize session (once at start of debugging)
+export E2E_SESSION=$(date +%s)-$$
+
+# Standard pattern - capture output to temp file
+npm run test:e2e -- -t "{test name}" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+
+# Read summary only
+tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
+
+# Get failure details
+grep -B 5 -A 20 "FAIL\|Error:" /tmp/e2e-${E2E_SESSION}-debug.log
+
+# Cleanup when done
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
+```
+
+**Temp File Locations** (with `${E2E_SESSION}` unique per agent):
+- `/tmp/e2e-${E2E_SESSION}-debug.log` - Debug runs
+- `/tmp/e2e-${E2E_SESSION}-output.log` - General test output
+- `/tmp/e2e-${E2E_SESSION}-verify.log` - Verification runs
+- `/tmp/e2e-${E2E_SESSION}-failures.md` - Tracking file
+
+---
+
 ## VS Code Debugging
 
 ### launch.json Configuration
@@ -67,17 +98,19 @@
 
 ## Command Line Debugging
 
+**All commands output to temp files for context efficiency.**
+
 ### Node Inspector
 
 ```bash
-# Basic debug mode
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand
+# Basic debug mode (output to temp file)
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
 
 # With specific test file
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand test/e2e/user.e2e-spec.ts
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand test/e2e/user.e2e-spec.ts 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
 
 # With test name pattern
-node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "should create user"
+node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "should create user" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 Open Chrome → `chrome://inspect` to connect.
@@ -85,22 +118,28 @@ Open Chrome → `chrome://inspect` to connect.
 ### Verbose Output
 
 ```bash
-npm run test:e2e -- --verbose
-npm run test:e2e -- --verbose --expand
-npm run test:e2e -- --silent=false
+# Verbose output - capture then read summary
+npm run test:e2e -- --verbose 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+tail -100 /tmp/e2e-${E2E_SESSION}-debug.log
+
+npm run test:e2e -- --verbose --expand 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+tail -100 /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 ### Single Test Execution
 
 ```bash
-# Run specific file
-npm run test:e2e -- test/e2e/user.e2e-spec.ts
+# Run specific file (output to temp file)
+npm run test:e2e -- test/e2e/user.e2e-spec.ts 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run tests matching pattern
-npm run test:e2e -- -t "should create user"
+npm run test:e2e -- -t "should create user" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run single describe block
-npm run test:e2e -- -t "User API"
+npm run test:e2e -- -t "User API" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 ---
@@ -110,17 +149,17 @@ npm run test:e2e -- -t "User API"
 ### Viewing Logs
 
 ```bash
-# Real-time watching
-tail -f logs/e2e-test.log
+# View application logs (limited output)
+tail -100 logs/e2e-test.log
 
-# Search for errors
-grep -i "error" logs/e2e-test.log
+# Search for errors in test output
+grep -i "error\|fail\|exception" /tmp/e2e-${E2E_SESSION}-output.log
 
 # Search with context (5 lines before/after)
-grep -B5 -A5 "FAIL" logs/e2e-test.log
+grep -B5 -A5 "FAIL" /tmp/e2e-${E2E_SESSION}-output.log
 
-# Find specific request
-grep "POST /users" logs/e2e-test.log
+# Find specific request in app logs
+grep "POST /users" logs/e2e-test.log | tail -20
 ```
 
 ### Adding Debug Logs in Tests
@@ -243,19 +282,28 @@ const order = await waitFor(() =>
 
 ## Systematic Failure Resolution
 
+**CRITICAL: Fix ONE test at a time. NEVER run full suite repeatedly while debugging.**
+
+```
+❌ WRONG: Run full suite → See 5 failures → Run full suite again → Still failures → ...
+✅ RIGHT: Run full suite → See 5 failures → Fix test 1 → Verify → Fix test 2 → ... → Full suite ONCE
+```
+
 ### Step 1: Create Tracking File
 
+List ALL failing tests from the initial run. Work through them one by one.
+
 ```markdown
-<!-- _e2e-failures.md -->
+<!-- /tmp/e2e-${E2E_SESSION}-failures.md -->
 # E2E Test Failures
 
-## Test: "should create user and publish event"
+## Test 1: "should create user and publish event"
 - **File**: `test/e2e/user.e2e-spec.ts:42`
 - **Error**: `Timeout - Async callback was not invoked within 25000ms`
 - **Status**: IN_PROGRESS
 - **Notes**: Kafka consumer might not be ready
 
-## Test: "should return 404 for missing user"
+## Test 2: "should return 404 for missing user"
 - **File**: `test/e2e/user.e2e-spec.ts:78`
 - **Error**: `Expected 404, received 500`
 - **Status**: PENDING
@@ -263,12 +311,15 @@ const order = await waitFor(() =>
 
 ### Step 2: Fix ONE Test at a Time
 
-```bash
-# Run only the failing test
-npm run test:e2e -- -t "should create user and publish event"
+**Run ONLY the specific test, NEVER the full suite:**
 
-# Check logs for that specific test
-grep "should create user" logs/e2e-test.log
+```bash
+# Run only the failing test (output to temp file)
+npm run test:e2e -- -t "should create user and publish event" 2>&1 | tee /tmp/e2e-${E2E_SESSION}-debug.log
+tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
+
+# Check for errors in output
+grep -i "error\|fail" /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 ### Step 3: Analyze Root Cause
@@ -281,29 +332,41 @@ grep "should create user" logs/e2e-test.log
 
 ### Step 4: Verify Fix
 
+**Run the SAME test 3-5 times to ensure stability:**
+
 ```bash
-# Run the fixed test multiple times
-for i in {1..5}; do npm run test:e2e -- -t "should create user"; done
+# Run the fixed test multiple times (capture results)
+rm -f /tmp/e2e-${E2E_SESSION}-verify.log
+for i in {1..5}; do
+  echo "=== Run $i ===" >> /tmp/e2e-${E2E_SESSION}-verify.log
+  npm run test:e2e -- -t "should create user" 2>&1 | tail -15 >> /tmp/e2e-${E2E_SESSION}-verify.log
+done
+cat /tmp/e2e-${E2E_SESSION}-verify.log
 ```
 
-### Step 5: Update Tracking
+### Step 5: Update Tracking and Move to Next
 
 ```markdown
-## Test: "should create user and publish event"
-- **Status**: FIXED
+## Test 1: "should create user and publish event"
+- **Status**: FIXED ✅
 - **Root Cause**: Kafka consumer group not ready
 - **Fix**: Added 5s delay in beforeAll after startAllMicroservices()
 ```
 
-### Step 6: Run Full Suite
+**Now move to Test 2. Repeat steps 2-5 for each failing test.**
+
+### Step 6: Run Full Suite ONLY ONCE
+
+**Only after ALL individual tests pass:**
 
 ```bash
-# Only after all individual tests pass
-npm run test:e2e
+npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 ### Step 7: Clean Up
 
 ```bash
-rm _e2e-failures.md
+rm /tmp/e2e-${E2E_SESSION}-failures.md
+rm -f /tmp/e2e-*.log
 ```
