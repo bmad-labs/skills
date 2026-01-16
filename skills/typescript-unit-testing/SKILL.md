@@ -1,21 +1,52 @@
 ---
 name: typescript-unit-testing
 description: |
-  Unit testing skill for TypeScript/NestJS projects using Jest, @golevelup/ts-jest, and in-memory databases.
+  Complete unit testing skill for TypeScript/NestJS projects using Jest, @golevelup/ts-jest, and in-memory databases.
 
-  ALWAYS use this skill when:
-  - User asks to write, create, add, or generate unit tests
-  - User asks to test a service, usecase, controller, guard, interceptor, pipe, or filter
-  - User mentions "unit test", "spec file", ".spec.ts", or "jest test"
-  - User asks to improve test coverage or add missing tests
-  - User asks to mock dependencies or set up test fixtures
-  - User is working on any file ending in .spec.ts
-  - User asks about testing patterns like AAA, mocking, or assertions
-  - User mentions testing repositories, kafka, or redis in isolation
+  ALWAYS use this skill when user needs to:
 
-  Covers: NestJS components, DeepMocked/createMock patterns, mongodb-memory-server, pg-mem, Kafka testing, Redis testing, exception validation, coverage optimization
+  **SETUP** - Initialize or configure unit testing:
+  - Set up Jest for a new project
+  - Configure test infrastructure (jest.config.ts)
+  - Install testing dependencies (@nestjs/testing, @golevelup/ts-jest)
+  - Create mock helpers or test utilities
+  - Set up coverage configuration
 
-  Keywords: unit test, spec, jest, typescript, nestjs, mock, DeepMocked, createMock, AAA, test coverage, TDD, .spec.ts, testing, write test, add test, create test
+  **WRITE** - Create or add unit tests:
+  - Write, create, add, or generate unit tests
+  - Test a service, usecase, controller, guard, interceptor, pipe, or filter
+  - Add tests for new code or features
+  - Improve test coverage or add missing tests
+  - Mock dependencies or set up test fixtures
+  - Working on any file ending in .spec.ts
+
+  **REVIEW** - Audit or evaluate unit tests:
+  - Review existing tests for quality
+  - Check test coverage and gaps
+  - Audit testing patterns and conventions
+  - Evaluate assertion quality
+
+  **RUN** - Execute or analyze test results:
+  - Run unit tests
+  - Analyze test results or coverage reports
+  - Understand test failures or successes
+  - Check which tests are passing/failing
+
+  **DEBUG** - Fix failing or broken tests:
+  - Fix failing unit tests
+  - Debug test errors or exceptions
+  - Resolve mock issues or setup problems
+  - Troubleshoot test timeouts or flaky tests
+  - Diagnose "undefined" or unexpected results
+
+  **OPTIMIZE** - Improve test performance and maintainability:
+  - Speed up slow tests
+  - Fix open handles preventing clean exit
+  - Improve test organization
+  - Reduce test execution time
+  - Clean up test code
+
+  Keywords: unit test, spec, jest, typescript, nestjs, mock, DeepMocked, createMock, AAA, test coverage, TDD, .spec.ts, testing, write test, add test, create test, fix test, debug test, run test, review test, optimize test, test setup, jest config
 ---
 
 # Unit Testing Skill
@@ -37,11 +68,27 @@ For guided, step-by-step execution of unit testing tasks, use the appropriate wo
 | [Debugging](workflows/debugging-unit-test.md) | Fix failing tests | Tests failing, need diagnosis |
 | [Optimizing](workflows/optimizing-unit-test.md) | Improve test performance | Slow tests, maintainability |
 
-**Workflow Instructions:**
-1. Load the appropriate workflow file before starting the task
-2. Follow each step in order, completing checkpoints before proceeding
-3. Load referenced knowledge files from `references/` as directed by the workflow
-4. After completing the task, re-read relevant reference files to verify compliance
+## Workflow Selection Guide
+
+**IMPORTANT**: Before starting any testing task, identify the user's intent and load the appropriate workflow.
+
+### Detect User Intent → Select Workflow
+
+| User Says / Wants | Workflow to Load | File |
+|-------------------|------------------|------|
+| "Set up tests", "configure Jest", "add testing to project", "install test dependencies" | **Setup** | `workflows/setup-unit-test.md` |
+| "Write tests", "add tests", "create tests", "test this service/controller" | **Writing** | `workflows/writing-unit-test.md` |
+| "Review tests", "check test quality", "audit tests", "are these tests good?" | **Reviewing** | `workflows/reviewing-unit-test.md` |
+| "Run tests", "execute tests", "check if tests pass", "show test results" | **Running** | `workflows/running-unit-test.md` |
+| "Fix tests", "debug tests", "tests are failing", "why is this test broken?" | **Debugging** | `workflows/debugging-unit-test.md` |
+| "Speed up tests", "optimize tests", "tests are slow", "fix open handles" | **Optimizing** | `workflows/optimizing-unit-test.md` |
+
+### Workflow Execution Protocol
+
+1. **ALWAYS load the workflow file first** - Read the full workflow before taking action
+2. **Follow each step in order** - Complete checkpoints before proceeding
+3. **Load knowledge files as directed** - Each workflow specifies which `references/` files to read
+4. **Verify compliance after completion** - Re-read relevant reference files to ensure quality
 
 ---
 
