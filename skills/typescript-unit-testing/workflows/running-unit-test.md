@@ -20,7 +20,47 @@ Before running tests, review the following reference files if troubleshooting is
 - Always run tests in a clean state
 - Interpret results correctly before taking action
 - Document any unexpected failures
-- Complete full test run before making changes
+- **NEVER run full suite repeatedly while debugging** - Fix one test at a time
+- **ALWAYS output test results to temp files** - Avoids context bloat
+
+### Critical: One-by-One Fixing Rule
+
+**When tests fail, NEVER keep running the full suite.** Instead:
+1. Note all failing tests in `/tmp/ut-${UT_SESSION}-failures.md`
+2. Fix ONE test at a time using `-t "test name"`
+3. Verify each fix with 3-5 runs of that specific test
+4. Only run full suite ONCE after ALL individual tests pass
+
+---
+
+## Context Efficiency: Temp File Output
+
+**Why**: Test output can be verbose. Direct terminal output bloats agent context.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+```bash
+# Initialize session (once at start)
+export UT_SESSION=$(date +%s)-$$
+
+# Standard pattern for all test runs
+npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+
+# Read only summary
+tail -50 /tmp/ut-${UT_SESSION}-output.log
+
+# Get failure details
+grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log
+
+# Cleanup when done
+rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
+```
+
+**Temp File Locations** (with `${UT_SESSION}` unique per agent):
+- `/tmp/ut-${UT_SESSION}-output.log` - Full test output
+- `/tmp/ut-${UT_SESSION}-failures.md` - Tracking file for one-by-one fixing
+- `/tmp/ut-${UT_SESSION}-debug.log` - Debug runs
+- `/tmp/ut-${UT_SESSION}-coverage.log` - Coverage output
 
 ---
 
@@ -54,23 +94,29 @@ Before running tests, review the following reference files if troubleshooting is
 
 **Actions:**
 
-1. Execute test command:
+1. Execute test command (output to temp file):
    ```bash
    # Standard run
-   npm test -- [path/to/file.spec.ts]
+   npm test -- [path/to/file.spec.ts] 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   tail -50 /tmp/ut-${UT_SESSION}-output.log
 
    # With verbose output
-   npm test -- [path/to/file.spec.ts] --verbose
+   npm test -- [path/to/file.spec.ts] --verbose 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   tail -100 /tmp/ut-${UT_SESSION}-output.log
 
-   # In watch mode (for development)
-   npm test -- [path/to/file.spec.ts] --watch
+   # Specific test only
+   npm test -- -t "test name" 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+   tail -50 /tmp/ut-${UT_SESSION}-output.log
    ```
 
-2. Capture output including:
-   - Test results (pass/fail)
-   - Execution time
-   - Any error messages
-   - Stack traces for failures
+2. Read results from temp file:
+   ```bash
+   # Get summary
+   tail -50 /tmp/ut-${UT_SESSION}-output.log
+
+   # Get failure details
+   grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log
+   ```
 
 **Checkpoint:** Tests executed successfully or failures captured.
 
@@ -115,9 +161,10 @@ Before running tests, review the following reference files if troubleshooting is
 
 **Actions:**
 
-1. Execute coverage command:
+1. Execute coverage command (output to temp file):
    ```bash
-   npm run test:cov -- [path/to/file.spec.ts]
+   npm run test:cov -- [path/to/file.spec.ts] 2>&1 | tee /tmp/ut-${UT_SESSION}-coverage.log
+   tail -50 /tmp/ut-${UT_SESSION}-coverage.log
    ```
 
 2. Parse coverage output:
@@ -169,11 +216,33 @@ No action required.
       - Expected: [expected value]
       - Received: [received value]
       - Location: [file:line]
+
+   ⚠️ STOP: Do NOT run full suite again!
    ```
 
-2. Recommend next steps:
-   - Use `debugging-unit-test.md` workflow for investigation
-   - Run single failing test: `npm test -- -t "[test name]"`
+2. **Follow one-by-one fixing protocol**:
+   ```bash
+   # Create tracking file with all failures
+   cat > /tmp/ut-${UT_SESSION}-failures.md << 'EOF'
+   # Unit Test Failures
+
+   ## Test 1: "[test name]"
+   - File: [path:line]
+   - Error: [message]
+   - Status: PENDING
+
+   ## Test 2: "[test name]"
+   - File: [path:line]
+   - Error: [message]
+   - Status: PENDING
+   EOF
+
+   # Fix ONE test at a time
+   npm test -- -t "[first test name]" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+   tail -50 /tmp/ut-${UT_SESSION}-debug.log
+   ```
+
+3. Use `debugging-unit-test.md` workflow for investigation
 
 #### Scenario C: Setup Failures
 
@@ -256,19 +325,23 @@ No action required.
 
 ## Common Commands Reference
 
+**All commands output to temp files with unique session ID.**
+
+```bash
+# Initialize session (once at start)
+export UT_SESSION=$(date +%s)-$$
+```
+
 | Task | Command |
 |------|---------|
-| Run all tests | `npm test` |
-| Run single file | `npm test -- path/to/file.spec.ts` |
-| Run with pattern | `npm test -- --testPathPattern="user"` |
-| Run single test | `npm test -- -t "should return user"` |
-| Watch mode | `npm test -- --watch` |
-| Coverage | `npm run test:cov` |
-| Coverage single file | `npm run test:cov -- path/to/file.spec.ts` |
-| Verbose output | `npm test -- --verbose` |
-| Bail on first failure | `npm test -- --bail` |
-| Update snapshots | `npm test -- -u` |
+| Run all tests | `npm test 2>&1 \| tee /tmp/ut-${UT_SESSION}-output.log && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
+| Run single file | `npm test -- path/to/file.spec.ts 2>&1 \| tee /tmp/ut-${UT_SESSION}-output.log && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
+| Run single test | `npm test -- -t "should return user" 2>&1 \| tee /tmp/ut-${UT_SESSION}-output.log && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
+| Get failure details | `grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log` |
+| Coverage | `npm run test:cov 2>&1 \| tee /tmp/ut-${UT_SESSION}-coverage.log && tail -50 /tmp/ut-${UT_SESSION}-coverage.log` |
+| Verbose output | `npm test -- --verbose 2>&1 \| tee /tmp/ut-${UT_SESSION}-output.log && tail -100 /tmp/ut-${UT_SESSION}-output.log` |
 | Clear cache | `npx jest --clearCache` |
+| Cleanup | `rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md` |
 
 ---
 

@@ -178,13 +178,13 @@ references/
 ### Run E2E Tests
 **Workflow**: [Running E2E Test](workflows/running-e2e-test.md)
 1. Verify Docker infrastructure is running
-2. Run tests sequentially with `npm run test:e2e`
+2. Run tests sequentially with `npm run test:e2e 2>&1 | tee /tmp/e2e-${E2E_SESSION}-output.log`
 3. Follow failure protocol if tests fail
 
 ### Debug Failing Tests
 **Workflow**: [Debugging E2E Test](workflows/debugging-e2e-test.md)
 1. Read `references/common/debugging.md`
-2. Create `/tmp/e2e-failures.md` tracking file
+2. Create `/tmp/e2e-${E2E_SESSION}-failures.md` tracking file
 3. Fix ONE test at a time
 
 ### Optimize Test Performance

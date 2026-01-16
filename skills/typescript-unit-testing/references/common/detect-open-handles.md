@@ -11,17 +11,30 @@ Open handles are resources (files, network sockets, database connections, timers
 
 ## Detection Commands
 
+**IMPORTANT**: Always output to temp files to avoid context bloat. Use unique session ID.
+
+```bash
+# Initialize session (once at start)
+export UT_SESSION=$(date +%s)-$$
+```
+
 ### Basic Detection
 
 ```bash
 # Detect open handles (runs tests serially)
-npm test -- --detectOpenHandles
+npm test -- --detectOpenHandles 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Detect with force exit (for debugging)
-npm test -- --detectOpenHandles --forceExit
+npm test -- --detectOpenHandles --forceExit 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Single file detection
-npm test -- --detectOpenHandles path/to/file.spec.ts
+npm test -- --detectOpenHandles path/to/file.spec.ts 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
+
+# Extract handle details
+grep -A 10 "open handles" /tmp/ut-${UT_SESSION}-handles.log
 ```
 
 ### Understanding the Output
@@ -297,11 +310,13 @@ export default {
 ### 1. Isolate the Problem
 
 ```bash
-# Run single file
-npm test -- --detectOpenHandles path/to/suspect.spec.ts
+# Run single file (output to temp file)
+npm test -- --detectOpenHandles path/to/suspect.spec.ts 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
-# Run single test
-npm test -- --detectOpenHandles -t "test name"
+# Run single test (output to temp file)
+npm test -- --detectOpenHandles -t "test name" 2>&1 | tee /tmp/ut-${UT_SESSION}-handles.log
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 ```
 
 ### 2. Add Logging

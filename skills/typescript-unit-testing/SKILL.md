@@ -168,6 +168,35 @@ references/
 
 ## Core Principles
 
+### 0. Context Efficiency (Temp File Output)
+**ALWAYS redirect unit test output to temp files**. Test output can be verbose and bloats agent context.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+```bash
+# Initialize session (once at start of testing session)
+export UT_SESSION=$(date +%s)-$$
+
+# Standard pattern - run and capture to temp file
+npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+
+# Read summary only (last 50 lines)
+tail -50 /tmp/ut-${UT_SESSION}-output.log
+
+# Get failure details
+grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log
+
+# Cleanup when done
+rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
+```
+
+**Temp Files** (with `${UT_SESSION}` unique per agent):
+- `/tmp/ut-${UT_SESSION}-output.log` - Full test output
+- `/tmp/ut-${UT_SESSION}-failures.md` - Tracking file for one-by-one fixing
+- `/tmp/ut-${UT_SESSION}-debug.log` - Debug runs
+- `/tmp/ut-${UT_SESSION}-verify.log` - Verification runs
+- `/tmp/ut-${UT_SESSION}-coverage.log` - Coverage output
+
 ### 1. AAA Pattern (Mandatory)
 ALL unit tests MUST follow Arrange-Act-Assert:
 ```typescript
@@ -310,6 +339,37 @@ describe('UserService', () => {
 | Input validation | MANDATORY | Invalid inputs, type mismatches |
 
 **Coverage Target:** 80%+ for new code
+
+---
+
+## Failure Resolution Protocol
+
+**CRITICAL: Fix ONE test at a time. NEVER run full suite repeatedly while fixing.**
+
+When unit tests fail:
+
+1. **Initialize session** (once at start):
+   ```bash
+   export UT_SESSION=$(date +%s)-$$
+   ```
+2. **Create tracking file**: `/tmp/ut-${UT_SESSION}-failures.md` with all failing tests
+3. **Select ONE failing test** - work on only this test
+4. **Run ONLY that test** (never full suite):
+   ```bash
+   npm test -- -t "test name" 2>&1 | tee /tmp/ut-${UT_SESSION}-debug.log
+   tail -50 /tmp/ut-${UT_SESSION}-debug.log
+   ```
+5. **Fix the issue** - analyze error, make targeted fix
+6. **Verify fix** - run same test 3-5 times:
+   ```bash
+   for i in {1..5}; do npm test -- -t "test name" 2>&1 | tail -10; done
+   ```
+7. **Mark as FIXED** in tracking file
+8. **Move to next failing test** - repeat steps 3-7
+9. **Run full suite ONLY ONCE** after ALL individual tests pass
+10. **Cleanup**: `rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md`
+
+**WHY**: Running full suite wastes time and context. Each failing test pollutes output, making debugging harder.
 
 ---
 

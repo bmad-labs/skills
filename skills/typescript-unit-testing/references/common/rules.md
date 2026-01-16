@@ -1,5 +1,59 @@
 # Unit Testing Rules
 
+## Context Efficiency Rule
+
+**ALWAYS redirect unit test output to temp files**. Test output can be verbose and bloats agent context.
+
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+
+```bash
+# Initialize session (once at start of testing session)
+export UT_SESSION=$(date +%s)-$$
+
+# Standard pattern - run and capture to temp file
+npm test 2>&1 | tee /tmp/ut-${UT_SESSION}-output.log
+
+# Read summary only (last 50 lines)
+tail -50 /tmp/ut-${UT_SESSION}-output.log
+
+# Get failure details
+grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log
+
+# Cleanup when done
+rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
+```
+
+**Temp File Locations** (with `${UT_SESSION}` unique per agent):
+- `/tmp/ut-${UT_SESSION}-output.log` - Full test output
+- `/tmp/ut-${UT_SESSION}-failures.md` - Tracking file for one-by-one fixing
+- `/tmp/ut-${UT_SESSION}-debug.log` - Debug runs
+- `/tmp/ut-${UT_SESSION}-verify.log` - Verification runs
+- `/tmp/ut-${UT_SESSION}-coverage.log` - Coverage output
+
+---
+
+## One-by-One Fixing Rule
+
+**CRITICAL: When tests fail, NEVER keep running the full suite.**
+
+```
+❌ WRONG: Run full suite → See 5 failures → Run full suite again → Still 5 failures → ...
+✅ RIGHT: Run full suite → See 5 failures → Fix test 1 only → Verify → Fix test 2 only → ... → Run full suite ONCE
+```
+
+**WHY**: Full suite runs waste time and pollute output. Each failing test adds noise, making debugging harder.
+
+### Protocol:
+1. Run full suite ONCE to identify all failures
+2. Create tracking file `/tmp/ut-${UT_SESSION}-failures.md` listing all failing tests
+3. Fix ONE test at a time using `-t "test name"`
+4. Verify each fix with 3-5 runs of that specific test
+5. Mark as FIXED in tracking file
+6. Move to next failing test
+7. Run full suite ONLY ONCE after ALL individual tests pass
+
+---
+
 ## Core Rules
 
 | Rule | Requirement |
