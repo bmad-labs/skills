@@ -1,19 +1,21 @@
 ---
 name: typescript-unit-testing
 description: |
-  Comprehensive unit testing skill for TypeScript/NestJS projects using Jest, @golevelup/ts-jest, and in-memory databases.
+  Unit testing skill for TypeScript/NestJS projects using Jest, @golevelup/ts-jest, and in-memory databases.
 
-  Use this skill when:
-  - Writing unit tests for NestJS services, usecases, controllers, guards, interceptors, pipes, or filters
-  - Setting up mocks with DeepMocked and createMock from golevelup/ts-jest
-  - Testing repository implementations with mongodb-memory-server or pg-mem
-  - Testing NestJS Kafka with ClientKafka, @MessagePattern, and @EventPattern
-  - Testing Redis cache operations, health checks, and graceful degradation
-  - Following AAA (Arrange-Act-Assert) pattern with proper assertions
-  - Validating exception handling, error codes, and edge cases
-  - Optimizing test performance and coverage
+  ALWAYS use this skill when:
+  - User asks to write, create, add, or generate unit tests
+  - User asks to test a service, usecase, controller, guard, interceptor, pipe, or filter
+  - User mentions "unit test", "spec file", ".spec.ts", or "jest test"
+  - User asks to improve test coverage or add missing tests
+  - User asks to mock dependencies or set up test fixtures
+  - User is working on any file ending in .spec.ts
+  - User asks about testing patterns like AAA, mocking, or assertions
+  - User mentions testing repositories, kafka, or redis in isolation
 
-  Keywords: unit test, jest, typescript, nestjs, mocking, DeepMocked, createMock, AAA pattern, mongodb-memory-server, pg-mem, kafka, ClientKafka, MessagePattern, EventPattern, redis, cache, test coverage, TDD
+  Covers: NestJS components, DeepMocked/createMock patterns, mongodb-memory-server, pg-mem, Kafka testing, Redis testing, exception validation, coverage optimization
+
+  Keywords: unit test, spec, jest, typescript, nestjs, mock, DeepMocked, createMock, AAA, test coverage, TDD, .spec.ts, testing, write test, add test, create test
 ---
 
 # Unit Testing Skill
@@ -288,6 +290,19 @@ describe('ClassName', () => {
 
 ---
 
+## What NOT to Unit Test
+
+Do NOT create unit tests for:
+- **Interfaces** - Type definitions only, no runtime behavior
+- **Enums** - Static value mappings, no logic to test
+- **Constants** - Static values, no behavior
+- **Type aliases** - Type definitions only
+- **Plain DTOs** - Data structures without logic
+
+Only test files containing **executable logic** (classes with methods, functions with behavior).
+
+---
+
 ## Anti-Patterns to Avoid
 
 | Don't | Why | Do Instead |
@@ -298,6 +313,7 @@ describe('ClassName', () => {
 | Share state between tests | Causes flaky tests | Fresh setup in beforeEach |
 | Mock repositories in services | Tests implementation | Mock interfaces |
 | Skip mock verification | Doesn't validate behavior | Verify mock calls |
+| Test interfaces/enums/constants | No behavior to test | Skip these files |
 
 ---
 
