@@ -1,9 +1,51 @@
 # KafkaTestHelper Implementation
 
 ## Table of Contents
+- [Topic Management with Admin](#topic-management-with-admin)
 - [Complete Implementation](#complete-implementation)
 - [Usage Patterns](#usage-patterns)
 - [API Reference](#api-reference)
+
+---
+
+## Topic Management with Admin
+
+**Never rely on topic auto-create in E2E tests.**
+
+Auto-create causes timing issues - tests may fail intermittently waiting for topics to be created. Use Kafka Admin to explicitly create topics before tests run.
+
+### Why Use Admin Instead of Auto-Create?
+
+| Auto-Create Problems | Admin Benefits |
+|---------------------|----------------|
+| Timing issues - topic may not be ready | Topic guaranteed ready before tests |
+| No control over partitions/replication | Explicit partition and replication control |
+| Intermittent test failures | Deterministic test setup |
+| Hidden dependencies on broker config | Self-contained test configuration |
+
+### Admin Initialization Pattern
+
+```typescript
+// In beforeAll - initialize admin and create topics FIRST
+beforeAll(async () => {
+  kafkaHelper = new KafkaTestHelper();
+  await kafkaHelper.connect();
+
+  // Create topics explicitly - don't rely on auto-create
+  await kafkaHelper.createTopicIfNotExists(inputTopic, 1);
+  await kafkaHelper.createTopicIfNotExists(outputTopic, 1);
+
+  // Then subscribe to output topics
+  await kafkaHelper.subscribeToTopic(outputTopic, false);
+
+  // Then start app
+}, 90000);
+
+// In afterAll - cleanup admin connection
+afterAll(async () => {
+  await kafkaHelper?.disconnect();
+}, 30000);
+```
 
 ---
 
@@ -167,14 +209,66 @@ export class KafkaTestHelper {
     });
   }
 
-  /** Ensure topic exists before testing */
-  async ensureTopicExists(topic: string, numPartitions: number = 1): Promise<void> {
+  /**
+   * Create topic if not exists - CRITICAL for test setup.
+   * Call in beforeAll BEFORE subscribing or starting app.
+   * Never rely on auto-create - it causes timing issues.
+   */
+  async createTopicIfNotExists(
+    topic: string,
+    numPartitions: number = 1,
+    replicationFactor: number = 1
+  ): Promise<void> {
     const topics = await this.admin.listTopics();
     if (!topics.includes(topic)) {
       await this.admin.createTopics({
-        topics: [{ topic, numPartitions }],
+        topics: [{
+          topic,
+          numPartitions,
+          replicationFactor,
+        }],
       });
     }
+  }
+
+  /** Alias for backward compatibility */
+  async ensureTopicExists(topic: string, numPartitions: number = 1): Promise<void> {
+    return this.createTopicIfNotExists(topic, numPartitions);
+  }
+
+  /**
+   * Delete topic - use for cleanup or resetting test state.
+   * Note: Topic deletion may take time to propagate.
+   */
+  async deleteTopic(topic: string): Promise<void> {
+    try {
+      await this.admin.deleteTopics({ topics: [topic] });
+    } catch {
+      // Topic may not exist, ignore
+    }
+  }
+
+  /**
+   * Update topic configuration.
+   * Use for testing config changes (retention, cleanup policy, etc.)
+   */
+  async updateTopicConfig(
+    topic: string,
+    configEntries: Array<{ name: string; value: string }>
+  ): Promise<void> {
+    await this.admin.alterConfigs({
+      validateOnly: false,
+      resources: [{
+        type: 2, // TOPIC
+        name: topic,
+        configEntries,
+      }],
+    });
+  }
+
+  /** List all topics */
+  async listTopics(): Promise<string[]> {
+    return this.admin.listTopics();
   }
 
   /** Delete consumer group offsets (for complete reset) */
@@ -207,12 +301,21 @@ export class KafkaTestHelper {
 ```typescript
 describe('Kafka E2E Tests', () => {
   let kafkaHelper: KafkaTestHelper;
-  const outputTopic = 'test-output';
+  const inputTopic = `test-input-${Date.now()}`;
+  const outputTopic = `test-output-${Date.now()}`;
 
   beforeAll(async () => {
     kafkaHelper = new KafkaTestHelper();
     await kafkaHelper.connect();
+
+    // 1. Create topics first - NEVER rely on auto-create
+    await kafkaHelper.createTopicIfNotExists(inputTopic, 1);
+    await kafkaHelper.createTopicIfNotExists(outputTopic, 1);
+
+    // 2. Subscribe to output topics
     await kafkaHelper.subscribeToTopic(outputTopic, false);
+
+    // 3. Start app after topics are ready
     // ... start app
   }, 90000);
 
@@ -272,17 +375,38 @@ it('should handle 100 messages within 30 seconds', async () => {
 
 ## API Reference
 
+### Admin Methods (Topic Management)
+
 | Method | Description |
 |--------|-------------|
-| `connect()` | Initialize Kafka connections |
+| `createTopicIfNotExists(topic, partitions, replication)` | Create topic if not exists - call in beforeAll |
+| `ensureTopicExists(topic, partitions)` | Alias for createTopicIfNotExists |
+| `deleteTopic(topic)` | Delete topic (for cleanup) |
+| `updateTopicConfig(topic, configEntries)` | Update topic configuration |
+| `listTopics()` | List all topics |
+| `deleteConsumerGroupOffsets(groupId)` | Reset consumer group |
+
+### Connection Methods
+
+| Method | Description |
+|--------|-------------|
+| `connect()` | Initialize Kafka connections (producer + admin) |
+| `disconnect()` | Clean up all connections |
+
+### Consumer Methods
+
+| Method | Description |
+|--------|-------------|
 | `subscribeToTopic(topic, fromBeginning)` | Pre-subscribe to topic, accumulate in buffer |
 | `waitForMessages(topic, count, timeout)` | Poll for expected message count |
 | `waitForMessage(topic, predicate, timeout)` | Poll for specific message |
 | `clearMessages(topic)` | Clear buffer for topic (primary isolation) |
 | `clearAllMessages()` | Clear all buffers |
 | `getMessages(topic)` | Get current buffer contents |
+
+### Producer Methods
+
+| Method | Description |
+|--------|-------------|
 | `publishEvent(topic, event, key)` | Publish single message |
 | `publishBatch(topic, events)` | Publish multiple messages |
-| `ensureTopicExists(topic, partitions)` | Create topic if not exists |
-| `deleteConsumerGroupOffsets(groupId)` | Reset consumer group |
-| `disconnect()` | Clean up all connections |
