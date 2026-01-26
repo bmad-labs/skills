@@ -9,7 +9,7 @@ Skills are self-contained instruction sets that teach Claude Code how to perform
 ## Repository Structure
 
 ```
-bmad-skills/
+<root>/
 ├── skills/                  # All skill implementations
 │   └── [skill-name]/        # Individual skill folder
 │       ├── SKILL.md         # Required - Main skill definition
