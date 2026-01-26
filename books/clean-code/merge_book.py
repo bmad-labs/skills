@@ -6,7 +6,7 @@ with an auto-generated Table of Contents.
 Usage:
     python merge_book.py [--input-dir DIR] [--output FILE] [--no-toc]
 
-Default output: clean-code-complete.md
+Default output: clean-code-book.md.md
 """
 
 import re
@@ -179,8 +179,8 @@ def main():
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path(__file__).parent / "clean-code-complete.md",
-        help="Output file path (default: ./clean-code-complete.md)"
+        default=Path(__file__).parent / "clean-code-book.md.md",
+        help="Output file path (default: ./clean-code-book.md.md)"
     )
     parser.add_argument(
         "--no-toc",
