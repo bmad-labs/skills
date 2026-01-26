@@ -2,7 +2,7 @@
 
 ## Overview
 
-- **File:** `clean-code-collection.md`
+- **File:** `clean-code-parsed.md`
 - **Total Lines:** ~35,000
 - **Content:** Two books combined
   - Book 1: *Clean Code: A Handbook of Agile Software Craftsmanship* (Lines 1-18,693)

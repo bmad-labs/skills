@@ -10,7 +10,7 @@ This document defines the workflow for formatting individual chapters from the C
 
 1. **Formatting Standards:** `books/MARKDOWN_BOOK_FORMATTING_STANDARDS.md`
 2. **Fix Plan:** `books/clean-code/FORMATTING_FIX_PLAN.md`
-3. **Source File:** `books/clean-code/clean-code-collection.md`
+3. **Source File:** `books/clean-code/clean-code-parsed.md`
 
 ## Output Files
 
@@ -84,7 +84,7 @@ Read and understand:
 
 ### Step 2: Read Chapter from Source
 
-Read the chapter content from `books/clean-code/clean-code-collection.md` using the line ranges from the Chapter Map above.
+Read the chapter content from `books/clean-code/clean-code-parsed.md` using the line ranges from the Chapter Map above.
 
 ### Step 3: Identify Issues
 

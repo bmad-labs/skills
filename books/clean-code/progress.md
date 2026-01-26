@@ -2,7 +2,7 @@
 
 ## Overview
 
-- **Source:** `clean-code-collection.md` (35,011 lines)
+- **Source:** `clean-code-parsed.md` (35,011 lines)
 - **Standard:** `../MARKDOWN_BOOK_FORMATTING_STANDARDS.md`
 - **Workflow:** `CHAPTER_FORMATTING_WORKFLOW.md`
 
