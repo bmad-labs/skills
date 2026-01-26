@@ -2,9 +2,94 @@
 
 Copy and adapt these templates for each knowledge file type.
 
+## Required Files Per Category
+
+Each category MUST have these 3 basic files:
+1. **knowledge.md** - Core concepts, definitions, foundational understanding
+2. **rules.md** - Specific guidelines, do's and don'ts
+3. **examples.md** - Good/bad code examples, before/after comparisons
+
+Optional files (add as needed):
+- **patterns.md** - Reusable solutions to common problems
+- **smells.md** - Anti-patterns and what to avoid
+- **checklist.md** - Quick reference checklists
+
+## Workflows
+
+Workflows are step-by-step processes for repeatable tasks. See `workflow-templates.md` for:
+- When to create workflows
+- Workflow best practices
+- Complete workflow template
+- Example workflows by category
+
 ---
 
-## Template: Rules File
+## Template: Knowledge File (REQUIRED)
+
+```markdown
+# [Topic] Knowledge
+
+Core concepts and foundational understanding for [topic].
+
+## Overview
+
+[2-3 sentences summarizing what this topic covers and why it matters]
+
+## Key Concepts
+
+### [Concept 1]
+
+**Definition**: [Clear, concise definition]
+
+[1-2 sentences of explanation]
+
+**Key points**:
+- [Important aspect]
+- [Important aspect]
+
+### [Concept 2]
+
+**Definition**: [Clear, concise definition]
+
+[Explanation]
+
+### [Concept 3]
+
+**Definition**: [Clear, concise definition]
+
+[Explanation]
+
+## Terminology
+
+| Term | Definition |
+|------|------------|
+| [Term] | [Brief definition] |
+| [Term] | [Brief definition] |
+
+## How It Relates To
+
+- **[Related Topic 1]**: [How they connect]
+- **[Related Topic 2]**: [How they connect]
+
+## Common Misconceptions
+
+- **Myth**: [Common misconception]
+  **Reality**: [The truth]
+
+- **Myth**: [Common misconception]
+  **Reality**: [The truth]
+
+## Quick Reference
+
+| Concept | One-Line Summary |
+|---------|-----------------|
+| [Name] | [Summary] |
+| [Name] | [Summary] |
+```
+
+---
+
+## Template: Rules File (REQUIRED)
 
 ```markdown
 # [Topic] Rules
@@ -60,7 +145,7 @@ When these rules may be relaxed:
 
 ---
 
-## Template: Examples File
+## Template: Examples File (REQUIRED)
 
 ```markdown
 # [Topic] Examples
@@ -123,7 +208,7 @@ Code examples demonstrating [topic] principles.
 
 ---
 
-## Template: Smells File
+## Template: Smells File (OPTIONAL)
 
 ```markdown
 # [Category] Smells
@@ -182,7 +267,7 @@ Code smells related to [category]. Use for code review and refactoring.
 
 ---
 
-## Template: Checklist File
+## Template: Checklist File (OPTIONAL)
 
 ```markdown
 # [Topic] Checklist
@@ -227,7 +312,7 @@ Stop and address if you find:
 
 ---
 
-## Template: Patterns File
+## Template: Patterns File (OPTIONAL)
 
 ```markdown
 # [Topic] Patterns
@@ -296,7 +381,7 @@ Reusable patterns for [context].
 
 ---
 
-## Template: Principles File
+## Template: Principles File (OPTIONAL - merge into knowledge.md if small)
 
 ```markdown
 # [Topic] Principles
@@ -375,15 +460,26 @@ Ask yourself:
 
 Source: Chapter X (lines N-M)
 
-- [ ] [category]/[topic]-rules.md
-- [ ] [category]/[topic]-examples.md
+Required files:
+- [ ] [category]/knowledge.md
+- [ ] [category]/rules.md
+- [ ] [category]/examples.md
+
+Optional files:
+- [ ] [category]/patterns.md
+- [ ] [category]/checklist.md
 
 ## Phase 3: [Category Name]
 
 Source: Chapter Y (lines N-M)
 
-- [ ] [category]/[topic]-rules.md
-- [ ] [category]/[topic]-smells.md
+Required files:
+- [ ] [category]/knowledge.md
+- [ ] [category]/rules.md
+- [ ] [category]/examples.md
+
+Optional files:
+- [ ] [category]/smells.md
 
 ## Notes
 
@@ -427,6 +523,12 @@ description: |
 ### Workflows
 
 - `workflows/[name].md` - [purpose]
+
+## Workflows
+
+| Task | Workflow |
+|------|----------|
+| [task] | `workflows/[name].md` |
 
 ## Guidelines
 
