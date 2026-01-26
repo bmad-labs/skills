@@ -2,6 +2,24 @@
 
 How to analyze a book before creating a skill from it.
 
+## CRITICAL: Context Efficiency
+
+**DO NOT read the full book content in this phase.**
+
+The purpose of analysis is to understand structure and plan extraction tasks. Reading full content wastes context and should only happen during extraction phase by subagents.
+
+### What TO DO:
+- Extract headers/TOC only
+- Count lines to estimate size
+- Identify chapter boundaries
+- Plan file structure
+
+### What NOT TO DO:
+- Read full chapters
+- Read code examples in detail
+- Read explanatory prose
+- Load large sections into context
+
 ## Step 1: Structural Analysis
 
 ### Get Book Metrics
@@ -9,36 +27,39 @@ How to analyze a book before creating a skill from it.
 # Count total lines
 wc -l book.md
 
-# View table of contents (headers)
+# View table of contents (headers) - THIS IS SUFFICIENT
 grep -E "^#{1,3} " book.md
 ```
 
-### Identify Structure Elements
+**STOP HERE** - Do not read beyond the headers. The TOC gives you everything needed for analysis.
+
+### Identify Structure Elements FROM HEADERS ONLY
 | Element | How to Find | Example |
 |---------|-------------|---------|
 | Chapters | `# Chapter` or `# 1.` patterns | `# Chapter 3: Functions` |
 | Sections | `## ` headers | `## Small Functions` |
 | Subsections | `### ` headers | `### Do One Thing` |
-| Code examples | Fenced code blocks | ``` ```java ``` |
-| Lists/Rules | Numbered or bulleted lists | `1. Functions should be small` |
-| Key quotes | Blockquotes | `> FUNCTIONS SHOULD DO ONE THING` |
+
+**Note**: Code examples, lists, and quotes will be found during extraction phase - NOT now.
 
 ### Document Structure Map
-Create a structure map:
+Create a structure map from the TOC output:
 ```markdown
 ## Book Structure
 
-- Chapter 1: [Name] (lines 1-500)
+- Chapter 1: [Name] (estimate lines from position)
   - Section 1.1: [Name]
   - Section 1.2: [Name]
-- Chapter 2: [Name] (lines 501-1200)
+- Chapter 2: [Name]
   ...
 ```
 
-## Step 2: Content Classification
+**Line estimates**: Use header positions from grep output to estimate chapter boundaries. Exact line numbers are not critical - subagents will read specific sections.
+
+## Step 2: Content Classification (Based on Headers)
 
 ### Knowledge Types
-Classify content into these categories:
+**Infer content types from section/chapter names** - do not read content:
 
 | Type | Description | File Suffix |
 |------|-------------|-------------|
@@ -50,12 +71,13 @@ Classify content into these categories:
 | Checklists | Quick reference lists | `-checklist.md` |
 | Definitions | Terminology and concepts | `-glossary.md` |
 
-### Content Density Analysis
-For each chapter, note:
-- High-value sections (core concepts)
-- Example-heavy sections (code samples)
-- Theory-heavy sections (explanations)
-- Reference sections (lists, tables)
+### Content Density Estimation
+Based on chapter/section titles, estimate:
+- Which chapters likely have rules (e.g., "Functions", "Naming")
+- Which likely have examples (e.g., "Refactoring", "Case Study")
+- Which are reference material (e.g., "Smells and Heuristics")
+
+**Do not read chapter content to verify** - make reasonable assumptions from titles.
 
 ## Step 3: Use Case Identification
 
