@@ -30,12 +30,12 @@ This method installs the entire plugin with all skills automatically detected.
 
 **Step 1: Add the marketplace**
 ```bash
-/plugin marketplace add thuantan2060/bmad-skills
+/plugin marketplace add bmad-labs/skills
 ```
 
 **Step 2: Install the plugin**
 ```bash
-/plugin install bmad-skills@bmad-skills
+/plugin install bmad-labs@skills
 ```
 
 **Step 3: Verify installation**
@@ -53,42 +53,41 @@ Add to your project's `.claude/settings.json`:
 ```json
 {
   "extraKnownMarketplaces": {
-    "bmad-skills": {
+    "bmad-labs": {
       "source": {
         "source": "github",
-        "repo": "thuantan2060/bmad-skills"
+        "repo": "bmad-labs/skills"
       }
     }
   },
   "enabledPlugins": {
-    "bmad-skills@bmad-skills": true
+    "bmad-labs@skills": true
   }
 }
 ```
 
-### Method 3: Install Individual Skills (Manual)
+### Method 3: Install Individual Skills
 
-Add individual skills to your project's `.claude/settings.json`:
-
-```json
-{
-  "skills": [
-    "github:thuantan2060/bmad-skills/skills/mcp-builder",
-    "github:thuantan2060/bmad-skills/skills/typescript-e2e-testing",
-    "github:thuantan2060/bmad-skills/skills/typescript-unit-testing"
-  ]
-}
-```
-
-Or install from a local path during development:
+If you only need specific skills, add them individually to your project's `.claude/settings.json`:
 
 ```json
 {
   "skills": [
-    "/path/to/bmad-skills/skills/skill-name"
+    "github:bmad-labs/skills/skills/clean-code",
+    "github:bmad-labs/skills/skills/typescript-e2e-testing",
+    "github:bmad-labs/skills/skills/typescript-unit-testing"
   ]
 }
 ```
+
+**Available skill paths:**
+- `github:bmad-labs/skills/skills/mcp-builder`
+- `github:bmad-labs/skills/skills/typescript-e2e-testing`
+- `github:bmad-labs/skills/skills/typescript-unit-testing`
+- `github:bmad-labs/skills/skills/skill-creator`
+- `github:bmad-labs/skills/skills/clean-code`
+- `github:bmad-labs/skills/skills/book-converter`
+- `github:bmad-labs/skills/skills/skill-from-book`
 
 ### Troubleshooting
 
@@ -148,6 +147,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [mcp-builder](skills/mcp-builder) | Guide for creating high-quality MCP servers for LLM integrations | Development |
 | [typescript-e2e-testing](skills/typescript-e2e-testing) | Comprehensive E2E testing for TypeScript/NestJS with Kafka, PostgreSQL, MongoDB, Redis | Development |
 | [typescript-unit-testing](skills/typescript-unit-testing) | Unit testing for TypeScript/NestJS with Jest, DeepMocked, mongodb-memory-server, pg-mem, Kafka, Redis | Development |
+| [skill-creator](skills/skill-creator) | Guide for creating effective Claude Code skills | Development |
+| [clean-code](skills/clean-code) | Clean Code principles and workflows for TypeScript development | Development |
+| [book-converter](skills/book-converter) | Convert EPUB books to formatted Markdown | Productivity |
+| [skill-from-book](skills/skill-from-book) | Convert book content into structured Claude Code skills | Development |
 
 ## License
 
