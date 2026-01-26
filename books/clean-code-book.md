@@ -1,4 +1,6 @@
-# Clean Code: A Handbook of Agile Software Craftsmanship
+# Clean Code
+
+**A Handbook of Agile Software Craftsmanship**
 
 ## Table of Contents
 
@@ -87,7 +89,7 @@
   - [Footnotes](#footnotes)
 - [Chapter 7: Error Handling](#chapter-7-error-handling)
   - [Use Exceptions Rather Than Return Codes](#use-exceptions-rather-than-return-codes)
-  - [Write Your `Try-Catch-Finally` Statement First](#write-your-try-catch-finally-statement-first)
+  - [Write Your Try-Catch-Finally Statement First](#write-your-try-catch-finally-statement-first)
   - [Use Unchecked Exceptions](#use-unchecked-exceptions)
   - [Provide Context with Exceptions](#provide-context-with-exceptions)
   - [Define Exception Classes in Terms of a Caller's Needs](#define-exception-classes-in-terms-of-a-callers-needs)
@@ -100,7 +102,7 @@
 - [Chapter 8: Boundaries](#chapter-8-boundaries)
   - [Using Third-Party Code](#using-third-party-code)
   - [Exploring and Learning Boundaries](#exploring-and-learning-boundaries)
-  - [Learning `log4j`](#learning-log4j)
+  - [Learning log4j](#learning-log4j)
   - [Learning Tests Are Better Than Free](#learning-tests-are-better-than-free)
   - [Using Code That Does Not Yet Exist](#using-code-that-does-not-yet-exist)
   - [Clean Boundaries](#clean-boundaries)
@@ -181,7 +183,7 @@
 - [15 JUnit Internals](#15-junit-internals)
   - [The JUnit Framework](#the-junit-framework)
   - [Conclusion](#conclusion)
-- [16 Refactoring `SerialDate`](#16-refactoring-serialdate)
+- [16 Refactoring SerialDate](#16-refactoring-serialdate)
   - [First, Make It Work](#first-make-it-work)
   - [Then Make It Right](#then-make-it-right)
   - [Conclusion](#conclusion)
@@ -211,11 +213,12 @@
 - [Appendix B: org.jfree.date.SerialDate](#appendix-b-orgjfreedateserialdate)
 
 ---
+
 # The Robert C. Martin Clean Code Collection
 
-![The Robert C. Martin Clean Code Collection Cover](clean-code-md-images/cover.jpeg)
+![The Robert C. Martin Clean Code Collection Cover](clean-code/clean-code-md-images/cover.jpeg)
 
-![Pearson Logo](clean-code-md-images/images/00060.jpg)
+![Pearson Logo](clean-code/clean-code-md-images/images/00060.jpg)
 
 Upper Saddle River, NJ • Boston • Indianapolis • San Francisco • New York • Toronto • Montreal • London • Munich • Paris • Madrid • Capetown • Sydney • Tokyo • Singapore • Mexico City
 
@@ -276,7 +279,7 @@ ISBN-10: 0-13-291122-1
 
 > Writing clean code is what you must do in order to call yourself a professional. There is no reasonable excuse for doing anything less than your best.
 
-![Clean Code Handbook Cover](clean-code-md-images/images/00065.jpg)
+![Clean Code Handbook Cover](clean-code/clean-code-md-images/images/00065.jpg)
 
 Upper Saddle River, NJ • Boston • Indianapolis • San Francisco • New York • Toronto • Montreal • London • Munich • Paris • Madrid • Capetown • Sydney • Tokyo • Singapore • Mexico City
 
@@ -386,7 +389,7 @@ Having completed this exercise in lofty insights, I am off to clean my desk.
 
 # Introduction
 
-![W.T.F. Door](clean-code-md-images/images/00070.jpg)
+![W.T.F. Door](clean-code/clean-code-md-images/images/00070.jpg)
 
 Which door represents your code? Which door represents your team or your company? Why are we in that room? Is this just a normal code review or have we found a stream of horrible problems shortly after going live? Are we debugging in a panic, poring over code that we thought worked? Are customers leaving in droves and managers breathing down our necks? How can we make sure we wind up behind the *right* door when the going gets tough? The answer is: *craftsmanship*.
 
@@ -446,7 +449,7 @@ The image of M104 on the cover is a combination of the famous visible light phot
 
 But in the infrared, the hot particles in the ring shine through the central bulge. The two images combined give us a view we've not seen before and imply that long ago it was a raging inferno of activity.
 
-![M104: Sombrero Galaxy](clean-code-md-images/images/00075.jpg)
+![M104: Sombrero Galaxy](clean-code/clean-code-md-images/images/00075.jpg)
 
 Cover image: © Spitzer Space Telescope
 
@@ -476,7 +479,7 @@ I was recently reading the preface to Kent Beck's book *Implementation Patterns*
 
 I know of one company that, in the late 80s, wrote a *killer* app. It was very popular, and lots of professionals bought and used it. But then the release cycles began to stretch. Bugs were not repaired from one release to the next. Load times grew and crashes increased. I remember the day I shut the product down in frustration and never used it again. The company went out of business a short time after that.
 
-![Illustration of a mess in code](clean-code-md-images/images/00083.jpg)
+![Illustration of a mess in code](clean-code/clean-code-md-images/images/00083.jpg)
 
 Two decades later I met one of the early employees of that company and asked him what had happened. The answer confirmed my fears. They had rushed the product to market and had made a huge mess in the code. As they added more and more features, the code got worse and worse until they simply could not manage it any longer. *It was the bad code that brought the company down.*
 
@@ -496,7 +499,7 @@ As the mess builds, the productivity of the team continues to decrease, asymptot
 
 > *Figure 1-1* Productivity vs. time
 
-![Productivity vs. time graph showing declining productivity as code mess grows](clean-code-md-images/images/00087.jpg)
+![Productivity vs. time graph showing declining productivity as code mess grows](clean-code/clean-code-md-images/images/00087.jpg)
 
 ## The Grand Redesign in the Sky
 
@@ -551,7 +554,7 @@ There are probably as many definitions as there are programmers. So I asked some
 ### Bjarne Stroustrup
 *inventor of C++ and author of The C++ Programming Language*
 
-![Bjarne Stroustrup](clean-code-md-images/images/00092.jpg)
+![Bjarne Stroustrup](clean-code/clean-code-md-images/images/00092.jpg)
 
 > "I like my code to be elegant and efficient. The logic should be straightforward to make it hard for bugs to hide, the dependencies minimal to ease maintenance, error handling complete according to an articulated strategy, and performance close to optimal so as not to tempt people to make the code messy with unprincipled optimizations. Clean code does one thing well."
 
@@ -568,7 +571,7 @@ Bjarne closes with the assertion that clean code does one thing well. It is no a
 ### Grady Booch
 *author of Object Oriented Analysis and Design with Applications*
 
-![Grady Booch](clean-code-md-images/images/00100.jpg)
+![Grady Booch](clean-code/clean-code-md-images/images/00100.jpg)
 
 > "Clean code is simple and direct. Clean code reads like well-written prose. Clean code never obscures the designer's intent but rather is full of crisp abstractions and straightforward lines of control."
 
@@ -581,7 +584,7 @@ I find Grady's use of the phrase "crisp abstraction" to be a fascinating oxymoro
 ### "Big" Dave Thomas
 *founder of OTI, godfather of the Eclipse strategy*
 
-!["Big" Dave Thomas](clean-code-md-images/images/00107.jpg)
+!["Big" Dave Thomas](clean-code/clean-code-md-images/images/00107.jpg)
 
 > "Clean code can be read, and enhanced by a developer other than its original author. It has unit and acceptance tests. It has meaningful names. It provides one way rather than many ways for doing one thing. It has minimal dependencies, which are explicitly defined, and provides a clear and minimal API. Code should be literate since depending on the language, not all necessary information can be expressed clearly in code alone."
 
@@ -596,7 +599,7 @@ Dave also says that code should be *literate*. This is a soft reference to Knuth
 ### Michael Feathers
 *author of Working Effectively with Legacy Code*
 
-![Michael Feathers](clean-code-md-images/images/00113.jpg)
+![Michael Feathers](clean-code/clean-code-md-images/images/00113.jpg)
 
 > "I could list all of the qualities that I notice in clean code, but there is one overarching quality that leads to all of them. Clean code always looks like it was written by someone who cares. There is nothing obvious that you can do to make it better. All of those things were thought about by the code's author, and if you try to imagine improvements, you're led back to where you are, sitting in appreciation of the code someone left for you—code left by someone who cares deeply about the craft."
 
@@ -609,7 +612,7 @@ Michael hit it on the head. Clean code is code that has been taken care of. Some
 
 Ron began his career programming in Fortran at the Strategic Air Command and has written code in almost every language and on almost every machine. It pays to consider his words carefully.
 
-![Ron Jeffries](clean-code-md-images/images/00118.jpg)
+![Ron Jeffries](clean-code/clean-code-md-images/images/00118.jpg)
 
 > "In recent years I begin, and nearly end, with Beck's rules of simple code. In priority order, simple code:
 >
@@ -637,7 +640,7 @@ Here, in a few short paragraphs, Ron has summarized the contents of this book. N
 ### Ward Cunningham
 *inventor of Wiki, inventor of Fit, coinventor of eXtreme Programming. Motive force behind Design Patterns. Smalltalk and OO thought leader. The godfather of all those who care about code.*
 
-![Ward Cunningham](clean-code-md-images/images/00123.jpg)
+![Ward Cunningham](clean-code/clean-code-md-images/images/00123.jpg)
 
 > "You know you are working on clean code when each routine you read turns out to be pretty much what you expected. You can call it beautiful code when the code also makes it look like the language was made for the problem."
 
@@ -653,7 +656,7 @@ And what about Ward's notion of beauty? We've all railed against the fact that o
 
 What about me (Uncle Bob)? What do I think clean code is? This book will tell you, in hideous detail, what I and my compatriots think about clean code. We will tell you what we think makes a clean variable name, a clean function, a clean class, etc. We will present these opinions as absolutes, and we will not apologize for our stridence. To us, at this point in our careers, they *are* absolutes. They are *our school of thought* about clean code.
 
-![Uncle Bob](clean-code-md-images/images/00130.jpg)
+![Uncle Bob](clean-code/clean-code-md-images/images/00130.jpg)
 
 Martial artists do not all agree about the best martial art, or the best technique within a martial art. Often master martial artists will form their own schools of thought and gather students to learn from them. So we see *Gracie Jiu Jistu*, founded and taught by the Gracie family in Brazil. We see Hakkoryu Jiu Jitsu, founded and taught by Okuyama Ryuho in Tokyo. We see Jeet Kune Do, founded and taught by Bruce Lee in the United States.
 
@@ -1885,7 +1888,7 @@ public class SetupTeardownIncluder {
 
 # Chapter 4: Comments
 
-![CleanCode](clean-code-md-images/images/00004.jpg)
+![CleanCode](clean-code/clean-code-md-images/images/00004.jpg)
 
 > "Don't comment bad code---rewrite it."
 >
@@ -2058,7 +2061,7 @@ There is a substantial risk, of course, that a clarifying comment is incorrect. 
 
 Sometimes it is useful to warn other programmers about certain consequences. For example, here is a comment that explains why a particular test case is turned off:
 
-![](clean-code-md-images/images/00006.jpg)
+![](clean-code/clean-code-md-images/images/00006.jpg)
 
 ```java
 // Don't run unless you
@@ -2844,7 +2847,7 @@ It's worth thinking about. Using the square root as the iteration limit satisfie
 
 # Chapter 5: Formatting
 
-![Professional work](clean-code-md-images/images/00007.jpg)
+![Professional work](clean-code/clean-code-md-images/images/00007.jpg)
 
 When people look under the hood, we want them to be impressed with the neatness, consistency, and attention to detail that they perceive. We want them to be struck by the orderliness. We want their eyebrows to rise as they scroll through the modules. We want them to perceive that professionals have been at work. If instead they see a scrambled mass of code that looks like it was written by a bevy of drunken sailors, then they are likely to conclude that the same inattention to detail pervades every other aspect of the project.
 
@@ -2868,7 +2871,7 @@ Seven different projects are depicted. JUnit, FitNesse, testNG, Time and Money, 
 
 > *Figure 5-1* File length distributions LOG scale (box height = sigma)
 
-![File length distributions LOG scale](clean-code-md-images/images/00011.jpg)
+![File length distributions LOG scale](clean-code/clean-code-md-images/images/00011.jpg)
 
 JUnit, FitNesse, and Time and Money are composed of relatively small files. None are over 500 lines and most of those files are less than 200 lines. Tomcat and Ant, on the other hand, have some files that are several thousand lines long and close to half are over 200 lines.
 
@@ -3150,7 +3153,7 @@ As an aside, this snippet provides a nice example of keeping constants at the ap
 
 As we have seen, this affinity might be based on a direct dependence, such as one function calling another, or a function using a variable. But there are other possible causes of affinity. Affinity might be caused because a group of functions perform a similar operation. Consider this snippet of code from JUnit 4.3.1:
 
-![Assert class](clean-code-md-images/images/00012.jpg)
+![Assert class](clean-code/clean-code-md-images/images/00012.jpg)
 
 ```java
 public class Assert {
@@ -3188,7 +3191,7 @@ How wide should a line be? To answer that, let's look at how wide lines are in t
 
 > *Figure 5-2* Java line width distribution
 
-![Java line width distribution](clean-code-md-images/images/00014.jpg)
+![Java line width distribution](clean-code/clean-code-md-images/images/00014.jpg)
 
 This suggests that we should strive to keep our lines short. The old Hollerith limit of 80 is a bit arbitrary, and I'm not opposed to lines edging out to 100 or even 120. But beyond that is probably just careless.
 
@@ -3388,7 +3391,7 @@ The title of this section is a play on words. Every programmer has his own favor
 
 A team of developers should agree upon a single formatting style, and then every member of that team should use that style. We want the software to have a consistent style. We don't want it to appear to have been written by a bunch of disagreeing individuals.
 
-![Team rules](clean-code-md-images/images/00016.jpg)
+![Team rules](clean-code/clean-code-md-images/images/00016.jpg)
 
 When I started the FitNesse project back in 2002, I sat down with the team to work out a coding style. This took about 10 minutes. We decided where we'd put our braces, what our indent size would be, how we would name classes, variables, and methods, and so forth. Then we encoded those rules into the code formatter of our IDE and have stuck with them ever since. These were not the rules that I prefer; they were rules decided by the team. As a member of that team I followed them when writing code in the FitNesse project.
 
@@ -3451,7 +3454,7 @@ private Integer[] getSortedWidths() {
 
 # Chapter 6: Objects and Data Structures
 
-![object structures](clean-code-md-images/images/00017.jpg)
+![object structures](clean-code/clean-code-md-images/images/00017.jpg)
 
 There is a reason that we keep our variables private. We don't want anyone else to depend on them. We want to keep the freedom to change their type or implementation on a whim or an impulse. Why, then, do so many programmers automatically add getters and setters to their objects, exposing their private variables as if they were public?
 
@@ -3636,7 +3639,7 @@ final String outputDir = scratchDir.getAbsolutePath();
 
 Are these two snippets of code violations of the Law of Demeter? Certainly the containing module knows that the `ctxt` object contains options, which contain a scratch directory, which has an absolute path. That's a lot of knowledge for one function to know. The calling function knows how to navigate through a lot of different objects.
 
-![](clean-code-md-images/images/00021.jpg)
+![](clean-code/clean-code-md-images/images/00021.jpg)
 
 Whether this is a violation of Demeter depends on whether or not `ctxt`, `Options`, and `ScratchDir` are objects or data structures. If they are objects, then their internal structure should be hidden rather than exposed, and so knowledge of their innards is a clear violation of the Law of Demeter. On the other hand, if `ctxt`, `Options`, and `ScratchDir` are just data structures with no behavior, then they naturally expose their internal structure, and so Demeter does not apply.
 
@@ -3770,7 +3773,7 @@ In any given system we will sometimes want the flexibility to add new data types
 
 by Michael Feathers
 
-![Error Handling illustration](clean-code-md-images/images/00023.jpg)
+![Error Handling illustration](clean-code/clean-code-md-images/images/00023.jpg)
 
 It might seem odd to have a section about error handling in a book about clean code. Error handling is just one of those things that we all have to do when we program. Input can be abnormal and devices can fail. In short, things can go wrong, and when they do, we as programmers are responsible for making sure that our code does what it needs to do.
 
@@ -3999,7 +4002,7 @@ Often a single exception class is fine for a particular area of code. The inform
 
 If you follow the advice in the preceding sections, you'll end up with a good amount of separation between your business logic and your error handling. The bulk of your code will start to look like a clean unadorned algorithm. However, the process of doing this pushes error detection to the edges of your program. You wrap external APIs so that you can throw your own exceptions, and you define a handler above your code so that you can deal with any aborted computation. Most of the time this is a great approach, but there are some times when you may not want to abort.
 
-![Normal Flow illustration](clean-code-md-images/images/00026.jpg)
+![Normal Flow illustration](clean-code/clean-code-md-images/images/00026.jpg)
 
 Let's take a look at an example. Here is some awkward code that sums expenses in a billing application:
 
@@ -4377,7 +4380,7 @@ We manage third-party boundaries by having very few places in the code that refe
 
 # Chapter 9: Unit Tests
 
-![Unit Tests illustration](clean-code-md-images/images/00035.jpg)
+![Unit Tests illustration](clean-code/clean-code-md-images/images/00035.jpg)
 
 Our profession has come a long way in the last ten years. In 1997 no one had heard of Test Driven Development. For the vast majority of us, unit tests were short bits of throw-away code that we wrote to make sure our programs "worked." We would painstakingly write our classes and methods, and then we would concoct some ad hoc code to test them. Typically this would involve some kind of simple driver program that would allow us to manually interact with the program we had written.
 
@@ -4783,7 +4786,7 @@ If you let the tests rot, then your code will rot too. Keep your tests clean.
 
 with Jeff Langr
 
-![Classes Intro Image](clean-code-md-images/images/00038.jpg)
+![Classes Intro Image](clean-code/clean-code-md-images/images/00038.jpg)
 
 So far in this book we have focused on how to write lines and blocks of code well. We have delved into proper composition of functions and how they interrelate. But for all the attention to the expressiveness of code statements and the functions they comprise, we still don't have clean code until we've paid attention to higher levels of code organization. Let's talk about clean classes.
 
@@ -5469,11 +5472,11 @@ Sometimes, of course, we need to make the application responsible for *when* an 
 
 > *Figure 11-1* Separating construction in `main()`
 
-![Separating construction in main()](clean-code-md-images/images/00041.jpg)
+![Separating construction in main()](clean-code/clean-code-md-images/images/00041.jpg)
 
 > *Figure 11-2* Separation construction with factory
 
-![Separation construction with factory](clean-code-md-images/images/00043.jpg)
+![Separation construction with factory](clean-code/clean-code-md-images/images/00043.jpg)
 
 Again notice that all the dependencies point from `main` toward the `OrderProcessing` application. This means that the application is decoupled from the details of how to build a `LineItem`. That capability is held in the `LineItemFactoryImplementation`, which is on the `main` side of the line. And yet the application is in complete control of when the `LineItem` instances get built and can even provide application-specific constructor arguments.
 
@@ -5724,7 +5727,7 @@ Each "bean" is like one part of a nested "Russian doll," with a domain object fo
 
 > *Figure 11-3* The "Russian doll" of decorators
 
-![The Russian doll of decorators](clean-code-md-images/images/00045.jpg)
+![The Russian doll of decorators](clean-code/clean-code-md-images/images/00045.jpg)
 
 The client believes it is invoking `getAccounts()` on a `Bank` object, but it is actually talking to the outermost of a set of nested **DECORATOR**[^14] objects that extend the basic behavior of the `Bank` POJO. We could add other decorators for transactions, caching, and so forth.
 
@@ -5907,7 +5910,7 @@ Whether you are designing systems or individual modules, never forget to *use th
 
 by Jeff Langr
 
-![Simple design rules icon](clean-code-md-images/images/00048.jpg)
+![Simple design rules icon](clean-code/clean-code-md-images/images/00048.jpg)
 
 ## Getting Clean via Emergent Design
 
@@ -6119,7 +6122,7 @@ Is there a set of simple practices that can replace experience? Clearly not. On 
 
 by Brett L. Schuchert
 
-![Clean Code Concurrency](clean-code-md-images/images/00051.jpg)
+![Clean Code Concurrency](clean-code/clean-code-md-images/images/00051.jpg)
 
 > "Objects are abstractions of processing. Threads are abstractions of schedule."
 >
@@ -6239,7 +6242,7 @@ When Java was young, Doug Lea wrote the seminal book[^8] *Concurrent Programming
 
 There are several other kinds of classes added to support advanced concurrency design. Here are a few examples:
 
-![Concurrency Libraries](clean-code-md-images/images/00053.jpg)
+![Concurrency Libraries](clean-code/clean-code-md-images/images/00053.jpg)
 
 > **Recommendation:** Review the classes available to you. In the case of Java, become familiar with `java.util.concurrent`, `java.util.concurrent.atomic`, `java.util.concurrent.locks`.
 
@@ -6247,7 +6250,7 @@ There are several other kinds of classes added to support advanced concurrency d
 
 There are several different ways to partition behavior in a concurrent application. To discuss them we need to understand some basic definitions.
 
-![Execution Models Definitions](clean-code-md-images/images/00057.jpg)
+![Execution Models Definitions](clean-code/clean-code-md-images/images/00057.jpg)
 
 Given these definitions, we can now discuss the various execution models used in concurrent programming.
 
@@ -6498,7 +6501,7 @@ If you take a clean approach, your chances of getting it right increase drastica
 
 ### Case Study of a Command-Line Argument Parser
 
-![Successive Refinement Illustration](clean-code-md-images/images/00062.jpg)
+![Successive Refinement Illustration](clean-code/clean-code-md-images/images/00062.jpg)
 
 This chapter is a case study in successive refinement. You will see a module that started well but did not scale. Then you will see how the module was refactored and cleaned.
 
@@ -12171,7 +12174,7 @@ To calculate the number of possible execution paths, we'll start with the genera
 
 For this simple case of *N* instructions in a sequence, no looping or conditionals, and *T* threads, the total number of possible execution paths is equal to:
 
-![Number of paths formula](clean-code-md-images/images/00085.jpg)
+![Number of paths formula](clean-code/clean-code-md-images/images/00085.jpg)
 
 #### Calculating the Possible Orderings
 
@@ -12241,9 +12244,9 @@ Before we go any further, here are three definitions that will be important:
 
 Here is the byte-code generated for `resetId()`:
 
-![Byte-code for resetId part 1](clean-code-md-images/images/00089.jpg)
+![Byte-code for resetId part 1](clean-code/clean-code-md-images/images/00089.jpg)
 
-![Byte-code for resetId part 2](clean-code-md-images/images/00096.jpg)
+![Byte-code for resetId part 2](clean-code/clean-code-md-images/images/00096.jpg)
 
 These three instructions are guaranteed to be atomic because, although the thread executing them could be interrupted after any one of them, the information for the `PUTFIELD` instruction (the constant value 0 on the top of the stack and the reference to `this` one below the top, along with the field value) cannot be touched by another thread. So when the assignment occurs, we are guaranteed that the value 0 will be stored in the field value. The operation is atomic. The operands all deal with information local to the method, so there is no interference between multiple threads.
 
@@ -12251,7 +12254,7 @@ So if these three instructions are executed by ten threads, there are $4.3867973
 
 With the `++` operation in the `getNextId` method, there are going to be problems. Assume that `lastId` holds 42 at the beginning of this method. Here is the byte-code for this new method:
 
-![Byte-code for getNextId](clean-code-md-images/images/00103.jpg)
+![Byte-code for getNextId](clean-code/clean-code-md-images/images/00103.jpg)
 
 Imagine the case where the first thread completes the first three instructions, up to and including `GETFIELD`, and then it is interrupted. A second thread takes over and performs the entire method, incrementing `lastId` by one; it gets 43 back. Then the first thread picks up where it left off; 42 is still on the operand stack because that was the value of `lastId` when it executed `GETFIELD`. It adds one to get 43 again and stores the result. The value 43 is returned to the first thread as well. The result is that one of the increments is lost because the first thread stepped on the second thread after the second thread interrupted the first thread.
 
@@ -12614,7 +12617,7 @@ For *N* pages being processed by a single thread, the total execution time is 1.
 
 > *Figure A-1* Single thread
 
-![Single thread performance timeline](clean-code-md-images/images/00110.jpg)
+![Single thread performance timeline](clean-code/clean-code-md-images/images/00110.jpg)
 
 ### Multithread Calculation of Throughput
 
@@ -12624,7 +12627,7 @@ As you can see in Figure A-2, the multithreaded solution allows the process-boun
 
 > *Figure A-2* Three concurrent threads
 
-![Three concurrent threads performance timeline](clean-code-md-images/images/00115.jpg)
+![Three concurrent threads performance timeline](clean-code/clean-code-md-images/images/00115.jpg)
 
 ## Deadlock
 
@@ -12679,7 +12682,7 @@ This is also referred to as the deadly embrace. Imagine two threads, T1 and T2, 
 
 > *Figure A-3* Circular Wait
 
-![Circular wait diagram](clean-code-md-images/images/00120.jpg)
+![Circular wait diagram](clean-code/clean-code-md-images/images/00120.jpg)
 
 All four of these conditions must hold for deadlock to be possible. Break any one of these conditions and deadlock is not possible.
 
@@ -16322,7 +16325,3 @@ public class SpreadsheetDate extends DayDate {
     }
 }
 ```
-
-
----
-
