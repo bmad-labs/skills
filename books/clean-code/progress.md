@@ -35,6 +35,191 @@
 | Appendix A | Complete | `clean-code/appendix-a-concurrency-ii.md` | 2026-01-26 | Fixed headers, code blocks, math formulas, and footnotes |
 | Appendix B | Complete | `clean-code/appendix-b-serialdate.md` | 2026-01-26 | Formatted listings and added descriptive alt text for code images |
 
+## Book 2: The Clean Coder
+
+| Chapter | Status | Output File | Date | Notes |
+|---------|--------|-------------|------|-------|
+| Ch 1: Professionalism | Complete | `clean-coder/coder-chapter-01-professionalism.md` | 2026-01-26 | Fixed headers, paragraphs, and footnote conversion |
+| Ch 2: Saying No | Complete | `clean-coder/coder-chapter-02-saying-no.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs and dialog cleanup |
+| Ch 3: Saying Yes | Complete | `clean-coder/coder-chapter-03-saying-yes.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs and dialog cleanup |
+| Ch 4: Coding | Complete | `clean-coder/coder-chapter-04-coding.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs, fixed emphasis, and footnote conversion |
+| Ch 5: Test Driven Development | Complete | `clean-coder/coder-chapter-05-tdd.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs, fixed emphasis, and detailed footnote conversion |
+| Ch 6: Practicing | Complete | `clean-coder/coder-chapter-06-practicing.md` | 2026-01-26 | Fixed headers, joined sentences, formatted footnotes |
+| Ch 7: Acceptance Testing | Complete | `clean-coder/coder-chapter-07-acceptance-testing.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs, dialog cleanup, and statistical test formatting |
+| Ch 8: Testing Strategies | Complete | `clean-coder/coder-chapter-08-testing-strategies.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs and Footnote/Pyramid conversion |
+| Ch 9: Time Management | Complete | `clean-coder/coder-chapter-09-time-management.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs, fixed emphasis, and footnote conversion |
+| Ch 10: Estimation | Complete | `clean-coder/coder-chapter-10-estimation.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs, dialog cleanup, and math symbol conversion |
+| Ch 11: Pressure | Complete | `clean-coder/coder-chapter-11-pressure.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs and emphasis cleanup |
+| Ch 12: Collaboration | Complete | `clean-coder/coder-chapter-12-collaboration.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs and emphasis cleanup |
+| Ch 13: Teams and Projects | Complete | `clean-coder/coder-chapter-13-teams-and-projects.md` | 2026-01-26 | High-quality manual formatting with joined paragraphs, emphasis cleanup, and velocity footnote |
+| Ch 14: Mentoring, Apprenticeship | Complete | `clean-coder/coder-chapter-14-mentoring.md` | 2026-01-26 | Fixed headers, joined sentences, formatted footnotes |
+| Appendix A: Tooling | Complete | `clean-coder/coder-appendix-a-tooling.md` | 2026-01-26 | High-quality manual formatting of Tooling appendix |
+
+---
+
+### Appendix A: Tooling (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Proper `#` and `##` for title and sections.
+- Text: Joined hundreds of split sentences into cohesive paragraphs.
+- Emphasis: Fixed `[word]` artifacts (e.g., `[then]`, `[Nobody]`, `[speed]`) to `*word*`.
+- Code: Formatted characters like `\n` and `\r` as inline code. Fixed `git` and `vi` formatting.
+- Footnotes: Converted `^**[1**...` to standard `[^1]` and added definitions at the end.
+- Images: Added descriptive alt text for the Teradyne system and FitNesse history charts.
+- Attributions: Formatted Figure captions consistently.
+- Cleanup: Removed calibre-specific markers and mid-word line breaks.
+
+---
+
+### Ch 14: Mentoring, Apprenticeship (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`) and H2 (`##`).
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[word]` artifacts to standard `*word*` (e.g., `[teaching]` -> *teaching*, `[mindset]` -> *mindset*, `[observable]` -> *observable*).
+- Footnotes: Converted corrupted markers (e.g., `^**[1**...`) to standard `[^1]` format and added definitions at the end.
+- Images: Added descriptive alt text for the "Tooling" illustration and FITNESSE history charts.
+- Appendix: Formatted the "Tooling" section (Appendix A) as part of the chapter, including fixing `git` and `vi` formatting.
+- Code blocks: Formatted inline characters like `\n` and `\r` with backticks.
+- Cleanup: Removed calibre-specific markers and mid-word line breaks.
+
+---
+
+### Ch 13: Teams and Projects (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`) and H2 (`##`).
+- Text/paragraphs: Joined dozens of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[word]` artifacts to standard `*word*` (e.g., `[gel]` -> *gel*, `[get things done]` -> *get things done*, `[points]` -> *points*).
+- Footnotes: Converted corrupted marker `^**[1**...` to standard `[^1]` format regarding "velocity".
+- Images: Added descriptive alt text for the chapter illustration (blender).
+- Bibliography: Formatted the chapter bibliography entries for RCM2003 and COHN2006 as a clean list with proper titles.
+- Cleanup: Removed mid-sentence line breaks and fixed word wrapping from the source.
+
+---
+
+### Ch 12: Collaboration (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`), H2 (`##`), and H3 (`###`).
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[word]` artifacts to standard `*word*` (e.g., `[team]` -> *team*, `[professionals pair]` -> *professionals pair*).
+- Footnotes: Converted corrupted marker `^**[1**...` to standard `[^1]` format and added definition.
+- Images: Added descriptive alt text for the chapter illustration.
+- Metadata: Verified chapter range and content consistency.
+
+---
+
+### Ch 11: Pressure (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`), H2 (`##`), and H3 (`###`).
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[word]` artifacts to standard `*word*` (e.g., `[literal]` -> *literal*, `[cause]` -> *cause*, `[not]` -> *not*).
+- Images: Added descriptive alt text for the chapter illustration.
+- Links: Updated internal cross-reference to `[Chapter 10](#chapter-10-estimation)`.
+
+---
+
+### Ch 8: Testing Strategies (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`), H2 (`##`), and H3 (`###`).
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[word]` artifacts to standard `*word*` (e.g., `[testing strategy]` -> *testing strategy*, `[not]` -> *not*, `[true]` -> *true*).
+- Footnotes: Converted corrupted marker `^**[1**...` to standard `[^1]` format and added references for Cem Kaner and Mike Cohn.
+- Images: Added descriptive alt text for Figure 8-1, 8-2, 8-3 and the chapter illustration.
+- Pyramid: Corrected the Test Automation Pyramid references and layout.
+- Links: Updated internal cross-references to point to standard Markdown anchors.
+
+---
+
+### Ch 7: Acceptance Testing (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`), H2 (`##`), and H3 (`###`).
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[word]` artifacts to standard `*word*` (e.g., `[acceptance test]` -> *acceptance test*, `[hard]` -> *hard*, `[done]` -> *done*).
+- Footnotes: Converted corrupted marker `^**[1**...` to standard `[^1]` format and added the Tom DeMarco reference from the source bibliography.
+- Images: Added descriptive alt text for Figure 7-1 and the chapter illustration.
+- Dialog: Cleaned up extensive Paula/Sam/Peter/Tom dialogs, fixing mid-sentence breaks and formatting as blockquotes.
+- Code/Test Formatting: Formatted FITNESSE-style tests as clean blockquotes with code font for readability.
+- Links: Updated internal cross-references to point to standard Markdown anchors (e.g., `#chapter-10-estimation`).
+
+---
+
+### Ch 4: Coding (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`), H2 (`##`), and H3 (`###`).
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[text]` artifacts to standard `*text*` (e.g., `[act]` -> `*act*`).
+- Footnotes: Converted corrupted markers (e.g., `^**[1**...`) to standard `[^1]` format and added definitions.
+- Images: Added descriptive alt text for the "Coding" illustration.
+- Code blocks: Ensured inline code like `if` and `while` use backticks.
+- Cleanup: Removed calibre-specific markers (`::: calibre164`).
+
+---
+
+### Ch 3: Saying Yes (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`) and H2 (`##`). Added H3 (`###`) for sub-sections in the guest article.
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[text]` artifacts to standard `*text*` (e.g., `[say]` -> `*say*`).
+- Dialog: Cleaned up the Marge/Peter dialogs, fixing mid-sentence breaks and formatting as blockquotes.
+- Blockquotes: simplified Roy Osherove's guest article with proper indentation and separators.
+- Footnotes: Converted corrupted markers (e.g., `^**[1**...`) to standard `[^1]` format and added definitions.
+- Images: Added descriptive alt text for the "Saying Yes" illustration.
+
+---
+
+### Ch 2: Saying No (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`) and H2 (`##`).
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[text]` artifacts to standard `*text*` (e.g., `[lying]` -> `*lying*`).
+- Dialog: Cleaned up the Paula/Mike dialogs, removing excessive nesting and fixing mid-sentence breaks.
+- Blockquotes: simplified John Blanco's guest story with proper indentation and separators.
+- Footnotes: Converted corrupted markers (e.g., `^**[1**...`) to standard `[^1]` format and added definitions.
+- Images: Added descriptive alt text for the "Do or do not" illustration.
+
+---
+
+### Ch 1: Professionalism (The Clean Coder) - 2026-01-26
+
+**Status:** Complete
+
+**Fixes Applied:**
+- Headers: Converted **Bold** headers to H1 (`#`) and H2 (`##`).
+- Text/paragraphs: Joined hundreds of split lines into cohesive paragraphs.
+- Emphasis: Fixed `[text]` artifacts to standard `*text*` (e.g., `[professional!]` -> `*professional!*`).
+- Blockquotes: Cleaned up nested quotes, simplified attributions to `> — Author`.
+- Footnotes: Converted corrupted markers (e.g., `^**[1**...`) to standard `[^1]` format and added definitions.
+- Images: Added descriptive alt text for the chapter illustration.
+- Bibliography: Formatted as a clean list.
+
 ---
 
 ### Appendix A: Concurrency II - 2026-01-26
@@ -251,7 +436,7 @@
 
 | Date | Agent | Chapters Processed | Duration |
 |------|-------|-------------------|----------|
-| 2026-01-26 | opencode | Chapters 1, 2, 3, 4, 5, 6 | 2 hours |
+| 2026-01-26 | opencode | Chapters 1-14 | 8 hours |
 
 ---
 
