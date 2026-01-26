@@ -45,48 +45,6 @@ ISBN-10: 0-13-291122-1
 
 ---
 
-## Table of Contents
-
-- [Book 1: Clean Code](#clean-code)
-  - [Chapter 1: Clean Code](#chapter-1-clean-code)
-  - [Chapter 2: Meaningful Names](#chapter-2-meaningful-names)
-  - [Chapter 3: Functions](#chapter-3-functions)
-  - [Chapter 4: Comments](#chapter-4-comments)
-  - [Chapter 5: Formatting](#chapter-5-formatting)
-  - [Chapter 6: Objects and Data Structures](#chapter-6-objects-and-data-structures)
-  - [Chapter 7: Error Handling](#chapter-7-error-handling)
-  - [Chapter 8: Boundaries](#chapter-8-boundaries)
-  - [Chapter 9: Unit Tests](#chapter-9-unit-tests)
-  - [Chapter 10: Classes](#chapter-10-classes)
-  - [Chapter 11: Systems](#chapter-11-systems)
-  - [Chapter 12: Emergence](#chapter-12-emergence)
-  - [Chapter 13: Concurrency](#chapter-13-concurrency)
-  - [Chapter 14: Successive Refinement](#chapter-14-successive-refinement)
-  - [Chapter 15: JUnit Internals](#chapter-15-junit-internals)
-  - [Chapter 16: Refactoring SerialDate](#chapter-16-refactoring-serialdate)
-  - [Chapter 17: Smells and Heuristics](#chapter-17-smells-and-heuristics)
-  - [Appendix A: Concurrency II](#appendix-a-concurrency-ii)
-  - [Appendix B: org.jfree.date.SerialDate](#appendix-b-orgjfreedateserialdate)
-  - [Appendix C: Cross References of Heuristics](#appendix-c-cross-references-of-heuristics)
-- [Book 2: The Clean Coder](#the-clean-coder)
-  - [Chapter 1: Professionalism](#chapter-1-professionalism)
-  - [Chapter 2: Saying No](#chapter-2-saying-no)
-  - [Chapter 3: Saying Yes](#chapter-3-saying-yes)
-  - [Chapter 4: Coding](#chapter-4-coding)
-  - [Chapter 5: Test Driven Development](#chapter-5-test-driven-development)
-  - [Chapter 6: Practicing](#chapter-6-practicing)
-  - [Chapter 7: Acceptance Testing](#chapter-7-acceptance-testing)
-  - [Chapter 8: Testing Strategies](#chapter-8-testing-strategies)
-  - [Chapter 9: Time Management](#chapter-9-time-management)
-  - [Chapter 10: Estimation](#chapter-10-estimation)
-  - [Chapter 11: Pressure](#chapter-11-pressure)
-  - [Chapter 12: Collaboration](#chapter-12-collaboration)
-  - [Chapter 13: Teams and Projects](#chapter-13-teams-and-projects)
-  - [Chapter 14: Mentoring, Apprenticeship, and Craftsmanship](#chapter-14-mentoring-apprenticeship-and-craftsmanship)
-  - [Appendix A: Tooling](#appendix-a-tooling)
-
----
-
 # Clean Code
 
 ## A Handbook of Agile Software Craftsmanship
