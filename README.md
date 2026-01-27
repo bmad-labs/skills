@@ -36,7 +36,7 @@ npx add-skill bmad-labs/skills --list
 npx add-skill bmad-labs/skills
 
 # Install common skills for TypeScript development
-npx add-skill bmad-labs/skills --skill clean-code --skill typescript-e2e-testing --skill typescript-unit-testing
+npx add-skill bmad-labs/skills --skill typescript-clean-code --skill typescript-e2e-testing --skill typescript-unit-testing
 
 # Install to specific agent (e.g., claude-code, cursor, codex)
 npx add-skill bmad-labs/skills -a claude-code
@@ -106,7 +106,7 @@ If you only need specific skills, add them individually to your project's `.clau
 - `github:bmad-labs/skills/skills/typescript-e2e-testing`
 - `github:bmad-labs/skills/skills/typescript-unit-testing`
 - `github:bmad-labs/skills/skills/skill-creator`
-- `github:bmad-labs/skills/skills/clean-code`
+- `github:bmad-labs/skills/skills/typescript-clean-code`
 - `github:bmad-labs/skills/skills/book-converter`
 - `github:bmad-labs/skills/skills/skill-from-book`
 
@@ -169,7 +169,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [typescript-e2e-testing](skills/typescript-e2e-testing) | Comprehensive E2E testing for TypeScript/NestJS with Kafka, PostgreSQL, MongoDB, Redis | Development |
 | [typescript-unit-testing](skills/typescript-unit-testing) | Unit testing for TypeScript/NestJS with Jest, DeepMocked, mongodb-memory-server, pg-mem, Kafka, Redis | Development |
 | [skill-creator](skills/skill-creator) | Guide for creating effective Claude Code skills | Development |
-| [clean-code](skills/clean-code) | Clean Code principles and workflows for TypeScript development | Development |
+| [typescript-clean-code](skills/typescript-clean-code) | Clean Code principles and workflows for TypeScript development | Development |
 | [book-converter](skills/book-converter) | Convert EPUB books to formatted Markdown | Productivity |
 | [skill-from-book](skills/skill-from-book) | Convert book content into structured Claude Code skills | Development |
 

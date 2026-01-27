@@ -1,5 +1,5 @@
 ---
-name: clean-code
+name: typescript-clean-code
 description: |
   Clean Code principles, professional practices, and workflows for TypeScript developers. Based on Robert C. Martin's "Clean Code" and "The Clean Coder" books.
   
