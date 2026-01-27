@@ -24,25 +24,22 @@ Skills are self-contained instruction sets that teach Claude Code how to perform
 
 ## Installation
 
-### Method 1: Install via add-skill CLI (Recommended)
+### Method 1: Install via skills CLI (Recommended)
 
-The easiest way to install skills using the [`add-skill`](https://www.npmjs.com/package/add-skill) package. Supports Claude Code, Cursor, Codex, OpenCode, and [20+ other agents](https://www.npmjs.com/package/add-skill#available-agents).
+The easiest way to install skills using the [`skills`](https://www.npmjs.com/package/skills) package. Supports Claude Code, Cursor, Codex, OpenCode, and [20+ other agents](https://www.npmjs.com/package/skills#available-agents).
 
 ```bash
-# List available skills
-npx add-skill bmad-labs/skills --list
-
 # Install all skills
-npx add-skill bmad-labs/skills
+npx skills add bmad-labs/skills
 
-# Install common skills for TypeScript development
-npx add-skill bmad-labs/skills --skill typescript-clean-code --skill typescript-e2e-testing --skill typescript-unit-testing
+# Install specific skills for TypeScript development
+npx skills add bmad-labs/skills --skill typescript-clean-code --skill typescript-e2e-testing --skill typescript-unit-testing
 
 # Install to specific agent (e.g., claude-code, cursor, codex)
-npx add-skill bmad-labs/skills -a claude-code
+npx skills add bmad-labs/skills -a claude-code
 
 # Install globally (user-level, available in all projects)
-npx add-skill bmad-labs/skills -g
+npx skills add bmad-labs/skills -g
 ```
 
 ### Method 2: Install via Plugin Marketplace
