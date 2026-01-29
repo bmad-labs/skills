@@ -187,17 +187,17 @@ Expand your Claude Code capabilities with these excellent skills from the commun
 npx skills add vercel-labs/agent-browser
 
 # Install React best practices skill
-npx skills add vercel-labs/agent-skills --skill react-best-practices
+npx skills add vercel-labs/agent-skills --skill vercel-react-best-practices
 
 # Install all recommended skills at once
 npx skills add vercel-labs/agent-browser && \
-npx skills add vercel-labs/agent-skills --skill react-best-practices
+npx skills add vercel-labs/agent-skills --skill vercel-react-best-practices
 ```
 
 | Repository | Skill | Description |
 |------------|-------|-------------|
 | [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser) | agent-browser | Browser automation and web interaction capabilities |
-| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | react-best-practices | React development best practices and patterns |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | vercel-react-best-practices | React development best practices and patterns |
 
 ## License
 
