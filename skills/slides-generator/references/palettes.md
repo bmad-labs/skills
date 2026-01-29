@@ -1,6 +1,6 @@
 # Color Palette Library
 
-> 76 color palettes, organized by style
+> 78 color palettes, organized by style
 
 ---
 
@@ -10,9 +10,9 @@
 
 | Content | Line Range | Description |
 |---------|------------|-------------|
-| Quick Query Index | 32-111 | 76 palettes with ID/name/tags/scenario |
-| AI Usage Guide | 115-138 | Color value mapping and derivation rules |
-| Dark/Black Themes | 143-365 | 18 palette details |
+| Quick Query Index | 32-113 | 78 palettes with ID/name/tags/scenario |
+| AI Usage Guide | 117-150 | Color value mapping and derivation rules |
+| Dark/Black Themes | 155-365 | 18 palette details |
 | Light/Minimal Themes | 366-432 | 6 palette details |
 | Neon/Cyberpunk | 433-486 | 5 palette details |
 | Natural Landscapes | 487-579 | 9 palette details |
@@ -26,7 +26,8 @@
 | Monochrome | 997-1076 | 6 palette details |
 | Professional/Business | 1077-1143 | 5 palette details |
 | Regional/Cultural | 1144-1158 | 1 palette details |
-| Other Palettes | 1159-1240 | 8 palette details |
+| Other Palettes | 1159-1250 | 8 palette details |
+| Brand-Inspired Themes | 1280-1350 | 2 palette details (Redis) |
 
 ---
 
@@ -110,6 +111,8 @@
 | 74 | slate-maroon-pink | professional,gray,maroon,formal | Formal occasions | flat | [→](#slate-maroon-pink) |
 | 75 | dull-grays-orange | professional,gray,orange,modern | Modern professional | flat | [→](#dull-grays-orange) |
 | 76 | sweden | regional,Sweden,flag,Nordic | Nordic style | flat | [→](#sweden) |
+| 77 | redis-predictions | dark,red,tech,enterprise,SaaS | Tech predictions, AI demos | flat | [→](#redis-predictions) |
+| 78 | redis-docs-dark | dark,slate,developer,documentation | Developer docs, technical | glass | [→](#redis-docs-dark) |
 
 ---
 
@@ -1269,3 +1272,77 @@ Each palette provides 5 core color values, mapped as follows:
 | Warm/cozy | autumn, halloween-warm, caramel-sage-green |
 | Professional/trustworthy | banking-website, navy-and-blush, slate-maroon-pink |
 | Romantic/soft | lavendar, periwinkle-and-coral, blush-and-slate |
+| Developer/Technical | redis-docs-dark, hacker-news, react |
+| AI/Predictions | redis-predictions, dark-sapphire-blue, space |
+
+---
+
+## Brand-Inspired Themes
+
+### redis-predictions
+**Tags:** dark, red, tech, enterprise, SaaS, AI, predictions
+**Inspired by:** [Redis 2026 Predictions](https://redis.io/2026-predictions/)
+
+| Value | Hex | Usage |
+|-------|-----|-------|
+| 1 | `#10141c` | bg-100 (dark navy background) |
+| 2 | `#ec2d01` | primary-100 (Redis red, CTAs) |
+| 3 | `#f64516` | primary-200 (hover red) |
+| 4 | `#694539` | accent-100 (muted brown) |
+| 5 | `#ffffff` | text-100 (white text) |
+
+**Extended Palette:**
+| Token | Hex | Usage |
+|-------|-----|-------|
+| bg-200 | `#1a1f2a` | elevated cards |
+| bg-300 | `#252b38` | borders, dividers |
+| text-200 | `#bbbbbc` | secondary text |
+| text-muted | `#6a6a6b` | muted labels |
+| accent-200 | `#6a100d` | dark red accent |
+
+**Typography:** System sans-serif stack (-apple-system, Segoe UI, Roboto)
+**Style:** flat (minimal, content-focused, enterprise SaaS)
+
+**Recommended for:**
+- AI/ML product demos
+- Tech predictions presentations
+- Enterprise SaaS pitches
+- Forward-looking trend reports
+
+---
+
+### redis-docs-dark
+**Tags:** dark, slate, developer, documentation, technical, modern
+**Inspired by:** [Redis AI Documentation](https://redis.io/docs/latest/develop/ai/)
+
+| Value | Hex | Usage |
+|-------|-----|-------|
+| 1 | `#0f172a` | bg-100 (dark slate background) |
+| 2 | `#3b82f6` | primary-100 (blue accent) |
+| 3 | `#60a5fa` | primary-200 (light blue) |
+| 4 | `#fbbf24` | accent-100 (amber highlight) |
+| 5 | `#f8fafc` | text-100 (off-white text) |
+
+**Extended Palette:**
+| Token | Hex | Usage |
+|-------|-----|-------|
+| bg-200 | `#1e293b` | elevated surfaces, cards |
+| bg-300 | `#334155` | code blocks, borders |
+| text-200 | `#94a3b8` | secondary text |
+| text-muted | `#64748b` | muted text, labels |
+| accent-200 | `#d97706` | dark amber |
+| code-bg | `#1e293b` | code block background |
+
+**Typography:**
+- Display: Space Grotesk (variable weight)
+- Body: Geist (400)
+- Code: Geist Mono, Space Mono
+
+**Style:** glass (subtle glassmorphism for cards, developer-focused)
+
+**Recommended for:**
+- Technical documentation presentations
+- Developer-focused demos
+- API/SDK showcases
+- Code-heavy slides
+- AI/ML technical content
