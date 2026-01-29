@@ -1455,6 +1455,50 @@ Each palette provides 5 core color values, mapped as follows:
 - Nav chips: Rounded buttons with `$` prefix commands
 - Active state: Darker bg or underline
 
+**Hover Animations:**
+- **Card hover**: Border color transitions from `#e8e8e8` to primary teal `#00bfa5`
+- **Text color change**: Card title/content transitions to primary teal on hover
+- **Arrow reveal**: Right arrow (`→`) appears in bottom-right corner on hover
+- **Smooth transition**: `transition: all 0.2s ease` for color and border changes
+- **No scale/shadow**: Cards stay flat, only color changes (no lift effect)
+
+**Hover State Example:**
+```
+Normal state:                      Hover state:
+┌─────────────────────┐           ┌─────────────────────┐ ← teal border
+│ filename.ts       ● │           │ filename.ts       ● │
+│                     │           │                     │
+│ import Title        │  ──────►  │ import Title        │ ← teal text
+│ // 1234 skills      │           │ // 1234 skills      │ ← teal numbers
+│                     │           │                   → │ ← arrow appears
+└─────────────────────┘           └─────────────────────┘
+```
+
+**Framer Motion Implementation:**
+```jsx
+// Card hover animation
+<motion.div
+  className="border border-gray-200 rounded-lg p-4"
+  whileHover={{
+    borderColor: '#00bfa5',
+    transition: { duration: 0.2 }
+  }}
+>
+  <motion.span
+    className="text-gray-900"
+    whileHover={{ color: '#00bfa5' }}
+  >
+    import Title
+  </motion.span>
+  <motion.span
+    className="opacity-0"
+    whileHover={{ opacity: 1 }}
+  >
+    →
+  </motion.span>
+</motion.div>
+```
+
 **Style:** flat (clean, IDE-inspired, code-editor aesthetic)
 
 **Recommended for:**
