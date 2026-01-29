@@ -1,6 +1,6 @@
 # Color Palette Library
 
-> 78 color palettes, organized by style
+> 79 color palettes, organized by style
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Content | Line Range | Description |
 |---------|------------|-------------|
-| Quick Query Index | 32-113 | 78 palettes with ID/name/tags/scenario |
+| Quick Query Index | 32-116 | 79 palettes with ID/name/tags/scenario |
 | AI Usage Guide | 117-150 | Color value mapping and derivation rules |
 | Dark/Black Themes | 155-365 | 18 palette details |
 | Light/Minimal Themes | 366-432 | 6 palette details |
@@ -27,7 +27,7 @@
 | Professional/Business | 1077-1143 | 5 palette details |
 | Regional/Cultural | 1144-1158 | 1 palette details |
 | Other Palettes | 1159-1250 | 8 palette details |
-| Brand-Inspired Themes | 1280-1350 | 2 palette details (Redis) |
+| Brand-Inspired Themes | 1280-1400 | 3 palette details (Redis) |
 
 ---
 
@@ -113,6 +113,7 @@
 | 76 | sweden | regional,Sweden,flag,Nordic | Nordic style | flat | [→](#sweden) |
 | 77 | redis-predictions | dark,red,tech,enterprise,SaaS | Tech predictions, AI demos | flat | [→](#redis-predictions) |
 | 78 | redis-docs-dark | dark,slate,developer,documentation | Developer docs, technical | glass | [→](#redis-docs-dark) |
+| 79 | redis-docs-light | light,slate,developer,documentation,AI | Developer docs, AI content | flat | [→](#redis-docs-light) |
 
 ---
 
@@ -1272,8 +1273,8 @@ Each palette provides 5 core color values, mapped as follows:
 | Warm/cozy | autumn, halloween-warm, caramel-sage-green |
 | Professional/trustworthy | banking-website, navy-and-blush, slate-maroon-pink |
 | Romantic/soft | lavendar, periwinkle-and-coral, blush-and-slate |
-| Developer/Technical | redis-docs-dark, hacker-news, react |
-| AI/Predictions | redis-predictions, dark-sapphire-blue, space |
+| Developer/Technical | redis-docs-dark, redis-docs-light, hacker-news, react |
+| AI/Predictions | redis-predictions, redis-docs-light, dark-sapphire-blue, space |
 
 ---
 
@@ -1346,3 +1347,50 @@ Each palette provides 5 core color values, mapped as follows:
 - API/SDK showcases
 - Code-heavy slides
 - AI/ML technical content
+
+---
+
+### redis-docs-light
+**Tags:** light, red, developer, documentation, AI, modern, technical, clean
+**Inspired by:** [Redis AI Documentation](https://redis.io/docs/latest/develop/ai/)
+
+| Value | Hex | Usage |
+|-------|-----|-------|
+| 1 | `#ffffff` | bg-100 (pure white background) |
+| 2 | `#dc382d` | primary-100 (Redis red accent) |
+| 3 | `#b82d24` | primary-200 (darker red hover) |
+| 4 | `#161f31` | accent-100 (dark navy text) |
+| 5 | `#161f31` | text-100 (primary text) |
+
+**Extended Palette:**
+| Token | Hex | Usage |
+|-------|-----|-------|
+| bg-200 | `#f9f9f9` | secondary background, card hover |
+| bg-300 | `#e5e5e5` | borders, dividers, card outlines |
+| text-200 | `#6b7280` | secondary/metadata text, breadcrumbs |
+| text-muted | `#9ca3af` | muted labels, placeholders |
+| accent-200 | `#ff6b5b` | light red for icons |
+| code-bg | `#1e293b` | code block background (dark) |
+| code-text | `#f8fafc` | code text (light on dark) |
+| link | `#dc382d` | accent links (Commands, etc.) |
+
+**Typography:**
+- Display: System sans-serif (-apple-system, BlinkMacSystemFont, Segoe UI)
+- Body: System sans-serif (clean, readable)
+- Code: Monospace (JetBrains Mono, Fira Code)
+
+**UI Elements:**
+- Cards: white bg, `#e5e5e5` border, no shadow, `rounded-lg`
+- Icons: Redis red `#dc382d` or coral `#ff6b5b`
+- Active nav indicator: vertical red bar on left
+- Links: underlined text, red for accent links
+- Buttons: red bg `#dc382d` with white text
+
+**Style:** flat (clean documentation style, minimal shadows, high readability)
+
+**Recommended for:**
+- Technical documentation presentations
+- AI/ML feature showcases
+- Developer tutorials
+- API walkthroughs
+- Clean, professional technical content

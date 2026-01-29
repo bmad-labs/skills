@@ -32,11 +32,17 @@ Optimized for presentation scenarios—balancing readability and personality:
 - Outfit — Rounded, strong approachability
 - Manrope — Clear, slight personality
 - Poppins — Geometric rounded, trendy feel
+- Space Grotesk — Variable weight, technical documentation (Redis style)
 
 **Body fonts for content (choose one):**
 - Source Sans 3 — High readability, professional
 - Nunito Sans — Soft, friendly
 - Work Sans — Neutral, highly adaptable
+- Geist — Modern, clean technical documentation (Redis style)
+
+**Code/Monospace fonts (for code-heavy slides):**
+- Geist Mono — Modern monospace, pairs with Geist
+- Space Mono — Technical, pairs with Space Grotesk
 
 ### Typography Usage Principles
 
