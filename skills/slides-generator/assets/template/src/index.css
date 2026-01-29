@@ -1,0 +1,345 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Layout Safe Area Variables ===== */
+:root {
+  /* Navigation bar safe area */
+  --nav-height: 4rem;
+  --nav-margin: 1.5rem; /* bottom-6 */
+  --nav-safe-area: calc(var(--nav-height) + var(--nav-margin) + 1rem);
+
+  /* Default spacing (2K baseline) */
+  --slide-padding: 2.5rem;
+  --card-gap: 1.5rem;
+}
+
+/* 1080p and below */
+@media (max-width: 1920px) {
+  :root {
+    --slide-padding: 2rem;
+    --card-gap: 1rem;
+  }
+}
+
+/* 4K and above */
+@media (min-width: 2560px) {
+  :root {
+    --slide-padding: 3rem;
+    --card-gap: 2rem;
+  }
+}
+
+/* Global style reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Responsive base font - based on viewport width */
+html {
+  /* 4K screen optimization: 1vw = 38.4px on 4K (3840px), = 19.2px on 1080p */
+  font-size: clamp(14px, 1vw, 24px);
+}
+
+body {
+  /* Default: Use theme font-family or fallback to system fonts */
+  /* Recommended: Sora, DM Sans, Outfit, Manrope, Poppins */
+  /* Avoid: Inter, Roboto, Arial (too generic) */
+  font-family: var(--font-body, 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif);
+  background-color: #0a0a0a;
+  color: #fafafa;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Display font for headings */
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: var(--font-display, 'Sora', 'DM Sans', sans-serif);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 0.4vw;
+  height: 0.4vw;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.2vw;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Code font */
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Glassmorphism effect - dark theme */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Glassmorphism effect - light theme */
+.glass-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Gradient border effect */
+.gradient-border {
+  position: relative;
+  background: transparent;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Glowing border animation */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 2vw rgba(222, 40, 59, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 4vw rgba(222, 40, 59, 0.35);
+  }
+}
+
+.glow-primary {
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #de283b, #ff6366);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Smooth transition */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pulse animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Entry animation - fade in from bottom */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Entry animation - scale fade in */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* Entry animation - fade in */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* Responsive utility classes */
+.text-vw-xs { font-size: 0.8vw; }
+.text-vw-sm { font-size: 1vw; }
+.text-vw-base { font-size: 1.2vw; }
+.text-vw-lg { font-size: 1.5vw; }
+.text-vw-xl { font-size: 1.8vw; }
+.text-vw-2xl { font-size: 2.2vw; }
+.text-vw-3xl { font-size: 2.8vw; }
+.text-vw-4xl { font-size: 3.5vw; }
+.text-vw-5xl { font-size: 4.5vw; }
+.text-vw-6xl { font-size: 5.5vw; }
+.text-vw-7xl { font-size: 7vw; }
+.text-vw-8xl { font-size: 9vw; }
+
+/* Responsive spacing */
+.gap-vw-1 { gap: 0.25vw; }
+.gap-vw-2 { gap: 0.5vw; }
+.gap-vw-3 { gap: 0.75vw; }
+.gap-vw-4 { gap: 1vw; }
+.gap-vw-6 { gap: 1.5vw; }
+.gap-vw-8 { gap: 2vw; }
+
+.p-vw-2 { padding: 0.5vw; }
+.p-vw-3 { padding: 0.75vw; }
+.p-vw-4 { padding: 1vw; }
+.p-vw-6 { padding: 1.5vw; }
+.p-vw-8 { padding: 2vw; }
+
+.px-vw-4 { padding-left: 1vw; padding-right: 1vw; }
+.px-vw-6 { padding-left: 1.5vw; padding-right: 1.5vw; }
+.px-vw-8 { padding-left: 2vw; padding-right: 2vw; }
+.py-vw-2 { padding-top: 0.5vw; padding-bottom: 0.5vw; }
+.py-vw-4 { padding-top: 1vw; padding-bottom: 1vw; }
+
+.mb-vw-2 { margin-bottom: 0.5vw; }
+.mb-vw-4 { margin-bottom: 1vw; }
+.mb-vw-6 { margin-bottom: 1.5vw; }
+.mb-vw-8 { margin-bottom: 2vw; }
+
+.space-y-vw-4 > * + * { margin-top: 1vw; }
+.space-y-vw-6 > * + * { margin-top: 1.5vw; }
+.space-y-vw-8 > * + * { margin-top: 2vw; }
+
+/* Responsive border radius */
+.rounded-vw { border-radius: 0.5vw; }
+.rounded-vw-lg { border-radius: 0.8vw; }
+.rounded-vw-xl { border-radius: 1vw; }
+.rounded-vw-2xl { border-radius: 1.2vw; }
+.rounded-vw-full { border-radius: 50%; }
+
+/* ===== Slide Layout Utility Classes ===== */
+
+/* Slide page container - reserve navigation safe area */
+.slide-page {
+  /* Force size constraints - prevent override by h-screen/h-full */
+  height: 100% !important;
+  max-height: 100% !important;
+  width: 100%;
+
+  /* Force padding - prevent override by extra padding */
+  padding: var(--slide-padding) !important;
+  padding-bottom: var(--nav-safe-area) !important;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Defensive: direct children of slide-page should not fill height */
+.slide-page > * {
+  max-height: 100%;
+  box-sizing: border-box;
+}
+
+/* Defensive: prevent h-screen usage inside slide-page */
+.slide-page [class*="h-screen"] {
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Slide content area - auto-fill remaining space */
+.slide-content {
+  flex: 1;
+  min-height: 0; /* Allow flex shrink */
+  max-height: 100%; /* Prevent overflow */
+  overflow: hidden;
+}
+
+/* Equal height grid layout */
+.grid-auto-fit {
+  display: grid;
+  gap: var(--card-gap);
+}
+
+.grid-2x2 {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.grid-1x3 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr;
+}
+
+.grid-2x3 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+/* Card adaptive height */
+.card-fit {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.card-fit > * {
+  flex-shrink: 0;
+}
+
+.card-fit > .card-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
