@@ -1,6 +1,8 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 
-export default function Background({
+// Memoized Background component - prevents re-renders when parent updates
+const Background = memo(function Background({
   variant = 'glow',
   animate = true,
   className = ''
@@ -11,16 +13,18 @@ export default function Background({
       <div className="absolute inset-0 bg-gradient-to-br from-bg-base via-bg-base to-bg-elevated" />
 
       {/* Variant-specific decorations */}
-      {variant === 'glow' && <GlowEffect animate={animate} />}
-      {variant === 'grid' && <GridPattern />}
-      {variant === 'mesh' && <MeshGradient animate={animate} />}
-      {variant === 'minimal' && <MinimalAccent />}
+      {variant === 'glow' ? <GlowEffect animate={animate} /> : null}
+      {variant === 'grid' ? <GridPattern /> : null}
+      {variant === 'mesh' ? <MeshGradient animate={animate} /> : null}
+      {variant === 'minimal' ? <MinimalAccent /> : null}
 
       {/* Noise texture overlay */}
       <NoiseOverlay />
     </div>
   );
-}
+});
+
+export default Background;
 
 // Floating glow orbs
 function GlowEffect({ animate }) {
