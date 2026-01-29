@@ -302,7 +302,9 @@ h1, h2, h3, h4, h5, h6, .font-display {
   flex: 1;
   min-height: 0; /* Allow flex shrink */
   max-height: 100%; /* Prevent overflow */
-  overflow: hidden;
+  overflow: visible; /* Allow hover scale effects to show */
+  padding: 4px; /* Small padding to accommodate scale(1.02) hover effect */
+  margin: -4px; /* Compensate padding to maintain layout */
 }
 
 /* Equal height grid layout */
