@@ -98,37 +98,56 @@ See [context-guide.md](references/context-guide.md) for detailed question flow.
 ```
 
 **Phase 3 - Style Discovery** (Always):
+
+**Step 1**: Get keywords from user
 ```
 "Describe the vibe in a few words"
   Examples: "tech, modern, dark" or "professional, clean, corporate"
 ```
 
-Then present 5 best-match palettes from [palettes.md](references/palettes.md):
+**Step 2**: Use **ui-ux-pro-max** skill for comprehensive design recommendations
 
+```bash
+python3 ~/.claude/skills/ui-ux-pro-max/scripts/search.py "<topic> <keywords> presentation" --design-system -p "<Presentation Name>"
 ```
-Based on your description, here are 5 style options:
 
-1. **Dark Sapphire Blue** (dark-sapphire-blue)
-   Dark tech style with blue accents, glass effects
+This provides:
+- Style recommendations with reasoning
+- Color palette suggestions
+- Typography pairings
+- Animation guidelines
+
+**Step 3**: Combine with [palettes.md](references/palettes.md) to present 5 options
+Example prompt to user:
+```
+Based on your description and design analysis, here are 5 style options:
+
+1. **Dark Sapphire Blue** (glass) - Recommended by ui-ux-pro-max
+   Dark tech with blue accents, gradient glows
+   Typography: Sora + Source Sans 3
    Best for: Tech products, developer tools
 
-2. **Electric City Nights** (electric-city-nights)
-   Urban dark theme with vibrant blue highlights
-   Best for: Modern tech, SaaS products
+2. **Electric City Nights** (glass)
+   Urban dark with vibrant blue highlights
+   Typography: DM Sans + Work Sans
+   Best for: Modern SaaS, tech startups
 
-3. **Hacker News** (hacker-news)
-   Dark with orange accents, geek aesthetic
-   Best for: Developer content, technical demos
+3. **Cyberpunk** (glass)
+   Neon colors, futuristic sci-fi feel
+   Typography: Outfit + Nunito Sans
+   Best for: Gaming, AI/ML, futuristic topics
 
-4. **Minimal Modern Light** (minimal-modern-light)
+4. **Minimal Modern Light** (flat)
    Clean light theme with blue accents
+   Typography: DM Sans + Work Sans
    Best for: Corporate, professional presentations
 
-5. **Cyberpunk** (cyberpunk)
-   Neon colors, futuristic sci-fi feel
-   Best for: Gaming, futuristic topics
+5. **Hacker News** (glass)
+   Dark with orange accents, geek aesthetic
+   Typography: Sora + Source Sans 3
+   Best for: Developer content, technical demos
 
-Which style would you like? (1-5)
+Which style? (1-5)
 ```
 
 **Selection is captured in context.md** under Style section.
@@ -165,7 +184,11 @@ After questions, create `context.md` capturing:
 - **Palette Name**: Dark Sapphire Blue
 - **Mode**: dark
 - **Style**: glass
-- **Why chosen**: User wanted "tech, modern, dark"
+- **Typography**:
+  - Display: Sora
+  - Body: Source Sans 3
+- **User Keywords**: "tech, modern, dark"
+- **Design Source**: ui-ux-pro-max + palettes.md
 ```
 
 ## Step 2.5: Research Checkpoint
@@ -739,33 +762,40 @@ Claude: "Describe the vibe in a few words (e.g., tech, modern, professional)"
 
 User: "tech, modern, dark, sleek"
 
-Claude: "Based on your description, here are 5 style options:
+Claude: [Runs ui-ux-pro-max: python3 ~/.claude/skills/ui-ux-pro-max/scripts/search.py "AI benchmark tech modern dark presentation" --design-system]
 
-1. **Dark Sapphire Blue** (glass)
+Claude: "Based on design analysis, here are 5 style options:
+
+1. **Dark Sapphire Blue** (glass) - Recommended
    Dark tech with blue accents, gradient glows
+   Typography: Sora + Source Sans 3
    Best for: Tech products, developer tools
 
 2. **Electric City Nights** (glass)
    Urban dark with vibrant blue highlights
+   Typography: DM Sans + Work Sans
    Best for: Modern SaaS, tech startups
 
 3. **Purple Dark Black Blue** (glass)
    Deep purple-blue, cyberpunk undertones
+   Typography: Outfit + Nunito Sans
    Best for: AI/ML, futuristic topics
 
 4. **Hacker News** (glass)
    Dark with orange accents, geek aesthetic
+   Typography: Sora + Source Sans 3
    Best for: Developer content, technical demos
 
 5. **Space** (glass)
    Deep space theme with gold accents
+   Typography: Manrope + Source Sans 3
    Best for: Innovation, visionary topics
 
 Which style? (1-5)"
 
 User: "1"
 
-Claude: "Selected: Dark Sapphire Blue (glass style)"
+Claude: "Selected: Dark Sapphire Blue (glass) with Sora + Source Sans 3"
 
 Claude: "What are 3-5 key points to cover?"
 

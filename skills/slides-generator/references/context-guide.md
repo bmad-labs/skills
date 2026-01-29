@@ -42,7 +42,7 @@ Q4: "What's the goal?"
 
 ### Phase 3: Style Discovery (Always Ask)
 
-**Goal**: Calibrate visual direction with user choice
+**Goal**: Calibrate visual direction with user choice using design intelligence
 
 **Step 1 - Get keywords**:
 ```
@@ -50,48 +50,66 @@ Q5: "Describe the vibe in a few words"
     Examples: "tech, modern, dark" or "professional, clean, corporate"
 ```
 
-**Step 2 - Present 5 best matches from palettes.md**:
+**Step 2 - Use ui-ux-pro-max for design recommendations**:
 
-Based on user keywords, search palettes.md and present 5 options:
-
+```bash
+python3 ~/.claude/skills/ui-ux-pro-max/scripts/search.py "<topic> <keywords> presentation" --design-system -p "<Presentation Name>"
 ```
-"Based on your description '[keywords]', here are 5 style options:
 
-1. **[Palette Name]** ([style: glass/flat])
-   [Brief description of visual style]
-   Best for: [Recommended scenario]
+This provides:
+- Style recommendations with reasoning
+- Color palette suggestions
+- Typography pairings (heading + body fonts)
+- Animation and effect guidelines
+- Anti-patterns to avoid
+
+**Step 3 - Combine with palettes.md to present 5 options**:
+
+Merge ui-ux-pro-max recommendations with palettes.md to offer 5 curated choices:
+Example prompt to user:
+```
+"Based on your description and design analysis, here are 5 style options:
+
+1. **[Palette Name]** ([glass/flat]) - Recommended
+   [Visual description]
+   Typography: [Heading Font] + [Body Font]
+   Best for: [Scenario]
 
 2. **[Palette Name]** ([style])
    [Description]
+   Typography: [Fonts]
    Best for: [Scenario]
 
 3. **[Palette Name]** ([style])
    [Description]
+   Typography: [Fonts]
    Best for: [Scenario]
 
 4. **[Palette Name]** ([style])
    [Description]
+   Typography: [Fonts]
    Best for: [Scenario]
 
 5. **[Palette Name]** ([style])
    [Description]
+   Typography: [Fonts]
    Best for: [Scenario]
 
-Which style would you like? (1-5)"
+Which style? (1-5)"
 ```
 
-**Matching keywords to palettes**:
+**Keyword to palette mapping** (for manual matching):
 
-| User Keywords | Search in palettes.md Tags |
-|---------------|---------------------------|
-| tech, modern, dark | dark, tech, professional |
-| professional, corporate | professional, business, light |
-| creative, bold, vibrant | neon, cyberpunk, colorful |
-| natural, organic, calm | nature, green, soft |
-| minimal, clean, simple | minimal, black-white, light |
-| luxury, premium | gold, metallic, luxury |
+| User Keywords | Search Tags | Typical Style |
+|---------------|-------------|---------------|
+| tech, modern, dark | dark, tech, professional | glass |
+| professional, corporate | professional, business, light | flat |
+| creative, bold, vibrant | neon, cyberpunk, colorful | glass |
+| natural, organic, calm | nature, green, soft | flat |
+| minimal, clean, simple | minimal, black-white, light | flat |
+| luxury, premium | gold, metallic, luxury | glass |
 
-**User selects a number (1-5)** → Capture in context.md
+**User selects a number (1-5)** → Capture in context.md with full details
 
 ### Phase 4: Content Depth (Conditional)
 
@@ -204,7 +222,11 @@ After gathering requirements, create `context.md`:
 - **Palette Name**: [Full name]
 - **Mode**: [dark/light]
 - **Style**: [glass/flat]
+- **Typography**:
+  - Display: [Heading font from ui-ux-pro-max]
+  - Body: [Body font from ui-ux-pro-max]
 - **User Keywords**: [original keywords user provided]
+- **Design Source**: ui-ux-pro-max + palettes.md
 - **Why Selected**: [brief note on why user chose this option]
 
 ## Research
@@ -241,33 +263,39 @@ Claude: "Describe the vibe in a few words (e.g., tech, modern, professional)"
 
 User: "tech, modern, dark"
 
-Claude: "Based on 'tech, modern, dark', here are 5 style options:
+Claude: [Runs ui-ux-pro-max design system search]
+Claude: "Based on 'tech, modern, dark' and design analysis, here are 5 style options:
 
-1. **Dark Sapphire Blue** (glass)
+1. **Dark Sapphire Blue** (glass) - Recommended
    Dark tech with blue accents, gradient glows
+   Typography: Sora + Source Sans 3
    Best for: Tech products, developer tools
 
 2. **Electric City Nights** (glass)
    Urban dark with vibrant blue highlights
+   Typography: DM Sans + Work Sans
    Best for: Modern SaaS, tech startups
 
 3. **Purple Dark Black Blue** (glass)
    Deep purple-blue, cyberpunk undertones
+   Typography: Outfit + Nunito Sans
    Best for: AI/ML, futuristic topics
 
 4. **Hacker News** (glass)
    Dark with orange accents, geek aesthetic
+   Typography: Sora + Source Sans 3
    Best for: Developer content, technical demos
 
 5. **Space** (glass)
    Deep space theme with gold accents
+   Typography: Manrope + Source Sans 3
    Best for: Innovation, visionary topics
 
 Which style? (1-5)"
 
 User: "1"
 
-Claude: "Selected: Dark Sapphire Blue"
+Claude: "Selected: Dark Sapphire Blue with Sora + Source Sans 3"
 
 Claude: "What are 3-5 key points to cover?"
 
