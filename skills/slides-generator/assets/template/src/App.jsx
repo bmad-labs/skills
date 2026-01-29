@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navigation from './components/Navigation';
 import Background from './components/Background';
@@ -37,42 +37,78 @@ const slideTransition = {
 // Presentation name for export (will be replaced during generation)
 const PRESENTATION_NAME = 'Presentation';
 
+// Memoized empty state component to prevent re-renders
+// eslint-disable-next-line react-refresh/only-export-components
+const EmptyState = memo(function EmptyState() {
+  return (
+    <div className="h-screen w-screen bg-bg-base flex items-center justify-center relative overflow-hidden">
+      <Background variant="glow" />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center z-10"
+      >
+        <p className="text-xl mb-2 text-text-primary">No slides yet</p>
+        <p className="text-sm text-text-muted">Slides will be generated here</p>
+      </motion.div>
+    </div>
+  );
+});
+
 export default function App() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showExportModal, setShowExportModal] = useState(false);
 
-  // Navigate to specific slide
+  // Navigate to specific slide - stable callback using functional setState
   const goToSlide = useCallback((index) => {
-    setDirection(index > currentSlide ? 1 : -1);
-    setCurrentSlide(index);
-  }, [currentSlide]);
+    setCurrentSlide(prev => {
+      setDirection(index > prev ? 1 : -1);
+      return index;
+    });
+  }, []);
 
-  // Next slide
+  // Next slide - stable callback using functional setState
   const nextSlide = useCallback(() => {
-    if (currentSlide < SLIDES.length - 1) {
-      setDirection(1);
-      setCurrentSlide(prev => prev + 1);
-    }
-  }, [currentSlide]);
+    setCurrentSlide(prev => {
+      if (prev < SLIDES.length - 1) {
+        setDirection(1);
+        return prev + 1;
+      }
+      return prev;
+    });
+  }, []);
 
-  // Previous slide
+  // Previous slide - stable callback using functional setState
   const prevSlide = useCallback(() => {
-    if (currentSlide > 0) {
-      setDirection(-1);
-      setCurrentSlide(prev => prev - 1);
-    }
-  }, [currentSlide]);
+    setCurrentSlide(prev => {
+      if (prev > 0) {
+        setDirection(-1);
+        return prev - 1;
+      }
+      return prev;
+    });
+  }, []);
 
-  // Keyboard navigation
+  // Keyboard navigation - stable effect with stable callbacks
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
-        e.preventDefault();
-        nextSlide();
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        prevSlide();
+      // Skip if typing in input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowDown':
+        case ' ':
+          e.preventDefault();
+          nextSlide();
+          break;
+        case 'ArrowLeft':
+        case 'ArrowUp':
+          e.preventDefault();
+          prevSlide();
+          break;
       }
     };
 
@@ -80,22 +116,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [nextSlide, prevSlide]);
 
-  // Empty state
+  // Empty state - use memoized component
   if (SLIDES.length === 0) {
-    return (
-      <div className="h-screen w-screen bg-bg-base flex items-center justify-center relative overflow-hidden">
-        <Background variant="glow" />
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center z-10"
-        >
-          <p className="text-xl mb-2 text-text-primary">No slides yet</p>
-          <p className="text-sm text-text-muted">Slides will be generated here</p>
-        </motion.div>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   const CurrentSlideComponent = SLIDES[currentSlide];

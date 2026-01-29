@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Transition variants
+// Transition variants - hoisted outside component for stability
 const variants = {
   fade: {
     initial: { opacity: 0 },
@@ -35,7 +36,7 @@ const transitionConfig = {
   stiffness: 300
 };
 
-export default function SlideTransition({
+const SlideTransition = memo(function SlideTransition({
   children,
   slideKey,
   variant = 'elegant',
@@ -58,7 +59,9 @@ export default function SlideTransition({
       </motion.div>
     </AnimatePresence>
   );
-}
+});
+
+export default SlideTransition;
 
 // Hook for staggered children animations
 export function useStaggerAnimation(delay = 0.1) {

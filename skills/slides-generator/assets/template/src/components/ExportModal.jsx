@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, FileText, Globe, Loader2, Check, AlertCircle, Image, Code } from 'lucide-react';
 
-export default function ExportModal({
+// Memoized ExportModal - prevents re-renders when closed
+const ExportModal = memo(function ExportModal({
   isOpen,
   onClose,
   totalSlides,
@@ -621,4 +622,6 @@ export default function ExportModal({
       )}
     </AnimatePresence>
   );
-}
+});
+
+export default ExportModal;

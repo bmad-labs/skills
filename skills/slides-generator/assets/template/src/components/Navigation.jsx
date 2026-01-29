@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronLeft, ChevronRight, Keyboard, Download } from 'lucide-react';
 
-export default function Navigation({
+// Memoized Navigation component - only re-renders when props change
+const Navigation = memo(function Navigation({
   currentSlide,
   totalSlides,
   navItems,
@@ -312,4 +313,6 @@ export default function Navigation({
       </AnimatePresence>
     </>
   );
-}
+});
+
+export default Navigation;
