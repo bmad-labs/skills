@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, FileText, Globe, Loader2, Check, AlertCircle, Image } from 'lucide-react';
+import { X, Download, FileText, Globe, Loader2, Check, AlertCircle, Image, Code } from 'lucide-react';
 
 export default function ExportModal({
   isOpen,
@@ -268,7 +268,48 @@ export default function ExportModal({
     }
   };
 
-  // Generate standalone HTML
+  // Download the full HTML source file
+  const downloadHTMLSource = async () => {
+    setExporting(true);
+    setExportMode('source');
+    setError(null);
+    setCompleted(null);
+    setProgress(0);
+    setStatus('Fetching HTML source...');
+
+    try {
+      setProgress(30);
+
+      // Fetch the current page's HTML source
+      const response = await fetch(window.location.href);
+      const htmlSource = await response.text();
+
+      setStatus('Preparing download...');
+      setProgress(70);
+
+      // Download the HTML source
+      const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${presentationName}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setProgress(100);
+      setCompleted('source');
+      setStatus('HTML downloaded!');
+    } catch (err) {
+      console.error('Download error:', err);
+      setError(err.message || 'Failed to download HTML');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // Generate standalone HTML (screenshot-based)
   const generateStandaloneHTML = (title, base64Images) => {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -496,11 +537,27 @@ export default function ExportModal({
                         <button
                           onClick={() => exportToHTML('all')}
                           className="flex-1 flex items-center justify-center gap-2 p-2.5 rounded-lg bg-bg-elevated/50 hover:bg-bg-elevated border border-border-subtle hover:border-blue-500/50 transition-all text-sm"
+                          title="Screenshot-based HTML (static images)"
                         >
                           <Globe size={16} className="text-blue-400" />
-                          <span>HTML</span>
+                          <span>Images</span>
                         </button>
                       </div>
+                    </div>
+
+                    {/* Download HTML Source */}
+                    <div className="pt-2 border-t border-border-subtle">
+                      <button
+                        onClick={downloadHTMLSource}
+                        className="w-full flex items-center justify-center gap-2 p-2.5 rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 hover:from-purple-500/30 hover:to-blue-500/30 border border-purple-500/30 hover:border-purple-500/50 transition-all text-sm"
+                        title="Download the full HTML file with all assets embedded"
+                      >
+                        <Code size={16} className="text-purple-400" />
+                        <span>Download HTML</span>
+                      </button>
+                      <p className="text-xs text-text-muted mt-1.5 text-center">
+                        Single file with animations &amp; fonts
+                      </p>
                     </div>
                   </div>
                 )}
