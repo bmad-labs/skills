@@ -39,13 +39,15 @@ Each slide project is organized in a dedicated folder:
 ```
 Step 1: Initialize Project Folder
     ↓
-Step 2: Collect Requirements → context.md
+Step 2: Collect Requirements (Progressive Disclosure)
+    Phase 1: Topic → Phase 2: Audience → Phase 3: Style → Phase 4: Content
     ↓
-Step 2.5: Research (if needed) → researches/
+Step 2.5: Research Checkpoint
+    "Would you like me to research [topic]?" → User confirms
     ↓
-Step 3: Create Markdown Slides → slides.md
+Step 3: Create context.md + slides.md
     ↓
-Step 4: Confirm with User
+Step 4: Confirm Outline with User
     ↓
 Step 5: Create Source Code → source/
     ↓
@@ -69,113 +71,170 @@ Default: ./presentation-name
 mkdir -p <project-folder>/source <project-folder>/researches <project-folder>/verify
 ```
 
-## Step 2: Collect Requirements
+## Step 2: Collect Requirements (Progressive Disclosure)
 
-Gather comprehensive context using questions. See [context-guide.md](references/context-guide.md) for detailed guidance.
+Use progressive disclosure: ask 3-5 questions at a time, reveal more based on answers.
 
-**Key areas to cover:**
-- **Topic & Purpose**: What and why
-- **Audience**: Who and their expertise level
-- **Content**: Key points, data needs, visual requirements
-- **Style**: Theme preference, tone, animations
+See [context-guide.md](references/context-guide.md) for detailed question flow.
 
-**Save to `context.md`:**
-```markdown
-# Presentation Context
+### Question Flow
 
-## Topic
-[Main topic and specific focus area]
-
-## Purpose
-[What this presentation aims to achieve]
-- Primary goal: [inform/persuade/demo/report]
-- Expected action: [what audience should do after]
-
-## Audience
-- **Primary**: [main target group]
-- **Expertise level**: [beginner/intermediate/expert]
-- **Key interests**: [what they care about]
-
-## Key Points
-
-### [Section 1]
-- Point 1
-- Point 2
-
-### [Section 2]
-- Point 1
-- Point 2
-
-## Data & Statistics
-- [Stat]: [Source]
-
-## Visual Requirements
-- [ ] Code examples
-- [ ] Diagrams
-- [ ] Charts
-- [ ] Custom images
-
-## Style
-- **Theme**: [theme-id from palettes.md]
-- **Style**: [glass/flat]
-- **Tone**: [professional/casual/energetic/minimal]
-
-## Sources
-- [Source]: [URL/reference]
-
-## Additional Notes
-[Any other relevant context]
+**Phase 1 - Quick Start** (Always):
+```
+"What's the presentation about?"
+"Any content or notes to include?" (optional)
 ```
 
-Recommend a theme from [palettes.md](references/palettes.md) based on style keywords.
+**Phase 2 - Audience & Purpose** (Always):
+```
+"Who will view this?"
+  - Executives / Decision makers
+  - Technical team / Developers
+  - General audience / Mixed
+  - Customers / External
 
-## Step 2.5: Research (When Needed)
+"What's the goal?"
+  - Inform / Persuade / Demo / Report
+```
 
-If the topic requires research to gather accurate data, statistics, or technical details:
+**Phase 3 - Style Discovery** (Always):
+```
+"Describe the vibe in a few words"
+  Examples: "tech, modern, dark" or "professional, clean, corporate"
+```
 
-1. **Identify knowledge gaps** during context collection
-2. **Conduct research** using web search or provided materials
-3. **Document findings** in `researches/` folder
+Then present 5 best-match palettes from [palettes.md](references/palettes.md):
 
-**Research file naming:**
+```
+Based on your description, here are 5 style options:
+
+1. **Dark Sapphire Blue** (dark-sapphire-blue)
+   Dark tech style with blue accents, glass effects
+   Best for: Tech products, developer tools
+
+2. **Electric City Nights** (electric-city-nights)
+   Urban dark theme with vibrant blue highlights
+   Best for: Modern tech, SaaS products
+
+3. **Hacker News** (hacker-news)
+   Dark with orange accents, geek aesthetic
+   Best for: Developer content, technical demos
+
+4. **Minimal Modern Light** (minimal-modern-light)
+   Clean light theme with blue accents
+   Best for: Corporate, professional presentations
+
+5. **Cyberpunk** (cyberpunk)
+   Neon colors, futuristic sci-fi feel
+   Best for: Gaming, futuristic topics
+
+Which style would you like? (1-5)
+```
+
+**Selection is captured in context.md** under Style section.
+
+**Phase 4 - Content Depth** (Conditional):
+```
+"What are 3-5 key points to cover?"
+"Any specific data to include?"
+  - Yes, I have data → [Get details]
+  - Research needed → [Trigger Step 2.5]
+  - No data needed → [Skip]
+```
+
+### Drill-Down for Abstract Terms
+
+When users give vague terms, clarify:
+
+| User Says | Ask |
+|-----------|-----|
+| "Professional" | "Clean/minimal, or rich/detailed?" |
+| "Modern" | "Can you point to an example?" |
+| "Engaging" | "Animations, or compelling content?" |
+
+### Save to context.md
+
+After questions, create `context.md` capturing:
+- Topic, purpose, audience from Phase 1-2
+- **Selected style** (palette ID, name, style type) from Phase 3
+- Key points and data needs from Phase 4
+
+```markdown
+## Style (User Selected)
+- **Palette ID**: dark-sapphire-blue
+- **Palette Name**: Dark Sapphire Blue
+- **Mode**: dark
+- **Style**: glass
+- **Why chosen**: User wanted "tech, modern, dark"
+```
+
+## Step 2.5: Research Checkpoint
+
+**Always ask before researching** - apply Just-In-Time research pattern.
+
+### When to Offer Research
+
+Offer research when:
+- Topic involves comparisons (A vs B)
+- User mentions data/statistics/benchmarks
+- Topic is current events or recent technology
+- User needs facts they don't have
+
+Skip research when:
+- User provides their own data
+- Topic is personal/internal
+- User explicitly declines
+
+### Research Prompt
+
+```
+"This topic would benefit from research. Would you like me to:
+
+[ ] Research current data/statistics
+[ ] Find competitive comparisons
+[ ] Gather industry trends
+[ ] Skip research - I'll provide content"
+```
+
+### Research Workflow
+
+```
+1. User confirms research needed
+    ↓
+2. Conduct targeted web search
+    ↓
+3. Document in researches/ folder
+    ↓
+4. Present summary to user:
+   "I found: [key findings]. Does this look accurate?"
+    ↓
+5. User confirms → Update context.md
+```
+
+### Research Templates
+
+See [research-templates.md](references/research-templates.md) for:
+- **Statistics & Data** - Metrics, benchmarks, numbers
+- **Competitive Analysis** - A vs B comparisons
+- **Trends & Forecasts** - Industry outlook
+- **Quick Facts** - Simple fact lookup
+
+### File Organization
+
 ```
 researches/
-├── YYYY-MM-DD-main-research.md      # Primary research
-├── YYYY-MM-DD-statistics.md         # Data and numbers
-└── YYYY-MM-DD-references.md         # Sources and links
+├── YYYY-MM-DD-statistics.md    # Data and numbers
+├── YYYY-MM-DD-comparison.md    # A vs B analysis
+└── YYYY-MM-DD-trends.md        # Industry trends
 ```
 
-**Research document template:**
-```markdown
-# Research: [Topic]
+### Quality Checklist
 
-## Date: YYYY-MM-DD
-
-## Research Questions
-- Question 1?
-- Question 2?
-
-## Findings
-
-### [Finding 1]
-[Details with source citations]
-
-### [Finding 2]
-[Details with source citations]
-
-## Key Statistics
-| Metric | Value | Source |
-|--------|-------|--------|
-| [Metric] | [Value] | [Source] |
-
-## Sources
-1. [Title](URL) - [Brief description]
-2. [Title](URL) - [Brief description]
-
-## Notes for Slides
-- Use [finding] for slide X
-- Cite [statistic] in data slide
-```
+Before using researched data:
+- [ ] Source is authoritative
+- [ ] Data is recent (<6 months for fast fields)
+- [ ] Cross-referenced with another source
+- [ ] User has confirmed accuracy
 
 **After research, update context.md** with verified data and sources.
 
@@ -656,18 +715,84 @@ Default: ./claude-benchmark"
 
 User: "OK"
 
-Claude: "A few questions:
-1. How many evaluation tasks? (e.g., 3-5)
-2. What capabilities? (coding / reasoning / agent)
-3. Style preference? (Tech/Professional/Vibrant)
-4. Do you have specific benchmark data, or should I research current benchmarks?"
+Claude: "What's this presentation about? Give me a brief description."
 
-User: "3 tasks, coding ability, tech style, research current data"
+User: "Comparing Claude and GPT coding abilities for our dev team"
+
+Claude: "Who will view this?
+  - Executives / Decision makers
+  - Technical team / Developers ←
+  - General audience
+  - Customers"
+
+User: "Technical team"
+
+Claude: "What's the goal?
+  - Inform - Share findings
+  - Persuade - Recommend one model
+  - Demo - Show capabilities
+  - Report - Present data"
+
+User: "Inform"
+
+Claude: "Describe the vibe in a few words (e.g., tech, modern, professional)"
+
+User: "tech, modern, dark, sleek"
+
+Claude: "Based on your description, here are 5 style options:
+
+1. **Dark Sapphire Blue** (glass)
+   Dark tech with blue accents, gradient glows
+   Best for: Tech products, developer tools
+
+2. **Electric City Nights** (glass)
+   Urban dark with vibrant blue highlights
+   Best for: Modern SaaS, tech startups
+
+3. **Purple Dark Black Blue** (glass)
+   Deep purple-blue, cyberpunk undertones
+   Best for: AI/ML, futuristic topics
+
+4. **Hacker News** (glass)
+   Dark with orange accents, geek aesthetic
+   Best for: Developer content, technical demos
+
+5. **Space** (glass)
+   Deep space theme with gold accents
+   Best for: Innovation, visionary topics
+
+Which style? (1-5)"
+
+User: "1"
+
+Claude: "Selected: Dark Sapphire Blue (glass style)"
+
+Claude: "What are 3-5 key points to cover?"
+
+User: "Coding ability, reasoning, context window, speed"
+
+Claude: "This topic would benefit from current benchmark data.
+Would you like me to research:
+  [ ] Current benchmark statistics
+  [ ] Model comparison data
+  [ ] Skip research"
+
+User: "Yes, research current benchmarks"
+
+Claude: [Conducts web search for current AI benchmarks]
+Claude: "I found the following data:
+- Claude scores 92% on HumanEval (coding)
+- GPT-4 scores 87% on HumanEval
+- Claude has 200K context, GPT-4 has 128K
+[Sources: official docs, research papers]
+
+Does this look accurate?"
+
+User: "Yes, use that"
 
 Claude: [Creates ./claude-benchmark/ folder structure]
-Claude: [Researches current benchmark data]
-Claude: [Creates ./claude-benchmark/researches/2026-01-29-benchmark-data.md]
-Claude: [Creates ./claude-benchmark/context.md with researched data]
+Claude: [Saves research to ./claude-benchmark/researches/2026-01-29-benchmark-data.md]
+Claude: [Creates ./claude-benchmark/context.md with verified data]
 Claude: [Creates ./claude-benchmark/slides.md]
 Claude: "Here's the outline:
 
@@ -722,7 +847,8 @@ Open slide.html to view your presentation."
 
 | Reference | Description |
 |-----------|-------------|
-| [context-guide.md](references/context-guide.md) | Comprehensive guide for gathering requirements |
+| [context-guide.md](references/context-guide.md) | Progressive disclosure question flow for gathering requirements |
+| [research-templates.md](references/research-templates.md) | Templates for statistics, comparison, and trends research |
 | [slides-design.md](references/slides-design.md) | Design system patterns, slide types, layouts, animations |
 | [browser-verification.md](references/browser-verification.md) | Browser testing with agent-browser |
 | [aesthetics.md](references/aesthetics.md) | Design philosophy and visual guidelines |

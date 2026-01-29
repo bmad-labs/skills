@@ -1,163 +1,302 @@
 # Context Collection Guide
 
-> Reference for gathering comprehensive presentation requirements into `context.md`
+> Progressive disclosure approach for gathering presentation requirements
 
 ## Purpose
 
-The `context.md` file captures all knowledge, requirements, and expectations before generating slides. This ensures:
-- Consistent output quality
-- Clear design direction
-- Proper content structure
-- User expectations alignment
+Gather requirements efficiently using structured question flow. Apply progressive disclosure: show 3-5 questions at a time, reveal more based on answers.
 
-## Context Collection Workflow
+## Question Flow Framework
+
+### Phase 1: Quick Start (Always Ask)
+
+**Goal**: Get started with minimal friction
 
 ```
-Step 1: Identify Topic & Purpose
-    ↓
-Step 2: Understand Audience
-    ↓
-Step 3: Gather Content Points
-    ↓
-Step 4: Research (if needed)
-    ↓
-Step 5: Define Style & Theme
-    ↓
-Step 6: Document Sources
-    ↓
-Step 7: Create context.md
+Q1: "What's the presentation about?"
+    [Open text - let user explain in their own words]
+
+Q2: "Brief description or any content to include?"
+    [Optional - paste existing content, notes, or outline]
 ```
 
-## Questions to Ask
+### Phase 2: Audience & Purpose (Always Ask)
 
-### 1. Topic & Purpose
+**Goal**: Understand who and why
 
-| Question | Why It Matters |
-|----------|----------------|
-| What is the main topic? | Defines scope and focus |
-| What is the purpose? (inform, persuade, demo, report) | Affects tone and structure |
-| What action should the audience take after? | Shapes call-to-action |
-| Is this a standalone presentation or part of a series? | Affects intro/outro design |
+```
+Q3: "Who will view this?"
+    Options:
+    - Executives / Decision makers
+    - Technical team / Developers
+    - General audience / Mixed
+    - Customers / External stakeholders
 
-### 2. Audience Analysis
+Q4: "What's the goal?"
+    Options:
+    - Inform - Share knowledge or updates
+    - Persuade - Convince or propose
+    - Demo - Show product or process
+    - Report - Present data or results
+```
 
-| Question | Why It Matters |
-|----------|----------------|
-| Who is the primary audience? | Determines complexity level |
-| What is their expertise level? (beginner, intermediate, expert) | Affects terminology and depth |
-| What do they already know about the topic? | Avoids redundancy |
-| What are their pain points or interests? | Makes content relevant |
+### Phase 3: Style Discovery (Always Ask)
 
-### 3. Content Depth
+**Goal**: Calibrate visual direction with user choice
 
-| Question | Why It Matters |
-|----------|----------------|
-| How many slides are appropriate? | Scopes the presentation |
-| What are the 3-5 key takeaways? | Focuses content creation |
-| Are there specific data points or statistics needed? | Identifies research needs |
-| Should it include code examples, diagrams, or charts? | Determines visual assets |
+**Step 1 - Get keywords**:
+```
+Q5: "Describe the vibe in a few words"
+    Examples: "tech, modern, dark" or "professional, clean, corporate"
+```
 
-### 4. Style Preferences
+**Step 2 - Present 5 best matches from palettes.md**:
 
-| Question | Why It Matters |
-|----------|----------------|
-| What tone? (professional, casual, energetic, minimal) | Guides design choices |
-| Dark or light theme preference? | Affects palette selection |
-| Any brand colors or guidelines to follow? | Ensures brand consistency |
-| Reference presentations they like? | Clarifies visual expectations |
+Based on user keywords, search palettes.md and present 5 options:
 
-## context.md Template
+```
+"Based on your description '[keywords]', here are 5 style options:
+
+1. **[Palette Name]** ([style: glass/flat])
+   [Brief description of visual style]
+   Best for: [Recommended scenario]
+
+2. **[Palette Name]** ([style])
+   [Description]
+   Best for: [Scenario]
+
+3. **[Palette Name]** ([style])
+   [Description]
+   Best for: [Scenario]
+
+4. **[Palette Name]** ([style])
+   [Description]
+   Best for: [Scenario]
+
+5. **[Palette Name]** ([style])
+   [Description]
+   Best for: [Scenario]
+
+Which style would you like? (1-5)"
+```
+
+**Matching keywords to palettes**:
+
+| User Keywords | Search in palettes.md Tags |
+|---------------|---------------------------|
+| tech, modern, dark | dark, tech, professional |
+| professional, corporate | professional, business, light |
+| creative, bold, vibrant | neon, cyberpunk, colorful |
+| natural, organic, calm | nature, green, soft |
+| minimal, clean, simple | minimal, black-white, light |
+| luxury, premium | gold, metallic, luxury |
+
+**User selects a number (1-5)** → Capture in context.md
+
+### Phase 4: Content Depth (Conditional)
+
+**Trigger**: Based on topic complexity
+
+```
+Q6: "What are 3-5 key points to cover?"
+    [Helps structure the presentation]
+
+Q7: "Any specific data or statistics to include?"
+    - Yes, I have data → [Ask for details]
+    - Research needed → [Trigger research workflow]
+    - No data needed → [Skip]
+```
+
+### Phase 5: Research Checkpoint (Conditional)
+
+**Trigger**: When data/research would improve the presentation
+
+```
+"This topic would benefit from research. Would you like me to:
+
+[ ] Research current data/statistics
+[ ] Find competitive comparisons
+[ ] Gather industry trends
+[ ] Skip research - I'll provide the content"
+```
+
+See [research-templates.md](research-templates.md) for research patterns.
+
+### Phase 6: Advanced Options (Optional)
+
+**Trigger**: Only if user wants more control
+
+```
+Q8: "Any brand guidelines or colors to follow?"
+    [Optional - for corporate presentations]
+
+Q9: "Reference presentations you like?"
+    [Optional - URLs for style calibration]
+
+Q10: "Special requirements?"
+    [Optional - constraints, export format, etc.]
+```
+
+## Drill-Down Patterns
+
+When users give abstract terms, ask for concrete details:
+
+| User Says | Follow-Up |
+|-----------|-----------|
+| "Professional" | "Clean and minimal, or rich and detailed?" |
+| "Modern" | "Can you point to an example?" |
+| "High quality" | "What specific qualities signal that to you?" |
+| "Engaging" | "Animations and interactivity, or compelling content?" |
+| "Simple" | "Minimal content per slide, or minimal design elements?" |
+
+## Question Best Practices
+
+### Do
+- Ask open-ended questions first, then narrow down
+- Show visual examples when asking about style
+- Ask about past experiences ("What presentations have you liked?")
+- Let users skip optional questions
+- Confirm understanding before proceeding
+
+### Don't
+- Ask more than 5 questions at once
+- Use yes/no questions for discovery
+- Ask hypothetical questions ("What might resonate?")
+- Assume technical knowledge about design
+- Skip the style discovery phase
+
+## Context Document Template
+
+After gathering requirements, create `context.md`:
 
 ```markdown
 # Presentation Context
 
 ## Topic
-[Main topic and specific focus area]
+[Main topic and specific focus area from Q1]
 
 ## Purpose
-[What this presentation aims to achieve]
-- Primary goal: [inform/persuade/demo/report]
-- Expected action: [what audience should do after]
+- **Goal**: [inform/persuade/demo/report from Q4]
+- **Expected outcome**: [what audience should do/know after]
 
 ## Audience
-- **Primary**: [main target group]
-- **Secondary**: [other potential viewers]
+- **Primary**: [from Q3]
 - **Expertise level**: [beginner/intermediate/expert]
 - **Key interests**: [what they care about]
 
 ## Key Points
+[From Q6 - 3-5 main points]
 
-### [Section 1 Name]
-- Point 1
-- Point 2
-- Point 3
+### [Point 1]
+- Detail
+- Detail
 
-### [Section 2 Name]
-- Point 1
-- Point 2
-
-### [Section 3 Name]
-- Point 1
-- Point 2
+### [Point 2]
+- Detail
+- Detail
 
 ## Data & Statistics
-- [Stat 1]: [Source]
-- [Stat 2]: [Source]
-- [Stat 3]: [Source]
+[From Q7 or research]
+- [Stat]: [Source]
 
-## Visual Requirements
-- [ ] Code examples
-- [ ] Diagrams/flowcharts
-- [ ] Charts/graphs
-- [ ] Screenshots
-- [ ] Custom illustrations
-
-## Style
-- **Theme**: [theme-id from palettes.md]
+## Style (User Selected)
+- **Palette ID**: [palette-id from selection]
+- **Palette Name**: [Full name]
+- **Mode**: [dark/light]
 - **Style**: [glass/flat]
-- **Tone**: [professional/casual/energetic/minimal]
-- **Special effects**: [animations, transitions]
+- **User Keywords**: [original keywords user provided]
+- **Why Selected**: [brief note on why user chose this option]
 
-## Constraints
-- Time limit: [if presenting live]
-- Technical: [screen resolution, offline viewing]
-- Branding: [any brand guidelines]
+## Research
+- [ ] Completed - see researches/ folder
+- [ ] Not needed
 
 ## Sources
-- [Source 1]: [URL or reference]
-- [Source 2]: [URL or reference]
-- [Source 3]: [URL or reference]
+[Any references provided or researched]
 
-## Additional Notes
-[Any other relevant context, special requests, or considerations]
+## Notes
+[Additional context from conversation]
 ```
 
-## Research Integration
-
-When topics require research:
-
-1. **Identify knowledge gaps** during context collection
-2. **Document research questions** in context.md under "Research Needed"
-3. **Save research findings** to `researches/` folder with timestamps
-4. **Update context.md** with validated data and sources
-
-### Research File Naming
+## Example Interaction
 
 ```
-researches/
-├── YYYY-MM-DD-topic-keyword.md    # Main research document
-├── YYYY-MM-DD-statistics.md       # Data and statistics
-└── YYYY-MM-DD-references.md       # Links and citations
+Claude: "What's this presentation about?"
+
+User: "AI benchmark comparison between Claude and GPT"
+
+Claude: "Who will view this?"
+  - Executives / Decision makers
+  - Technical team / Developers  ← [User selects]
+  - General audience
+  - Customers
+
+Claude: "What's the goal?"
+  - Inform ← [User selects]
+  - Persuade
+  - Demo
+  - Report
+
+Claude: "Describe the vibe in a few words (e.g., tech, modern, professional)"
+
+User: "tech, modern, dark"
+
+Claude: "Based on 'tech, modern, dark', here are 5 style options:
+
+1. **Dark Sapphire Blue** (glass)
+   Dark tech with blue accents, gradient glows
+   Best for: Tech products, developer tools
+
+2. **Electric City Nights** (glass)
+   Urban dark with vibrant blue highlights
+   Best for: Modern SaaS, tech startups
+
+3. **Purple Dark Black Blue** (glass)
+   Deep purple-blue, cyberpunk undertones
+   Best for: AI/ML, futuristic topics
+
+4. **Hacker News** (glass)
+   Dark with orange accents, geek aesthetic
+   Best for: Developer content, technical demos
+
+5. **Space** (glass)
+   Deep space theme with gold accents
+   Best for: Innovation, visionary topics
+
+Which style? (1-5)"
+
+User: "1"
+
+Claude: "Selected: Dark Sapphire Blue"
+
+Claude: "What are 3-5 key points to cover?"
+
+User: "Coding ability, reasoning, context window, speed"
+
+Claude: "This topic would benefit from current benchmark data.
+Would you like me to research:
+  [ ] Current benchmark statistics
+  [ ] Model comparison data
+  [ ] Skip research"
+
+User: "Yes, research current benchmarks"
+
+[Claude conducts research, presents findings, then proceeds]
 ```
 
-## Quality Checklist
+## Integration with Workflow
 
-Before finalizing context.md:
-
-- [ ] Topic is clearly defined with specific focus
-- [ ] Audience is identified with expertise level
-- [ ] Key points are limited to 3-5 main themes
-- [ ] Data has verified sources
-- [ ] Style theme is selected from palettes.md
-- [ ] Any research has been documented
-- [ ] User has confirmed the context
+```
+Step 1: Initialize Project
+    ↓
+Step 2: Question Flow (this guide)
+    Phase 1 → Phase 2 → Phase 3 → Phase 4
+    ↓
+Step 2.5: Research (if triggered)
+    ↓
+Step 3: Create context.md
+    ↓
+Step 4: Generate slides.md
+    ↓
+[Continue workflow...]
+```
