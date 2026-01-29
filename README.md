@@ -106,6 +106,9 @@ If you only need specific skills, add them individually to your project's `.clau
 - `github:bmad-labs/skills/skills/typescript-clean-code`
 - `github:bmad-labs/skills/skills/book-converter`
 - `github:bmad-labs/skills/skills/skill-from-book`
+- `github:bmad-labs/skills/skills/ui-ux-pro-max`
+- `github:bmad-labs/skills/skills/slides-generator`
+- `github:bmad-labs/skills/skills/ai-multimodal`
 
 ### Troubleshooting
 
@@ -169,6 +172,32 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [typescript-clean-code](skills/typescript-clean-code) | Clean Code principles and workflows for TypeScript development | Development |
 | [book-converter](skills/book-converter) | Convert EPUB books to formatted Markdown | Productivity |
 | [skill-from-book](skills/skill-from-book) | Convert book content into structured Claude Code skills | Development |
+| [ui-ux-pro-max](skills/ui-ux-pro-max) | UI/UX design intelligence with 50 styles, 21 palettes, multiple frameworks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter) | Creative |
+| [slides-generator](skills/slides-generator) | Generate interactive presentation slides using React + Tailwind, export to PDF or HTML | Productivity |
+| [ai-multimodal](skills/ai-multimodal) | Process and generate multimedia content using Google Gemini API (audio, images, videos, documents) | Data |
+
+## Recommended Skills from Other Repositories
+
+Expand your Claude Code capabilities with these excellent skills from the community:
+
+### Vercel Labs Skills
+
+```bash
+# Install agent-browser skill for browser automation
+npx skills add vercel-labs/agent-browser
+
+# Install React best practices skill
+npx skills add vercel-labs/agent-skills --skill react-best-practices
+
+# Install all recommended skills at once
+npx skills add vercel-labs/agent-browser && \
+npx skills add vercel-labs/agent-skills --skill react-best-practices
+```
+
+| Repository | Skill | Description |
+|------------|-------|-------------|
+| [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser) | agent-browser | Browser automation and web interaction capabilities |
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | react-best-practices | React development best practices and patterns |
 
 ## License
 
