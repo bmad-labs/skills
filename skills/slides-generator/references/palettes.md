@@ -1,6 +1,6 @@
 # Color Palette Library
 
-> 79 color palettes, organized by style
+> 80 color palettes, organized by style
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Content | Line Range | Description |
 |---------|------------|-------------|
-| Quick Query Index | 32-116 | 79 palettes with ID/name/tags/scenario |
+| Quick Query Index | 32-117 | 80 palettes with ID/name/tags/scenario |
 | AI Usage Guide | 117-150 | Color value mapping and derivation rules |
 | Dark/Black Themes | 155-365 | 18 palette details |
 | Light/Minimal Themes | 366-432 | 6 palette details |
@@ -114,6 +114,7 @@
 | 77 | redis-predictions | dark,red,tech,enterprise,SaaS | Tech predictions, AI demos | flat | [→](#redis-predictions) |
 | 78 | redis-docs-dark | dark,slate,developer,documentation | Developer docs, technical | glass | [→](#redis-docs-dark) |
 | 79 | redis-docs-light | light,slate,developer,documentation,AI | Developer docs, AI content | flat | [→](#redis-docs-light) |
+| 80 | skillsmp | light,terminal,developer,tools,code-editor | Developer tools, skill marketplace | flat | [→](#skillsmp) |
 
 ---
 
@@ -1257,7 +1258,7 @@ Each palette provides 5 core color values, mapped as follows:
 | Scenario | Recommended Palettes |
 |----------|---------------------|
 | Corporate website | minimal-modern-light, banking-website |
-| Tech products | react, cyberpunk, electric-city-nights, dark-sapphire-blue |
+| Tech products | react, cyberpunk, electric-city-nights, dark-sapphire-blue, skillsmp |
 | E-commerce | playful, pantone-2023, fuscia-and-turquoise |
 | Social media | tiktok, facebook, dance-network |
 | Nature/eco | summer-meadow, deep-green, marigold-forest-green |
@@ -1273,7 +1274,7 @@ Each palette provides 5 core color values, mapped as follows:
 | Warm/cozy | autumn, halloween-warm, caramel-sage-green |
 | Professional/trustworthy | banking-website, navy-and-blush, slate-maroon-pink |
 | Romantic/soft | lavendar, periwinkle-and-coral, blush-and-slate |
-| Developer/Technical | redis-docs-dark, redis-docs-light, hacker-news, react |
+| Developer/Technical | redis-docs-dark, redis-docs-light, hacker-news, react, skillsmp |
 | AI/Predictions | redis-predictions, redis-docs-light, dark-sapphire-blue, space |
 
 ---
@@ -1394,3 +1395,72 @@ Each palette provides 5 core color values, mapped as follows:
 - Developer tutorials
 - API walkthroughs
 - Clean, professional technical content
+
+---
+
+### skillsmp
+**Tags:** light, terminal, developer, tools, code-editor, IDE, marketplace, skills
+**Inspired by:** [Skills Marketplace Categories](https://skillsmp.com/categories)
+
+| Value | Hex | Usage |
+|-------|-----|-------|
+| 1 | `#ffffff` | bg-100 (pure white background) |
+| 2 | `#00bfa5` | primary-100 (teal/cyan for keywords like "export", "import") |
+| 3 | `#00a68e` | primary-200 (darker teal for hover) |
+| 4 | `#7c4dff` | accent-100 (purple for highlights) |
+| 5 | `#1a1a1a` | text-100 (primary dark text) |
+
+**Extended Palette:**
+| Token | Hex | Usage |
+|-------|-----|-------|
+| bg-200 | `#f8f8f8` | card backgrounds, elevated surfaces |
+| bg-300 | `#e8e8e8` | borders, dividers |
+| text-200 | `#666666` | secondary text, comments (// syntax) |
+| text-muted | `#999999` | muted labels, placeholders |
+| accent-200 | `#e91e63` | pink/red for status indicators, warnings |
+| accent-300 | `#4caf50` | green for numbers, success states |
+| terminal-red | `#ff5f57` | traffic light dot - close |
+| terminal-yellow | `#ffbd2e` | traffic light dot - minimize |
+| terminal-green | `#28c940` | traffic light dot - maximize |
+| chip-bg | `#f0f0f0` | chip/tag background |
+| chip-border | `#d0d0d0` | chip/tag border |
+
+**Typography:**
+- Display: JetBrains Mono, Fira Code, or SF Mono (monospace for code feel)
+- Body: Inter, -apple-system, sans-serif (clean, readable)
+- Code: JetBrains Mono, Fira Code
+
+**UI Elements:**
+- Cards: White bg with subtle border (`#e8e8e8`), code-editor chrome with traffic light dots
+- File tabs: `filename.ts` style headers with colored dots
+- Comments: `// 37081 skills` style for metadata/counts
+- Keywords: Teal `export`, `import` before titles
+- Chips/Tags: Rounded pills with light bg, subtle border
+- Terminal prompt: `$` prefix for commands, `$ pwd: ~ / path` style breadcrumbs
+- Status indicator: Green dot for "ready" state
+- Numbers: Green accent color for stats/counts
+
+**Card Patterns:**
+```
+┌─────────────────────────────────────┐
+│ ● ● ●  filename.ts           $ cmd →│  (traffic lights + file + action)
+├─────────────────────────────────────┤
+│ 🔧 export Title                     │  (icon + keyword + title)
+│ // 12345 items                      │  (comment-style metadata)
+└─────────────────────────────────────┘
+```
+
+**Navigation Style:**
+- Breadcrumb: `$ pwd: ~ / categories` (terminal-style path)
+- Nav chips: Rounded buttons with `$` prefix commands
+- Active state: Darker bg or underline
+
+**Style:** flat (clean, IDE-inspired, code-editor aesthetic)
+
+**Recommended for:**
+- Developer tools presentations
+- Skill/plugin marketplace demos
+- CLI tool showcases
+- Technical product catalogs
+- IDE/editor feature presentations
+- API/SDK directory displays
