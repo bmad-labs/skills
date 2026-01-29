@@ -1,6 +1,6 @@
 ---
 name: slides-generator
-description: Generate interactive presentation slides using React + Tailwind, and export to standalone single-file HTML. Triggers on keywords like "slides", "presentation", "PPT", "demo", "benchmark", or when user requests export. Uses agent-browser skill for browser verification (install with `npx skills add vercel-labs/agent-browser` if not available).
+description: Generate interactive presentation slides using React + Tailwind, and export to standalone single-file HTML. Triggers on keywords like "slides", "presentation", "PPT", "demo", "benchmark", or when user requests export. Uses agent-browser skill for browser verification before export (install with `npx skills add vercel-labs/agent-browser` if not available).
 ---
 
 # Slides Generator
@@ -14,6 +14,8 @@ Each slide project is organized in a dedicated folder:
 ```
 <project-folder>/
 ├── context.md          ← Collected knowledge and context from user
+├── researches/         ← Research documents (when topic requires research)
+│   └── YYYY-MM-DD-topic.md
 ├── slides.md           ← Markdown slides for preview/discussion
 ├── source/             ← React source code (from template)
 │   ├── package.json
@@ -28,6 +30,7 @@ Each slide project is organized in a dedicated folder:
 │           ├── 01-hero.jsx
 │           ├── 02-content.jsx
 │           └── ...
+├── verify/             ← Verification screenshots (from browser testing)
 └── slide.html          ← Final standalone HTML (auto-generated)
 ```
 
@@ -38,6 +41,8 @@ Step 1: Initialize Project Folder
     ↓
 Step 2: Collect Requirements → context.md
     ↓
+Step 2.5: Research (if needed) → researches/
+    ↓
 Step 3: Create Markdown Slides → slides.md
     ↓
 Step 4: Confirm with User
@@ -46,9 +51,9 @@ Step 5: Create Source Code → source/
     ↓
 Step 6: Generate Slides (parallel subagents)
     ↓
-Step 7: Build & Export → slide.html
+Step 7: Dev Mode + Browser Verification (REQUIRED)
     ↓
-Step 8: Browser Verification (optional)
+Step 8: Build & Export → slide.html
 ```
 
 ## Step 1: Initialize Project Folder
@@ -61,34 +66,62 @@ Default: ./presentation-name
 
 **Create folder structure:**
 ```bash
-mkdir -p <project-folder>/source
+mkdir -p <project-folder>/source <project-folder>/researches <project-folder>/verify
 ```
 
 ## Step 2: Collect Requirements
 
-Ask questions to understand:
-- **Scenario type**: Benchmark / Product Demo / Report / General
-- **Content**: Title, number of slides, key points per slide
-- **Style preference**: Tech / Professional / Vibrant / Minimal
+Gather comprehensive context using questions. See [context-guide.md](references/context-guide.md) for detailed guidance.
+
+**Key areas to cover:**
+- **Topic & Purpose**: What and why
+- **Audience**: Who and their expertise level
+- **Content**: Key points, data needs, visual requirements
+- **Style**: Theme preference, tone, animations
 
 **Save to `context.md`:**
 ```markdown
 # Presentation Context
 
 ## Topic
-[Main topic and purpose]
+[Main topic and specific focus area]
+
+## Purpose
+[What this presentation aims to achieve]
+- Primary goal: [inform/persuade/demo/report]
+- Expected action: [what audience should do after]
 
 ## Audience
-[Target audience]
+- **Primary**: [main target group]
+- **Expertise level**: [beginner/intermediate/expert]
+- **Key interests**: [what they care about]
 
 ## Key Points
+
+### [Section 1]
 - Point 1
 - Point 2
-- ...
+
+### [Section 2]
+- Point 1
+- Point 2
+
+## Data & Statistics
+- [Stat]: [Source]
+
+## Visual Requirements
+- [ ] Code examples
+- [ ] Diagrams
+- [ ] Charts
+- [ ] Custom images
 
 ## Style
-- Theme: [theme-id]
-- Style: glass / flat
+- **Theme**: [theme-id from palettes.md]
+- **Style**: [glass/flat]
+- **Tone**: [professional/casual/energetic/minimal]
+
+## Sources
+- [Source]: [URL/reference]
 
 ## Additional Notes
 [Any other relevant context]
@@ -96,49 +129,190 @@ Ask questions to understand:
 
 Recommend a theme from [palettes.md](references/palettes.md) based on style keywords.
 
+## Step 2.5: Research (When Needed)
+
+If the topic requires research to gather accurate data, statistics, or technical details:
+
+1. **Identify knowledge gaps** during context collection
+2. **Conduct research** using web search or provided materials
+3. **Document findings** in `researches/` folder
+
+**Research file naming:**
+```
+researches/
+├── YYYY-MM-DD-main-research.md      # Primary research
+├── YYYY-MM-DD-statistics.md         # Data and numbers
+└── YYYY-MM-DD-references.md         # Sources and links
+```
+
+**Research document template:**
+```markdown
+# Research: [Topic]
+
+## Date: YYYY-MM-DD
+
+## Research Questions
+- Question 1?
+- Question 2?
+
+## Findings
+
+### [Finding 1]
+[Details with source citations]
+
+### [Finding 2]
+[Details with source citations]
+
+## Key Statistics
+| Metric | Value | Source |
+|--------|-------|--------|
+| [Metric] | [Value] | [Source] |
+
+## Sources
+1. [Title](URL) - [Brief description]
+2. [Title](URL) - [Brief description]
+
+## Notes for Slides
+- Use [finding] for slide X
+- Cite [statistic] in data slide
+```
+
+**After research, update context.md** with verified data and sources.
+
 ## Step 3: Create Markdown Slides
 
-Create `slides.md` for user preview before generating code:
+Create `slides.md` with complete design system and content structure. See [slides-design.md](references/slides-design.md) for detailed patterns.
+
+### 3.1 Generate Design System (Optional but Recommended)
+
+Use **ui-ux-pro-max** skill to get comprehensive design recommendations:
+
+```bash
+python3 skills/ui-ux-pro-max/scripts/search.py "<topic> <style keywords>" --design-system -p "<Presentation Name>"
+```
+
+**Example:**
+```bash
+python3 skills/ui-ux-pro-max/scripts/search.py "tech benchmark modern dark glass" --design-system -p "Claude Benchmark"
+```
+
+### 3.2 slides.md Template
 
 ```markdown
-# Presentation Title
+# [Presentation Title]
+
+## Design System
+
+### Theme
+- **Palette**: [theme-id from palettes.md]
+- **Mode**: dark / light
+- **Style**: glass / flat
+
+### Colors
+| Token | Hex | Usage |
+|-------|-----|-------|
+| bg-base | #0f1c2e | Main background |
+| primary-500 | #4d648d | Primary accent |
+| accent-500 | #3d5a80 | Contrast accent |
+| text-primary | #ffffff | Main text |
+| text-secondary | #cee8ff | Secondary text |
+
+### Typography
+- **Display**: Sora (headings)
+- **Body**: Source Sans 3 (content)
+
+### Effects
+- **Cards**: glass with border-white/20
+- **Animations**: stagger reveal (0.1s delay)
+- **Background**: gradient glow + grid pattern
+
+---
 
 ## Slide 1: Hero
 **Type**: Hero
+**Layout**: centered
 **Title**: Main Title Here
 **Subtitle**: Supporting tagline
+**Background**: gradient glow (primary top-left, accent bottom-right)
+**Animation**: fade-in + scale (0.6s)
 
 ---
 
 ## Slide 2: Overview
 **Type**: Content
+**Layout**: three-column
 **Title**: What We'll Cover
+**Cards**: 3 cards, glass style
 **Points**:
-- First key point
-- Second key point
-- Third key point
+- [icon: Zap] First key point
+- [icon: Shield] Second key point
+- [icon: Rocket] Third key point
+**Animation**: stagger reveal (0.1s)
 
 ---
 
 ## Slide 3: Details
 **Type**: Data
+**Layout**: stat-cards
 **Title**: Key Metrics
-**Content**:
-| Metric | Value |
-|--------|-------|
-| Users  | 10K   |
-| Growth | 25%   |
+**Stats**:
+| Metric | Value | Trend | Context |
+|--------|-------|-------|---------|
+| Users | 10K+ | +25% | Monthly active |
+| Growth | 40% | +15% | Year over year |
+| NPS | 72 | +8 | Industry avg: 45 |
+**Animation**: count-up numbers
 
 ---
 
-## Slide 4: Summary
+## Slide 4: Comparison
+**Type**: Comparison
+**Layout**: versus
+**Title**: Head to Head
+**Comparison**:
+| Feature | Option A | Option B |
+|---------|----------|----------|
+| Speed | ✓ Fast | ○ Medium |
+| Cost | $99/mo | $149/mo |
+| Support | 24/7 | Business |
+**Highlight**: Option A for performance
+
+---
+
+## Slide 5: Summary
 **Type**: Summary
+**Layout**: takeaways
 **Title**: Key Takeaways
-**Points**:
-- Conclusion 1
-- Conclusion 2
-- Call to action
+**Takeaways**:
+1. First key insight
+2. Second key insight
+3. Third key insight
+**CTA**: "Get Started" → [link]
+**Animation**: fade-in sequential
 ```
+
+### 3.3 Slide Types Reference
+
+| Type | Use For | Layouts |
+|------|---------|---------|
+| Hero | Opening slide | centered, split, asymmetric |
+| Content | Information, bullets | single-column, two-column, icon-list |
+| Data | Statistics, metrics | stat-cards, chart-focus, dashboard |
+| Comparison | Side-by-side analysis | versus, feature-matrix, ranking |
+| Timeline | Process, roadmap | horizontal, vertical, milestone |
+| Grid | Multiple cards | 2x2, 2x3, bento |
+| Quote | Testimonials | centered, with-avatar |
+| Summary | Closing, CTA | takeaways, cta-focused |
+
+### 3.4 Design Patterns by Scenario
+
+| Scenario | Theme | Style | Typography |
+|----------|-------|-------|------------|
+| Tech/Product | dark-sapphire-blue | glass | Sora + Source Sans 3 |
+| Professional | banking-website | flat | DM Sans + Work Sans |
+| Creative | cyberpunk or neon | glass | Outfit + Nunito Sans |
+| Nature | summer-meadow | flat | Manrope + Source Sans 3 |
+| Minimal | black-and-white | flat | DM Sans + Work Sans |
 
 ## Step 4: Confirm with User
 
@@ -186,6 +360,11 @@ Generate each slide JSX file based on `slides.md` content.
 **Before generating, read:**
 - [aesthetics.md](references/aesthetics.md) - Design philosophy
 - [principles.md](references/principles.md) - Technical principles
+
+**Use vercel-react-best-practices skill** for React code generation to ensure:
+- Proper component composition and patterns
+- Performance-optimized rendering
+- Clean, maintainable code structure
 
 **Technical Requirements:**
 - Framework: React function component
@@ -269,7 +448,7 @@ import Slide02 from './slides/02-content';
 // Update SLIDES array
 const SLIDES = [Slide01, Slide02, ...];
 
-// Update NAV_ITEMS array
+// Update NAV_ITEMS array (used for navigation labels)
 const NAV_ITEMS = [
   { slideIndex: 0, label: 'Hero' },
   { slideIndex: 1, label: 'Content' },
@@ -280,21 +459,137 @@ const NAV_ITEMS = [
 const PRESENTATION_NAME = 'Your Presentation Title';
 ```
 
-## Step 7: Build & Export (Automatic)
+**Navigation Features:**
 
-After slides are generated, automatically build the standalone HTML:
+The template includes quick-jump navigation:
+
+| Feature | How to Use |
+|---------|------------|
+| Slide dots | Click dots at bottom center (≤12 slides) |
+| Number keys | Press 1-9 to jump to slides 1-9 |
+| Quick nav | Press G or click progress bar to open grid picker |
+| Menu | Click hamburger for full slide list with labels |
+| Arrows | ← → keys or click chevron buttons |
+
+## Step 7: Dev Mode + Browser Verification (REQUIRED)
+
+**IMPORTANT**: Always verify slides in dev mode BEFORE building the standalone export. This catches UI, animation, and interaction issues early.
+
+See [browser-verification.md](references/browser-verification.md) for detailed verification procedures.
+
+### 7.1 Start Dev Server
 
 ```bash
 cd <project-folder>/source
-
-# Install dependencies
 npm install
+npm run dev
+# Server runs at http://localhost:5173
+```
+
+### 7.2 Browser Verification with agent-browser
+
+**Check if agent-browser is available:**
+```bash
+# Try to run agent-browser
+agent-browser --version
+```
+
+**If not installed, prompt user:**
+```
+Browser verification requires agent-browser skill.
+
+Install with:
+npx skills add vercel-labs/agent-browser
+
+Then restart Claude Code and retry.
+```
+
+### 7.3 Verification Workflow
+
+```bash
+# Open presentation in browser
+agent-browser open http://localhost:5173
+agent-browser set viewport 1920 1080
+
+# Create verify folder
+mkdir -p <project-folder>/verify
+
+# Capture first slide
+agent-browser wait 2000
+agent-browser screenshot <project-folder>/verify/slide-01.png
+
+# Navigate and capture each slide
+agent-browser press ArrowRight
+agent-browser wait 1000
+agent-browser screenshot <project-folder>/verify/slide-02.png
+# ... repeat for all slides
+```
+
+### 7.4 Verification Checklist
+
+| Check | How | Pass Criteria |
+|-------|-----|---------------|
+| Layout | Screenshot each slide | No content overflow, proper spacing |
+| Navigation | Press ArrowRight/Left | Slides transition smoothly |
+| Quick jump | Press 1-5 or G key | Jumps to correct slide |
+| Slide dots | Click dots at bottom | Navigates correctly (≤12 slides) |
+| Animations | Watch transitions | No jank, elements animate in |
+| Interactive | Hover elements | Visual feedback works |
+| Responsive | Change viewport | Layout adapts correctly |
+
+### 7.5 Common Issues to Check
+
+**Layout Problems:**
+- Content extending beyond viewport
+- Navigation bar hidden or overlapped
+- Cards cramped or overflowing
+
+**Animation Problems:**
+- Stuttering transitions
+- Elements not animating
+- Flash of unstyled content
+
+**Interaction Problems:**
+- Keyboard navigation not working
+- Click areas not responsive
+- Hover states missing
+
+### 7.6 Fix and Re-verify
+
+If issues found:
+1. Fix the problematic slide JSX
+2. Browser auto-reloads (hot reload)
+3. Re-verify the specific slide
+4. Take new screenshot to confirm fix
+
+## Step 8: Build & Export
+
+**Only after verification passes**, build the standalone HTML:
+
+```bash
+cd <project-folder>/source
 
 # Build standalone HTML
 npm run build:standalone
 
 # Copy to project root
 cp dist-standalone/index.html ../slide.html
+```
+
+### 8.1 Final Verification
+
+Verify the standalone file works correctly:
+
+```bash
+# Test standalone file
+agent-browser open file://<absolute-path>/slide.html
+agent-browser set viewport 1920 1080
+agent-browser screenshot <project-folder>/verify/final-standalone.png
+
+# Quick navigation test
+agent-browser press ArrowRight
+agent-browser wait 500
+agent-browser press ArrowLeft
 ```
 
 **Final output**: `<project-folder>/slide.html`
@@ -305,31 +600,11 @@ This single HTML file:
 - Opens directly in any browser (file://)
 - Full React interactivity and animations
 
-## Step 8: Browser Verification (Optional)
+### 8.2 Close Browser
 
-Use the **agent-browser** skill for browser automation and verification.
-
-**Check if agent-browser is installed:**
 ```bash
-claude skill list | grep -q "agent-browser"
+agent-browser close
 ```
-
-**If not installed, prompt user:**
-```
-The agent-browser skill is required for browser verification.
-
-Install it with:
-npx skills add vercel-labs/agent-browser
-
-Then restart Claude Code and retry.
-```
-
-**Once installed, use agent-browser to:**
-1. Open `<project-folder>/slide.html` in browser
-2. Take screenshots of each slide
-3. Verify navigation works (arrow keys, click)
-4. Check responsive behavior
-5. Fix any layout or styling issues found
 
 ## Step 5.5: Generate Images (When Required)
 
@@ -384,11 +659,15 @@ User: "OK"
 Claude: "A few questions:
 1. How many evaluation tasks? (e.g., 3-5)
 2. What capabilities? (coding / reasoning / agent)
-3. Style preference? (Tech/Professional/Vibrant)"
+3. Style preference? (Tech/Professional/Vibrant)
+4. Do you have specific benchmark data, or should I research current benchmarks?"
 
-User: "3 tasks, coding ability, tech style"
+User: "3 tasks, coding ability, tech style, research current data"
 
-Claude: [Creates ./claude-benchmark/context.md]
+Claude: [Creates ./claude-benchmark/ folder structure]
+Claude: [Researches current benchmark data]
+Claude: [Creates ./claude-benchmark/researches/2026-01-29-benchmark-data.md]
+Claude: [Creates ./claude-benchmark/context.md with researched data]
 Claude: [Creates ./claude-benchmark/slides.md]
 Claude: "Here's the outline:
 
@@ -412,15 +691,49 @@ User: "OK"
 Claude: [Creates source/ from template]
 Claude: [Generates 6 slide JSX files]
 Claude: [Updates App.jsx with imports]
-Claude: [Runs npm install && npm run build:standalone]
+Claude: [Starts dev server: npm run dev]
+Claude: [Opens browser: agent-browser open http://localhost:5173]
+Claude: [Verifies each slide, takes screenshots]
+Claude: "Verification complete. All slides look good:
+- Layout: ✓ No overflow issues
+- Navigation: ✓ Arrow keys work
+- Animations: ✓ Smooth transitions
+
+Building standalone export..."
+
+Claude: [Runs npm run build:standalone]
 Claude: [Copies to slide.html]
+Claude: [Final verification of slide.html]
+Claude: [Closes browser]
 Claude: "Presentation complete!
 
 Files created:
 - ./claude-benchmark/context.md
+- ./claude-benchmark/researches/2026-01-29-benchmark-data.md
 - ./claude-benchmark/slides.md
 - ./claude-benchmark/source/ (React project)
+- ./claude-benchmark/verify/ (verification screenshots)
 - ./claude-benchmark/slide.html ← Open this in browser
 
 Open slide.html to view your presentation."
 ```
+
+## Reference Documentation
+
+| Reference | Description |
+|-----------|-------------|
+| [context-guide.md](references/context-guide.md) | Comprehensive guide for gathering requirements |
+| [slides-design.md](references/slides-design.md) | Design system patterns, slide types, layouts, animations |
+| [browser-verification.md](references/browser-verification.md) | Browser testing with agent-browser |
+| [aesthetics.md](references/aesthetics.md) | Design philosophy and visual guidelines |
+| [principles.md](references/principles.md) | Technical layout and component rules |
+| [palettes.md](references/palettes.md) | 76 color themes with usage guide |
+
+## External Skill Integration
+
+| Skill | Use For |
+|-------|---------|
+| **vercel-react-best-practices** | React code generation best practices (REQUIRED for slide JSX) |
+| **ui-ux-pro-max** | Design system generation, typography, color palettes |
+| **agent-browser** | Browser verification before export |
+| **ai-multimodal** | Custom image/diagram generation |
