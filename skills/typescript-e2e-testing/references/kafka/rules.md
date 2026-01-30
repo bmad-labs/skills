@@ -9,7 +9,7 @@
 | Consumer isolation | Use `fromBeginning: false`, clear buffer between tests |
 | Consumer group | Unique per test suite: `${baseId}-e2e-${Date.now()}` |
 | Microservice config | `{ inheritAppConfig: true }` |
-| Startup wait | 5s after `startAllMicroservices()` |
+| Consumer readiness | Use Admin API `waitForConsumerGroupStable()` - NOT blind waits |
 
 ## Topic Management Rules
 
@@ -142,6 +142,52 @@ await app.init();
 await new Promise(r => setTimeout(r, 5000)); // Wait 5s
 ```
 
+## Consumer Group Synchronization Rules
+
+### CRITICAL: Use Admin API for Consumer Readiness
+
+**Never use blind waits to assume consumer readiness.** Use Admin API `describeGroups` to verify consumer group state.
+
+```typescript
+// ❌ WRONG: Blind wait (guessing consumer is ready)
+await app.startAllMicroservices();
+await new Promise(r => setTimeout(r, 5000)); // Hope 5s is enough
+
+// ✅ CORRECT: Admin API state verification
+await app.startAllMicroservices();
+const groupId = getConsumerGroupId(); // Expose from your client
+await kafkaHelper.waitForConsumerGroupStable(groupId, 15000);
+```
+
+### After Dynamic Topic Subscription
+
+When subscribing to topics after consumer is already running, a rebalance occurs. The consumer is NOT ready until rebalance completes.
+
+```typescript
+// ❌ WRONG: Assume subscription is immediate
+await client.subscribeToResponseOf('new-topic');
+await kafkaHelper.publishEvent('new-topic', event); // May be lost!
+
+// ✅ CORRECT: Wait for rebalance completion
+await client.subscribeToResponseOf('new-topic');
+await kafkaHelper.waitForConsumerGroupStable(groupId, 15000);
+await kafkaHelper.publishEvent('new-topic', event); // Safe
+```
+
+### Consumer Group State Reference
+
+| State | Value | Ready? | Action |
+|-------|-------|--------|--------|
+| `Stable` | 3 | ✅ Yes | Proceed with test |
+| `PreparingRebalance` | 1 | ❌ No | Wait |
+| `CompletingRebalance` | 2 | ❌ No | Wait |
+| `Empty` | 5 | ❌ No | Consumer not started |
+| `Dead` | 4 | ❌ No | Error - check setup |
+
+**Note:** @confluentinc/kafka-javascript uses numeric values, KafkaJS uses string names.
+
+---
+
 ## Polling Rules
 
 ### Smart Polling vs Fixed Waits
@@ -210,8 +256,13 @@ mockHttpService.post.mockReturnValueOnce(of({ status: 500 })); // attempt 3
 - [ ] Unique consumer group ID per suite
 - [ ] `fromBeginning: false` in subscribe options
 - [ ] `inheritAppConfig: true` in connectMicroservice
-- [ ] 5s wait after `startAllMicroservices()`
 - [ ] Pre-subscribe to output topics before app starts
+
+**Consumer Synchronization (Admin API):**
+- [ ] Use `waitForConsumerGroupStable()` instead of blind waits
+- [ ] Expose consumer group ID from your Kafka client
+- [ ] After dynamic subscription, wait for rebalance completion
+- [ ] Verify state is `Stable` before publishing test messages
 
 **Test Isolation:**
 - [ ] Clear message buffer in `beforeEach`

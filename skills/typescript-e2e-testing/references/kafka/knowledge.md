@@ -75,11 +75,60 @@ E2E testing with Kafka requires a fundamentally different approach than other in
 | Phase | Value | Purpose |
 |-------|-------|---------|
 | Setup timeout | 90s | Full app + Kafka initialization |
-| App startup wait | 5s | Consumer subscription |
+| Consumer ready | Admin API | Use `waitForConsumerGroupStable()` instead of fixed wait |
 | Between-test delay | 2s | Buffer clearing grace period |
 | Polling interval | 50ms | Message check frequency |
 | Processing wait | 10-20s max | Async message handling timeout |
 | Test timeout | 30-60s | Account for variability |
+
+## Admin API for Test Synchronization
+
+**CRITICAL: Use Admin API to determine when tests are ready to proceed, instead of blind waits.**
+
+### Why Admin API?
+
+| Blind Wait Problems | Admin API Benefits |
+|--------------------|--------------------|
+| May wait too long (slow tests) | Proceeds as soon as ready |
+| May not wait long enough (flaky) | State-based, deterministic |
+| Guessing game in CI | Consistent across environments |
+| No visibility into consumer state | Can log/debug actual state |
+
+### Key Admin API Methods for E2E Tests
+
+| Method | Purpose |
+|--------|---------|
+| `describeGroups([groupId])` | Get consumer group state (Stable, PreparingRebalance, etc.) |
+| `listGroups()` | List all consumer groups |
+| `deleteGroups([groupId])` | Reset consumer group for clean start |
+
+### Consumer Group States
+
+```
+PreparingRebalance (1) → CompletingRebalance (2) → Stable (3)
+          ↑                                            │
+          └──────────── (new subscription) ────────────┘
+```
+
+| State | Numeric | String (KafkaJS) | Meaning |
+|-------|---------|------------------|---------|
+| Unknown | 0 | 'Unknown' | State unknown |
+| PreparingRebalance | 1 | 'PreparingRebalance' | Rebalance in progress ⏳ |
+| CompletingRebalance | 2 | 'CompletingRebalance' | Assigning partitions ⏳ |
+| **Stable** | **3** | **'Stable'** | **Ready to consume ✅** |
+| Dead | 4 | 'Dead' | Group deleted ❌ |
+| Empty | 5 | 'Empty' | No consumers ⚠️ |
+
+**Note:** @confluentinc/kafka-javascript (node-rdkafka) uses numeric states, KafkaJS uses strings.
+
+### Usage Pattern
+
+```typescript
+// After starting microservices or subscribing to topics
+const groupId = client.getConsumerGroupId();
+await kafkaHelper.waitForConsumerGroupStable(groupId, 15000);
+// NOW safe to publish test messages
+```
 
 ## Broker Options for E2E Tests
 

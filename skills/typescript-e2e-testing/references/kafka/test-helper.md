@@ -280,6 +280,138 @@ export class KafkaTestHelper {
     }
   }
 
+  // ============================================================
+  // CONSUMER GROUP STATE MONITORING (Admin API)
+  // ============================================================
+  // Use these methods to synchronize tests with Kafka consumer state
+  // instead of blind waits. These provide deterministic test readiness.
+  // ============================================================
+
+  /**
+   * Wait for consumer group to reach 'Stable' state.
+   * CRITICAL: Use this after subscribing to topics to ensure consumer is ready.
+   *
+   * Consumer group states (from librdkafka/confluentinc ConsumerGroupStates enum):
+   * - 0: Unknown
+   * - 1: PreparingRebalance - Group is rebalancing, NOT ready
+   * - 2: CompletingRebalance - Finishing rebalance, NOT ready
+   * - 3: Stable - Ready to consume messages ✓
+   * - 4: Dead - Group has been deleted
+   * - 5: Empty - No active members
+   *
+   * Note: For KafkaJS, states are strings ('Stable', 'PreparingRebalance', etc.)
+   * For @confluentinc/kafka-javascript (node-rdkafka), states are numeric.
+   */
+  async waitForConsumerGroupStable(
+    groupId: string,
+    timeoutMs: number = 30000,
+    pollIntervalMs: number = 500
+  ): Promise<void> {
+    const startTime = Date.now();
+    const STABLE_STATE = 3; // For node-rdkafka/confluentinc
+
+    while (Date.now() - startTime < timeoutMs) {
+      const state = await this.getConsumerGroupState(groupId);
+      const stateNum = typeof state === 'string' ? parseInt(state, 10) : state;
+
+      if (stateNum === STABLE_STATE) {
+        // Small buffer for consume loop to fully start
+        await new Promise(r => setTimeout(r, 500));
+        return; // Consumer ready
+      }
+
+      // Log for debugging
+      if (state !== null) {
+        const stateNames: Record<number, string> = {
+          0: 'Unknown', 1: 'PreparingRebalance', 2: 'CompletingRebalance',
+          3: 'Stable', 4: 'Dead', 5: 'Empty'
+        };
+        console.log(`Consumer group '${groupId}' state: ${stateNames[stateNum] || state}`);
+      }
+
+      await new Promise(r => setTimeout(r, pollIntervalMs));
+    }
+
+    throw new Error(`Timeout waiting for consumer group '${groupId}' to reach Stable state`);
+  }
+
+  /**
+   * Get current state of a consumer group using Admin API.
+   * Returns null if group doesn't exist.
+   *
+   * For @confluentinc/kafka-javascript (node-rdkafka):
+   */
+  async getConsumerGroupState(groupId: string): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      this.admin.describeGroups([groupId], { timeout: 5000 }, (err, result) => {
+        if (err) {
+          reject(new Error(`Failed to describe group: ${err.message}`));
+          return;
+        }
+        if (!result.groups || result.groups.length === 0) {
+          resolve(null);
+          return;
+        }
+        const groupInfo = result.groups[0];
+        if (groupInfo.error) {
+          resolve(null);
+          return;
+        }
+        resolve(String(groupInfo.state));
+      });
+    });
+  }
+
+  /**
+   * Wait for consumer group to have expected number of members.
+   * Useful when testing consumer scaling or ensuring all consumers joined.
+   */
+  async waitForConsumerGroupMembers(
+    groupId: string,
+    expectedMembers: number,
+    timeoutMs: number = 30000
+  ): Promise<void> {
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeoutMs) {
+      const count = await this.getConsumerGroupMemberCount(groupId);
+      if (count >= expectedMembers) {
+        return;
+      }
+      await new Promise(r => setTimeout(r, 500));
+    }
+
+    const finalCount = await this.getConsumerGroupMemberCount(groupId);
+    throw new Error(
+      `Timeout waiting for ${expectedMembers} members in group ${groupId}. ` +
+      `Current count: ${finalCount}`
+    );
+  }
+
+  /**
+   * Get current number of members in a consumer group.
+   */
+  async getConsumerGroupMemberCount(groupId: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      this.admin.describeGroups([groupId], { timeout: 5000 }, (err, result) => {
+        if (err) {
+          reject(new Error(`Failed to describe group: ${err.message}`));
+          return;
+        }
+        if (!result.groups || result.groups.length === 0) {
+          resolve(0);
+          return;
+        }
+        const groupInfo = result.groups[0];
+        if (groupInfo.error) {
+          resolve(0);
+          return;
+        }
+        resolve(groupInfo.members?.length || 0);
+      });
+    });
+  }
+
   async disconnect(): Promise<void> {
     await this.producer.disconnect();
     await this.admin.disconnect();
@@ -371,6 +503,68 @@ it('should handle 100 messages within 30 seconds', async () => {
 });
 ```
 
+### Consumer Group State Synchronization (Admin API)
+
+**CRITICAL: Use Admin API for deterministic synchronization instead of blind waits.**
+
+The Admin API `describeGroups` provides real-time consumer group state, enabling tests to proceed only when consumers are actually ready.
+
+```typescript
+// ❌ WRONG: Blind wait (may be too short or wastefully long)
+await app.startAllMicroservices();
+await new Promise(r => setTimeout(r, 5000)); // Guessing wait time
+
+// ✅ CORRECT: Admin API state-based synchronization
+await app.startAllMicroservices();
+const groupId = client.getResponseConsumerGroupId();
+if (groupId) {
+  await kafkaHelper.waitForConsumerGroupStable(groupId, 15000);
+}
+```
+
+#### After Subscribing to New Topics
+
+When dynamically subscribing to topics during tests, consumer group rebalancing occurs. Use Admin API to wait for stability:
+
+```typescript
+// Subscribe to multiple topics (triggers rebalance)
+await client.subscribeToResponseOf('request-topic-1');
+await client.subscribeToResponseOf('request-topic-2');
+
+// Wait for rebalance to complete using Admin API
+const groupId = client.getResponseConsumerGroupId();
+await kafkaHelper.waitForConsumerGroupStable(groupId, 15000);
+
+// NOW the consumer is ready to receive messages
+await kafkaHelper.publishEvent('request-topic-1', { data: 'test' });
+```
+
+#### Consumer Group States Reference
+
+| State | Value | Meaning | Test Action |
+|-------|-------|---------|-------------|
+| `Unknown` | 0 | State unknown | ⏳ Retry query |
+| `PreparingRebalance` | 1 | Rebalancing in progress | ⏳ Wait |
+| `CompletingRebalance` | 2 | Finishing rebalance | ⏳ Wait |
+| `Stable` | 3 | Consumer ready, partitions assigned | ✅ Safe to proceed |
+| `Dead` | 4 | Group deleted | ❌ Error - reinitialize |
+| `Empty` | 5 | No active members | ⚠️ Check consumer started |
+
+**Note:** @confluentinc/kafka-javascript (node-rdkafka) uses numeric values. KafkaJS uses string names.
+
+#### Verifying Consumer Member Count
+
+For tests involving multiple consumers or consumer scaling:
+
+```typescript
+// Ensure expected number of consumers have joined
+await kafkaHelper.waitForConsumerGroupMembers('my-group', 3, 30000);
+
+// Get current member count
+const memberCount = await kafkaHelper.getConsumerGroupMemberCount('my-group');
+expect(memberCount).toBe(3);
+```
+
 ---
 
 ## API Reference
@@ -385,6 +579,15 @@ it('should handle 100 messages within 30 seconds', async () => {
 | `updateTopicConfig(topic, configEntries)` | Update topic configuration |
 | `listTopics()` | List all topics |
 | `deleteConsumerGroupOffsets(groupId)` | Reset consumer group |
+
+### Admin Methods (Consumer Group Monitoring)
+
+| Method | Description |
+|--------|-------------|
+| `waitForConsumerGroupStable(groupId, timeoutMs)` | Poll until consumer group state is 'Stable' |
+| `getConsumerGroupState(groupId)` | Get current state: 'Stable', 'PreparingRebalance', 'CompletingRebalance', 'Empty', 'Dead' |
+| `waitForConsumerGroupMembers(groupId, expectedMembers, timeoutMs)` | Wait for specific member count |
+| `getConsumerGroupMemberCount(groupId)` | Get current consumer count in group |
 
 ### Connection Methods
 
