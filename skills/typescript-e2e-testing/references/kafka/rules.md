@@ -10,6 +10,8 @@
 | Consumer group | Unique per test suite: `${baseId}-e2e-${Date.now()}` |
 | Microservice config | `{ inheritAppConfig: true }` |
 | Consumer readiness | Use Admin API `waitForConsumerGroupStable()` - NOT blind waits |
+| Broker health | Use `waitForBrokerReady()` in beforeAll for reliability |
+| **Test file ordering** | Tests with invalid broker connections MUST run LAST |
 
 ## Topic Management Rules
 
@@ -245,7 +247,101 @@ mockHttpService.post.mockReturnValueOnce(of({ status: 500 })); // attempt 2
 mockHttpService.post.mockReturnValueOnce(of({ status: 500 })); // attempt 3
 ```
 
+## Test File Ordering Rules
+
+### CRITICAL: Invalid Broker Connection Tests Run LAST
+
+Tests that connect to invalid brokers (for error handling validation) corrupt librdkafka's internal state. This corruption persists within the Jest process.
+
+```typescript
+// These patterns corrupt state for subsequent tests
+'bootstrap.servers': 'localhost:19999', // Non-existent port
+'bootstrap.servers': 'invalid-broker:9999', // Non-existent host
+```
+
+### Solution: Custom Test Sequencer
+
+```javascript
+// test/e2e/test-sequencer.js
+import Sequencer from '@jest/test-sequencer';
+
+const TEST_ORDER = [
+  'standard-tests.e2e-spec.ts',      // Clean operations first
+  'integration-tests.e2e-spec.ts',   // Complex tests middle
+  'error-handling.e2e-spec.ts',      // Invalid brokers LAST
+];
+
+export default class CustomSequencer extends Sequencer.default {
+  sort(tests) {
+    const orderMap = new Map(TEST_ORDER.map((name, index) => [name, index]));
+    return [...tests].sort((a, b) => {
+      const aOrder = orderMap.get(a.path.split('/').pop()) ?? 999;
+      const bOrder = orderMap.get(b.path.split('/').pop()) ?? 999;
+      return aOrder - bOrder;
+    });
+  }
+}
+```
+
+### Jest Configuration
+
+```javascript
+// test/jest-e2e.config.mjs
+const config = {
+  testSequencer: '<rootDir>/e2e/test-sequencer.js',
+  // ... other config
+};
+```
+
+---
+
+## Broker Health Check Rules
+
+### Use Broker Health Checks in beforeAll
+
+Always verify broker availability before running tests:
+
+```typescript
+beforeAll(async () => {
+  kafkaHelper = new KafkaTestHelper();
+  await kafkaHelper.connect();
+
+  // CRITICAL: Wait for broker to be ready
+  await kafkaHelper.waitForBrokerReady(30000);
+
+  // Then create topics and subscribe
+  await kafkaHelper.createTopicIfNotExists(inputTopic, 1);
+  // ...
+}, 90000);
+```
+
+### After Infrastructure Manipulation Tests
+
+Tests that stop/pause Docker containers need comprehensive health verification:
+
+```typescript
+// In self-healing test file
+afterAll(async () => {
+  // Ensure broker is healthy before next test file runs
+  await kafkaHelper.ensureBrokerHealthy(60000);
+  await kafkaHelper.disconnect();
+}, 90000);
+```
+
+---
+
 ## Checklist
+
+**Test File Ordering:**
+- [ ] Custom test sequencer configured in `jest-e2e.config.mjs`
+- [ ] Tests with invalid broker connections run LAST
+- [ ] Tests that manipulate Docker run late in sequence
+- [ ] All test files listed in sequencer
+
+**Broker Health:**
+- [ ] Use `waitForBrokerReady()` in `beforeAll`
+- [ ] Use `ensureBrokerHealthy()` in `afterAll` for infrastructure tests
+- [ ] Handle broker unavailability gracefully
 
 **Topic Management:**
 - [ ] Create topics with Admin in `beforeAll` (createTopicIfNotExists)

@@ -567,7 +567,112 @@ expect(memberCount).toBe(3);
 
 ---
 
+### Broker Health Verification
+
+**CRITICAL: Always verify broker health in beforeAll for reliable tests.**
+
+Tests can fail if the broker is unavailable or recovering from previous test file operations. Use these methods to ensure broker readiness:
+
+```typescript
+beforeAll(async () => {
+  kafkaHelper = new KafkaTestHelper();
+  await kafkaHelper.connect();
+
+  // CRITICAL: Wait for broker to be ready before any operations
+  await kafkaHelper.waitForBrokerReady(30000);
+
+  // Then proceed with topic creation and subscription
+  await kafkaHelper.createTopicIfNotExists(inputTopic, 1);
+  await kafkaHelper.subscribeToTopic(outputTopic, false);
+  // ...
+}, 90000);
+```
+
+#### After Infrastructure Manipulation Tests
+
+Tests that stop/pause Docker containers (e.g., self-healing tests) should ensure broker health in afterAll:
+
+```typescript
+// In self-healing.e2e-spec.ts or similar
+afterAll(async () => {
+  // Ensure broker is fully healthy before next test file runs
+  await kafkaHelper.ensureBrokerHealthy(60000);
+
+  // Add small delay to allow librdkafka to stabilize
+  await new Promise(r => setTimeout(r, 5000));
+
+  await kafkaHelper.disconnect();
+}, 90000);
+```
+
+#### Broker Health Check Implementation
+
+```typescript
+/**
+ * Quick health check using Admin API listTopics().
+ * Returns true if broker responds within timeout.
+ */
+async isBrokerHealthy(timeoutMs: number = 5000): Promise<boolean> {
+  try {
+    await Promise.race([
+      this.admin.listTopics(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Broker health check timeout')), timeoutMs)
+      ),
+    ]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Wait for broker to be ready with polling.
+ * Use in beforeAll before any Kafka operations.
+ */
+async waitForBrokerReady(
+  timeoutMs: number = 30000,
+  pollIntervalMs: number = 1000
+): Promise<void> {
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < timeoutMs) {
+    if (await this.isBrokerHealthy(5000)) {
+      return; // Broker is ready
+    }
+    console.log('Waiting for broker to be ready...');
+    await new Promise(r => setTimeout(r, pollIntervalMs));
+  }
+
+  throw new Error(`Broker not ready after ${timeoutMs}ms`);
+}
+
+/**
+ * Comprehensive broker health verification.
+ * Use after infrastructure manipulation (Docker stop/pause).
+ */
+async ensureBrokerHealthy(timeoutMs: number = 60000): Promise<void> {
+  await this.waitForBrokerReady(timeoutMs);
+
+  // Verify can list topics (confirms Admin API working)
+  await this.admin.listTopics();
+
+  // Small buffer for full stability
+  await new Promise(r => setTimeout(r, 1000));
+}
+```
+
+---
+
 ## API Reference
+
+### Admin Methods (Broker Health)
+
+| Method | Description |
+|--------|-------------|
+| `isBrokerHealthy(timeoutMs)` | Quick health check - returns true if broker responds |
+| `waitForBrokerReady(timeoutMs, pollIntervalMs)` | Poll until broker is available |
+| `ensureBrokerHealthy(timeoutMs)` | Comprehensive health verification for infrastructure tests |
 
 ### Admin Methods (Topic Management)
 
