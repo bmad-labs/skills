@@ -155,12 +155,87 @@ test/
     └── assertion-helpers.ts
 ```
 
+## Cross-File Test Isolation
+
+### The librdkafka State Corruption Problem
+
+When running multiple E2E test files in a single Jest session, tests that connect to **invalid brokers** can corrupt librdkafka's internal state. This corruption:
+
+1. **Persists within the Jest process** - Cannot be cleaned up by broker health checks
+2. **Affects subsequent test files** - Tests that passed individually now fail
+3. **Manifests as timeouts** - Connection-related failures in previously working tests
+
+### Symptoms
+
+| Observation | Likely Cause |
+|-------------|--------------|
+| Tests pass individually, fail in suite | Cross-file state pollution |
+| Timeouts after certain test files run | Invalid broker connection tests corrupting state |
+| First test file passes, later files fail | Order-dependent pollution |
+
+### Solution: Custom Jest Test Sequencer
+
+Control test file execution order to ensure tests with invalid broker connections run **LAST**:
+
+```javascript
+// test/e2e/test-sequencer.js
+import Sequencer from '@jest/test-sequencer';
+
+const TEST_ORDER = [
+  // Clean broker operations first
+  'standard-client.e2e-spec.ts',
+  // Complex integrations middle
+  'request-response.e2e-spec.ts',
+  // Invalid broker tests LAST
+  'error-handling.e2e-spec.ts',
+];
+
+export default class CustomSequencer extends Sequencer.default {
+  sort(tests) {
+    const orderMap = new Map(TEST_ORDER.map((name, index) => [name, index]));
+    return [...tests].sort((a, b) => {
+      const aOrder = orderMap.get(a.path.split('/').pop()) ?? 999;
+      const bOrder = orderMap.get(b.path.split('/').pop()) ?? 999;
+      return aOrder - bOrder;
+    });
+  }
+}
+```
+
+See [isolation.md](isolation.md) for detailed implementation.
+
+## Broker Health Checks
+
+### When to Use Broker Health Checks
+
+| Scenario | Method | Purpose |
+|----------|--------|---------|
+| Before any test file starts | `waitForBrokerReady()` | Ensure broker is available |
+| After infrastructure manipulation | `ensureBrokerHealthy()` | Verify recovery |
+| After self-healing/Docker tests | `ensureBrokerHealthy()` | Confirm broker stability |
+
+### Key Methods
+
+```typescript
+// Quick health check (lightweight)
+const healthy = await kafkaHelper.isBrokerHealthy(5000);
+
+// Wait for broker with polling
+await kafkaHelper.waitForBrokerReady(30000);
+
+// Comprehensive health verification
+await kafkaHelper.ensureBrokerHealthy(60000);
+```
+
+See [test-helper.md](test-helper.md) for implementation details.
+
 ## Key Files in This Section
 
 | File | Purpose |
 |------|---------|
 | [rules.md](rules.md) | Kafka-specific testing rules |
 | [test-helper.md](test-helper.md) | KafkaTestHelper implementation |
+| [isolation.md](isolation.md) | Test isolation patterns including file ordering |
 | [docker-setup.md](docker-setup.md) | Redpanda/Kafka Docker configs |
 | [performance.md](performance.md) | Optimization techniques |
 | [examples.md](examples.md) | Complete test examples |

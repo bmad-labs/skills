@@ -97,6 +97,104 @@ await new Promise(r => setTimeout(r, 3000)); // Wait for propagation
 
 ---
 
+## Test File Ordering (Cross-File Isolation)
+
+### Problem: librdkafka State Corruption
+
+When running multiple E2E test files in sequence, tests that connect to **invalid brokers** (for error handling validation) can corrupt librdkafka's internal state, causing subsequent tests to fail.
+
+**Key Insight:** This corruption persists within the Jest process and cannot be cleaned up via broker health checks alone.
+
+### Symptoms
+
+- Tests pass when run individually
+- Tests pass when run as a single file
+- Tests fail when run as part of the full E2E suite
+- Failures appear as timeouts or connection issues in tests that worked before
+
+### Root Cause
+
+Test files that contain tests connecting to invalid brokers (e.g., `localhost:19999`, `invalid-broker:9999`) leave librdkafka in a corrupted state:
+
+```typescript
+// These patterns corrupt librdkafka state for subsequent tests
+'bootstrap.servers': 'localhost:19999', // Non-existent port
+'bootstrap.servers': 'invalid-broker:9999', // Non-existent host
+```
+
+### Solution: Custom Jest Test Sequencer
+
+Create a custom test sequencer to control test file execution order, ensuring tests with invalid broker connections run **LAST**.
+
+```javascript
+// test/e2e/test-sequencer.js
+import Sequencer from '@jest/test-sequencer';
+
+const TEST_ORDER = [
+  // Group 1: Basic client tests (clean broker operations)
+  'confluent-kafka-client.e2e-spec.ts',
+  'confluent-kafka-client-status.e2e-spec.ts',
+
+  // Group 2: Utility tests (standard producer/consumer operations)
+  'promisified-producer.e2e-spec.ts',
+  'promisified-consumer.e2e-spec.ts',
+
+  // Group 3: Complex integration tests (sensitive to broker state)
+  'request-response.e2e-spec.ts',
+
+  // Group 4: Tests that manipulate infrastructure
+  'self-healing.e2e-spec.ts',
+
+  // Group 5: Tests with invalid broker connections (MUST RUN LAST)
+  // These tests connect to non-existent brokers and may corrupt librdkafka state
+  'promisified-producer-connection.e2e-spec.ts',
+  'confluent-kafka-client-errors.e2e-spec.ts',
+];
+
+export default class CustomSequencer extends Sequencer.default {
+  sort(tests) {
+    const orderMap = new Map(TEST_ORDER.map((name, index) => [name, index]));
+    return [...tests].sort((a, b) => {
+      const aName = a.path.split('/').pop();
+      const bName = b.path.split('/').pop();
+      const aOrder = orderMap.get(aName) ?? 999;
+      const bOrder = orderMap.get(bName) ?? 999;
+      return aOrder - bOrder;
+    });
+  }
+}
+```
+
+### Jest Configuration
+
+```javascript
+// test/jest-e2e.config.mjs
+const config = {
+  // ... other config
+  testSequencer: '<rootDir>/e2e/test-sequencer.js',
+};
+```
+
+### Test File Grouping Strategy
+
+| Group | Test Type | Example Files | Order |
+|-------|-----------|---------------|-------|
+| 1 | Basic operations | `client.e2e-spec.ts` | First |
+| 2 | Standard producer/consumer | `promisified-*.e2e-spec.ts` | Early |
+| 3 | Complex integration | `request-response.e2e-spec.ts` | Middle |
+| 4 | Infrastructure manipulation | `self-healing.e2e-spec.ts` | Late |
+| 5 | Invalid broker connections | `*-connection.e2e-spec.ts`, `*-errors.e2e-spec.ts` | **LAST** |
+
+### Checklist for Test File Ordering
+
+- [ ] Tests with invalid broker connections run LAST
+- [ ] Tests that manipulate Docker/infrastructure run late
+- [ ] Complex integration tests run after basic tests stabilize
+- [ ] Custom test sequencer configured in `jest-e2e.config.mjs`
+- [ ] All test files listed in sequencer (unlisted files run last with default order)
+
+---
+
 ## Common Issues and Solutions
 
 ### Issue: `fromBeginning: true` reads old messages
