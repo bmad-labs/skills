@@ -685,6 +685,104 @@ async ensureBrokerHealthy(timeoutMs: number = 60000): Promise<void> {
 | `listTopics()` | List all topics |
 | `deleteConsumerGroupOffsets(groupId)` | Reset consumer group |
 
+### Admin Methods (Consumer Group Cleanup)
+
+| Method | Description |
+|--------|-------------|
+| `deleteConsumerGroup(groupId)` | Delete a consumer group - use in afterAll for cleanup |
+| `deleteConsumerGroupsByPattern(pattern)` | Delete all groups matching RegExp pattern |
+
+#### Consumer Group Cleanup Example
+
+```typescript
+afterAll(async () => {
+  // Store group IDs before closing clients
+  const mainGroupId = client?.getResponseConsumerGroupId();
+  const customGroupId = customClient?.getResponseConsumerGroupId();
+
+  // Close clients first (consumers must be disconnected before group deletion)
+  await client?.close();
+  await customClient?.close();
+
+  // Delete consumer groups to prevent state accumulation
+  if (mainGroupId) {
+    await kafkaHelper.deleteConsumerGroup(mainGroupId);
+  }
+  if (customGroupId) {
+    await kafkaHelper.deleteConsumerGroup(customGroupId);
+  }
+
+  // Clean up orphaned groups from failed test runs
+  await kafkaHelper.deleteConsumerGroupsByPattern(/^test-client-.*-response-consumer-/);
+
+  kafkaHelper.disconnectAdmin();
+}, 30000);
+```
+
+#### Implementation
+
+```typescript
+/**
+ * Delete a consumer group from the broker.
+ * Use in afterAll to clean up test consumer groups.
+ *
+ * IMPORTANT: Consumers must be disconnected before deleting the group.
+ */
+async deleteConsumerGroup(groupId: string): Promise<void> {
+  return new Promise((resolve) => {
+    this.admin.deleteGroups([groupId], { timeout: 10000 }, (err) => {
+      if (err) {
+        const errorCode = (err as LibrdKafkaError).code;
+        // Error code 69 = GROUP_ID_NOT_FOUND, which is acceptable
+        if (errorCode === 69) {
+          resolve();
+        } else {
+          console.warn(`Could not delete consumer group '${groupId}': ${err.message}`);
+          resolve(); // Don't fail tests due to cleanup issues
+        }
+      } else {
+        console.log(`Deleted consumer group: ${groupId}`);
+        resolve();
+      }
+    });
+  });
+}
+
+/**
+ * Delete all consumer groups matching a pattern.
+ * Useful for cleaning up orphaned test consumer groups.
+ */
+async deleteConsumerGroupsByPattern(pattern: RegExp): Promise<void> {
+  return new Promise((resolve) => {
+    this.admin.listGroups({ timeout: 10000 }, (err, result) => {
+      if (err) {
+        console.warn(`Could not list consumer groups: ${err.message}`);
+        resolve();
+        return;
+      }
+
+      const matchingGroups = (result.groups || [])
+        .filter((g) => pattern.test(g.groupId))
+        .map((g) => g.groupId);
+
+      if (matchingGroups.length === 0) {
+        resolve();
+        return;
+      }
+
+      console.log(`Deleting ${matchingGroups.length} orphaned consumer groups...`);
+
+      this.admin.deleteGroups(matchingGroups, { timeout: 10000 }, (deleteErr) => {
+        if (deleteErr) {
+          console.warn(`Could not delete some consumer groups: ${deleteErr.message}`);
+        }
+        resolve();
+      });
+    });
+  });
+}
+```
+
 ### Admin Methods (Consumer Group Monitoring)
 
 | Method | Description |

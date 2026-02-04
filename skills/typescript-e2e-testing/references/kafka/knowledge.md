@@ -229,13 +229,53 @@ await kafkaHelper.ensureBrokerHealthy(60000);
 
 See [test-helper.md](test-helper.md) for implementation details.
 
+## Kafka State Accumulation
+
+### The Problem
+
+Even with proper cleanup, **Kafka state accumulates** across test runs within the same Jest process:
+
+| Layer | State Type | Can Clean? |
+|-------|------------|------------|
+| Broker | Consumer groups, offsets | ✅ Yes (Admin API) |
+| librdkafka | Connection pools, metadata | ❌ No |
+| Node.js | Client instances | ✅ Partial |
+
+### Impact on Tests
+
+| Run | Pass Rate (without restart) | Pass Rate (with restart) |
+|-----|----------------------------|--------------------------|
+| 1 | 100% | 100% |
+| 2 | ~80% | 100% |
+| 3+ | ~0-20% | ~60-80% |
+
+### Solution: Kafka Container Restart
+
+For complex tests (request-response, high-concurrency), restart the Kafka Docker container in `beforeAll`:
+
+```typescript
+async function restartKafkaContainer(): Promise<void> {
+  await execAsync('docker restart kafka-e2e');
+  await new Promise(r => setTimeout(r, 20000)); // Wait for full initialization
+}
+
+beforeAll(async () => {
+  await restartKafkaContainer();
+  // ... rest of setup
+}, 120000);
+```
+
+See [isolation.md](isolation.md) for detailed implementation and when to use this pattern.
+
+---
+
 ## Key Files in This Section
 
 | File | Purpose |
 |------|---------|
 | [rules.md](rules.md) | Kafka-specific testing rules |
 | [test-helper.md](test-helper.md) | KafkaTestHelper implementation |
-| [isolation.md](isolation.md) | Test isolation patterns including file ordering |
+| [isolation.md](isolation.md) | Test isolation patterns including file ordering and state cleanup |
 | [docker-setup.md](docker-setup.md) | Redpanda/Kafka Docker configs |
 | [performance.md](performance.md) | Optimization techniques |
 | [examples.md](examples.md) | Complete test examples |

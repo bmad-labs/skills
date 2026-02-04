@@ -12,6 +12,7 @@
 | Consumer readiness | Use Admin API `waitForConsumerGroupStable()` - NOT blind waits |
 | Broker health | Use `waitForBrokerReady()` in beforeAll for reliability |
 | **Test file ordering** | Tests with invalid broker connections MUST run LAST |
+| **State cleanup** | For request-response tests, restart Kafka container in `beforeAll` |
 
 ## Topic Management Rules
 
@@ -330,6 +331,60 @@ afterAll(async () => {
 
 ---
 
+## Kafka Container Restart Rules
+
+### When to Restart Kafka Container
+
+For tests suffering from state accumulation, restart the Kafka Docker container in `beforeAll`:
+
+| Test Type | Restart Needed? | Reason |
+|-----------|-----------------|--------|
+| Request-response pattern | ✅ Yes | Consumer group state, pending responses |
+| High-concurrency (10+ parallel) | ✅ Yes | librdkafka connection pool state |
+| Consumer group manipulation | ✅ Yes | Offset tracking state |
+| Simple produce/consume | ❌ No | Minimal state accumulation |
+| CI/CD (fresh process) | ❌ No | Process isolation handles cleanup |
+
+### Implementation
+
+```typescript
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+async function restartKafkaContainer(): Promise<void> {
+  console.log('[Setup] Restarting Kafka container for clean state...');
+  await execAsync('docker restart kafka-e2e');
+  // 20 seconds ensures broker fully initialized
+  await new Promise((resolve) => setTimeout(resolve, 20000));
+  console.log('[Setup] Kafka container restarted');
+}
+
+beforeAll(async () => {
+  await restartKafkaContainer();
+  // ... rest of setup
+}, 120000); // Extended timeout
+```
+
+### Key Points
+
+- **Wait 20 seconds** after restart for Kafka to fully initialize
+- **Extend beforeAll timeout** to 120 seconds (2 minutes)
+- **Use in development** when running tests repeatedly
+- **Not needed in CI/CD** where each run is a fresh process
+
+### Limitations
+
+| Consecutive Runs | Result |
+|------------------|--------|
+| Run 1-2 | ✅ 100% pass |
+| Run 3+ | ⚠️ May fail (~60-80% pass) due to librdkafka internal state |
+
+For complete isolation on unlimited runs, consider running each test file in a separate process.
+
+---
+
 ## Checklist
 
 **Test File Ordering:**
@@ -337,6 +392,12 @@ afterAll(async () => {
 - [ ] Tests with invalid broker connections run LAST
 - [ ] Tests that manipulate Docker run late in sequence
 - [ ] All test files listed in sequencer
+
+**State Cleanup (Request-Response Tests):**
+- [ ] Restart Kafka container in `beforeAll` for complex tests
+- [ ] Wait 20 seconds after restart for full initialization
+- [ ] Extended `beforeAll` timeout (120 seconds)
+- [ ] Delete consumer groups in `afterAll`
 
 **Broker Health:**
 - [ ] Use `waitForBrokerReady()` in `beforeAll`

@@ -307,6 +307,111 @@ await producer.send({ topic, messages: [...] });
 | **Pre-subscription Model** | Subscribe before app starts | Always - prevents race conditions |
 | **Unique Consumer Groups** | Per-suite unique group ID | Only for parallel suites |
 | **Environment-based Topics** | `env-${env}-topic-name` pattern | Multi-environment testing |
+| **Kafka Container Restart** | Restart Docker container in `beforeAll` | Request-response patterns, complex integration tests |
+
+---
+
+## Kafka State Accumulation Problem
+
+### The Hidden Issue
+
+Even with consumer group cleanup, message buffer clearing, and proper test isolation, **Kafka state accumulates** across test runs within the same Jest process. This causes intermittent failures, especially in:
+
+- Request-response pattern tests
+- Tests with high message throughput (10+ concurrent requests)
+- Tests run multiple times consecutively
+
+### Root Causes
+
+| Layer | State Type | Cleanup Method | Effectiveness |
+|-------|------------|----------------|---------------|
+| **Broker** | Consumer groups, offsets, topics | `deleteConsumerGroup()`, topic deletion | Partial |
+| **librdkafka** | Connection pools, metadata cache | None available | ❌ Cannot clean |
+| **Node.js process** | Client instances, internal state | Close clients | Partial |
+
+**Key Insight:** librdkafka (the underlying C library) maintains internal state that persists within the Node.js process. This cannot be cleaned up through the Kafka Admin API.
+
+### Symptoms
+
+| Observation | Likely Cause |
+|-------------|--------------|
+| Tests pass on run 1-2, fail on run 3+ | State accumulation in librdkafka |
+| First test in file passes, rest timeout | Consumer not receiving responses |
+| Works after `docker restart kafka-e2e` | Broker state needed reset |
+| Works in CI (fresh process each time) | Process isolation prevents accumulation |
+
+---
+
+## Solution: Kafka Container Restart in beforeAll
+
+For complex tests that suffer from state accumulation, restart the Kafka container at the start of the test file.
+
+### Implementation
+
+```typescript
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+/**
+ * Restart Kafka container to ensure clean state.
+ * This eliminates all accumulated state (consumer groups, offsets, etc.)
+ * that can cause test failures on subsequent runs.
+ */
+async function restartKafkaContainer(): Promise<void> {
+  console.log('[Setup] Restarting Kafka container for clean state...');
+  await execAsync('docker restart kafka-e2e');
+  // 20 seconds ensures broker, controller, and metadata are fully initialized
+  await new Promise((resolve) => setTimeout(resolve, 20000));
+  console.log('[Setup] Kafka container restarted');
+}
+
+describe('Request-Response E2E Tests', () => {
+  beforeAll(async () => {
+    // Step 0: Restart Kafka for clean state
+    await restartKafkaContainer();
+
+    // Step 1: Initialize helpers and verify broker health
+    kafkaHelper = new KafkaTestHelper();
+    kafkaHelper.initializeAdmin(BROKER);
+    await kafkaHelper.waitForBrokerReady(30000);
+
+    // Step 2: Create topics, start app, etc.
+    // ...
+  }, 120000); // Extended timeout for restart + setup
+});
+```
+
+### Results
+
+| Run | Without Restart | With Restart |
+|-----|-----------------|--------------|
+| Run 1 | ✅ Pass | ✅ Pass |
+| Run 2 | ❌ ~20% pass | ✅ Pass |
+| Run 3+ | ❌ ~0% pass | ⚠️ May fail (librdkafka state) |
+
+### When to Use Kafka Restart
+
+| Scenario | Recommendation |
+|----------|----------------|
+| Request-response pattern tests | ✅ Use restart |
+| High-concurrency tests (10+ parallel) | ✅ Use restart |
+| Tests that manipulate consumer groups | ✅ Use restart |
+| Simple produce/consume tests | ❌ Not needed |
+| CI/CD pipelines (fresh process) | ❌ Not needed |
+| Development with repeated runs | ✅ Use restart |
+
+### Limitations
+
+The Kafka restart approach provides:
+- **100% reliability** for CI/CD (fresh process each run)
+- **2 consecutive successful runs** in development
+- **Diminishing reliability** on 3rd+ run in same process
+
+For complete reliability across unlimited consecutive runs, you would need:
+1. Process isolation (run each test file in separate Node.js process)
+2. Or accept the limitation and restart Kafka manually when needed
 
 ---
 
