@@ -45,15 +45,26 @@ Step-by-step processes for common tasks:
 
 | Workflow | When to Use |
 |----------|-------------|
-| `workflows/code-review.md` | Reviewing code for quality |
-| `workflows/pr-review.md` | Reviewing pull requests |
+| `workflows/code-review/workflow.md` | Reviewing code for quality |
+| `workflows/pr-review/workflow.md` | Reviewing pull requests |
 | `workflows/tdd.md` | Test-driven development cycle |
-| `workflows/refactoring.md` | Safe refactoring with tests |
+| `workflows/refactoring/workflow.md` | Safe refactoring with tests |
 | `workflows/new-feature.md` | Building new functionality |
 | `workflows/bug-fix.md` | Fixing bugs properly |
 | `workflows/test-strategy.md` | Planning test coverage |
 | `workflows/estimation.md` | Estimating tasks (PERT) |
 | `workflows/deadline-negotiation.md` | Handling unrealistic deadlines |
+
+### Step-File Architecture (Code Review, PR Review, Refactoring)
+
+The code review, PR review, and refactoring workflows use a **step-file architecture** for context-safe execution:
+
+- Each workflow has a `workflow.md` entry point that describes steps and loads `steps/step-01-init.md`
+- Each step is a separate file in `steps/`, loaded sequentially
+- Progress is tracked via `stepsCompleted` array in the output document's YAML frontmatter
+- If context is compacted mid-workflow, `step-01-init.md` detects the existing output and `step-01b-continue.md` resumes from the last completed step
+- Each step loads specific reference files before analysis and cites rules in findings
+- The refactoring workflow includes a loop (steps 4-7) for iterative change-test-commit cycles
 
 ## Reference Categories
 

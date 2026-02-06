@@ -47,15 +47,23 @@
 
 ## Workflows
 
-- [x] workflows/code-review.md - Review code for quality
-- [x] workflows/pr-review.md - Review pull requests
+- [x] workflows/code-review/workflow.md - Review code for quality (step-file architecture: 10 step files)
+- [x] workflows/pr-review/workflow.md - Review pull requests (step-file architecture: 10 step files)
 - [x] workflows/tdd.md - Test-driven development cycle
-- [x] workflows/refactoring.md - Safe refactoring with tests
+- [x] workflows/refactoring/workflow.md - Safe refactoring with tests (step-file architecture: 8 step files)
 - [x] workflows/new-feature.md - Building new functionality
 - [x] workflows/bug-fix.md - Fixing bugs properly
 - [x] workflows/test-strategy.md - Planning test coverage
 - [x] workflows/estimation.md - PERT-based task estimation
 - [x] workflows/deadline-negotiation.md - Handling deadline pressure
+
+### Step-File Workflows (new)
+
+Code review, PR review, and refactoring workflows converted to step-file architecture for context-safe execution. Original files preserved as `.legacy.md`.
+
+- [x] workflows/code-review.legacy.md (original, preserved for reference)
+- [x] workflows/pr-review.legacy.md (original, preserved for reference)
+- [x] workflows/refactoring.legacy.md (original, preserved for reference)
 
 ---
 
