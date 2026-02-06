@@ -61,12 +61,12 @@ For guided, step-by-step execution of unit testing tasks, use the appropriate wo
 
 | Workflow | Purpose | When to Use |
 |----------|---------|-------------|
-| [Setup](workflows/setup-unit-test.md) | Initialize test infrastructure | New project or missing test setup |
-| [Writing](workflows/writing-unit-test.md) | Write new unit tests | Creating tests for components |
-| [Reviewing](workflows/reviewing-unit-test.md) | Review existing tests | Code review, quality audit |
-| [Running](workflows/running-unit-test.md) | Execute tests | Running tests, analyzing results |
-| [Debugging](workflows/debugging-unit-test.md) | Fix failing tests | Tests failing, need diagnosis |
-| [Optimizing](workflows/optimizing-unit-test.md) | Improve test performance | Slow tests, maintainability |
+| [Setup](workflows/setup/workflow.md) | Initialize test infrastructure | New project or missing test setup |
+| [Writing](workflows/writing/workflow.md) | Write new unit tests | Creating tests for components |
+| [Reviewing](workflows/reviewing/workflow.md) | Review existing tests | Code review, quality audit |
+| [Running](workflows/running/workflow.md) | Execute tests | Running tests, analyzing results |
+| [Debugging](workflows/debugging/workflow.md) | Fix failing tests | Tests failing, need diagnosis |
+| [Optimizing](workflows/optimizing/workflow.md) | Improve test performance | Slow tests, maintainability |
 
 ## Workflow Selection Guide
 
@@ -76,12 +76,12 @@ For guided, step-by-step execution of unit testing tasks, use the appropriate wo
 
 | User Says / Wants | Workflow to Load | File |
 |-------------------|------------------|------|
-| "Set up tests", "configure Jest", "add testing to project", "install test dependencies" | **Setup** | `workflows/setup-unit-test.md` |
-| "Write tests", "add tests", "create tests", "test this service/controller" | **Writing** | `workflows/writing-unit-test.md` |
-| "Review tests", "check test quality", "audit tests", "are these tests good?" | **Reviewing** | `workflows/reviewing-unit-test.md` |
-| "Run tests", "execute tests", "check if tests pass", "show test results" | **Running** | `workflows/running-unit-test.md` |
-| "Fix tests", "debug tests", "tests are failing", "why is this test broken?" | **Debugging** | `workflows/debugging-unit-test.md` |
-| "Speed up tests", "optimize tests", "tests are slow", "fix open handles" | **Optimizing** | `workflows/optimizing-unit-test.md` |
+| "Set up tests", "configure Jest", "add testing to project", "install test dependencies" | **Setup** | `workflows/setup/workflow.md` |
+| "Write tests", "add tests", "create tests", "test this service/controller" | **Writing** | `workflows/writing/workflow.md` |
+| "Review tests", "check test quality", "audit tests", "are these tests good?" | **Reviewing** | `workflows/reviewing/workflow.md` |
+| "Run tests", "execute tests", "check if tests pass", "show test results" | **Running** | `workflows/running/workflow.md` |
+| "Fix tests", "debug tests", "tests are failing", "why is this test broken?" | **Debugging** | `workflows/debugging/workflow.md` |
+| "Speed up tests", "optimize tests", "tests are slow", "fix open handles" | **Optimizing** | `workflows/optimizing/workflow.md` |
 
 ### Workflow Execution Protocol
 
