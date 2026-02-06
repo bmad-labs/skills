@@ -65,12 +65,12 @@ For comprehensive step-by-step guidance, use the appropriate workflow:
 
 | Workflow | When to Use |
 |----------|-------------|
-| [Setup E2E Test](workflows/setup-e2e-test.md) | Setting up E2E infrastructure for a new or existing project |
-| [Writing E2E Test](workflows/writing-e2e-test.md) | Creating new E2E test cases with proper GWT pattern |
-| [Review E2E Test](workflows/review-e2e-test.md) | Reviewing existing tests for quality and correctness |
-| [Running E2E Test](workflows/running-e2e-test.md) | Executing tests with proper verification |
-| [Debugging E2E Test](workflows/debugging-e2e-test.md) | Systematically fixing failing tests |
-| [Optimize E2E Test](workflows/optimize-e2e-test.md) | Improving test suite performance |
+| [Setup E2E Test](workflows/setup/workflow.md) | Setting up E2E infrastructure for a new or existing project |
+| [Writing E2E Test](workflows/writing/workflow.md) | Creating new E2E test cases with proper GWT pattern |
+| [Review E2E Test](workflows/review/workflow.md) | Reviewing existing tests for quality and correctness |
+| [Running E2E Test](workflows/running/workflow.md) | Executing tests with proper verification |
+| [Debugging E2E Test](workflows/debugging/workflow.md) | Systematically fixing failing tests |
+| [Optimize E2E Test](workflows/optimize/workflow.md) | Improving test suite performance |
 
 ## Workflow Selection Guide
 
@@ -80,12 +80,12 @@ For comprehensive step-by-step guidance, use the appropriate workflow:
 
 | User Says / Wants | Workflow to Load | File |
 |-------------------|------------------|------|
-| "Set up E2E tests", "configure docker-compose", "add E2E to project", "create test helpers" | **Setup** | `workflows/setup-e2e-test.md` |
-| "Write E2E tests", "add integration tests", "test this endpoint", "create e2e-spec" | **Writing** | `workflows/writing-e2e-test.md` |
-| "Review E2E tests", "check test quality", "audit tests", "is this test correct?" | **Reviewing** | `workflows/review-e2e-test.md` |
-| "Run E2E tests", "execute tests", "start docker and test", "check if tests pass" | **Running** | `workflows/running-e2e-test.md` |
-| "Fix E2E tests", "debug tests", "tests are failing", "flaky test", "connection error" | **Debugging** | `workflows/debugging-e2e-test.md` |
-| "Speed up E2E tests", "optimize tests", "tests are slow", "reduce test time" | **Optimizing** | `workflows/optimize-e2e-test.md` |
+| "Set up E2E tests", "configure docker-compose", "add E2E to project", "create test helpers" | **Setup** | `workflows/setup/workflow.md` |
+| "Write E2E tests", "add integration tests", "test this endpoint", "create e2e-spec" | **Writing** | `workflows/writing/workflow.md` |
+| "Review E2E tests", "check test quality", "audit tests", "is this test correct?" | **Reviewing** | `workflows/review/workflow.md` |
+| "Run E2E tests", "execute tests", "start docker and test", "check if tests pass" | **Running** | `workflows/running/workflow.md` |
+| "Fix E2E tests", "debug tests", "tests are failing", "flaky test", "connection error" | **Debugging** | `workflows/debugging/workflow.md` |
+| "Speed up E2E tests", "optimize tests", "tests are slow", "reduce test time" | **Optimizing** | `workflows/optimize/workflow.md` |
 
 ### Workflow Execution Protocol
 
@@ -153,13 +153,13 @@ references/
 > **Tip**: For detailed step-by-step guidance, use the [Workflows](#workflows) section above.
 
 ### Setup New E2E Structure
-**Workflow**: [Setup E2E Test](workflows/setup-e2e-test.md)
+**Workflow**: [Setup E2E Test](workflows/setup/workflow.md)
 1. Read `references/common/knowledge.md` - Understand E2E fundamentals
 2. Read `references/common/nestjs-setup.md` - Project setup
 3. Read technology-specific `docker-setup.md` files as needed
 
 ### Write Test Cases
-**Workflow**: [Writing E2E Test](workflows/writing-e2e-test.md)
+**Workflow**: [Writing E2E Test](workflows/writing/workflow.md)
 1. **MANDATORY**: Read `references/common/rules.md` - GWT pattern, timeouts
 2. Read `references/common/test-case-creation-guide.md` - Templates
 3. Read technology-specific files:
@@ -170,25 +170,25 @@ references/
    - **API**: `references/api/rules.md` → `test-helper.md`
 
 ### Review Test Quality
-**Workflow**: [Review E2E Test](workflows/review-e2e-test.md)
+**Workflow**: [Review E2E Test](workflows/review/workflow.md)
 1. Read `references/common/rules.md` - Check against mandatory patterns
 2. Read `references/common/best-practices.md` - Quality standards
 3. Read technology-specific `rules.md` files
 
 ### Run E2E Tests
-**Workflow**: [Running E2E Test](workflows/running-e2e-test.md)
+**Workflow**: [Running E2E Test](workflows/running/workflow.md)
 1. Verify Docker infrastructure is running
 2. Run tests sequentially with `npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1`
 3. Follow failure protocol if tests fail
 
 ### Debug Failing Tests
-**Workflow**: [Debugging E2E Test](workflows/debugging-e2e-test.md)
+**Workflow**: [Debugging E2E Test](workflows/debugging/workflow.md)
 1. Read `references/common/debugging.md`
 2. Create `/tmp/e2e-${E2E_SESSION}-failures.md` tracking file
 3. Fix ONE test at a time
 
 ### Optimize Test Performance
-**Workflow**: [Optimize E2E Test](workflows/optimize-e2e-test.md)
+**Workflow**: [Optimize E2E Test](workflows/optimize/workflow.md)
 1. Read `references/common/best-practices.md` - Performance patterns
 2. Read `references/kafka/performance.md` for Kafka tests
 3. Measure baseline before making changes
