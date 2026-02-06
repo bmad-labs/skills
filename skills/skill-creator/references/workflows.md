@@ -26,3 +26,9 @@ For tasks with branching logic, guide Claude through decision points:
 2. Creation workflow: [steps]
 3. Editing workflow: [steps]
 ```
+
+## Step-File Workflows (Context-Safe)
+
+For long workflows (5+ steps or 150+ lines) that risk losing progress during context compaction, use the **step-file architecture**: one file per step with YAML frontmatter progress tracking and automatic continuation detection.
+
+See `references/step-file-workflows.md` for the complete pattern, including directory structure, templates, continuation detection, loop handling, and design guidelines.

@@ -285,6 +285,7 @@ When editing the (newly-generated or existing) skill, remember that the skill is
 Consult these helpful guides based on your skill's needs:
 
 - **Multi-step processes**: See references/workflows.md for sequential workflows and conditional logic
+- **Long workflows (5+ steps)**: See references/step-file-workflows.md for context-safe step-file architecture with progress tracking, continuation detection, and loop handling
 - **Specific output formats or quality standards**: See references/output-patterns.md for template and example patterns
 
 These files contain established best practices for effective skill design.

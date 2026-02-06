@@ -16,11 +16,11 @@ Step-by-step processes for common tasks. **Start here for known tasks.**
 
 | Task | Workflow |
 |------|----------|
-| Review code quality | `workflows/code-review.md` |
-| Review a pull request | `workflows/pr-review.md` |
+| Review code quality | `workflows/code-review/workflow.md` |
+| Review a pull request | `workflows/pr-review/workflow.md` |
 | Build new feature | `workflows/new-feature.md` |
 | Fix a bug | `workflows/bug-fix.md` |
-| Refactor code | `workflows/refactoring.md` |
+| Refactor code | `workflows/refactoring/workflow.md` |
 | Write tests (TDD) | `workflows/tdd.md` |
 | Plan test coverage | `workflows/test-strategy.md` |
 
@@ -156,11 +156,11 @@ What do you need to do?
 ├─► KNOWN TASK (use workflow)
 │   │
 │   ├─► Code Tasks
-│   │   ├─► Review code → workflows/code-review.md
-│   │   ├─► Review PR → workflows/pr-review.md
+│   │   ├─► Review code → workflows/code-review/workflow.md
+│   │   ├─► Review PR → workflows/pr-review/workflow.md
 │   │   ├─► Build feature → workflows/new-feature.md
 │   │   ├─► Fix bug → workflows/bug-fix.md
-│   │   ├─► Refactor → workflows/refactoring.md
+│   │   ├─► Refactor → workflows/refactoring/workflow.md
 │   │   ├─► Write tests → workflows/tdd.md
 │   │   └─► Plan tests → workflows/test-strategy.md
 │   │
@@ -194,11 +194,11 @@ What do you need to do?
 
 | Workflow | Purpose |
 |----------|---------|
-| `workflows/code-review.md` | Review code for quality |
-| `workflows/pr-review.md` | Review pull requests |
+| `workflows/code-review/workflow.md` | Review code for quality |
+| `workflows/pr-review/workflow.md` | Review pull requests |
 | `workflows/new-feature.md` | Build new functionality |
 | `workflows/bug-fix.md` | Fix bugs with test coverage |
-| `workflows/refactoring.md` | Safe refactoring process |
+| `workflows/refactoring/workflow.md` | Safe refactoring process |
 | `workflows/tdd.md` | Test-driven development |
 | `workflows/test-strategy.md` | Plan test coverage |
 | `workflows/estimation.md` | PERT-based estimation |
@@ -240,7 +240,7 @@ What do you need to do?
 
 | Scenario | Files |
 |----------|-------|
-| Full code review | `workflows/code-review.md` or `references/functions/checklist.md` + `references/smells/rules.md` |
+| Full code review | `workflows/code-review/workflow.md` or `references/functions/checklist.md` + `references/smells/rules.md` |
 | Writing a new feature | `workflows/new-feature.md` |
 | Starting TDD | `workflows/tdd.md` |
 | Test strategy planning | `workflows/test-strategy.md` |
