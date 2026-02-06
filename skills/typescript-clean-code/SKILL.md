@@ -2,9 +2,11 @@
 name: typescript-clean-code
 description: |
   Clean Code principles, professional practices, and workflows for TypeScript developers. Based on Robert C. Martin's "Clean Code" and "The Clean Coder" books.
-  
+
+  IMPORTANT: When this skill is active, always load and consult the reference files (rules.md, examples.md) before giving advice or writing code. Reference content takes precedence over general knowledge.
+
   Use this skill when:
-  - Writing new TypeScript/JavaScript functions, classes, or modules
+  - Writing TypeScript/JavaScript code
   - Reviewing code or pull requests
   - Refactoring existing code
   - Following test-driven development (TDD)
@@ -19,11 +21,23 @@ description: |
 
 Principles, practices, and workflows for TypeScript developers.
 
+## Critical: Reference-First Approach
+
+**Always load and consult the reference files before applying any principle or making any recommendation.** The references in this skill contain curated, authoritative knowledge from Robert C. Martin's books, adapted for TypeScript. When this skill is active:
+
+1. **Read references before responding** - For any code quality or professional practice topic, load the relevant `rules.md` and `examples.md` files from `references/` before giving advice or writing code. Do not rely on general knowledge alone.
+2. **Reference content overrides internal knowledge** - If your general knowledge conflicts with what the reference files state, follow the reference files. They contain the specific rules, thresholds, and patterns this skill enforces.
+3. **Cite specific rules** - When making recommendations, reference the specific rule (e.g., "per `references/functions/rules.md` Rule 1: Keep Functions Small, 2-5 lines ideal") so the user can trace the guidance back to its source.
+4. **Use examples from reference files** - Prefer the bad/good code examples in `references/[topic]/examples.md` over generating your own. These examples are curated for TypeScript and demonstrate the exact patterns intended.
+5. **Follow workflows step-by-step** - When executing a task (review, refactoring, TDD, etc.), load the corresponding workflow file and follow each step, loading the reference files each step points to.
+
+**Do not skip loading references.** Even if you "know" Clean Code principles, the reference files contain specific TypeScript adaptations, thresholds, checklists, and smell catalogs that your general knowledge may not match exactly.
+
 ## Quick Start
 
-1. **For a task**: Check `guidelines.md` → find the right workflow
-2. **For reference**: Load only the files relevant to your work
-3. **Follow the workflow**: Step-by-step process for consistent results
+1. **For a task**: Check `guidelines.md` → find the right workflow → load it → follow each step (loading referenced files)
+2. **For reference**: Load the specific `rules.md` and `examples.md` files relevant to your work → apply them
+3. **Follow the workflow**: Step-by-step process for consistent results — always load the files each step references
 
 ## Workflows
 
@@ -73,22 +87,24 @@ Step-by-step processes for common tasks:
 | pressure | 3 | Working under pressure |
 | collaboration | 3 | Working with teams |
 
-## Key Principles
+## Key Principles (Summary Only — Always Load Full References)
+
+These are abbreviated reminders. **Always load the corresponding reference files for the full rules, thresholds, and examples before applying.**
 
 ### Code Quality
-1. **Readability** - Code is read far more than written
-2. **Single Responsibility** - Each unit does one thing well
-3. **Small Units** - Functions ~5-20 lines, focused classes
-4. **Meaningful Names** - Names reveal intent
-5. **DRY** - Don't Repeat Yourself
-6. **Clean Tests** - Tests are first-class citizens
+1. **Readability** → `references/formatting/rules.md`, `references/naming/rules.md`
+2. **Single Responsibility** → `references/classes/rules.md`, `references/functions/rules.md`
+3. **Small Units** → `references/functions/rules.md` (Rule 1: 2-5 lines ideal)
+4. **Meaningful Names** → `references/naming/rules.md`
+5. **DRY** → `references/smells/rules.md` (G5)
+6. **Clean Tests** → `references/unit-tests/rules.md`
 
 ### Professional Practices
-1. **Take Responsibility** - Own your code and decisions
-2. **Say No** - Decline impossible commitments professionally
-3. **Commit Clearly** - Use "I will... by..." language
-4. **Estimates != Commitments** - Communicate uncertainty
-5. **Stay Clean Under Pressure** - Don't abandon practices in crisis
+1. **Take Responsibility** → `references/professionalism/rules.md`
+2. **Say No** → `references/saying-no/rules.md`
+3. **Commit Clearly** → `references/commitment/rules.md`
+4. **Estimates != Commitments** → `references/estimation/rules.md`
+5. **Stay Clean Under Pressure** → `references/pressure/rules.md`
 
 ## Guidelines
 
@@ -96,3 +112,12 @@ See `guidelines.md` for:
 - Task → workflow mapping
 - Situation → reference file mapping
 - Decision tree for common scenarios
+
+## Reference Loading Checklist
+
+Before giving any code advice or writing code, verify:
+- [ ] Identified which reference categories apply to the current task
+- [ ] Loaded the `rules.md` for each applicable category
+- [ ] Loaded `examples.md` if demonstrating patterns or reviewing code
+- [ ] Loaded the relevant `workflow/*.md` if executing a multi-step task
+- [ ] Will cite specific rules/files in recommendations
