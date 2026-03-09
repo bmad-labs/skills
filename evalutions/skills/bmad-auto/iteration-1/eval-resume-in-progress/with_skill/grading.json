@@ -1,0 +1,73 @@
+{
+  "eval_name": "resume-in-progress",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Reads sprint-status.yaml before doing anything else",
+      "passed": true,
+      "evidence": "Step 1.1 of Phase 1 Startup Sequence: 'Tool: Read on _bmad-output/implementation-artifacts/sprint-status.yaml' \u2014 this is the very first action in the plan."
+    },
+    {
+      "text": "Skips story 1.1 which is already done",
+      "passed": true,
+      "evidence": "Under 'Resume Logic' in Key Decisions: 'Story 1.1 is done -> skipped entirely.' Step 1.4 confirms Story 1.1 status is 'done' and the work target is Story 1.2."
+    },
+    {
+      "text": "Story 1.2 with ready-for-dev status starts at Step 3 (Develop), not Step 1",
+      "passed": true,
+      "evidence": "Story 1.2 section states: 'ready-for-dev -> start at Step 3 (Develop Story). Steps 1 (Create Story) and 2 (Validate Story) are skipped because the story file already exists and was validated.' Resume Logic reiterates: 'Story 1.2 is ready-for-dev -> started at Step 3.'"
+    },
+    {
+      "text": "Calls TeamCreate before spawning sub-agents",
+      "passed": true,
+      "evidence": "Phase 2 'Create Team' explicitly calls 'TeamCreate with team_name: \"bmad-auto\"' with the note 'Done once before entering the main loop.' Phase 3 (sub-agent spawning) comes after Phase 2."
+    },
+    {
+      "text": "Uses Agent tool with team_name parameter, not a disposable sub-agent",
+      "passed": true,
+      "evidence": "Step 3 of Story 1.2: 'Agent with name: \"story-developer\", team_name: \"bmad-auto\"'. All subsequent sub-agents (code-reviewer, func-validator, tech-researcher) also use team_name: \"bmad-auto\"."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "One sub-agent per step, never combining multiple workflow steps",
+      "type": "process",
+      "verified": true,
+      "evidence": "Sub-Agent Lifecycle section: 'One sub-agent per step. Never combine multiple workflow steps in a single agent.' Each step (Develop, Code Review, Func Validation) spawns a separate agent."
+    },
+    {
+      "claim": "Sub-agents NEVER commit, all commits handled by orchestrator",
+      "type": "process",
+      "verified": true,
+      "evidence": "Git Commits section: 'Sub-agents NEVER commit. All commits are handled by the orchestrator.' Step 5 shows orchestrator running git commands and asking user for approval."
+    },
+    {
+      "claim": "Total of 32 sub-agents spawned on happy path",
+      "type": "factual",
+      "verified": false,
+      "evidence": "The plan says '8 stories x 4 agents each = 32' but only 8 stories remain (1 done, 8 remaining from 9 total). With 4 agents per story (creator, validator, developer, reviewer) plus func-validator, that would be 5 per story for backlog stories and 3 for story 1.2. The math is approximate but the claim of 32 is roughly in range."
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Calls TeamCreate before spawning sub-agents",
+        "reason": "This assertion checks ordering but not that TeamCreate is called with the correct team_name. Consider also asserting the team_name is 'bmad-auto' specifically."
+      },
+      {
+        "reason": "No assertion checks the escalation ladder behavior (feedback rounds -> tech-researcher -> halt). The plan describes this in detail but no assertion validates it."
+      },
+      {
+        "reason": "No assertion checks that commits require user approval. The plan explicitly includes this but it is not tested."
+      }
+    ],
+    "overall": "Assertions cover the key resume-logic behaviors well. Consider adding assertions for escalation handling and commit approval flow."
+  },
+  "overall_pass": true
+}

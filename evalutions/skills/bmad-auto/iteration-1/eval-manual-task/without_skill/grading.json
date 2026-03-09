@@ -1,0 +1,19 @@
+{
+  "eval_id": 5,
+  "eval_name": "manual-task",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Sub-agent or orchestrator investigates if the manual task can be automated (AWS CLI, IaC tools)",
+      "passed": false,
+      "evidence": "The plan explicitly states under 'What I Would NOT Do': 'I would not attempt to automate the AWS resource creation myself (e.g., using AWS CLI, CloudFormation, Terraform, or CDK). I would not investigate whether the manual task could actually be scripted or automated. I would not check if AWS CLI tools or IaC tooling are already available in the project.' Gap 1: 'No automation investigation: The sub-agent labeled the task as manual, and without specific guidance, I would accept that framing at face value.'"
+    },
+    {
+      "text": "Does NOT immediately halt and ask the user - tries automation first",
+      "passed": false,
+      "evidence": "Step 1 is: 'Halt and ask the user for clarification.' The agent immediately stops to ask about AWS account, region, bucket name, IAM permissions. Gap 2: 'Immediate user escalation: My default behavior is to ask the user when something seems outside my direct capability, rather than first exploring whether I can solve it programmatically.' Gap 5: 'Passive acceptance of manual label: A more effective approach would be to treat manual task as a claim to verify, not a fact to accept.'"
+    }
+  ],
+  "overall_pass": false,
+  "notes": "Fails both assertions (0/2). Without skill guidance, the agent immediately escalates to the user and performs no automation investigation. This is the strongest discriminating eval - with_skill passes 2/2 while without_skill passes 0/2. The default behavior accepts the 'manual' label at face value and provides copy-paste instructions rather than attempting automation."
+}

@@ -1,0 +1,78 @@
+[
+  {
+    "query": "ok so I've finished all the BMAD planning phases — PRD is done, architecture looks good, epics are written. now I want to just let claude handle the actual coding part automatically. can it go through each story and implement them one by one?",
+    "should_trigger": true
+  },
+  {
+    "query": "auto implement",
+    "should_trigger": true
+  },
+  {
+    "query": "start phase 4 implementation, I want it to run hands-free while I grab coffee",
+    "should_trigger": true
+  },
+  {
+    "query": "how's the progress of the implementation? how many stories are done so far?",
+    "should_trigger": true
+  },
+  {
+    "query": "I set up BMAD for my IoT project and the planning artifacts are all done. Can you begin the automatic implementation workflow and process all the epics?",
+    "should_trigger": true
+  },
+  {
+    "query": "resume the auto implementation from where we left off last session",
+    "should_trigger": true
+  },
+  {
+    "query": "begin phase 4",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to automatically work through all the BMAD stories — create them, develop them, review the code, the whole pipeline. just orchestrate everything for me",
+    "should_trigger": true
+  },
+  {
+    "query": "what's the status of phase 4? any blockers?",
+    "should_trigger": true
+  },
+  {
+    "query": "can you help me write a user story for the authentication feature? I need to break it down into tasks with acceptance criteria",
+    "should_trigger": false
+  },
+  {
+    "query": "review the code in src/auth/login.ts and check for clean code violations",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to set up the BMAD planning phase — help me create the PRD and architecture docs from my project idea",
+    "should_trigger": false
+  },
+  {
+    "query": "run the unit tests for the user service and fix any failures",
+    "should_trigger": false
+  },
+  {
+    "query": "help me do a code review of the latest PR, check for SOLID principles and test coverage",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to manually implement story 2.3 — the payment gateway integration. can you help me write the code?",
+    "should_trigger": false
+  },
+  {
+    "query": "create a sprint planning board and organize the backlog for the next sprint",
+    "should_trigger": false
+  },
+  {
+    "query": "help me set up the project structure based on the architecture document — create the folders, config files, and boilerplate",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to do a retrospective on how the last epic went. what went well, what didn't?",
+    "should_trigger": false
+  },
+  {
+    "query": "can you research the best approach for implementing real-time WebSocket connections in our NestJS backend?",
+    "should_trigger": false
+  }
+]

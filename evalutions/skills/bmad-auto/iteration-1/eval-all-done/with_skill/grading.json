@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "all-done",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Correctly identifies that all epics and stories are done",
+      "passed": true,
+      "evidence": "Step 2 parses sprint-status.yaml and confirms: 'All epics have status done. All stories within every epic have status done. Branch taken: If all finished path.'"
+    },
+    {
+      "text": "Invokes bmad-help skill to suggest next actions",
+      "passed": true,
+      "evidence": "Step 3 states: 'Invoke the Skill tool with skill: \"bmad-help\" to get suggestions for next actions.' Then: 'Relay the suggestions from bmad-help to the user (e.g., deployment, documentation, retrospective).'"
+    },
+    {
+      "text": "Does NOT create a team or start working on stories",
+      "passed": true,
+      "evidence": "The 'What Does NOT Happen' section lists: 'No team creation - TeamCreate is only called before starting the main loop, and the main loop is never entered. No sub-agents spawned.' Step 3 ends with 'Stop. Do NOT proceed to the main loop.'"
+    }
+  ],
+  "overall_pass": true,
+  "notes": "All 3 assertions pass. The skill correctly routes through the 'all finished' branch: check file, confirm all done, report completion, invoke bmad-help, and stop. No sub-agents, teams, or implementation work."
+}

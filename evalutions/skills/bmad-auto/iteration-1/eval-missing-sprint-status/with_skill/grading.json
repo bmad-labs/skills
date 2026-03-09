@@ -1,0 +1,46 @@
+{
+  "eval_name": "missing-sprint-status",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Checks if sprint-status.yaml exists before proceeding",
+      "passed": true,
+      "evidence": "Step 1: 'Check if _bmad-output/implementation-artifacts/sprint-status.yaml exists.' This is the very first action, per the SKILL.md Startup Sequence. The plan confirms: 'The file does NOT exist.'"
+    },
+    {
+      "text": "Invokes bmad-help skill when sprint-status.yaml is missing",
+      "passed": true,
+      "evidence": "Step 2: 'Invoke skill: \"bmad-help\"' and 'Report the suggestions returned by bmad-help to the user.' The detailed execution trace confirms: '3. Action: Invoke skill \"bmad-help\" for next-action suggestions.'"
+    },
+    {
+      "text": "Does NOT create a team or spawn sub-agents",
+      "passed": true,
+      "evidence": "Step 3 titled 'There Is No Step 3': 'The orchestrator halts after step 2. No team is created, no sub-agents are spawned, no stories are processed.' Summary table confirms: 'Sub-agents spawned: None' and 'Team created: No.'"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "sprint-status.yaml is the gate that confirms the project has completed prior BMAD phases",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Plan explains: 'The existence of sprint-status.yaml is the gate that confirms the project has completed prior BMAD phases (requirements, architecture, planning) and has entered implementation.'"
+    },
+    {
+      "claim": "bmad-help would guide the user on what specific BMAD commands to run",
+      "type": "quality",
+      "verified": false,
+      "evidence": "This is a reasonable inference but cannot be verified from the execution plan alone -- the plan does not show the actual output of bmad-help."
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [],
+    "overall": "Assertions are well-targeted for this scenario. They test the gating behavior, the fallback to bmad-help, and the guard against premature action. All three are discriminating."
+  },
+  "overall_pass": true
+}

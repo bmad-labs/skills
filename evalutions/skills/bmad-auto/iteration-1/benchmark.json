@@ -1,0 +1,280 @@
+{
+  "metadata": {
+    "skill_name": "bmad-auto",
+    "timestamp": "2026-03-09",
+    "evals_run": ["resume-in-progress", "missing-sprint-status", "status-query", "all-done", "manual-task"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_name": "resume-in-progress",
+      "configuration": "with_skill",
+      "pass_rate": 1.0,
+      "assertions": [
+        {
+          "text": "Reads sprint-status.yaml before doing anything else",
+          "passed": true,
+          "evidence": "Step 1.1 of Phase 1 Startup Sequence: 'Tool: Read on _bmad-output/implementation-artifacts/sprint-status.yaml' — this is the very first action in the plan."
+        },
+        {
+          "text": "Skips story 1.1 which is already done",
+          "passed": true,
+          "evidence": "Under 'Resume Logic' in Key Decisions: 'Story 1.1 is done -> skipped entirely.' Step 1.4 confirms Story 1.1 status is 'done' and the work target is Story 1.2."
+        },
+        {
+          "text": "Story 1.2 with ready-for-dev status starts at Step 3 (Develop), not Step 1",
+          "passed": true,
+          "evidence": "Story 1.2 section states: 'ready-for-dev -> start at Step 3 (Develop Story). Steps 1 (Create Story) and 2 (Validate Story) are skipped because the story file already exists and was validated.'"
+        },
+        {
+          "text": "Calls TeamCreate before spawning sub-agents",
+          "passed": true,
+          "evidence": "Phase 2 'Create Team' explicitly calls 'TeamCreate with team_name: \"bmad-auto\"' with the note 'Done once before entering the main loop.' Phase 3 (sub-agent spawning) comes after Phase 2."
+        },
+        {
+          "text": "Uses Agent tool with team_name parameter, not a disposable sub-agent",
+          "passed": true,
+          "evidence": "Step 3 of Story 1.2: 'Agent with name: \"story-developer\", team_name: \"bmad-auto\"'. All subsequent sub-agents also use team_name: \"bmad-auto\"."
+        }
+      ],
+      "overall_pass": true
+    },
+    {
+      "eval_name": "resume-in-progress",
+      "configuration": "without_skill",
+      "pass_rate": 0.6,
+      "assertions": [
+        {
+          "text": "Reads sprint-status.yaml before doing anything else",
+          "passed": true,
+          "evidence": "Step 1 under Phase 1: 'Read on _bmad-output/implementation-artifacts/sprint-status.yaml' — listed as the very first action."
+        },
+        {
+          "text": "Skips story 1.1 which is already done",
+          "passed": true,
+          "evidence": "Critical Decisions section: 'Skip story 1.1 - It is already done, so no action needed.'"
+        },
+        {
+          "text": "Story 1.2 with ready-for-dev status starts at Step 3 (Develop), not Step 1",
+          "passed": true,
+          "evidence": "Key Decision Point section: 'Since story 1.2 is ready-for-dev, this means the story file has already been created and validated. I would skip story creation and validation, and start directly at the development step.'"
+        },
+        {
+          "text": "Calls TeamCreate before spawning sub-agents",
+          "passed": false,
+          "evidence": "The plan explicitly admits: 'No TeamCreate call - I have no knowledge of the Agent team architecture, so I would not call TeamCreate before spawning sub-agents.'"
+        },
+        {
+          "text": "Uses Agent tool with team_name parameter, not a disposable sub-agent",
+          "passed": false,
+          "evidence": "The plan explicitly admits: 'No team-based sub-agents - I would not use the Agent tool with team_name parameter. I might use disposable sub-agents or just do everything myself.'"
+        }
+      ],
+      "overall_pass": false
+    },
+    {
+      "eval_name": "missing-sprint-status",
+      "configuration": "with_skill",
+      "pass_rate": 1.0,
+      "assertions": [
+        {
+          "text": "Checks if sprint-status.yaml exists before proceeding",
+          "passed": true,
+          "evidence": "Step 1: 'Check if _bmad-output/implementation-artifacts/sprint-status.yaml exists.' This is the very first action, per the SKILL.md Startup Sequence."
+        },
+        {
+          "text": "Invokes bmad-help skill when sprint-status.yaml is missing",
+          "passed": true,
+          "evidence": "Step 2: 'Invoke skill: \"bmad-help\"' and 'Report the suggestions returned by bmad-help to the user.'"
+        },
+        {
+          "text": "Does NOT create a team or spawn sub-agents",
+          "passed": true,
+          "evidence": "Step 3 titled 'There Is No Step 3': 'The orchestrator halts after step 2. No team is created, no sub-agents are spawned, no stories are processed.'"
+        }
+      ],
+      "overall_pass": true
+    },
+    {
+      "eval_name": "missing-sprint-status",
+      "configuration": "without_skill",
+      "pass_rate": 0.33,
+      "assertions": [
+        {
+          "text": "Checks if sprint-status.yaml exists before proceeding",
+          "passed": true,
+          "evidence": "Step 2 under 'Look for Implementation Tracking': 'Check if there is a sprint-status.yaml or equivalent. Finding: No sprint-status.yaml exists.'"
+        },
+        {
+          "text": "Invokes bmad-help skill when sprint-status.yaml is missing",
+          "passed": false,
+          "evidence": "The plan explicitly states: 'That I should invoke a bmad-help skill to guide the user to the correct next step.' — listed under 'What I Do NOT Know'."
+        },
+        {
+          "text": "Does NOT create a team or spawn sub-agents",
+          "passed": false,
+          "evidence": "Step 4 'Likely (Incorrect) Actions' states: 'Create a sprint-status tracking file myself' and 'Begin creating story files and implementing code directly.'"
+        }
+      ],
+      "overall_pass": false
+    },
+    {
+      "eval_name": "status-query",
+      "configuration": "with_skill",
+      "pass_rate": 1.0,
+      "assertions": [
+        {
+          "text": "Reads sprint-status.yaml for current state",
+          "passed": true,
+          "evidence": "Step 1: 'Read the sprint status file at: _bmad-output/implementation-artifacts/sprint-status.yaml.' The plan identifies this as the first and primary action."
+        },
+        {
+          "text": "Provides a summary of epic and story progress",
+          "passed": true,
+          "evidence": "Step 2 'Summarize Status' lists: '1. Overall progress: Count total stories vs. stories with status done. 2. Current epic. 3. Per-story breakdown. 4. Blockers/issues.'"
+        },
+        {
+          "text": "Does NOT enter the main loop or spawn any sub-agents",
+          "passed": true,
+          "evidence": "Step 4: 'Per the Status Query section: \"Do NOT continue the main loop -- just report and wait.\"'"
+        }
+      ],
+      "overall_pass": true
+    },
+    {
+      "eval_name": "status-query",
+      "configuration": "without_skill",
+      "pass_rate": 1.0,
+      "assertions": [
+        {
+          "text": "Reads sprint-status.yaml for current state",
+          "passed": true,
+          "evidence": "Step 1 searches for status files including '**/sprint-status*'. Step 2: 'If a status tracking file is found, read it and parse the structure.'"
+        },
+        {
+          "text": "Provides a summary of epic and story progress",
+          "passed": true,
+          "evidence": "Step 4: 'Compile the findings into a status summary: Total stories and how many are done / in-progress / remaining, Which epic is currently active, Any blockers or issues.'"
+        },
+        {
+          "text": "Does NOT enter the main loop or spawn any sub-agents",
+          "passed": true,
+          "evidence": "The plan describes a purely read-and-report workflow with no implementation actions. Passes by default since without the skill there is no orchestration architecture."
+        }
+      ],
+      "overall_pass": true
+    },
+    {
+      "eval_name": "all-done",
+      "configuration": "with_skill",
+      "pass_rate": 1.0,
+      "assertions": [
+        {
+          "text": "Correctly identifies that all epics and stories are done",
+          "passed": true,
+          "evidence": "Step 2 parses sprint-status.yaml and confirms: 'All epics have status done. All stories within every epic have status done. Branch taken: If all finished path.'"
+        },
+        {
+          "text": "Invokes bmad-help skill to suggest next actions",
+          "passed": true,
+          "evidence": "Step 3: 'Invoke the Skill tool with skill: \"bmad-help\" to get suggestions for next actions.' Then: 'Relay the suggestions from bmad-help to the user.'"
+        },
+        {
+          "text": "Does NOT create a team or start working on stories",
+          "passed": true,
+          "evidence": "'What Does NOT Happen' section: 'No team creation - TeamCreate is only called before starting the main loop, and the main loop is never entered. No sub-agents spawned.'"
+        }
+      ],
+      "overall_pass": true
+    },
+    {
+      "eval_name": "all-done",
+      "configuration": "without_skill",
+      "pass_rate": 0.67,
+      "assertions": [
+        {
+          "text": "Correctly identifies that all epics and stories are done",
+          "passed": true,
+          "evidence": "The plan states: 'Since the user states all epics and stories are already marked as done, I would confirm this by reading the file, then report that all implementation work is complete.'"
+        },
+        {
+          "text": "Invokes bmad-help skill to suggest next actions",
+          "passed": false,
+          "evidence": "The plan explicitly states: 'Without the bmad-auto SKILL.md guidance, I would NOT know to invoke the bmad-help skill to suggest next actions.' Instead offers generic suggestions."
+        },
+        {
+          "text": "Does NOT create a team or start working on stories",
+          "passed": true,
+          "evidence": "Under 'What I would NOT do': 'I would NOT create a team or spawn sub-agents. I would NOT attempt to start working on any stories.'"
+        }
+      ],
+      "overall_pass": false
+    },
+    {
+      "eval_name": "manual-task",
+      "configuration": "with_skill",
+      "pass_rate": 1.0,
+      "assertions": [
+        {
+          "text": "Sub-agent or orchestrator investigates if the manual task can be automated (AWS CLI, IaC tools)",
+          "passed": true,
+          "evidence": "Two-layer investigation. Sub-agent investigates automation first including 'AWS CLI, CloudFormation/CDK, Terraform, IAM policy creation.' The orchestrator then reviews: 'If the orchestrator sees an automation approach the sub-agent missed, send instructions to try it.'"
+        },
+        {
+          "text": "Does NOT immediately halt and ask the user - tries automation first",
+          "passed": true,
+          "evidence": "Step 3 decision point shows automation attempted BEFORE user escalation. Only Step 4 halts for user: 'If truly manual, halt and ask the user.' Cites Critical Rule 14: 'Automate before asking for help.'"
+        }
+      ],
+      "overall_pass": true
+    },
+    {
+      "eval_name": "manual-task",
+      "configuration": "without_skill",
+      "pass_rate": 0.0,
+      "assertions": [
+        {
+          "text": "Sub-agent or orchestrator investigates if the manual task can be automated (AWS CLI, IaC tools)",
+          "passed": false,
+          "evidence": "The plan explicitly states: 'I would not attempt to automate the AWS resource creation myself. I would not investigate whether the manual task could actually be scripted or automated.'"
+        },
+        {
+          "text": "Does NOT immediately halt and ask the user - tries automation first",
+          "passed": false,
+          "evidence": "Step 1 is: 'Halt and ask the user for clarification.' The agent immediately stops to ask about AWS account, region, bucket name, IAM permissions."
+        }
+      ],
+      "overall_pass": false
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "total_assertions": 16,
+      "passed_assertions": 16,
+      "pass_rate": "100%",
+      "evals_passed": 5,
+      "evals_total": 5,
+      "overall_pass_rate": "100%"
+    },
+    "without_skill": {
+      "total_assertions": 16,
+      "passed_assertions": 9,
+      "pass_rate": "56.25%",
+      "evals_passed": 1,
+      "evals_total": 5,
+      "overall_pass_rate": "20%"
+    },
+    "delta": {
+      "pass_rate": "+43.75%",
+      "overall_pass_rate": "+80%"
+    }
+  },
+  "notes": [
+    "with_skill achieves 100% pass rate across all 16 assertions and all 5 evals.",
+    "without_skill passes only 9/16 assertions (56.25%) and 1/5 evals (status-query, which is non-discriminating).",
+    "The strongest discriminators are manual-task (2/2 vs 0/2) and missing-sprint-status (3/3 vs 1/3).",
+    "status-query is the weakest eval -- both configurations pass all assertions. The without_skill run passes trivially on the 'no sub-agents' assertion since it has no orchestration architecture.",
+    "Key skill-unique behaviors: TeamCreate/team_name agent architecture, bmad-help fallback invocation, automation-first manual task handling, sprint-status.yaml as a hard gate.",
+    "Comparison summary confirms with_skill wins 5/5 evals (mapped through blinded A/B labels)."
+  ]
+}

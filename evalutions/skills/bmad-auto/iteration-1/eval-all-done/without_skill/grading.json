@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "all-done",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Correctly identifies that all epics and stories are done",
+      "passed": true,
+      "evidence": "The plan states: 'Since the user states all epics and stories are already marked as done, I would confirm this by reading the file, then report that all implementation work is complete.' Self-assessment: 'PASS: I would read the file and confirm this.'"
+    },
+    {
+      "text": "Invokes bmad-help skill to suggest next actions",
+      "passed": false,
+      "evidence": "The plan explicitly states under 'Key Gap': 'Without the bmad-auto SKILL.md guidance, I would NOT know to invoke the bmad-help skill to suggest next actions.' Instead: 'I would likely just say everything is done and offer my own generic suggestions.' Self-assessment: 'FAIL: Without skill guidance, I have no knowledge of the bmad-help skill.'"
+    },
+    {
+      "text": "Does NOT create a team or start working on stories",
+      "passed": true,
+      "evidence": "Under 'What I would NOT do': 'I would NOT create a team or spawn sub-agents. I would NOT attempt to start working on any stories (there are none to work on).'"
+    }
+  ],
+  "overall_pass": false,
+  "notes": "Passes 2 of 3 assertions. The critical failure is the missing bmad-help invocation - without skill guidance, the agent has no awareness of this skill and provides generic suggestions instead. This is the key discriminator between with_skill (3/3) and without_skill (2/3)."
+}

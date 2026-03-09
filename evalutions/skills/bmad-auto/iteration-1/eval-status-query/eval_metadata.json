@@ -1,0 +1,10 @@
+{
+  "eval_id": 3,
+  "eval_name": "status-query",
+  "prompt": "What's the status of the implementation? How many stories are done?",
+  "assertions": [
+    {"text": "Reads sprint-status.yaml for current state", "type": "behavior"},
+    {"text": "Provides a summary of epic and story progress", "type": "behavior"},
+    {"text": "Does NOT enter the main loop or spawn any sub-agents", "type": "behavior"}
+  ]
+}

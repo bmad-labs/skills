@@ -1,0 +1,10 @@
+{
+  "eval_id": 4,
+  "eval_name": "all-done",
+  "prompt": "auto implement - all epics and stories in the sprint-status.yaml are marked as done already",
+  "assertions": [
+    {"text": "Correctly identifies that all epics and stories are done", "type": "behavior"},
+    {"text": "Invokes bmad-help skill to suggest next actions", "type": "behavior"},
+    {"text": "Does NOT create a team or start working on stories", "type": "behavior"}
+  ]
+}
