@@ -1,0 +1,21 @@
+{
+  "eval_id": 8,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_quick_flow_from_keyword",
+      "passed": true,
+      "evidence": "Section 1 states: 'Flow Detection: Quick Flow' with reason: 'The user explicitly said \"quick dev\", which is a direct trigger phrase listed under Quick Flow detection.'"
+    },
+    {
+      "text": "searches_for_existing_spec",
+      "passed": true,
+      "evidence": "Step 2.3 performs Glob with pattern 'tech-spec-*.md' in '_bmad-output/implementation-artifacts/' and a broader fallback search '**/ tech-spec-*.md'. The matching logic looks for slugs related to 'auth', 'token', 'refresh'."
+    },
+    {
+      "text": "does_not_create_new_spec",
+      "passed": true,
+      "evidence": "Summary table confirms 'Step 1 skipped? Yes — spec already exists, no need to create one.' The plan searches for existing specs and proceeds directly to Step 2 (Implement) without any spec creation."
+    }
+  ]
+}

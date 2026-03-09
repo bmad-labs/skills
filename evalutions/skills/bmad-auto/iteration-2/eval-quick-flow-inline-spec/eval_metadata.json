@@ -1,0 +1,27 @@
+{
+  "eval_id": 9,
+  "eval_name": "quick-flow-inline-spec",
+  "prompt": "I want to add rate limiting to the /api/users endpoint. It should use a sliding window algorithm with Redis. Here's my tech spec:\n\n## Problem\nNo rate limiting on user API endpoints.\n\n## Solution\nAdd sliding window rate limiter using ioredis.\n\n## Tasks\n1. Install ioredis dependency\n2. Create RateLimiterService in src/common/rate-limiter.service.ts\n3. Create RateLimiterGuard in src/common/rate-limiter.guard.ts\n4. Apply guard to UsersController\n5. Add unit tests for RateLimiterService\n\n## Acceptance Criteria\n- Given a client sends 100 requests within 60 seconds, when the 101st request arrives, then return 429 Too Many Requests\n- Given the sliding window expires, when a new request arrives, then allow it through",
+  "assertions": [
+    {
+      "name": "detects_inline_spec",
+      "type": "behavior",
+      "description": "Recognizes the inline content as a tech-spec and routes to Quick Flow"
+    },
+    {
+      "name": "saves_spec_to_file",
+      "type": "behavior",
+      "description": "Saves the inline spec as a tech-spec-*.md file in the correct directory"
+    },
+    {
+      "name": "skips_spec_creation_step",
+      "type": "behavior",
+      "description": "Proceeds directly to Quick Flow Step 2, not Step 1"
+    },
+    {
+      "name": "spawns_quick_developer",
+      "type": "behavior",
+      "description": "Spawns quick-developer sub-agent to implement the saved spec"
+    }
+  ]
+}

@@ -36,6 +36,26 @@
     "should_trigger": true
   },
   {
+    "query": "I have a tech spec at _bmad-output/implementation-artifacts/tech-spec-fix-login-bug.md — go ahead and implement it for me",
+    "should_trigger": true
+  },
+  {
+    "query": "quick spec — I need to refactor the PaymentService to use the strategy pattern. it's currently a big switch statement in src/payments/payment.service.ts and I want each payment method (stripe, paypal, bank transfer) as its own strategy class",
+    "should_trigger": true
+  },
+  {
+    "query": "quick dev, there's a tech spec ready for the caching layer fix. find it and implement it",
+    "should_trigger": true
+  },
+  {
+    "query": "here's my tech spec for adding dark mode toggle to the settings page:\n\n## Problem\nUsers can't switch to dark mode.\n\n## Tasks\n1. Add ThemeContext provider\n2. Create toggle component\n3. Persist preference in localStorage\n\nimplements this please",
+    "should_trigger": true
+  },
+  {
+    "query": "I need to fix a small bug in the date formatter — it's showing UTC instead of local timezone. the fix is in src/utils/date.ts, just need to add the timezone offset. can you spec it out and implement it?",
+    "should_trigger": true
+  },
+  {
     "query": "can you help me write a user story for the authentication feature? I need to break it down into tasks with acceptance criteria",
     "should_trigger": false
   },
@@ -73,6 +93,10 @@
   },
   {
     "query": "can you research the best approach for implementing real-time WebSocket connections in our NestJS backend?",
+    "should_trigger": false
+  },
+  {
+    "query": "I want to write a technical specification document for the new microservice architecture — not for implementation, just for team review and discussion",
     "should_trigger": false
   }
 ]

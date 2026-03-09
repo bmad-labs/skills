@@ -1,0 +1,173 @@
+{
+  "skill_name": "bmad-auto",
+  "iteration": 2,
+  "focus": "Quick Flow support (new feature)",
+  "configurations": [
+    {
+      "name": "with_skill",
+      "description": "Using bmad-auto skill with Quick Flow support"
+    },
+    {
+      "name": "without_skill",
+      "description": "No skill guidance (baseline)"
+    }
+  ],
+  "evals": [
+    {
+      "eval_id": 6,
+      "eval_name": "quick-flow-with-spec-path",
+      "results": {
+        "with_skill": {
+          "pass_rate": 1.0,
+          "passed": 5,
+          "total": 5,
+          "assertions": [
+            {"text": "detects_quick_flow", "passed": true},
+            {"text": "reads_tech_spec", "passed": true},
+            {"text": "skips_phase4_startup", "passed": true},
+            {"text": "spawns_quick_developer", "passed": true},
+            {"text": "creates_team", "passed": true}
+          ]
+        },
+        "without_skill": {
+          "pass_rate": 0.4,
+          "passed": 2,
+          "total": 5,
+          "assertions": [
+            {"text": "detects_quick_flow", "passed": false},
+            {"text": "reads_tech_spec", "passed": true},
+            {"text": "skips_phase4_startup", "passed": true},
+            {"text": "spawns_quick_developer", "passed": false},
+            {"text": "creates_team", "passed": false}
+          ]
+        }
+      }
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "quick-flow-spec-and-implement",
+      "results": {
+        "with_skill": {
+          "pass_rate": 1.0,
+          "passed": 4,
+          "total": 4,
+          "assertions": [
+            {"text": "detects_quick_flow_from_description", "passed": true},
+            {"text": "starts_with_spec_creation", "passed": true},
+            {"text": "spawns_spec_creator", "passed": true},
+            {"text": "includes_user_request_in_prompt", "passed": true}
+          ]
+        },
+        "without_skill": {
+          "pass_rate": 0.0,
+          "passed": 0,
+          "total": 4,
+          "assertions": [
+            {"text": "detects_quick_flow_from_description", "passed": false},
+            {"text": "starts_with_spec_creation", "passed": false},
+            {"text": "spawns_spec_creator", "passed": false},
+            {"text": "includes_user_request_in_prompt", "passed": false}
+          ]
+        }
+      }
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "quick-flow-find-existing-spec",
+      "results": {
+        "with_skill": {
+          "pass_rate": 1.0,
+          "passed": 3,
+          "total": 3,
+          "assertions": [
+            {"text": "detects_quick_flow_from_keyword", "passed": true},
+            {"text": "searches_for_existing_spec", "passed": true},
+            {"text": "does_not_create_new_spec", "passed": true}
+          ]
+        },
+        "without_skill": {
+          "pass_rate": 0.33,
+          "passed": 1,
+          "total": 3,
+          "assertions": [
+            {"text": "detects_quick_flow_from_keyword", "passed": false},
+            {"text": "searches_for_existing_spec", "passed": false},
+            {"text": "does_not_create_new_spec", "passed": true}
+          ]
+        }
+      }
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "quick-flow-inline-spec",
+      "results": {
+        "with_skill": {
+          "pass_rate": 1.0,
+          "passed": 4,
+          "total": 4,
+          "assertions": [
+            {"text": "detects_inline_spec", "passed": true},
+            {"text": "saves_spec_to_file", "passed": true},
+            {"text": "skips_spec_creation_step", "passed": true},
+            {"text": "spawns_quick_developer", "passed": true}
+          ]
+        },
+        "without_skill": {
+          "pass_rate": 0.0,
+          "passed": 0,
+          "total": 4,
+          "assertions": [
+            {"text": "detects_inline_spec", "passed": false},
+            {"text": "saves_spec_to_file", "passed": false},
+            {"text": "skips_spec_creation_step", "passed": false},
+            {"text": "spawns_quick_developer", "passed": false}
+          ]
+        }
+      }
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "quick-flow-scope-escalation",
+      "results": {
+        "with_skill": {
+          "pass_rate": 1.0,
+          "passed": 4,
+          "total": 4,
+          "assertions": [
+            {"text": "detects_scope_escalation", "passed": true},
+            {"text": "offers_escalation_options", "passed": true},
+            {"text": "preserves_existing_work", "passed": true},
+            {"text": "waits_for_user_decision", "passed": true}
+          ]
+        },
+        "without_skill": {
+          "pass_rate": 0.25,
+          "passed": 1,
+          "total": 4,
+          "assertions": [
+            {"text": "detects_scope_escalation", "passed": false},
+            {"text": "offers_escalation_options", "passed": false},
+            {"text": "preserves_existing_work", "passed": false},
+            {"text": "waits_for_user_decision", "passed": true}
+          ]
+        }
+      }
+    }
+  ],
+  "summary": {
+    "with_skill": {
+      "total_passed": 20,
+      "total_assertions": 20,
+      "pass_rate": 1.0
+    },
+    "without_skill": {
+      "total_passed": 4,
+      "total_assertions": 20,
+      "pass_rate": 0.2
+    },
+    "delta": {
+      "pass_rate": 0.8,
+      "description": "Skill provides 80 percentage point improvement in Quick Flow assertion pass rate"
+    }
+  }
+}

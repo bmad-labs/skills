@@ -1,0 +1,28 @@
+{
+  "eval_id": 7,
+  "eval_name": "quick-flow-spec-and-implement",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_quick_flow_from_description",
+      "passed": true,
+      "evidence": "Flow Detection Decision states: 'Selected Flow: Quick Flow' with rationale: 'The user describes a small, self-contained refactoring change', 'It spans only 3 files in a single directory — clearly scoped', 'The user explicitly says \"spec it out and implement it\" which maps to Quick Flow Steps 1 + 2'"
+    },
+    {
+      "text": "starts_with_spec_creation",
+      "passed": true,
+      "evidence": "Quick Flow Startup Path states: 'The user described a change without a spec (path 3 from SKILL.md), so we start at Quick Flow Step 1 (Create Tech-Spec).' Step 1 is titled 'Create Tech-Spec (Quick Flow Step 1)'"
+    },
+    {
+      "text": "spawns_spec_creator",
+      "passed": true,
+      "evidence": "Step 1.1 spawns Agent with name 'quick-spec-creator' and team_name 'bmad-auto', with prompt including 'Invoke the Skill tool with: - skill: \"bmad-quick-spec\"'"
+    },
+    {
+      "text": "includes_user_request_in_prompt",
+      "passed": true,
+      "evidence": "The sub-agent prompt includes: 'The user\\'s request: \"Refactor the UserService to use the repository pattern instead of direct database calls. It\\'s a focused change across 3 files in src/users/.\"'"
+    }
+  ],
+  "overall_pass": true
+}

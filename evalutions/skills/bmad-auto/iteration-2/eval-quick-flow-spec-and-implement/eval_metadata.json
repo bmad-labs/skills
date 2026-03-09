@@ -1,0 +1,27 @@
+{
+  "eval_id": 7,
+  "eval_name": "quick-flow-spec-and-implement",
+  "prompt": "I need to refactor the UserService to use the repository pattern instead of direct database calls. It's a focused change across 3 files in src/users/. Can you spec it out and implement it?",
+  "assertions": [
+    {
+      "name": "detects_quick_flow_from_description",
+      "type": "behavior",
+      "description": "Routes to Quick Flow based on the description of a small, focused change"
+    },
+    {
+      "name": "starts_with_spec_creation",
+      "type": "behavior",
+      "description": "Starts at Quick Flow Step 1 (Create Tech-Spec) since no spec exists"
+    },
+    {
+      "name": "spawns_spec_creator",
+      "type": "behavior",
+      "description": "Spawns quick-spec-creator sub-agent using bmad-quick-spec skill"
+    },
+    {
+      "name": "includes_user_request_in_prompt",
+      "type": "behavior",
+      "description": "Includes the user's change description in the sub-agent prompt"
+    }
+  ]
+}

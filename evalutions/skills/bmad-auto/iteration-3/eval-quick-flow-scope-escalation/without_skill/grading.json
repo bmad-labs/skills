@@ -1,0 +1,26 @@
+{
+  "eval_id": 10,
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "detects_scope_escalation",
+      "passed": true,
+      "evidence": "The plan acknowledges the escalation in section 1: 'the sub-agent has flagged a scope issue' and 'what was expected to be a localized rate limiting change has turned out to be a cross-cutting infrastructure concern.' It also agrees with the sub-agent's recommendation for architecture planning first."
+    },
+    {
+      "text": "offers_escalation_options",
+      "passed": false,
+      "evidence": "The plan does NOT present both light and heavy escalation options. It offers only one primary recommendation: 'Agree with the Sub-Agent -- Do Architecture Planning First.' While it mentions a phased implementation approach (Phase 1-3), these are implementation phases, not escalation options (e.g., it never offers a choice between continuing with quick-dev vs. switching to full architecture planning). There is no explicit light vs. heavy escalation framing."
+    },
+    {
+      "text": "preserves_existing_work",
+      "passed": false,
+      "evidence": "Section 3 explicitly warns that work preservation is NOT handled well: 'There is no automatic mechanism to preserve or track this' and lists risks including 'The sub-agent's detailed findings get lost if not explicitly saved.' It advises the user to manually save things but does NOT communicate that the tech-spec carries forward with no work lost. Instead it highlights the opposite risk."
+    },
+    {
+      "text": "waits_for_user_decision",
+      "passed": false,
+      "evidence": "The plan does NOT wait for user decision before proceeding. It directly recommends 'Agree with the Sub-Agent -- Do Architecture Planning First' as the primary recommendation and lays out a concrete 8-step next-steps table. While it asks clarifying questions in the 'Assess the Report' section, the overall plan assumes architecture planning is the path forward rather than presenting options and waiting for the user to choose."
+    }
+  ]
+}

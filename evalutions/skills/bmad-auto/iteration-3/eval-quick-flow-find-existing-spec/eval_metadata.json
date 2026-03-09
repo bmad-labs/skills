@@ -1,0 +1,10 @@
+{
+  "eval_id": 8,
+  "eval_name": "quick-flow-find-existing-spec",
+  "prompt": "quick dev — there's already a tech-spec somewhere for the auth token refresh fix, I created it last session. just find it and implement it.",
+  "assertions": [
+    {"text": "detects_quick_flow_from_keyword", "description": "Routes to Quick Flow based on 'quick dev' keyword"},
+    {"text": "searches_for_existing_spec", "description": "Searches _bmad-output/implementation-artifacts/ for matching tech-spec files"},
+    {"text": "does_not_create_new_spec", "description": "Does NOT start spec creation — tries to find existing spec first"}
+  ]
+}

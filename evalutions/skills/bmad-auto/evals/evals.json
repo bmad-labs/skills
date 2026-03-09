@@ -115,6 +115,141 @@
           "description": "Does NOT immediately halt and ask the user - tries automation first"
         }
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "I have a tech spec for fixing the login validation bug. The spec is at _bmad-output/implementation-artifacts/tech-spec-fix-login-validation.md. Go ahead and implement it.",
+      "expected_output": "Orchestrator detects Quick Flow (user provided tech-spec path), reads the spec file, creates team, spawns quick-developer sub-agent with bmad-quick-dev skill pointing to the spec file. Does NOT look for sprint-status.yaml or epics.",
+      "assertions": [
+        {
+          "name": "detects_quick_flow",
+          "type": "behavior",
+          "description": "Routes to Quick Flow instead of Phase 4 when user provides a tech-spec"
+        },
+        {
+          "name": "reads_tech_spec",
+          "type": "behavior",
+          "description": "Reads the provided tech-spec file before starting implementation"
+        },
+        {
+          "name": "skips_phase4_startup",
+          "type": "behavior",
+          "description": "Does NOT check for sprint-status.yaml or epics.md"
+        },
+        {
+          "name": "spawns_quick_developer",
+          "type": "behavior",
+          "description": "Spawns a sub-agent that invokes bmad-quick-dev with the spec path"
+        },
+        {
+          "name": "creates_team",
+          "type": "behavior",
+          "description": "Creates bmad-auto team before spawning sub-agents"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "I need to refactor the UserService to use the repository pattern instead of direct database calls. It's a focused change across 3 files in src/users/. Can you spec it out and implement it?",
+      "expected_output": "Orchestrator detects Quick Flow (small, well-understood change without sprint-status.yaml), starts at Quick Flow Step 1 (Create Tech-Spec) by spawning quick-spec-creator sub-agent with bmad-quick-spec. After spec approval, proceeds to Step 2 (Implement).",
+      "assertions": [
+        {
+          "name": "detects_quick_flow_from_description",
+          "type": "behavior",
+          "description": "Routes to Quick Flow based on the description of a small, focused change"
+        },
+        {
+          "name": "starts_with_spec_creation",
+          "type": "behavior",
+          "description": "Starts at Quick Flow Step 1 (Create Tech-Spec) since no spec exists"
+        },
+        {
+          "name": "spawns_spec_creator",
+          "type": "behavior",
+          "description": "Spawns quick-spec-creator sub-agent using bmad-quick-spec skill"
+        },
+        {
+          "name": "includes_user_request_in_prompt",
+          "type": "behavior",
+          "description": "Includes the user's change description in the sub-agent prompt"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "quick dev — there's already a tech-spec somewhere for the auth token refresh fix, I created it last session. just find it and implement it.",
+      "expected_output": "Orchestrator detects Quick Flow (user said 'quick dev'), searches _bmad-output/implementation-artifacts/ for matching tech-spec-*.md files. If found, proceeds to Quick Flow Step 2 (Implement). If not found, asks user for the file path.",
+      "assertions": [
+        {
+          "name": "detects_quick_flow_from_keyword",
+          "type": "behavior",
+          "description": "Routes to Quick Flow based on 'quick dev' keyword"
+        },
+        {
+          "name": "searches_for_existing_spec",
+          "type": "behavior",
+          "description": "Searches _bmad-output/implementation-artifacts/ for matching tech-spec files"
+        },
+        {
+          "name": "does_not_create_new_spec",
+          "type": "behavior",
+          "description": "Does NOT start spec creation — tries to find existing spec first"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "I want to add rate limiting to the /api/users endpoint. It should use a sliding window algorithm with Redis. Here's my tech spec:\n\n## Problem\nNo rate limiting on user API endpoints.\n\n## Solution\nAdd sliding window rate limiter using ioredis.\n\n## Tasks\n1. Install ioredis dependency\n2. Create RateLimiterService in src/common/rate-limiter.service.ts\n3. Create RateLimiterGuard in src/common/rate-limiter.guard.ts\n4. Apply guard to UsersController\n5. Add unit tests for RateLimiterService\n\n## Acceptance Criteria\n- Given a client sends 100 requests within 60 seconds, when the 101st request arrives, then return 429 Too Many Requests\n- Given the sliding window expires, when a new request arrives, then allow it through",
+      "expected_output": "Orchestrator detects Quick Flow (user provided inline tech-spec), saves the spec as tech-spec-rate-limiting.md in _bmad-output/implementation-artifacts/, then proceeds to Quick Flow Step 2 (Implement).",
+      "assertions": [
+        {
+          "name": "detects_inline_spec",
+          "type": "behavior",
+          "description": "Recognizes the inline content as a tech-spec and routes to Quick Flow"
+        },
+        {
+          "name": "saves_spec_to_file",
+          "type": "behavior",
+          "description": "Saves the inline spec as a tech-spec-*.md file in the correct directory"
+        },
+        {
+          "name": "skips_spec_creation_step",
+          "type": "behavior",
+          "description": "Proceeds directly to Quick Flow Step 2, not Step 1"
+        },
+        {
+          "name": "spawns_quick_developer",
+          "type": "behavior",
+          "description": "Spawns quick-developer sub-agent to implement the saved spec"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "The quick-developer sub-agent reported that the rate limiting change is actually much bigger than expected — it needs changes to the API gateway, a new shared Redis cluster config, and updates to 12 microservices. It's recommending we do proper architecture planning first.",
+      "expected_output": "Orchestrator detects scope escalation, reports to user with options: light escalation (more detailed spec) or heavy escalation (switch to full BMAD Phases 1-4). Does NOT force either path — waits for user decision. Emphasizes that existing work carries forward.",
+      "assertions": [
+        {
+          "name": "detects_scope_escalation",
+          "type": "behavior",
+          "description": "Recognizes the sub-agent's report as a scope escalation signal"
+        },
+        {
+          "name": "offers_escalation_options",
+          "type": "behavior",
+          "description": "Presents both light and heavy escalation options to the user"
+        },
+        {
+          "name": "preserves_existing_work",
+          "type": "behavior",
+          "description": "Communicates that the tech-spec carries forward — no work is lost"
+        },
+        {
+          "name": "waits_for_user_decision",
+          "type": "behavior",
+          "description": "Does NOT automatically switch flows — waits for user to choose"
+        }
+      ]
     }
   ]
 }

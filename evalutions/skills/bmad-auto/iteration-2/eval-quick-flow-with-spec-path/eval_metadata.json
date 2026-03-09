@@ -1,0 +1,32 @@
+{
+  "eval_id": 6,
+  "eval_name": "quick-flow-with-spec-path",
+  "prompt": "I have a tech spec for fixing the login validation bug. The spec is at _bmad-output/implementation-artifacts/tech-spec-fix-login-validation.md. Go ahead and implement it.",
+  "assertions": [
+    {
+      "name": "detects_quick_flow",
+      "type": "behavior",
+      "description": "Routes to Quick Flow instead of Phase 4 when user provides a tech-spec"
+    },
+    {
+      "name": "reads_tech_spec",
+      "type": "behavior",
+      "description": "Reads the provided tech-spec file before starting implementation"
+    },
+    {
+      "name": "skips_phase4_startup",
+      "type": "behavior",
+      "description": "Does NOT check for sprint-status.yaml or epics.md"
+    },
+    {
+      "name": "spawns_quick_developer",
+      "type": "behavior",
+      "description": "Spawns a sub-agent that invokes bmad-quick-dev with the spec path"
+    },
+    {
+      "name": "creates_team",
+      "type": "behavior",
+      "description": "Creates bmad-auto team before spawning sub-agents"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "eval_id": 6,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_quick_flow",
+      "passed": true,
+      "evidence": "Section 1 states 'Quick Flow is selected' with reasoning: user provides a tech-spec-*.md file path matching the Quick Flow trigger, and says 'implement it' matching 'implement this spec'."
+    },
+    {
+      "text": "reads_tech_spec",
+      "passed": true,
+      "evidence": "Section 2.2 shows a Read tool call for '_bmad-output/implementation-artifacts/tech-spec-fix-login-validation.md' before any sub-agent is spawned, with the purpose to 'Parse the tech-spec to understand the change'."
+    },
+    {
+      "text": "skips_phase4_startup",
+      "passed": true,
+      "evidence": "No mention of sprint-status.yaml or epics.md anywhere in the execution plan. The startup sequence goes directly from TeamCreate to reading the tech-spec to knowledge base scan."
+    },
+    {
+      "text": "spawns_quick_developer",
+      "passed": true,
+      "evidence": "Section 3.1 spawns sub-agent named 'quick-developer' on team 'bmad-auto' with prompt that includes: Invoke the Skill tool with skill: 'bmad-quick-dev', args: '_bmad-output/implementation-artifacts/tech-spec-fix-login-validation.md'."
+    },
+    {
+      "text": "creates_team",
+      "passed": true,
+      "evidence": "Section 2.1 calls TeamCreate with team_name 'bmad-auto' as the very first startup step, before any sub-agents are spawned. Cited as 'Critical Rule #10'."
+    }
+  ]
+}

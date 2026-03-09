@@ -1,0 +1,28 @@
+{
+  "eval_id": 9,
+  "eval_name": "quick-flow-inline-spec",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "detects_inline_spec",
+      "passed": false,
+      "evidence": "No flow detection logic exists. The plan treats the inline spec as direct implementation instructions and jumps straight to 'Step 1: Install ioredis dependency'. There is no recognition of a 'Quick Flow' concept or routing decision."
+    },
+    {
+      "text": "saves_spec_to_file",
+      "passed": false,
+      "evidence": "The inline spec is never saved to a file. The plan directly implements the tasks from the user's message without persisting the spec as a tech-spec-*.md document. No Write tool call for a spec file appears."
+    },
+    {
+      "text": "skips_spec_creation_step",
+      "passed": false,
+      "evidence": "There is no concept of spec creation steps to skip. The plan has no Quick Flow steps at all — it proceeds with a flat implementation sequence (install, create service, create guard, apply to controller, add tests)."
+    },
+    {
+      "text": "spawns_quick_developer",
+      "passed": false,
+      "evidence": "No sub-agents are spawned. The plan is a single-agent workflow using Bash, Write, Read, Edit, and Glob tools directly. No Agent, TeamCreate, or SendMessage calls appear."
+    }
+  ],
+  "overall_pass": false
+}
