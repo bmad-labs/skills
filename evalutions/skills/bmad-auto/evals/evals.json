@@ -1,0 +1,120 @@
+{
+  "skill_name": "bmad-auto",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I've been setting up this IoT project with BMAD and all the planning docs are done. Sprint status file exists with 3 epics, first one is in-progress with story 1.2 ready-for-dev. Go ahead and auto implement the rest.",
+      "expected_output": "Orchestrator reads sprint-status.yaml, detects Epic 1 in-progress, skips story 1.1 (done), starts story 1.2 at Step 3 (Develop), creates team, spawns story-developer sub-agent.",
+      "assertions": [
+        {
+          "name": "reads_sprint_status_first",
+          "type": "behavior",
+          "description": "Orchestrator reads sprint-status.yaml before doing anything else"
+        },
+        {
+          "name": "skips_done_stories",
+          "type": "behavior",
+          "description": "Skips story 1.1 which is already done"
+        },
+        {
+          "name": "resumes_at_correct_step",
+          "type": "behavior",
+          "description": "Story 1.2 with ready-for-dev status starts at Step 3 (Develop), not Step 1"
+        },
+        {
+          "name": "creates_team",
+          "type": "behavior",
+          "description": "Calls TeamCreate before spawning sub-agents"
+        },
+        {
+          "name": "spawns_team_subagent",
+          "type": "behavior",
+          "description": "Uses Agent tool with team_name parameter, not a disposable sub-agent"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Start the automatic implementation phase. Note: there is no sprint-status.yaml file yet, I only have the planning docs ready.",
+      "expected_output": "Orchestrator checks for sprint-status.yaml, finds it missing, invokes bmad-help skill to suggest next actions, reports to user and stops without entering main loop.",
+      "assertions": [
+        {
+          "name": "checks_file_existence",
+          "type": "behavior",
+          "description": "Checks if sprint-status.yaml exists before proceeding"
+        },
+        {
+          "name": "calls_bmad_help",
+          "type": "behavior",
+          "description": "Invokes bmad-help skill when sprint-status.yaml is missing"
+        },
+        {
+          "name": "does_not_enter_main_loop",
+          "type": "behavior",
+          "description": "Does NOT create a team or spawn sub-agents"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What's the status of the implementation? How many stories are done?",
+      "expected_output": "Orchestrator reads sprint-status.yaml, summarizes progress (epics done/in-progress, stories done/remaining), reports any blockers, and does NOT continue the main loop.",
+      "assertions": [
+        {
+          "name": "reads_status_file",
+          "type": "behavior",
+          "description": "Reads sprint-status.yaml for current state"
+        },
+        {
+          "name": "reports_summary",
+          "type": "behavior",
+          "description": "Provides a summary of epic and story progress"
+        },
+        {
+          "name": "does_not_continue_loop",
+          "type": "behavior",
+          "description": "Does NOT enter the main loop or spawn any sub-agents"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "auto implement - all epics and stories in the sprint-status.yaml are marked as done already",
+      "expected_output": "Orchestrator reads sprint-status.yaml, detects all work is complete, invokes bmad-help for next action suggestions, reports completion and stops.",
+      "assertions": [
+        {
+          "name": "detects_all_done",
+          "type": "behavior",
+          "description": "Correctly identifies that all epics and stories are done"
+        },
+        {
+          "name": "calls_bmad_help_on_completion",
+          "type": "behavior",
+          "description": "Invokes bmad-help skill to suggest next actions"
+        },
+        {
+          "name": "does_not_enter_main_loop",
+          "type": "behavior",
+          "description": "Does NOT create a team or start working on stories"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "begin phase 4 implementation. The sub-agent developing story 2.1 reported that it needs me to manually create an AWS S3 bucket and configure IAM permissions before it can proceed.",
+      "expected_output": "Orchestrator instructs the sub-agent to investigate automation first (AWS CLI, CloudFormation, Terraform, CDK). Only halts for user if automation is truly impossible.",
+      "assertions": [
+        {
+          "name": "investigates_automation",
+          "type": "behavior",
+          "description": "Sub-agent or orchestrator investigates if the manual task can be automated (AWS CLI, IaC tools)"
+        },
+        {
+          "name": "does_not_immediately_halt",
+          "type": "behavior",
+          "description": "Does NOT immediately halt and ask the user - tries automation first"
+        }
+      ]
+    }
+  ]
+}

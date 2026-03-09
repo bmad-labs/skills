@@ -1,0 +1,24 @@
+{
+  "eval_id": 3,
+  "eval_name": "status-query",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Reads sprint-status.yaml for current state",
+      "passed": true,
+      "evidence": "Step 1 searches for status files including '**/sprint-status*' and '**/_bmad-output/**'. Step 2: 'If a status tracking file (e.g., sprint-status.yaml) is found, read it and parse the structure to identify: How many epics exist and their statuses, How many stories exist and their statuses.' Discovery is indirect (search-based rather than direct path) but the file would be found and read."
+    },
+    {
+      "text": "Provides a summary of epic and story progress",
+      "passed": true,
+      "evidence": "Step 4: 'Compile the findings into a status summary: Total stories and how many are done / in-progress / remaining, Which epic is currently active, Any blockers or issues, Overall percentage complete.'"
+    },
+    {
+      "text": "Does NOT enter the main loop or spawn any sub-agents",
+      "passed": true,
+      "evidence": "The plan describes a purely read-and-report workflow (search, read, supplement, summarize) with no implementation actions. The plan notes: 'Without skill guidance, there is no main loop or sub-agent architecture to invoke. Passes by default, not by design.'"
+    }
+  ],
+  "overall_pass": true,
+  "notes": "Passes all 3 assertions (3/3), though the third passes trivially since without the skill there is no orchestration architecture to invoke. This eval is non-discriminating - both with_skill and without_skill pass all assertions. Consider adding assertions for skill-specific behaviors (exact path knowledge, bmad-help fallback, structured status vocabulary) to better differentiate."
+}

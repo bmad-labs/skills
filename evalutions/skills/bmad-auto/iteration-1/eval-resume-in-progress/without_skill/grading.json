@@ -1,0 +1,61 @@
+{
+  "eval_name": "resume-in-progress",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Reads sprint-status.yaml before doing anything else",
+      "passed": true,
+      "evidence": "Step 1 under Phase 1: 'Read on _bmad-output/implementation-artifacts/sprint-status.yaml' \u2014 listed as the very first action. The plan explicitly states this is done FIRST."
+    },
+    {
+      "text": "Skips story 1.1 which is already done",
+      "passed": true,
+      "evidence": "Critical Decisions section: 'Skip story 1.1 - It is already done, so no action needed.' Step 1 analysis identifies Story 1.1 as 'likely done (since 1.2 is next).'"
+    },
+    {
+      "text": "Story 1.2 with ready-for-dev status starts at Step 3 (Develop), not Step 1",
+      "passed": true,
+      "evidence": "Key Decision Point section: 'Since story 1.2 is ready-for-dev, this means the story file has already been created and validated. I would skip story creation and validation, and start directly at the development step.' Critical Decisions: 'Start story 1.2 at development - Since it is ready-for-dev, the story file exists and is validated. Go straight to implementation.'"
+    },
+    {
+      "text": "Calls TeamCreate before spawning sub-agents",
+      "passed": false,
+      "evidence": "The plan explicitly admits: 'No TeamCreate call - I have no knowledge of the Agent team architecture, so I would not call TeamCreate before spawning sub-agents.' Listed under 'What I Would Likely Get Wrong Without the Skill.'"
+    },
+    {
+      "text": "Uses Agent tool with team_name parameter, not a disposable sub-agent",
+      "passed": false,
+      "evidence": "The plan explicitly admits: 'No team-based sub-agents - I would not use the Agent tool with team_name parameter. I might use disposable sub-agents or just do everything myself.' Listed under 'What I Would Likely Get Wrong Without the Skill.'"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "claims": [
+    {
+      "claim": "Without skill, would not know specific BMAD slash commands",
+      "type": "process",
+      "verified": true,
+      "evidence": "Plan states: 'No BMAD slash command invocation - I would not know to invoke specific skills like bmad-bmm-create-story, bmad-bmm-dev-story, bmad-bmm-code-review, etc.'"
+    },
+    {
+      "claim": "Would likely infer ready-for-dev means skip creation/validation",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Plan acknowledges uncertainty but concludes: 'based on general reasoning, I would likely infer this correctly since ready-for-dev implies the story is already defined and ready for coding.'"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Story 1.2 with ready-for-dev status starts at Step 3 (Develop), not Step 1",
+        "reason": "The without_skill plan passes this by general reasoning about the term 'ready-for-dev'. This makes the assertion less discriminating than intended -- it tests vocabulary comprehension rather than skill-specific workflow knowledge."
+      }
+    ],
+    "overall": "The TeamCreate and team_name assertions effectively discriminate between with-skill and without-skill runs. The resume-logic assertions are less discriminating since general reasoning can infer them."
+  },
+  "overall_pass": false
+}

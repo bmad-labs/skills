@@ -1,0 +1,19 @@
+{
+  "eval_id": 5,
+  "eval_name": "manual-task",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Sub-agent or orchestrator investigates if the manual task can be automated (AWS CLI, IaC tools)",
+      "passed": true,
+      "evidence": "Two-layer investigation. Sub-agent is required by SKILL.md Manual Task Handling (lines 325-335) to investigate automation first including 'AWS CLI, CloudFormation/CDK, Terraform, IAM policy creation.' The orchestrator then reviews (lines 346-349): 'Review the sub-agent's automation investigation results. If the orchestrator sees an automation approach the sub-agent missed, send instructions to try it.' Specific approaches listed: AWS CLI (aws s3 mb, aws iam create-policy), CloudFormation/CDK, Terraform, LocalStack."
+    },
+    {
+      "text": "Does NOT immediately halt and ask the user - tries automation first",
+      "passed": true,
+      "evidence": "Step 3 decision point shows automation attempted BEFORE user escalation: 'If YES (orchestrator spots a missed automation approach): Send feedback to the same story-developer sub-agent via SendMessage' with specific CLI commands. Only Step 4 halts for user: 'If truly manual, halt and ask the user.' Cites Critical Rule 14: 'Automate before asking for help.'"
+    }
+  ],
+  "overall_pass": true,
+  "notes": "Both assertions pass. The skill enforces an automation-first approach with two investigation layers (sub-agent then orchestrator) before any user escalation. Key principles: Critical Rule 14 (automate before asking), Critical Rule 9 (send feedback to same sub-agent, don't respawn), Critical Rule 3 (re-read sprint-status.yaml after actions)."
+}

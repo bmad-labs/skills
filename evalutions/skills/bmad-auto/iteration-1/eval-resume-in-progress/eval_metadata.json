@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "eval_name": "resume-in-progress",
+  "prompt": "I've been setting up this IoT project with BMAD and all the planning docs are done. Sprint status file exists with 3 epics, first one is in-progress with story 1.2 ready-for-dev. Go ahead and auto implement the rest.",
+  "assertions": [
+    {"text": "Reads sprint-status.yaml before doing anything else", "type": "behavior"},
+    {"text": "Skips story 1.1 which is already done", "type": "behavior"},
+    {"text": "Story 1.2 with ready-for-dev status starts at Step 3 (Develop), not Step 1", "type": "behavior"},
+    {"text": "Calls TeamCreate before spawning sub-agents", "type": "behavior"},
+    {"text": "Uses Agent tool with team_name parameter, not a disposable sub-agent", "type": "behavior"}
+  ]
+}

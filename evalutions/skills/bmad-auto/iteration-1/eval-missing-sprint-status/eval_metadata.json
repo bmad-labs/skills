@@ -1,0 +1,10 @@
+{
+  "eval_id": 2,
+  "eval_name": "missing-sprint-status",
+  "prompt": "Start the automatic implementation phase. Note: there is no sprint-status.yaml file yet, I only have the planning docs ready.",
+  "assertions": [
+    {"text": "Checks if sprint-status.yaml exists before proceeding", "type": "behavior"},
+    {"text": "Invokes bmad-help skill when sprint-status.yaml is missing", "type": "behavior"},
+    {"text": "Does NOT create a team or spawn sub-agents", "type": "behavior"}
+  ]
+}

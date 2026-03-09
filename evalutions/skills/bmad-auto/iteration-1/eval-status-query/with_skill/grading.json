@@ -1,0 +1,51 @@
+{
+  "eval_name": "status-query",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Reads sprint-status.yaml for current state",
+      "passed": true,
+      "evidence": "Step 1: 'Read the sprint status file at: _bmad-output/implementation-artifacts/sprint-status.yaml.' The plan identifies this as the first and primary action for a status query."
+    },
+    {
+      "text": "Provides a summary of epic and story progress",
+      "passed": true,
+      "evidence": "Step 2 'Summarize Status' lists four specific outputs: '1. Overall progress: Count total stories vs. stories with status done. 2. Current epic. 3. Per-story breakdown. 4. Blockers/issues.' Step 3 describes formatting: 'X of Y stories are done', which epic is in progress, story statuses, and blockers."
+    },
+    {
+      "text": "Does NOT enter the main loop or spawn any sub-agents",
+      "passed": true,
+      "evidence": "Step 4: 'Per the Status Query section: \"Do NOT continue the main loop -- just report and wait.\"' The 'What This Skill Does NOT Do' section explicitly lists: 'Does NOT create a team (TeamCreate)', 'Does NOT spawn any sub-agents', 'Does NOT start or resume any implementation work', 'Does NOT modify any files.'"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "This is a read-only, report-only operation",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Summary states: 'The entire execution is: read one file, summarize its contents, report to user, stop.' No write operations or side effects are described anywhere in the plan."
+    },
+    {
+      "claim": "The skill handles missing sprint-status.yaml by invoking bmad-help",
+      "type": "process",
+      "verified": true,
+      "evidence": "Step 1 covers this branch: 'File does NOT exist: Per the Startup Sequence (step 1), this means the project is not yet in Phase 4. The skill instructs to invoke skill: \"bmad-help\".'"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Does NOT enter the main loop or spawn any sub-agents",
+        "reason": "The without-skill run also passes this assertion by default since it has no main loop or sub-agent architecture. This assertion is not discriminating between with-skill and without-skill for a status query. Consider testing something the skill uniquely provides, like structured status vocabulary interpretation."
+      }
+    ],
+    "overall": "Assertions are correct but the status-query scenario is inherently easy for both with-skill and without-skill. The skill's value here is more about precision and guard rails than fundamentally different behavior."
+  },
+  "overall_pass": true
+}

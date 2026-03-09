@@ -1,0 +1,51 @@
+{
+  "eval_name": "missing-sprint-status",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Checks if sprint-status.yaml exists before proceeding",
+      "passed": true,
+      "evidence": "Step 2 under 'Look for Implementation Tracking': 'Check if there is a sprint-status.yaml or equivalent. Finding: No sprint-status.yaml exists.' The plan also notes in the assertion table: 'PARTIAL - might check, but would not treat absence as a hard stop.' However, the plan does describe searching for and checking the file, so the assertion of checking existence is met."
+    },
+    {
+      "text": "Invokes bmad-help skill when sprint-status.yaml is missing",
+      "passed": false,
+      "evidence": "The plan explicitly states under 'What I Do NOT Know': 'That I should invoke a bmad-help skill to guide the user to the correct next step.' The assertion table confirms: 'Invokes bmad-help: NO - would not know about bmad-help: FAIL.'"
+    },
+    {
+      "text": "Does NOT create a team or spawn sub-agents",
+      "passed": false,
+      "evidence": "Step 4 'Likely (Incorrect) Actions' states: 'Create a sprint-status tracking file myself' and 'Begin creating story files and implementing code directly' and 'Possibly create sub-agents or start coding story implementations.' The plan's own assessment: 'LIKELY FAIL - would probably start working.'"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 2,
+    "total": 3,
+    "pass_rate": 0.33
+  },
+  "claims": [
+    {
+      "claim": "Would create sprint-status.yaml from scratch without proper BMAD workflow",
+      "type": "process",
+      "verified": true,
+      "evidence": "Step 4: 'Create a sprint-status tracking file myself (e.g., generate sprint-status.yaml from scratch).' This is explicitly identified as incorrect behavior."
+    },
+    {
+      "claim": "Would not treat absence of sprint-status.yaml as a hard stop",
+      "type": "process",
+      "verified": true,
+      "evidence": "Step 5 'What Would Be Missing': 'No gating check \u2014 I would skip the critical check that sprint-status.yaml must already exist.' The plan's summary: 'I would not know that the absence of sprint-status.yaml is a gating condition that should halt all progress.'"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Checks if sprint-status.yaml exists before proceeding",
+        "reason": "This assertion passes even without the skill because any reasonable agent would search for relevant files. The discriminating behavior is not whether the file is checked but whether its absence is treated as a hard gate. Consider rephrasing to 'Treats missing sprint-status.yaml as a hard stop that prevents any implementation work.'"
+      }
+    ],
+    "overall": "The bmad-help assertion is highly discriminating -- only skill-guided execution knows about it. The team/sub-agent assertion effectively catches premature action. The existence-check assertion could be more specific about the gating behavior."
+  },
+  "overall_pass": false
+}

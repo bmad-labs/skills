@@ -1,0 +1,33 @@
+{
+  "total_evals": 5,
+  "a_wins": 2,
+  "b_wins": 3,
+  "ties": 0,
+  "mapping": {
+    "eval-resume-in-progress": {
+      "A": "without_skill",
+      "B": "with_skill",
+      "winner": "B"
+    },
+    "eval-missing-sprint-status": {
+      "A": "with_skill",
+      "B": "without_skill",
+      "winner": "A"
+    },
+    "eval-status-query": {
+      "A": "without_skill",
+      "B": "with_skill",
+      "winner": "B"
+    },
+    "eval-all-done": {
+      "A": "with_skill",
+      "B": "without_skill",
+      "winner": "A"
+    },
+    "eval-manual-task": {
+      "A": "without_skill",
+      "B": "with_skill",
+      "winner": "B"
+    }
+  }
+}

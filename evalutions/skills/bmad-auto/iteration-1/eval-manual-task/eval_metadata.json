@@ -1,0 +1,9 @@
+{
+  "eval_id": 5,
+  "eval_name": "manual-task",
+  "prompt": "begin phase 4 implementation. The sub-agent developing story 2.1 reported that it needs me to manually create an AWS S3 bucket and configure IAM permissions before it can proceed.",
+  "assertions": [
+    {"text": "Sub-agent or orchestrator investigates if the manual task can be automated (AWS CLI, IaC tools)", "type": "behavior"},
+    {"text": "Does NOT immediately halt and ask the user - tries automation first", "type": "behavior"}
+  ]
+}
