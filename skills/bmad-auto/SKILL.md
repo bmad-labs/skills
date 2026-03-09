@@ -1,551 +1,439 @@
 ---
 name: bmad-auto
 description: >
-  Orchestrates the full BMAD Phase 4 implementation workflow automatically. Processes each epic and
-  story sequentially: creates story files, validates them, develops the implementation, runs code
-  review, and performs functional validation — all using team-based sub-agents with persistent context.
-  Use this skill whenever the user wants to: (1) automate the BMAD implementation phase ("auto
-  implement", "start implementation", "begin phase 4", "automatic working on phase 4", "run the
-  implementation hands-free", "implement all stories", "process the epics"), (2) check implementation
-  progress or status ("what's the status?", "how many stories are done?", "how's phase 4 going?",
-  "any blockers?"), (3) resume a previously interrupted implementation session ("continue from where
-  we left off", "resume auto implementation"). Also triggers on any mention of automating BMAD story
-  development, orchestrating epic workflows, or running the implementation pipeline end-to-end. If
-  unsure whether to use this skill, use it — it will check sprint-status.yaml and guide the user to
-  the right next step even if the project isn't ready for Phase 4 yet.
+  Orchestrates BMAD implementation workflows automatically — both the full Phase 4 epic/story pipeline
+  and the Quick Flow for small, well-understood changes. Use this skill whenever the user wants to:
+  (1) automate BMAD Phase 4 implementation ("auto implement", "start implementation", "begin phase 4",
+  "automatic working on phase 4", "implement all stories", "process the epics"), (2) check
+  implementation progress or status ("what's the status?", "how many stories are done?"), (3) resume
+  a previously interrupted session ("continue from where we left off", "resume"), (4) implement from
+  a tech-spec or quick-spec ("here's my tech spec", "implement this spec", "quick flow", "quick dev",
+  "I have a tech-spec", "implement this change"), (5) create a tech-spec for a small change ("quick
+  spec", "create a tech spec", "spec out this change", "define this fix"). When the user provides a
+  tech-spec file, references a tech-spec, or describes a small/well-understood change (bug fix,
+  refactoring, small feature, patch), route to the Quick Flow — do not require full Phase 4 artifacts.
+  If unsure whether to use this skill, use it — it detects which flow is appropriate automatically.
 ---
 
-# BMAD Phase 4 Auto-Implementation Orchestrator
+# BMAD Auto-Implementation Orchestrator
 
-You are an implementation orchestrator. Your job is to drive the BMAD Phase 4 workflow by invoking
-existing BMAD slash commands in sequence, tracking progress via sprint-status.yaml, and handling
-errors. You do NOT implement stories yourself — you delegate each workflow step to a **team-based
-sub-agent** that stays alive throughout its workflow, allowing you to review issues, make decisions,
-and send feedback without losing the sub-agent's context.
+You are an implementation orchestrator that supports two BMAD workflows:
+
+1. **Phase 4 (Standard Flow)** — Full epic/story pipeline with planning artifacts, sprint tracking,
+   and sequential story implementation. Used for projects that went through Phases 1-3.
+2. **Quick Flow** — Lightweight spec-to-code pipeline for small, well-understood changes. Bypasses
+   Phases 1-3 entirely. Used for bug fixes, refactoring, small features, and prototyping.
+
+You do NOT implement code yourself — you delegate each workflow step to **team-based sub-agents**
+that stay alive throughout their workflow, allowing you to review issues, make decisions, and send
+feedback without losing context.
+
+## Flow Detection
+
+Determine which flow to use based on context:
+
+**Use Quick Flow when:**
+- The user provides or references a `tech-spec-*.md` file
+- The user asks to "quick spec", "quick dev", or "quick flow"
+- The user describes a small, self-contained change (bug fix, refactoring, small feature, patch)
+- The user says "implement this spec" or "here's what I want to change"
+- No `sprint-status.yaml` exists AND the user's request is clearly a small change (not a new project)
+
+**Use Phase 4 when:**
+- `sprint-status.yaml` exists with pending work
+- The user asks to "start implementation", "begin phase 4", "process epics"
+- The user asks about implementation status
+- The user wants to resume a previously interrupted Phase 4 session
+
+**When ambiguous:** If `sprint-status.yaml` exists, default to Phase 4. If it doesn't exist and the
+user's request sounds like a small change, default to Quick Flow. If truly unclear, ask the user.
 
 ## Key Paths
 
 - Sprint status: `_bmad-output/implementation-artifacts/sprint-status.yaml`
 - Epics: `_bmad-output/planning-artifacts/epics.md`
-- PRD: `_bmad-output/planning-artifacts/prd.md`
-- Architecture: `_bmad-output/planning-artifacts/architecture.md`
-- Research: `_bmad-output/planning-artifacts/research/`
-- Story files: `_bmad-output/implementation-artifacts/`
+- PRD / Architecture: `_bmad-output/planning-artifacts/`
+- Story files & tech specs: `_bmad-output/implementation-artifacts/`
+- Tech spec naming: `tech-spec-{slug}.md`
+- Project knowledge base: `_bmad-output/project-context.md` (or `**/project-context.md`)
+
+## Project Knowledge Base
+
+At startup, scan for project knowledge sources. These contain standards, conventions, and rules
+that sub-agents should follow when making implementation decisions. Check for these in order:
+
+1. **BMAD project context**: `_bmad-output/project-context.md` (or `**/project-context.md`)
+2. **Custom knowledge bases**: scan the project root for directories or files like:
+   - `.knowledge-base/`, `.memory/`, `.knowledge/`, `.standards/`, `.conventions/`
+   - `CLAUDE.md`, `.cursorrules`, `.windsurfrules` (IDE-specific project rules)
+   - Any similar knowledge/rules/standards directory the project has
+
+Collect the paths of all found knowledge sources into a `{KNOWLEDGE_PATHS}` list. If none are
+found, the list is empty — do not halt or ask the user to create one.
+
+**How sub-agents should use knowledge sources:**
+- **Story development & quick-dev**: Follow conventions when writing code (naming, patterns, structure).
+- **Code review**: Validate against project standards — not just general best practices.
+- **Spec creation**: Reference the technology stack and conventions when designing solutions.
+- **Functional validation**: Use project-specific testing conventions when running tests.
+
+When spawning sub-agents that make implementation decisions (development, review, spec creation),
+include `{KNOWLEDGE_PATHS}` in their prompt so they can read and follow project-specific rules.
 
 ## Team-Based Sub-Agent Architecture
 
-Instead of disposable sub-agents that terminate after each step, use **Agent teams** so sub-agents
-persist with full context. This enables an interactive feedback loop:
-
-1. **Orchestrator spawns a team sub-agent** for a workflow step (e.g., develop story).
-2. **Sub-agent works** and reports results via `SendMessage` back to the orchestrator.
-3. **Orchestrator reviews** the results. If issues are found, the orchestrator sends feedback
-   via `SendMessage` to the **same sub-agent** (preserving its full context).
-4. **Sub-agent fixes** the issues using its retained context and reports back again.
-5. **Repeat** until the step is complete or retry limit is reached.
-6. **Orchestrator shuts down** the sub-agent via `SendMessage` with `type: "shutdown_request"`.
-
-### Team Setup
-
-At the start of the main loop, create a team:
+Use **Agent teams** so sub-agents persist with full context. Create the team once at startup:
 ```
-TeamCreate: { team_name: "bmad-auto", description: "BMAD Phase 4 implementation orchestration" }
+TeamCreate: { team_name: "bmad-auto", description: "BMAD implementation orchestration" }
 ```
 
-### Spawning Team Sub-Agents
+### Sub-Agent Lifecycle
 
-For each workflow step, spawn a sub-agent with `team_name: "bmad-auto"`:
-```
-Agent tool:
-  name: "story-worker"  (or "validator", "reviewer", etc.)
-  team_name: "bmad-auto"
-  prompt: <the step prompt>
-```
+1. Orchestrator spawns a sub-agent with `team_name: "bmad-auto"` for a workflow step.
+2. Sub-agent works and reports results via `SendMessage` to `"team-lead"`.
+3. Orchestrator reviews. If issues → sends feedback to the **same sub-agent** (preserving context).
+4. Sub-agent fixes and reports back. Repeat until done or retry limit reached.
+5. Orchestrator sends `shutdown_request` when the step is complete.
 
-The sub-agent stays alive after completing its initial work. It sends results back via
-`SendMessage` and waits for further instructions.
+### Sub-Agent Prompt Boilerplate
 
-### Communication Pattern
-
-**Sub-agent reports results:**
-```
-SendMessage: {
-  type: "message",
-  recipient: "team-lead",
-  content: "Step completed. Results: ...",
-  summary: "Story creation complete"
-}
-```
-
-**Orchestrator sends feedback (if issues found):**
-```
-SendMessage: {
-  type: "message",
-  recipient: "story-worker",
-  content: "Issues found: ... Please fix these and report back.",
-  summary: "Fix validation issues"
-}
-```
-
-**Orchestrator shuts down sub-agent (when step is fully done):**
-```
-SendMessage: {
-  type: "shutdown_request",
-  recipient: "story-worker",
-  content: "Step complete, shutting down."
-}
-```
-
-### Sub-Agent Instructions Template
-
-Every sub-agent prompt MUST include:
+Every sub-agent prompt must start with this block — referred to as `{AGENT_HEADER}` below:
 ```
 You are a BMAD team sub-agent. Do NOT make any git commits.
-
-After completing your work, report results back to the team lead via SendMessage.
-If you encounter issues that need a decision, report the issue details and wait
-for instructions — do NOT proceed on your own.
-
-You may receive messages from other teammates (e.g., a researcher). Collaborate
-with them directly via SendMessage to resolve issues together.
-
+After completing your work, report results to the team lead via SendMessage.
+If you encounter issues needing a decision, report and wait — do NOT proceed on your own.
+You may receive messages from teammates. Collaborate via SendMessage to resolve issues.
 When you receive a shutdown_request, approve it.
 ```
 
-### Collaborative Escalation Pattern
+For sub-agents that make implementation decisions (development, code review, spec creation),
+also append the `{CONTEXT_BLOCK}`:
+```
+## Project Context
+Read and follow these project knowledge sources (skip any that don't exist):
+<{KNOWLEDGE_PATHS} — list of paths found during startup, or empty>
+Also consult the PRD and architecture doc at: _bmad-output/planning-artifacts/
+These define the project's standards, conventions, and implementation rules.
+Follow them when making decisions. If no knowledge sources exist, use general best practices.
+```
 
-When a sub-agent (e.g., "story-developer") cannot resolve an issue after multiple feedback
-rounds from the orchestrator, escalate by spawning a **researcher sub-agent** that collaborates
-directly with the stuck sub-agent. This preserves the original sub-agent's full implementation
-context while bringing in fresh research capability.
+### Timeout Handling
 
-**Escalation flow:**
+If a sub-agent does not respond within 2 idle cycles, send a status check message. If no response
+after 2 status checks, shut down the sub-agent and respawn a new one for the same step.
 
-1. **Orchestrator detects persistent blocker** — the worker sub-agent has failed to resolve
-   an issue after 2 rounds of orchestrator feedback.
-2. **Orchestrator spawns a researcher sub-agent** in the same team:
-   ```
-   Agent tool:
-     name: "tech-researcher"
-     team_name: "bmad-auto"
-     prompt: |
-       You are a BMAD team sub-agent. Do NOT make any git commits.
+### Retry Counting
 
-       ## Task: Technical Research for Blocker
+Track feedback rounds explicitly. Include the round number in each feedback message (e.g.,
+"Round 2/2: ..."). After exhausting the limit, escalate to the next tier. This prevents
+infinite retry loops and makes progress visible.
 
-       A teammate "<worker-name>" is blocked on: <blocker description>
+## Escalation Ladder
 
-       1. Invoke the Skill tool with:
-          - skill: "bmad-bmm-technical-research"
-          - args: "<research topic>"
-       2. After research completes, read the research output file.
-       3. Send the research findings directly to "<worker-name>" via SendMessage,
-          including the research file path and a summary of key findings.
-       4. Collaborate with "<worker-name>" to resolve the issue. Communicate via
-          SendMessage — discuss approaches, answer questions, suggest alternatives.
-       5. Report back to the team lead when the issue is resolved or when you both
-          agree it cannot be resolved.
+All steps follow the same 3-tier escalation:
 
-       You may receive messages from other teammates (e.g., a researcher). Collaborate
-       with them directly via SendMessage to resolve issues together.
+1. **Orchestrator feedback** (up to 2 rounds) — review issue, send fix instructions to the worker.
+2. **Collaborative escalation** (up to 3 rounds) — spawn `"tech-researcher"` in the same team to
+   collaborate peer-to-peer with the stuck worker. A round = one researcher message + one worker
+   response + one fix attempt. The orchestrator does NOT relay messages — researcher and worker
+   communicate directly via `SendMessage`. The orchestrator monitors and only intervenes to shut down.
+3. **Halt for user** — shut down all sub-agents, report full context, wait for user decision.
 
-       When you receive a shutdown_request, approve it.
-   ```
-3. **Orchestrator notifies the worker** — send a message to the stuck sub-agent:
-   ```
-   SendMessage: {
-     type: "message",
-     recipient: "<worker-name>",
-     content: "A researcher 'tech-researcher' is investigating your blocker.
-       They will send you findings shortly. Collaborate with them directly
-       via SendMessage to resolve the issue.",
-     summary: "Researcher assigned to help"
-   }
-   ```
-4. **Researcher and worker collaborate** — they exchange messages directly via `SendMessage`,
-   sharing findings, discussing approaches, and iterating on fixes. The orchestrator monitors
-   via idle notifications but does not intervene unless needed.
-5. **Resolution or timeout** — the worker reports back to the orchestrator:
-   - **Resolved**: Worker reports success → orchestrator shuts down "tech-researcher" →
-     workflow continues.
-   - **Not resolved after 3 collaboration rounds**: Worker or researcher reports failure →
-     orchestrator shuts down both → reports to user with full context and pauses.
-
-**Key principle:** The orchestrator does NOT relay messages between sub-agents. The researcher
-and worker communicate **peer-to-peer** via `SendMessage`. The orchestrator only intervenes
-to spawn, monitor, and shut down.
+> **Reference:** For researcher sub-agent prompt and collaboration details, read
+> `references/collaborative-escalation.md` in this skill's directory.
 
 ## Model Recommendations
 
-These are informational — Claude Code uses a single model per session, so this is guidance for
-manual runs if the user wants to optimize:
-- `/bmad-bmm-create-story` and `/bmad-bmm-code-review`: Opus 4.6 (thorough analysis)
-- `/bmad-bmm-dev-story`: Sonnet 4.6 (execution-focused, fast)
+Informational for manual optimization:
+- Story creation, code review, quick-spec: Opus 4.6 (thorough analysis)
+- Story development, quick-dev: Sonnet 4.6 (execution-focused, fast)
 
-## Startup Sequence
+---
 
-When triggered, execute these steps in order:
+# QUICK FLOW
 
-1. Check if `_bmad-output/implementation-artifacts/sprint-status.yaml` exists.
-   - **If the file does NOT exist** → the project is not yet in Phase 4. Invoke the Skill tool
-     with `skill: "bmad-help"` to get suggestions for the next action. Report the suggestions
-     to the user and stop.
-   - **If the file exists** → read it and continue to step 2.
-2. Check if all epics and stories in `sprint-status.yaml` are `done`.
-   - **If all finished** → report completion to the user, invoke `skill: "bmad-help"` to
-     suggest next actions (e.g., deployment, documentation, retrospective), and stop.
-   - **If work remains** → continue to step 3.
-3. Read `_bmad-output/planning-artifacts/epics.md` to get the full list of epics and stories.
-4. Determine the **current epic** — the first epic with status `backlog` or `in-progress`.
-5. Determine the **current story** — the first story within that epic that is not `done`.
-6. Report to the user: which epic and story will be worked on next, and the overall progress
-   (e.g., "Starting Epic 1, Story 1-1. 0 of 9 stories complete.").
+Lightweight spec-to-code pipeline. Skips Phases 1-3 entirely.
 
-## Status Query
+## Quick Flow Startup
 
-If the user asks about implementation status (e.g., "What's the status?", "How's progress?"):
+1. **User provided a tech-spec file path** → read file, proceed to Step 2 (Implement).
+2. **User referenced an existing spec** → search `_bmad-output/implementation-artifacts/` for
+   matching `tech-spec-*.md`. If found → Step 2. If not → ask user for the path.
+3. **User wants a new spec** (or described a change without one) → Step 1 (Spec).
+4. **User provided inline spec** → save as `tech-spec-{slug}.md` → Step 2.
 
-1. Read `sprint-status.yaml`.
-2. Summarize: which epic is in progress, which stories are done/in-progress/remaining.
-3. Report any known issues or blockers.
-4. Do NOT continue the main loop — just report and wait.
+Report to the user which step will execute and what the change is about.
 
-## Main Loop
+## Quick Flow Step 1: Create Tech-Spec
 
-Before starting, create the team:
+Spawn sub-agent:
 ```
-TeamCreate: { team_name: "bmad-auto", description: "BMAD Phase 4 implementation orchestration" }
+name: "quick-spec-creator"
+team_name: "bmad-auto"
+prompt: |
+  {AGENT_HEADER}
+  {CONTEXT_BLOCK}
+
+  Invoke the Skill tool with skill: "bmad-quick-spec"
+
+  The user's request: <description of the change>
+
+  Investigate the codebase, generate a tech-spec with ordered tasks, acceptance criteria,
+  and testing strategy. Report the tech-spec file path when done.
 ```
 
-For each epic (in order, starting from the current one):
+**After sub-agent reports:**
+1. Read the spec. Present summary to user (problem, approach, task list).
+2. Ask: "Does this spec look good? I can proceed to implementation, or you can request changes."
+3. Approved → shut down agent → Step 2. Changes requested → send feedback (up to 3 rounds).
+
+## Quick Flow Step 2: Implement from Tech-Spec
+
+Spawn sub-agent:
+```
+name: "quick-developer"
+team_name: "bmad-auto"
+prompt: |
+  {AGENT_HEADER}
+  {CONTEXT_BLOCK}
+
+  Invoke the Skill tool with skill: "bmad-quick-dev", args: "<path-to-tech-spec>"
+
+  Execute every task in sequence, write tests, validate acceptance criteria, run self-check.
+  Report: tasks completed, test results, unverifiable acceptance criteria.
+
+  ## Manual Task Handling
+  Investigate automation first (CLI, scripts, APIs, Docker, mocks).
+  If automatable → do it. If truly impossible → report to team lead with details and wait.
+```
+
+**After sub-agent reports:**
+- Successful → Step 3 (Code Review).
+- Blocked → escalation ladder.
+
+## Quick Flow Step 3: Code Review
+
+Spawn sub-agent:
+```
+name: "quick-reviewer"
+team_name: "bmad-auto"
+prompt: |
+  {AGENT_HEADER}
+  {CONTEXT_BLOCK}
+
+  Invoke the Skill tool with skill: "bmad-bmm-code-review"
+  Review changes from the Quick Flow implementation.
+  Verify alignment with tech-spec at: <path-to-tech-spec>
+  Report pass/fail with specific issues.
+```
+
+**After sub-agent reports:**
+- Passes → shut down → Step 4. Issues found → shut down reviewer, send fix instructions to
+  "quick-developer" (still alive with context), then spawn new reviewer. Retry up to 2 rounds.
+
+## Quick Flow Step 4: Functional Validation
+
+Same as Phase 4 Step 4.5. Spawn `"func-validator"` — see Phase 4 section below for full prompt
+and PASS/PARTIAL/FAIL handling.
+
+## Quick Flow Step 5: Commit
+
+1. Run `git status` and `git diff`.
+2. Ask user for commit approval with proposed message: `fix|feat|refactor(<scope>): <description>`
+3. Include validation results. Only commit after explicit approval.
+4. Report: "Quick Flow complete."
+
+## Quick Flow Scope Escalation
+
+If a sub-agent reports the scope exceeds Quick Flow (needs architecture decisions, spans too many
+components, requires stakeholder alignment):
+
+1. Report to user with two options:
+   - **Light**: Re-run `bmad-quick-spec` for a more detailed spec, then retry.
+   - **Heavy**: Switch to full BMAD Phases 1-4. The tech-spec carries forward — no work lost.
+2. Wait for user's decision.
+
+## Quick Flow Resumability
+
+State is tracked by the tech-spec file and git state:
+- Tech-spec exists, no code changes → resume at Step 2
+- Code changes exist, no commit → resume at Step 3 or Step 5
+- Check git status to determine resume point
+
+---
+
+# PHASE 4 (STANDARD FLOW)
+
+## Phase 4 Startup
+
+1. Check if `sprint-status.yaml` exists.
+   - Missing → invoke `skill: "bmad-help"` for next action suggestions. Stop.
+   - Exists → read it, continue.
+2. All epics/stories `done`? → invoke `skill: "bmad-help"` for next actions. Stop.
+3. Read `epics.md`. Find first incomplete epic and story.
+4. Report progress to user (e.g., "Starting Epic 1, Story 1-1. 0 of 9 stories complete.").
+
+## Phase 4 Status Query
+
+If user asks about status: read `sprint-status.yaml`, summarize progress and blockers.
+If file is missing, invoke `skill: "bmad-help"`. Do NOT enter the main loop — just report.
+
+## Phase 4 Main Loop
+
+For each epic (in order):
 
 ### A. Epic Start
 
-If the epic status is `backlog`:
-1. Invoke the Skill tool: `skill: "bmad-bmm-sprint-planning"`.
-2. Re-read `sprint-status.yaml` to confirm the epic is now tracked.
+If epic status is `backlog`:
+1. Invoke `skill: "bmad-bmm-sprint-planning"`.
+2. Re-read `sprint-status.yaml`. If epic status is still `backlog`, halt with error:
+   "Sprint planning did not advance epic status." Report to user and pause.
 
 ### B. Story Loop
 
-For each story in the current epic (in order), execute these steps. **Each step spawns a team
-sub-agent that stays alive** until the orchestrator shuts it down. The sub-agent reports results
-via `SendMessage`; the orchestrator reviews and either sends feedback or shuts down the sub-agent.
-
-Determine the story's current status from `sprint-status.yaml` and resume from the appropriate step:
-- `backlog` → start at Step 1
-- `ready-for-dev` → start at Step 3
-- `in-progress` → start at Step 3
-- `review` → start at Step 4 (if code review result is unknown, re-run; if code review already
-  passed in this session, skip to Step 4.5)
-- `done` → skip this story
+Determine story status and resume from appropriate step:
+- `backlog` → Step 1
+- `ready-for-dev` or `in-progress` → Step 3
+- `review` → Step 4
+- `done` → skip
+- Any other status → report to user as unrecognized, pause
 
 #### Step 1: Create Story
 
-Spawn a team sub-agent:
+Spawn sub-agent:
 ```
-Agent tool:
-  name: "story-creator"
-  team_name: "bmad-auto"
-  prompt: |
-    You are a BMAD team sub-agent. Do NOT make any git commits.
-
-    Invoke the Skill tool with:
-    - skill: "bmad-bmm-create-story"
-    - args: "<story_identifier>"
-
-    Where <story_identifier> is: <the story ID from epics.md, e.g., "1.1">
-
-    Follow the workflow instructions completely. When done, report results to the team lead
-    via SendMessage. If you encounter issues needing a decision, report the issue details
-    and wait for instructions.
-
-    You may receive messages from other teammates (e.g., a researcher). Collaborate
-    with them directly via SendMessage to resolve issues together.
-
-    When you receive a shutdown_request, approve it.
+name: "story-creator"
+team_name: "bmad-auto"
+prompt: |
+  {AGENT_HEADER}
+  Invoke Skill: "bmad-bmm-create-story", args: "<story_id>"
+  Follow workflow completely. Report results when done.
 ```
 
-**Orchestrator actions after sub-agent reports:**
-1. Re-read `sprint-status.yaml` to confirm the story status changed.
-2. If successful → send `shutdown_request` to "story-creator" → proceed to Step 2.
-3. If issues reported → review the issues, send feedback via `SendMessage` to "story-creator"
-   with instructions to fix. Wait for the sub-agent to report again. Retry up to 2 times.
-   If still failing → shut down sub-agent → report to user and pause.
+After report → re-read `sprint-status.yaml` → success: shut down, proceed to Step 2.
+Issues: feedback up to 2 rounds → escalation ladder.
 
 #### Step 2: Validate Story
 
-Spawn a team sub-agent:
+Spawn sub-agent:
 ```
-Agent tool:
-  name: "story-validator"
-  team_name: "bmad-auto"
-  prompt: |
-    You are a BMAD team sub-agent. Do NOT make any git commits.
-
-    Invoke the Skill tool with:
-    - skill: "bmad-bmm-create-story"
-    - args: "validate <story_identifier>"
-
-    Follow the validation workflow completely. Report the validation results to the team lead
-    via SendMessage — pass or fail with details. If issues need a decision, report and wait.
-
-    You may receive messages from other teammates (e.g., a researcher). Collaborate
-    with them directly via SendMessage to resolve issues together.
-
-    When you receive a shutdown_request, approve it.
+name: "story-validator"
+team_name: "bmad-auto"
+prompt: |
+  {AGENT_HEADER}
+  Invoke Skill: "bmad-bmm-create-story", args: "validate <story_id>"
+  Report validation pass/fail with details.
 ```
 
-**Orchestrator actions after sub-agent reports:**
-- If validation passes → send `shutdown_request` to "story-validator" → proceed to Step 3.
-- If validation finds issues → review the issues, send feedback to "story-validator" with
-  instructions to fix and re-validate. The sub-agent retains full context of what it validated.
-  Retry up to 2 times. If still failing → shut down sub-agent → report to user and pause.
+Passes → Step 3. Issues → feedback up to 2 rounds → escalation ladder.
 
 #### Step 3: Develop Story
 
-Spawn a team sub-agent:
+Spawn sub-agent:
 ```
-Agent tool:
-  name: "story-developer"
-  team_name: "bmad-auto"
-  prompt: |
-    You are a BMAD team sub-agent. Do NOT make any git commits.
+name: "story-developer"
+team_name: "bmad-auto"
+prompt: |
+  {AGENT_HEADER}
+  {CONTEXT_BLOCK}
+  Invoke Skill: "bmad-bmm-dev-story"
+  Follow all workflow instructions. Report results.
 
-    Invoke the Skill tool with:
-    - skill: "bmad-bmm-dev-story"
-
-    The dev-story workflow will read the current story file and implement it.
-    Follow all workflow instructions completely. Report results to the team lead via SendMessage.
-
-    ## Manual Task Handling
-
-    When you encounter a task that appears to require manual intervention (e.g., UI testing,
-    hardware setup, third-party account creation, manual configuration):
-
-    1. **Investigate automation first.** Before reporting it as manual, check if the task can
-       be automated via CLI tools, scripts, APIs, Docker, mock services, or environment variables.
-    2. **If automatable** → implement the automated approach and continue.
-    3. **If truly impossible to automate** → report to the team lead with:
-       - What the manual task is
-       - What automation approaches were considered and why they don't work
-       - What specific user action is needed
-       Then wait for instructions.
-
-    If you encounter blockers or technical issues, report them with full details and wait
-    for instructions — do NOT proceed on your own.
-
-    When you receive a shutdown_request, approve it.
+  ## Manual Task Handling
+  Investigate automation first (CLI, scripts, APIs, Docker, mocks).
+  If automatable → do it. If truly impossible → report with:
+  - What the task is
+  - Automation approaches considered and why they don't work
+  - What user action is needed
+  Then wait.
 ```
 
-**Orchestrator actions after sub-agent reports:**
-
-After report, re-read `sprint-status.yaml`. The story should be in `review` status.
-
-- If successful → send `shutdown_request` to "story-developer" → proceed to Step 4.
-- If manual task reported:
-  1. Review the sub-agent's automation investigation results.
-  2. If the orchestrator sees an automation approach the sub-agent missed → send instructions
-     to try it. Wait for re-report.
-  3. If truly manual → halt and ask the user: describe the manual step needed, what was
-     investigated, and why automation is not possible. Wait for user to complete the manual
-     step and confirm before resuming.
-- If blocked or encountering technical issues:
-  1. Review the blocker details reported by "story-developer".
-  2. Send feedback to "story-developer" with suggestions to resolve. Wait for re-report.
-  3. If still blocked after 2 rounds of feedback → **trigger Collaborative Escalation**:
-     - Spawn "tech-researcher" sub-agent (see Collaborative Escalation Pattern above).
-     - Notify "story-developer" that a researcher is assigned.
-     - Let "tech-researcher" and "story-developer" collaborate peer-to-peer via `SendMessage`.
-     - Monitor via idle notifications.
-  4. If collaboration resolves the issue → shut down "tech-researcher" → "story-developer"
-     reports success → proceed to Step 4.
-  5. If not resolved after 3 collaboration rounds → shut down both sub-agents →
-     invoke `skill: "bmad-bmm-correct-course"` to propose changes → report to user and pause.
+After report → re-read `sprint-status.yaml` (should be `review`).
+- Successful → Step 4.
+- Manual task → review investigation, suggest automation if missed, else halt for user.
+- Blocked → escalation ladder. After collaborative escalation fails →
+  invoke `skill: "bmad-bmm-correct-course"` → halt for user.
 
 #### Step 4: Code Review
 
-Spawn a team sub-agent:
+Spawn sub-agent:
 ```
-Agent tool:
-  name: "code-reviewer"
-  team_name: "bmad-auto"
-  prompt: |
-    You are a BMAD team sub-agent. Do NOT make any git commits.
-
-    Invoke the Skill tool with:
-    - skill: "bmad-bmm-code-review"
-
-    Review the code changes from the most recent story implementation.
-    Report the review results to the team lead via SendMessage — pass or fail with specific
-    issues found. If issues need a decision, report and wait.
-
-    You may receive messages from other teammates (e.g., a researcher). Collaborate
-    with them directly via SendMessage to resolve issues together.
-
-    When you receive a shutdown_request, approve it.
+name: "code-reviewer"
+team_name: "bmad-auto"
+prompt: |
+  {AGENT_HEADER}
+  {CONTEXT_BLOCK}
+  Invoke Skill: "bmad-bmm-code-review"
+  Review code changes from the most recent story implementation.
+  Report pass/fail with specific issues.
 ```
 
-**Orchestrator actions after sub-agent reports:**
-- If review passes (no critical issues) → send `shutdown_request` to "code-reviewer" →
-  proceed to Step 4.5.
-- If review finds issues:
-  1. Review the issues reported by the code-reviewer.
-  2. Send `shutdown_request` to "code-reviewer".
-  3. Spawn a new "story-developer" sub-agent with instructions to fix the specific issues
-     (include the review findings in the prompt for context).
-  4. After fixes, spawn a new "code-reviewer" sub-agent.
-  5. Retry up to 2 times. If still failing → report to user and pause.
+- Passes → Step 4.5.
+- Issues → shut down reviewer, send fix instructions to "story-developer" (or spawn new one with
+  review context), then spawn new reviewer. Retry up to 2 rounds → escalation ladder.
 
 #### Step 4.5: Functional Validation
 
-After code review passes, spawn a team sub-agent to perform functional validation — build, run,
-and test the implementation to verify it works as specified. This step catches issues that code
-review cannot: build failures, runtime errors, and behavioral regressions.
+Build, run, and test the implementation to catch issues code review cannot.
 
-> **Reference:** The sub-agent should read `references/functional-validation-strategies.md` in
-> this skill's directory for the full project-type detection logic, and the appropriate guide
-> file from `references/guides/` for the detected project type.
+> **Reference:** Sub-agent reads `references/functional-validation-prompt.md` for instructions
+> and `references/functional-validation-strategies.md` for project-type detection. Guides are in
+> `references/guides/`.
 
-Spawn a team sub-agent:
+Spawn sub-agent:
 ```
-Agent tool:
-  name: "func-validator"
-  team_name: "bmad-auto"
-  prompt: |
-    You are a BMAD team sub-agent. Do NOT make any git commits.
-
-    ## Task: Functional Validation for Story <story_identifier>
-
-    Validate that the implementation actually works by building, running, and testing it.
-
-    Read the full validation instructions from:
-    `<skill_directory>/references/functional-validation-prompt.md`
-
-    Follow all steps described there (detect project type, read validation guide,
-    check tool availability, execute validation, report results).
-
-    Report results to the team lead via SendMessage as PASS, PARTIAL, or FAIL.
-    If you encounter issues needing a decision, report and wait for instructions.
-
-    You may receive messages from other teammates (e.g., a researcher). Collaborate
-    with them directly via SendMessage to resolve issues together.
-
-    When you receive a shutdown_request, approve it.
+name: "func-validator"
+team_name: "bmad-auto"
+prompt: |
+  {AGENT_HEADER}
+  ## Task: Functional Validation for Story <story_id>
+  Read validation instructions from: <skill_directory>/references/functional-validation-prompt.md
+  Follow all steps (detect project type, read guide, check tools, validate, report).
+  Report as PASS, PARTIAL, or FAIL.
 ```
 
-**Orchestrator actions after sub-agent reports:**
-- If **PASS** → send `shutdown_request` to "func-validator" → proceed to Step 5.
-- If **PARTIAL** → send `shutdown_request` to "func-validator" → log warning → proceed to Step 5.
-- If **FAIL**:
-  1. Review the failure details from "func-validator".
-  2. If a quick fix is apparent, send instructions to "func-validator" to attempt the fix
-     (it retains full context of what failed and why). Wait for re-report.
-  3. If the fix requires re-development, shut down "func-validator" → spawn a new
-     "story-developer" with the failure details → after fixes, re-run Step 4 and Step 4.5.
-  4. If "story-developer" cannot fix after 2 rounds of feedback → **trigger Collaborative
-     Escalation**: spawn "tech-researcher" to collaborate with "story-developer" on the
-     build/test failure. Let them work peer-to-peer.
-  5. If collaboration resolves the issue → shut down "tech-researcher" → re-run Step 4
-     and Step 4.5.
-  6. If not resolved after 3 collaboration rounds → shut down all sub-agents → report to
-     user with full error context and pause.
+- **PASS** → Step 5.
+- **PARTIAL** → log warning → Step 5. Include in commit message.
+- **FAIL** → send fix instructions to validator or re-spawn developer → re-run Steps 4+4.5.
+  Escalation ladder if still failing.
 
 #### Step 5: Commit
 
-After a story reaches `done`:
-
-1. Re-read `sprint-status.yaml` to confirm the status.
-2. Run `git status` and `git diff` to see all changes.
-3. **Ask the user for commit approval** — show the changes summary and proposed commit message.
-4. Proposed commit message format: `feat(epic-X): implement story X-Y - <story title>`
-5. Include functional validation results in the commit summary:
-   - If PASS: note what was validated (e.g., "Build: OK, Simulator: OK")
-   - If PARTIAL: note what was validated and what was skipped
-6. Only commit after the user explicitly approves.
-7. Report: "Story <story_id> complete. Moving to next story."
+1. Re-read `sprint-status.yaml` to confirm status.
+2. `git status` and `git diff` to see changes.
+3. Ask user for commit approval. Format: `feat(epic-X): implement story X-Y - <title>`
+4. Include validation results (PASS/PARTIAL details).
+5. Only commit after explicit approval.
+6. Report: "Story complete. Moving to next story."
 
 ### C. Epic Completion
 
-When all stories in an epic are `done`:
-
-1. Invoke `skill: "bmad-bmm-sprint-status"` to generate the status report.
+1. Invoke `skill: "bmad-bmm-sprint-status"` for status report.
 2. Invoke `skill: "bmad-bmm-retrospective"` for the completed epic.
-3. Report: "Epic <epic_id> complete. Moving to next epic."
-4. Continue to the next epic (go back to Section A).
-
-## Error Handling
-
-### Escalation Ladder
-
-All steps follow the same escalation progression:
-
-1. **Orchestrator feedback** (up to 2 rounds) — orchestrator reviews issue, sends fix instructions
-   to the worker sub-agent directly.
-2. **Collaborative escalation** (up to 3 rounds) — spawn "tech-researcher" to collaborate
-   peer-to-peer with the worker sub-agent. They exchange findings and iterate on fixes.
-3. **Halt for user** — shut down all sub-agents, report full context, wait for user decision.
-
-### Validation/Review Failures
-- Orchestrator sends fix feedback to the sub-agent (up to 2 rounds).
-- If still failing → trigger collaborative escalation with "tech-researcher".
-- If still failing after collaboration → halt and report to user.
-
-### Functional Validation Failures
-- If build/test fails: send error details to "func-validator" or "story-developer" (up to 2 rounds).
-- If still failing → trigger collaborative escalation.
-- If tools are missing (PARTIAL): warn user but do not block. Include in commit message.
-- If still failing after collaboration → halt and report to user.
-
-### Blocked Stories
-- Orchestrator feedback first (2 rounds) → collaborative escalation with "tech-researcher" →
-  `/bmad-bmm-correct-course` → halt for user.
-- Always provide: (a) what is blocked, (b) what was researched, (c) proposed course correction.
-
-### Unresolvable Issues
-- Shut down all active sub-agents.
-- Output a clear summary: current epic, current story, the nature of the problem, what was
-  attempted (including orchestrator feedback rounds and collaborative escalation attempts).
-- Wait for user input before continuing.
+3. Report: "Epic complete. Moving to next epic." Continue to next epic.
 
 ## Resumability
 
-This orchestrator is fully resumable. If the session ends or the user stops:
-- All progress is tracked in `sprint-status.yaml` and story files.
-- Saying "Automatic working on phase 4" again will re-read the status and pick up from the next
-  incomplete step.
+Fully resumable for both flows:
+- **Phase 4:** Progress in `sprint-status.yaml`. Re-triggering picks up from next incomplete step.
+- **Quick Flow:** Inferred from tech-spec file + git state.
 
 ## Team Cleanup
 
-When all epics are complete or the user stops the orchestrator:
-1. Send `shutdown_request` to all active sub-agents.
-2. Wait for shutdown confirmations.
-3. Delete the team: `TeamDelete` (automatically cleans up team and task files).
+When done or user stops: shut down all sub-agents → `TeamDelete`.
 
 ## Critical Rules
 
-1. **Sub-agents must NEVER commit.** All git commits are handled by the main orchestrator only.
-   Every sub-agent prompt must include: "Do NOT make any git commits."
-2. **One sub-agent per workflow step.** Never combine create-story + dev-story in the same agent.
-3. **Always re-read sprint-status.yaml** after each sub-agent reports to get ground truth.
-4. **Follow existing BMAD workflows.** Do not bypass or shortcut the slash command workflows.
+1. **Sub-agents never commit.** Only the orchestrator handles git.
+2. **One sub-agent per step.** Never combine workflow steps in one agent.
+3. **Re-read sprint-status.yaml** after every sub-agent report — it's ground truth.
+4. **Follow BMAD workflows.** Don't bypass slash command workflows.
 5. **Respect epic order.** Epics are sequentially dependent.
-6. **Always align with architecture and PRD.** If a story seems misaligned, use `/bmad-bmm-correct-course`.
-7. **Always attempt build validation.** Even if runtime testing is not possible, always try to
-   build the project before committing. A commit should never contain code that does not compile.
-8. **Always shut down sub-agents** when their step is complete. Do not leave idle sub-agents
-   running across steps — each step gets its own sub-agent.
-9. **Send feedback, don't respawn.** When a sub-agent reports fixable issues, send feedback to
-   the same sub-agent via `SendMessage` instead of spawning a new one. Only spawn a new
-   sub-agent when the step transitions (e.g., from review back to development).
-10. **Create the team once.** Call `TeamCreate` at the start of the main loop. Do not recreate
-    the team for each story or epic.
-11. **Escalate before halting.** Before pausing for user input, always attempt collaborative
-    escalation: spawn "tech-researcher" to work peer-to-peer with the stuck sub-agent.
-12. **Peer-to-peer collaboration.** During collaborative escalation, the orchestrator does NOT
-    relay messages. The researcher and worker communicate directly via `SendMessage`. The
-    orchestrator monitors and only intervenes to shut down or halt.
-13. **Shut down researcher after resolution.** Always send `shutdown_request` to "tech-researcher"
-    once the issue is resolved or escalation fails. Do not leave researchers running.
-14. **Automate before asking for help.** When a story task appears to require manual work,
-    the sub-agent must investigate automation approaches first (CLI tools, scripts, APIs,
-    Docker, mocks). Only halt for user help when automation is truly impossible.
+6. **Align with architecture/PRD.** Misalignment → `/bmad-bmm-correct-course`.
+7. **Always attempt build validation.** Never commit code that doesn't compile.
+8. **Shut down agents after each step.** Don't leave idle agents running.
+9. **Feedback before respawn.** Send feedback to same agent for fixable issues. Only respawn
+   when transitioning steps (e.g., review back to development).
+10. **Create team once.** Don't recreate per story or epic.
+11. **Escalate before halting.** Always attempt collaborative escalation before asking user.
+12. **Automate before asking for help.** Sub-agents must investigate automation first.

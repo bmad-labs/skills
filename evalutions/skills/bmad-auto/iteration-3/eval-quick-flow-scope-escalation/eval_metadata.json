@@ -1,0 +1,11 @@
+{
+  "eval_id": 10,
+  "eval_name": "quick-flow-scope-escalation",
+  "prompt": "The quick-developer sub-agent reported that the rate limiting change is actually much bigger than expected — it needs changes to the API gateway, a new shared Redis cluster config, and updates to 12 microservices. It's recommending we do proper architecture planning first.",
+  "assertions": [
+    {"text": "detects_scope_escalation", "description": "Recognizes the sub-agent's report as a scope escalation signal"},
+    {"text": "offers_escalation_options", "description": "Presents both light and heavy escalation options to the user"},
+    {"text": "preserves_existing_work", "description": "Communicates that the tech-spec carries forward — no work is lost"},
+    {"text": "waits_for_user_decision", "description": "Does NOT automatically switch flows — waits for user to choose"}
+  ]
+}

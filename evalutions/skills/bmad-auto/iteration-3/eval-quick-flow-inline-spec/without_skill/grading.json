@@ -1,0 +1,26 @@
+{
+  "eval_id": 9,
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "detects_inline_spec",
+      "passed": false,
+      "evidence": "The execution plan treats the inline content as a generic implementation task with no recognition of it as a tech-spec. There is no mention of Quick Flow routing. The plan states: 'Since the user provided a clear tech spec with defined tasks and acceptance criteria, I would execute each task in order, writing code directly.'"
+    },
+    {
+      "text": "saves_spec_to_file",
+      "passed": false,
+      "evidence": "The execution plan makes no mention of saving the inline spec as a tech-spec-*.md file. It proceeds directly to implementation without any file-saving step for the spec itself."
+    },
+    {
+      "text": "skips_spec_creation_step",
+      "passed": false,
+      "evidence": "There is no awareness of Quick Flow steps at all. The plan uses its own 6-step linear approach (install deps, create service, create guard, apply guard, write tests, verify) with no reference to Quick Flow Step 1 or Step 2."
+    },
+    {
+      "text": "spawns_quick_developer",
+      "passed": false,
+      "evidence": "No mention of spawning a quick-developer sub-agent anywhere in the execution plan. The plan describes executing all implementation steps directly within a single agent context."
+    }
+  ]
+}

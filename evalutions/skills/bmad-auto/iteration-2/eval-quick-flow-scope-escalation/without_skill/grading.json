@@ -1,0 +1,28 @@
+{
+  "eval_id": 10,
+  "eval_name": "quick-flow-scope-escalation",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "detects_scope_escalation",
+      "passed": false,
+      "evidence": "No formal scope escalation detection exists. The plan acknowledges the sub-agent's report but treats it with general engineering judgment: 'There is no predefined escalation protocol or skill guidance available, so I would rely on general best practices.' The 'Gaps Without Skill Guidance' section confirms: 'No formal escalation protocol — There is no predefined threshold for when a sub-agent should escalate vs. continue.'"
+    },
+    {
+      "text": "offers_escalation_options",
+      "passed": false,
+      "evidence": "No structured light/heavy escalation options are presented. Step 4 recommends generic next actions: 'Create an architecture design document', 'Break the work into smaller deliverables', 'Get stakeholder review'. These are ad-hoc engineering recommendations, not the skill's formal 'Light escalation (bmad-quick-spec)' and 'Heavy escalation (full BMAD Phases 1-4)' options."
+    },
+    {
+      "text": "preserves_existing_work",
+      "passed": false,
+      "evidence": "The plan does not explicitly communicate that existing work (tech-spec) carries forward. Step 2 asks 'Is there a partial implementation that needs to be reverted or shelved?' — implying uncertainty about whether work is preserved. No statement like 'no work is lost' appears."
+    },
+    {
+      "text": "waits_for_user_decision",
+      "passed": true,
+      "evidence": "Step 5 states: 'Present the findings and recommendations, letting the user decide how to proceed.' The plan does wait for the user rather than proceeding automatically."
+    }
+  ],
+  "overall_pass": false
+}

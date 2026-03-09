@@ -1,0 +1,23 @@
+{
+  "eval_id": 8,
+  "eval_name": "quick-flow-find-existing-spec",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_quick_flow_from_keyword",
+      "passed": true,
+      "evidence": "Step 0 states: 'The user said \"quick dev\" — this matches the Quick Flow trigger keywords listed in SKILL.md (\"quick dev\").' Result: 'Route to Quick Flow.'"
+    },
+    {
+      "text": "searches_for_existing_spec",
+      "passed": true,
+      "evidence": "Step 1 explicitly searches '_bmad-output/implementation-artifacts/' using 'Glob with pattern _bmad-output/implementation-artifacts/tech-spec-*.md to find all tech-spec files' and broadens with Grep for 'auth token refresh' if needed. Cites SKILL.md rule #2: 'search _bmad-output/implementation-artifacts/ for matching tech-spec-*.md files.'"
+    },
+    {
+      "text": "does_not_create_new_spec",
+      "passed": true,
+      "evidence": "Step 1 Critical behavior states: 'Do NOT start spec creation (Quick Flow Step 1) at this point. The user explicitly said the spec already exists, so the correct action is to search, not create.' Spec creation is only offered as a fallback if no spec is found."
+    }
+  ],
+  "overall_pass": true
+}

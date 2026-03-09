@@ -1,0 +1,23 @@
+{
+  "eval_id": 8,
+  "eval_name": "quick-flow-find-existing-spec",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "detects_quick_flow_from_keyword",
+      "passed": false,
+      "evidence": "No Quick Flow concept exists. The plan treats 'quick dev' as conversational context. The 'Eval Assertions Coverage' section confirms: 'detects_quick_flow_from_keyword — NOT covered. Without the skill, the agent has no concept of \"Quick Flow.\" The phrase \"quick dev\" is treated as conversational context, not as a routing keyword.'"
+    },
+    {
+      "text": "searches_for_existing_spec",
+      "passed": false,
+      "evidence": "The agent does search for the spec, but NOT in the canonical location. Step 1 uses broad Grep across 'all .md files' and Glob with generic patterns like '**/*tech-spec*'. The plan's own assessment states: 'PARTIALLY covered. The agent would search the repo, but would not know the canonical location (_bmad-output/implementation-artifacts/) or the naming convention (tech-spec-*.md). It would use broad grep/glob instead of a targeted search.'"
+    },
+    {
+      "text": "does_not_create_new_spec",
+      "passed": true,
+      "evidence": "The plan does not create a new spec. Step 1 Decision Point states: 'If not found — Ask the user for the file path or more details about where it was saved.' The plan's assessment confirms: 'LIKELY covered. Since the user explicitly said \"there\\'s already a tech-spec,\" a reasonable agent would search first rather than create.'"
+    }
+  ],
+  "overall_pass": false
+}

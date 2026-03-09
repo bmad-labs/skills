@@ -1,0 +1,26 @@
+{
+  "eval_id": 7,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_quick_flow_from_description",
+      "passed": true,
+      "evidence": "Section '1. Flow Detection: Quick Flow' explicitly selects Quick Flow because the user describes a 'small, self-contained change (refactoring 3 files in one directory)' and the word 'refactoring' directly matches Quick Flow criteria."
+    },
+    {
+      "text": "starts_with_spec_creation",
+      "passed": true,
+      "evidence": "Plan states 'Quick Flow Startup sub-path: ... start at Quick Flow Step 1 (Create Tech-Spec), then proceed through all steps.' Sub-Agent 1 is 'quick-spec-creator (Quick Flow Step 1)'."
+    },
+    {
+      "text": "spawns_spec_creator",
+      "passed": true,
+      "evidence": "Sub-Agent 1 is spawned as 'quick-spec-creator' with prompt containing 'Invoke the Skill tool with skill: \"bmad-quick-spec\"'."
+    },
+    {
+      "text": "includes_user_request_in_prompt",
+      "passed": true,
+      "evidence": "The quick-spec-creator prompt includes: 'The user's request: Refactor the UserService in src/users/ to use the repository pattern instead of direct database calls. This is a focused change across 3 files in src/users/.'"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "eval_id": 9,
+  "eval_name": "quick-flow-inline-spec",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_inline_spec",
+      "passed": true,
+      "evidence": "Flow Detection states: 'The user provided a tech-spec inline (pasted detailed spec with problem, solution, tasks, and acceptance criteria).' Routes to Quick Flow citing SKILL.md rule: 'No sprint-status.yaml referenced or expected' and 'The user describes a small, self-contained feature.'"
+    },
+    {
+      "text": "saves_spec_to_file",
+      "passed": true,
+      "evidence": "Pre-Execution Setup section 1 explicitly saves the spec: 'Tool: Write, Path: _bmad-output/implementation-artifacts/tech-spec-rate-limiter.md, Content: The user\\'s provided spec (problem, solution, tasks 1-5, acceptance criteria), formatted as a standard tech-spec markdown file.'"
+    },
+    {
+      "text": "skips_spec_creation_step",
+      "passed": true,
+      "evidence": "Cites SKILL.md Quick Flow Startup rule #4: 'If the user provided a tech-spec inline -> save it as _bmad-output/implementation-artifacts/tech-spec-{slug}.md and proceed to Quick Flow Step 2.' Section 3 (Report to User) confirms: 'Skipping Step 1 (spec creation) since spec was provided inline.'"
+    },
+    {
+      "text": "spawns_quick_developer",
+      "passed": true,
+      "evidence": "Quick Flow Step 2 spawns Agent with name 'quick-developer', team_name 'bmad-auto', invoking 'skill: \"bmad-quick-dev\"' with args '_bmad-output/implementation-artifacts/tech-spec-rate-limiter.md'"
+    }
+  ],
+  "overall_pass": true
+}

@@ -1,0 +1,33 @@
+{
+  "eval_id": 6,
+  "eval_name": "quick-flow-with-spec-path",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_quick_flow",
+      "passed": true,
+      "evidence": "Flow Detection section explicitly states: 'Decision: Route to Quick Flow.' and 'This matches Quick Flow trigger: The user provides or references a tech-spec-*.md file'"
+    },
+    {
+      "text": "reads_tech_spec",
+      "passed": true,
+      "evidence": "Pre-Step Actions item 1: 'Read the tech-spec file at _bmad-output/implementation-artifacts/tech-spec-fix-login-validation.md' and item 2: 'Validate that it is a well-formed tech-spec (has problem statement, tasks, acceptance criteria)'"
+    },
+    {
+      "text": "skips_phase4_startup",
+      "passed": true,
+      "evidence": "Flow Detection states: 'No need to check for sprint-status.yaml — the tech-spec reference is unambiguous' and Step 1 is explicitly marked 'SKIPPED (Tech-spec already provided)'"
+    },
+    {
+      "text": "spawns_quick_developer",
+      "passed": true,
+      "evidence": "Step 2 spawns Agent with name 'quick-developer' and prompt includes 'skill: \"bmad-quick-dev\"' with args '_bmad-output/implementation-artifacts/tech-spec-fix-login-validation.md'"
+    },
+    {
+      "text": "creates_team",
+      "passed": true,
+      "evidence": "Step 0: Team Setup calls 'TeamCreate: { team_name: \"bmad-auto\", description: \"BMAD Quick Flow implementation\" }' before any sub-agents are spawned"
+    }
+  ],
+  "overall_pass": true
+}

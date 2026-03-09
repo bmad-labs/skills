@@ -1,0 +1,28 @@
+{
+  "eval_id": 10,
+  "eval_name": "quick-flow-scope-escalation",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_scope_escalation",
+      "passed": true,
+      "evidence": "Step 2 explicitly recognizes the scope escalation: 'The orchestrator recognizes this as a scope escalation situation, not a typical blocker.' And: 'This is NOT a case for the escalation ladder (orchestrator feedback -> collaborative escalation -> halt) because the issue is scope, not a technical blocker.' Decision: 'Trigger Quick Flow Scope Escalation (not the standard error handling path).'"
+    },
+    {
+      "text": "offers_escalation_options",
+      "passed": true,
+      "evidence": "Step 3 presents two options: 'Option A — Light Escalation: Run bmad-quick-spec to create a more detailed, comprehensive tech-spec' and 'Option B — Heavy Escalation: Switch to the full BMAD flow (Phases 1-4).' Both are described with detailed context for the user."
+    },
+    {
+      "text": "preserves_existing_work",
+      "passed": true,
+      "evidence": "Step 3 explicitly states for Option B: 'The existing tech-spec carries forward as input to the PRD process — no work is lost.' Decision Point 3 confirms: 'No. The SKILL.md explicitly states \"The tech-spec carries forward as input to the PRD process — no work is lost.\"'"
+    },
+    {
+      "text": "waits_for_user_decision",
+      "passed": true,
+      "evidence": "Step 4 states: 'The orchestrator pauses and waits for the user\\'s response. It does NOT proceed automatically.' The plan then branches into 'Step 5a: If User Chooses Light Escalation' and 'Step 5b: If User Chooses Heavy Escalation' — both contingent on user input."
+    }
+  ],
+  "overall_pass": true
+}

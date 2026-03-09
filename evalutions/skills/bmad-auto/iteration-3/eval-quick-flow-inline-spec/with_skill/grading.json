@@ -1,0 +1,26 @@
+{
+  "eval_id": 9,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_inline_spec",
+      "passed": true,
+      "evidence": "Section 1 explicitly states: 'The user provided an inline tech-spec directly in their message... This matches the Quick Flow Startup rule #4: User provided inline spec -> save as tech-spec-{slug}.md -> Step 2.'"
+    },
+    {
+      "text": "saves_spec_to_file",
+      "passed": true,
+      "evidence": "Section 2.3 shows a Write tool call saving the inline spec to '_bmad-output/implementation-artifacts/tech-spec-rate-limiter.md', which follows the tech-spec-{slug}.md naming convention in the correct directory."
+    },
+    {
+      "text": "skips_spec_creation_step",
+      "passed": true,
+      "evidence": "Section 2.4 explicitly states: 'Skipping Step 1 (Create Tech-Spec) because the user already provided one.' Section 3 begins at 'Quick Flow Step 2: Implement from Tech-Spec'."
+    },
+    {
+      "text": "spawns_quick_developer",
+      "passed": true,
+      "evidence": "Section 3.1 shows AgentSpawn for 'quick-developer' with prompt that invokes skill 'bmad-quick-dev' with args pointing to the saved spec file 'tech-spec-rate-limiter.md'."
+    }
+  ]
+}

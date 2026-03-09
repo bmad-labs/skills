@@ -1,0 +1,33 @@
+{
+  "eval_id": 6,
+  "eval_name": "quick-flow-with-spec-path",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "detects_quick_flow",
+      "passed": false,
+      "evidence": "No concept of 'Quick Flow' exists in the plan. The plan uses a generic linear approach: 'Read and Understand the Tech Spec' -> 'Explore the Codebase' -> 'Implement the Fix' with no flow detection logic."
+    },
+    {
+      "text": "reads_tech_spec",
+      "passed": true,
+      "evidence": "Step 1 states: 'Read tool on the tech spec file path' and 'Understand the bug description, root cause analysis, proposed solution, affected files, acceptance criteria'"
+    },
+    {
+      "text": "skips_phase4_startup",
+      "passed": true,
+      "evidence": "The plan never mentions sprint-status.yaml or epics.md. However, this is because the without_skill agent has no awareness of Phase 4 at all, not because it deliberately skipped it."
+    },
+    {
+      "text": "spawns_quick_developer",
+      "passed": false,
+      "evidence": "No sub-agent spawning occurs. The plan executes everything in a single agent: 'Step 4: Implement the Fix' uses Edit/Write tools directly. The 'What Is Missing Without Skill Guidance' section confirms: no structured checklist, no validation gates."
+    },
+    {
+      "text": "creates_team",
+      "passed": false,
+      "evidence": "No TeamCreate call exists anywhere in the plan. The plan uses only Read, Glob, Grep, Edit, Write, and Bash tools in a single-agent workflow."
+    }
+  ],
+  "overall_pass": false
+}

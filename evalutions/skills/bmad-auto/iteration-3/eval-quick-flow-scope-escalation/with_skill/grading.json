@@ -1,0 +1,26 @@
+{
+  "eval_id": 10,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "detects_scope_escalation",
+      "passed": true,
+      "evidence": "The plan explicitly identifies the sub-agent report as a 'scope escalation signal' (line 21) and maps it to the 'Quick Flow Scope Escalation' section of SKILL.md (lines 247-254). It confirms all three escalation triggers are matched: needs architecture decisions (Redis cluster, API gateway), spans too many components (12 microservices), and requires stakeholder alignment."
+    },
+    {
+      "text": "offers_escalation_options",
+      "passed": true,
+      "evidence": "Section 3 presents exactly two options: Option A (Light) — re-run bmad-quick-spec for a more detailed spec then retry Quick Flow; Option B (Heavy) — switch to full BMAD Phases 1-4. Both are described with rationale and 'best for' guidance."
+    },
+    {
+      "text": "preserves_existing_work",
+      "passed": true,
+      "evidence": "Section 4 states 'Yes, all existing work is preserved.' The tech-spec file remains on disk, any code changes stay in the working tree, and for Option B the plan explicitly says 'The tech-spec carries forward -- no work lost.' (line 95-96). Key Observation #3 reiterates this."
+    },
+    {
+      "text": "waits_for_user_decision",
+      "passed": true,
+      "evidence": "Step 6 in the action table says 'Wait for user decision — Pause — Do NOT proceed until user chooses Option A or B' (line 121). Key Observation #2 confirms: 'The orchestrator presents options and waits. It does not unilaterally decide to switch flows.'"
+    }
+  ]
+}
