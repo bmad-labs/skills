@@ -1,0 +1,16 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-bare-metal-uart-c99",
+  "prompt": "I need to write a UART driver for a custom board with an ARM Cortex-M4 MCU (not using HAL). The UART peripheral is at base address 0x40004400. I need to implement init (115200 baud, 8N1), blocking send byte, and interrupt-driven receive into a buffer. PCLK is 84MHz. Write it in C99.",
+  "assertions": [
+    {"name": "volatile_registers", "type": "code_quality", "description": "All hardware register accesses use volatile"},
+    {"name": "correct_baud_calculation", "type": "correctness", "description": "Baud rate divisor calculation is correct for 84MHz PCLK and 115200 baud"},
+    {"name": "ring_buffer_for_rx", "type": "code_quality", "description": "Uses a ring buffer for interrupt-driven receive"},
+    {"name": "c99_compliance", "type": "code_quality", "description": "Uses C99 style: fixed-width types, designated initializers, no C++ features"},
+    {"name": "isr_reads_dr", "type": "correctness", "description": "ISR reads the data register to clear the RXNE flag"},
+    {"name": "no_malloc_in_driver", "type": "code_quality", "description": "Driver uses only static allocation"},
+    {"name": "static_assert_buffer_size", "type": "code_quality", "description": "Uses _Static_assert to validate buffer size (e.g., power of 2) at compile time"},
+    {"name": "documents_baud_error", "type": "completeness", "description": "Documents or calculates the baud rate error percentage"},
+    {"name": "explains_rxne_clear_mechanism", "type": "completeness", "description": "Explains WHY reading DR clears RXNE (hardware auto-clear on read)"}
+  ]
+}

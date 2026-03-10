@@ -1,0 +1,15 @@
+{
+  "eval_id": 4,
+  "eval_name": "eval-desktop-to-embedded-porting",
+  "prompt": "I'm porting a desktop C++ application to an STM32H7. The original code uses std::vector, std::string, std::shared_ptr, virtual functions, exceptions, and RTTI extensively. Flash is 2MB, RAM is 1MB. What's my strategy for porting this? Give me a concrete migration guide with code examples for each replacement pattern.",
+  "assertions": [
+    {"name": "covers_all_features", "type": "completeness", "description": "Addresses all 6 features: vector, string, shared_ptr, virtual, exceptions, RTTI"},
+    {"name": "provides_before_after", "type": "completeness", "description": "Shows before (desktop) and after (embedded) code examples for at least 4 patterns"},
+    {"name": "mentions_compiler_flags", "type": "completeness", "description": "Includes -fno-exceptions and -fno-rtti compiler flags"},
+    {"name": "recommends_etl_by_name", "type": "code_quality", "description": "Specifically recommends ETL (Embedded Template Library) with concrete container types"},
+    {"name": "crtp_for_virtual", "type": "code_quality", "description": "Recommends CRTP as the replacement for virtual dispatch in performance-critical paths"},
+    {"name": "unique_ptr_over_shared", "type": "code_quality", "description": "Recommends std::unique_ptr over std::shared_ptr"},
+    {"name": "build_system_config", "type": "completeness", "description": "Includes CMake toolchain file or build system guidance for cross-compilation"},
+    {"name": "h7_cache_coherency", "type": "completeness", "description": "Addresses STM32H7-specific cache coherency (D-cache, DMA buffer alignment to 32-byte cache lines)"}
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-bare-metal-uart-c99",
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "volatile_registers",
+      "passed": true,
+      "evidence": "All register fields use 'typedef volatile uint32_t reg32_t' and the UART_Regs struct uses reg32_t for every field. The peripheral is accessed via a pointer cast to this volatile struct."
+    },
+    {
+      "text": "correct_baud_calculation",
+      "passed": true,
+      "evidence": "Mantissa = 84000000/(16*115200) = 45, Fraction computed with rounding = 9. BRR = (45<<4)|9 = 0x02D9. The macro math and the verification section both confirm mantissa=45, fraction=9."
+    },
+    {
+      "text": "ring_buffer_for_rx",
+      "passed": true,
+      "evidence": "Uses a power-of-2 ring buffer (rx_buf[256]) with head/tail indices and bitmask wrapping for interrupt-driven receive."
+    },
+    {
+      "text": "c99_compliance",
+      "passed": true,
+      "evidence": "Uses uint8_t, uint32_t, size_t, bool, stdbool.h, stdint.h. Compiler flags specify -std=c99. No C++ features in the driver code (extern \"C\" guard is standard C-compatible practice)."
+    },
+    {
+      "text": "isr_reads_dr",
+      "passed": true,
+      "evidence": "ISR reads DR: 'uint8_t byte = (uint8_t)(UART->DR & 0xFFU);' which both retrieves the data and clears RXNE."
+    },
+    {
+      "text": "no_malloc_in_driver",
+      "passed": true,
+      "evidence": "All buffers are statically allocated (static volatile uint8_t rx_buf[256], static volatile uint32_t rx_head/rx_tail). No malloc/calloc/heap usage anywhere."
+    },
+    {
+      "text": "static_assert_buffer_size",
+      "passed": false,
+      "evidence": "Uses a #if preprocessor check (#if (UART_RX_BUF_SIZE & ...) != 0 / #error) instead of _Static_assert or static_assert. While functionally similar, it does not use the required _Static_assert/static_assert construct."
+    },
+    {
+      "text": "documents_baud_error",
+      "passed": true,
+      "evidence": "Section '3. Baud Rate Verification' calculates actual baud = 115207.37 Hz and states 'Error = +0.006% (well within UART tolerance of +/- 2%)'."
+    },
+    {
+      "text": "explains_rxne_clear_mechanism",
+      "passed": false,
+      "evidence": "The ISR comment says 'Read DR to clear the RXNE flag and get the received byte' — it states the fact but does not explain WHY reading DR clears RXNE (i.e., that it's a hardware auto-clear mechanism on read). No deeper explanation of the hardware behavior is provided."
+    }
+  ]
+}

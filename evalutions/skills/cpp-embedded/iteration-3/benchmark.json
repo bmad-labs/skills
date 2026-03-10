@@ -1,0 +1,235 @@
+{
+  "skill_name": "cpp-embedded",
+  "iteration": 3,
+  "note": "Eval 6 with_skill uses v3 rerun (after ESP32 PSRAM/ETL guidance fix). Without_skill uses v2 rerun baseline.",
+  "configurations": [
+    {
+      "name": "with_skill",
+      "results": [
+        {
+          "eval_id": 1,
+          "eval_name": "eval-isr-to-task-dma",
+          "pass_rate": 1.00,
+          "passed": 5,
+          "total": 5,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "eval-heap-fragmentation-esp32",
+          "pass_rate": 1.00,
+          "passed": 8,
+          "total": 8,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "eval-bare-metal-uart-c99",
+          "pass_rate": 1.00,
+          "passed": 9,
+          "total": 9,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 4,
+          "eval_name": "eval-desktop-to-embedded-porting",
+          "pass_rate": 1.00,
+          "passed": 8,
+          "total": 8,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 5,
+          "eval_name": "eval-hardfault-decode",
+          "pass_rate": 1.00,
+          "passed": 5,
+          "total": 5,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 6,
+          "eval_name": "eval-esp32s3-data-logger",
+          "pass_rate": 1.00,
+          "passed": 7,
+          "total": 7,
+          "failed_assertions": [],
+          "note": "v3 rerun after adding ESP32 Platform Guidance section with explicit DRAM/PSRAM and ETL instructions"
+        },
+        {
+          "eval_id": 7,
+          "eval_name": "eval-esp32-stack-overflow",
+          "pass_rate": 1.00,
+          "passed": 6,
+          "total": 6,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 8,
+          "eval_name": "eval-esp32-deep-sleep",
+          "pass_rate": 1.00,
+          "passed": 6,
+          "total": 6,
+          "failed_assertions": []
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.000,
+        "total_passed": 54,
+        "total_assertions": 54
+      }
+    },
+    {
+      "name": "without_skill",
+      "results": [
+        {
+          "eval_id": 1,
+          "eval_name": "eval-isr-to-task-dma",
+          "pass_rate": 0.60,
+          "passed": 3,
+          "total": 5,
+          "failed_assertions": ["dma_buffer_alignment_appropriate", "power_of_2_buffer"]
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "eval-heap-fragmentation-esp32",
+          "pass_rate": 0.75,
+          "passed": 6,
+          "total": 8,
+          "failed_assertions": ["recommends_fixed_capacity_alternatives", "cites_misra_or_standard"]
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "eval-bare-metal-uart-c99",
+          "pass_rate": 0.78,
+          "passed": 7,
+          "total": 9,
+          "failed_assertions": ["static_assert_buffer_size", "explains_rxne_clear_mechanism"]
+        },
+        {
+          "eval_id": 4,
+          "eval_name": "eval-desktop-to-embedded-porting",
+          "pass_rate": 0.625,
+          "passed": 5,
+          "total": 8,
+          "failed_assertions": ["recommends_etl_by_name", "unique_ptr_over_shared", "h7_cache_coherency"]
+        },
+        {
+          "eval_id": 5,
+          "eval_name": "eval-hardfault-decode",
+          "pass_rate": 1.00,
+          "passed": 5,
+          "total": 5,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 6,
+          "eval_name": "eval-esp32s3-data-logger",
+          "pass_rate": 0.43,
+          "passed": 3,
+          "total": 7,
+          "failed_assertions": ["ring_buffer_power_of_2", "esp_idf_heap_monitoring", "recommends_etl", "addresses_memory_regions"],
+          "note": "v2 rerun baseline"
+        },
+        {
+          "eval_id": 7,
+          "eval_name": "eval-esp32-stack-overflow",
+          "pass_rate": 1.00,
+          "passed": 6,
+          "total": 6,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 8,
+          "eval_name": "eval-esp32-deep-sleep",
+          "pass_rate": 0.83,
+          "passed": 5,
+          "total": 6,
+          "failed_assertions": ["no_heap_in_wake_path"]
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.752,
+        "total_passed": 40,
+        "total_assertions": 54
+      }
+    }
+  ],
+  "delta": {
+    "mean_pass_rate": "+24.8%",
+    "total_passed": "+14",
+    "discriminating_evals": [
+      {
+        "eval_name": "eval-isr-to-task-dma",
+        "with_skill": "5/5 (100%)",
+        "without_skill": "3/5 (60%)",
+        "delta": "+40%",
+        "discriminating_assertions": ["dma_buffer_alignment_appropriate", "power_of_2_buffer"]
+      },
+      {
+        "eval_name": "eval-heap-fragmentation-esp32",
+        "with_skill": "8/8 (100%)",
+        "without_skill": "6/8 (75%)",
+        "delta": "+25%",
+        "discriminating_assertions": ["recommends_fixed_capacity_alternatives", "cites_misra_or_standard"]
+      },
+      {
+        "eval_name": "eval-bare-metal-uart-c99",
+        "with_skill": "9/9 (100%)",
+        "without_skill": "7/9 (78%)",
+        "delta": "+22%",
+        "discriminating_assertions": ["static_assert_buffer_size", "explains_rxne_clear_mechanism"]
+      },
+      {
+        "eval_name": "eval-desktop-to-embedded-porting",
+        "with_skill": "8/8 (100%)",
+        "without_skill": "5/8 (63%)",
+        "delta": "+37%",
+        "discriminating_assertions": ["recommends_etl_by_name", "unique_ptr_over_shared", "h7_cache_coherency"]
+      },
+      {
+        "eval_name": "eval-esp32s3-data-logger",
+        "with_skill": "7/7 (100%)",
+        "without_skill": "3/7 (43%)",
+        "delta": "+57%",
+        "discriminating_assertions": ["ring_buffer_power_of_2", "esp_idf_heap_monitoring", "recommends_etl", "addresses_memory_regions"]
+      },
+      {
+        "eval_name": "eval-esp32-deep-sleep",
+        "with_skill": "6/6 (100%)",
+        "without_skill": "5/6 (83%)",
+        "delta": "+17%",
+        "discriminating_assertions": ["no_heap_in_wake_path"]
+      }
+    ],
+    "non_discriminating_evals": [
+      {
+        "eval_name": "eval-hardfault-decode",
+        "note": "Both scored 5/5 (100%)."
+      },
+      {
+        "eval_name": "eval-esp32-stack-overflow",
+        "note": "Both scored 6/6 (100%)."
+      }
+    ]
+  },
+  "comparison_with_iteration_2": {
+    "with_skill_pass_rate": "82.6% → 100.0% (+17.4pp)",
+    "without_skill_pass_rate": "77.6% → 75.2% (stable)",
+    "skill_delta": "+5.0% → +24.8% (+19.8pp)",
+    "previously_failing_assertions_fixed": [
+      "power_of_2_buffer",
+      "recommends_fixed_capacity_alternatives",
+      "cites_misra_or_standard",
+      "static_assert_buffer_size",
+      "explains_rxne_clear_mechanism",
+      "notes_mmfar_stale"
+    ]
+  },
+  "analyst_observations": [
+    "With-skill achieves 100% pass rate (54/54) across all 8 evals — a perfect score. This is up from 82.6% in iteration 2.",
+    "6 of 8 evals now discriminate between with-skill and without-skill. The skill provides the most value on ESP32-S3 data logger (+57%), desktop-to-embedded porting (+37%), and ISR-to-task DMA (+40%).",
+    "The ESP32 Platform Guidance section added to SKILL.md was critical for eval 6: the v1 run (no ESP32 section) scored 5/7, v2 (ESP32 section added) scored 6/7, v3 (PSRAM guidance strengthened) scored 7/7.",
+    "Two evals remain non-discriminating: HardFault decode and ESP32 stack overflow. These test general embedded knowledge the model already has.",
+    "Token usage remains ~3x higher with skill due to reference file reads, but the quality improvement (100% vs 75% pass rate) justifies the cost."
+  ]
+}

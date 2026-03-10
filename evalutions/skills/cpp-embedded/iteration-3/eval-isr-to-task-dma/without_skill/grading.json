@@ -1,0 +1,31 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-isr-to-task-dma",
+  "expectations": [
+    {
+      "text": "no_heap_allocation",
+      "passed": true,
+      "evidence": "Uses xQueueCreateStatic and xTaskCreateStatic throughout. StaticQueue_t and static storage arrays are used for all FreeRTOS objects. Comment states 'All static allocation: Every FreeRTOS object uses the *Static() creation variants. No pvPortMalloc is ever called.'"
+    },
+    {
+      "text": "static_buffer_allocation",
+      "passed": true,
+      "evidence": "All buffers are statically allocated: 'static adc_block_t s_pool[ADC_BUFFER_POOL_SIZE]', 'static uint16_t s_dma_buf[2][ADC_BLOCK_SAMPLES]', 'static StaticTask_t s_proc_task_cb', 'static StackType_t s_proc_task_stack[256]', and static queue backing storage arrays."
+    },
+    {
+      "text": "isr_safe_communication",
+      "passed": true,
+      "evidence": "Uses xQueueReceiveFromISR and xQueueSendFromISR with BaseType_t xHigherPriorityTaskWoken and portYIELD_FROM_ISR. This is the standard FreeRTOS ISR-safe communication pattern."
+    },
+    {
+      "text": "dma_buffer_alignment_appropriate",
+      "passed": false,
+      "evidence": "The DMA buffer 'static uint16_t s_dma_buf[2][ADC_BLOCK_SAMPLES]' has no alignment attribute at all. No mention of alignment requirements for STM32F4. The assertion requires 4-byte alignment (appropriate for STM32F4). While no 32-byte over-specification exists, the absence of any alignment specification is a miss."
+    },
+    {
+      "text": "power_of_2_buffer",
+      "passed": false,
+      "evidence": "No ring buffer is used in this design. Instead a static buffer pool with FreeRTOS queue is used. The pool size is ADC_BUFFER_POOL_SIZE = 4U (not a ring buffer). No bitmask indexing is present. The assertion specifically requires a ring buffer with power-of-2 capacity and bitmask indexing."
+    }
+  ]
+}

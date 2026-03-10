@@ -1,0 +1,339 @@
+{
+  "skill_name": "cpp-embedded",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm working on an STM32F4 project with FreeRTOS. I need to pass ADC samples from a DMA complete ISR to a processing task. The samples come in bursts of 16 x uint16_t at 1kHz. What's the best way to do this without malloc? Write me the code.",
+      "expected_output": "Uses a lock-free SPSC ring buffer or double-buffering pattern with static allocation. Buffer alignment is appropriate for STM32F4 (4-byte, NOT 32-byte since M4 has no D-cache). Uses atomic or volatile correctly for ISR-task communication. No heap allocation. Power-of-2 buffer size with bitmask indexing.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "no_heap_allocation",
+          "type": "code_quality",
+          "description": "Code does not use malloc, new, std::vector, or any dynamic allocation in the data path"
+        },
+        {
+          "name": "static_buffer_allocation",
+          "type": "code_quality",
+          "description": "All buffers are statically allocated (static arrays or global with known size)"
+        },
+        {
+          "name": "isr_safe_communication",
+          "type": "code_quality",
+          "description": "Uses atomic operations, volatile, or critical sections correctly for ISR-to-task data passing"
+        },
+        {
+          "name": "dma_buffer_alignment_appropriate",
+          "type": "code_quality",
+          "description": "DMA buffer alignment is appropriate for the target MCU: 4-byte alignment for STM32F4 (Cortex-M4, no D-cache), NOT over-specified to 32-byte. 32-byte alignment is only needed for Cortex-M7 (STM32F7/H7) with D-cache."
+        },
+        {
+          "name": "power_of_2_buffer",
+          "type": "code_quality",
+          "description": "Ring buffer capacity is a power of 2 with bitmask indexing (not modulo operator)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My ESP32 firmware keeps crashing after about 6 hours of uptime. It's a sensor hub that reads from 4 I2C sensors every 100ms and sends data over MQTT. I'm using Arduino framework with C++. Each sensor read does a `new SensorReading()` and the MQTT publish does `new String(json)`. Memory seems fine at startup but free heap drops over time. What's going on and how do I fix it?",
+      "expected_output": "Diagnoses heap fragmentation from repeated new/delete cycles. Recommends replacing dynamic allocation with object pools or static buffers. Provides concrete refactored code using static SensorReading array or pool, and fixed-size char buffers for JSON serialization instead of String. Mentions monitoring with ESP.getFreeHeap() and ESP.getMaxAllocHeap(). References ETL containers or MISRA rules.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "identifies_heap_fragmentation",
+          "type": "diagnosis",
+          "description": "Correctly identifies heap fragmentation as the root cause of the crash-after-hours pattern"
+        },
+        {
+          "name": "eliminates_dynamic_alloc",
+          "type": "code_quality",
+          "description": "Refactored code replaces new/delete with static allocation, pools, or pre-allocated buffers"
+        },
+        {
+          "name": "replaces_arduino_string",
+          "type": "code_quality",
+          "description": "Replaces Arduino String class with fixed-size char buffers (char[], snprintf)"
+        },
+        {
+          "name": "provides_monitoring_advice",
+          "type": "completeness",
+          "description": "Suggests heap monitoring (ESP.getFreeHeap, ESP.getMaxAllocHeap, or equivalent)"
+        },
+        {
+          "name": "provides_working_code",
+          "type": "completeness",
+          "description": "Includes concrete refactored code, not just advice"
+        },
+        {
+          "name": "recommends_fixed_capacity_alternatives",
+          "type": "code_quality",
+          "description": "Recommends ETL containers (etl::string, etl::vector) or other named fixed-capacity alternatives, not just generic 'use static arrays'"
+        },
+        {
+          "name": "cites_misra_or_standard",
+          "type": "completeness",
+          "description": "References MISRA rule for dynamic memory prohibition or explains the embedded standard practice against heap allocation with specific reasoning"
+        },
+        {
+          "name": "quantifies_allocation_frequency",
+          "type": "diagnosis",
+          "description": "Calculates or estimates the allocation frequency from the described code (e.g., 4 sensors x 10Hz = 40 alloc/free cycles per second, ~14.4M per day)"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need to write a UART driver for a custom board with an ARM Cortex-M4 MCU (not using HAL). The UART peripheral is at base address 0x40004400. I need to implement init (115200 baud, 8N1), blocking send byte, and interrupt-driven receive into a buffer. PCLK is 84MHz. Write it in C99.",
+      "expected_output": "Defines UART register struct with volatile fields mapped to the base address. Calculates baud rate divisor correctly (84MHz / 16 / 115200). Uses volatile for all register access. Ring buffer for RX with volatile head/tail. ISR reads DR to clear RXNE. Follows C99 style with proper fixed-width types.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "volatile_registers",
+          "type": "code_quality",
+          "description": "All hardware register accesses use volatile (struct fields or pointer casts)"
+        },
+        {
+          "name": "correct_baud_calculation",
+          "type": "correctness",
+          "description": "Baud rate divisor calculation is correct for 84MHz PCLK and 115200 baud"
+        },
+        {
+          "name": "ring_buffer_for_rx",
+          "type": "code_quality",
+          "description": "Uses a ring buffer (not linear buffer) for interrupt-driven receive"
+        },
+        {
+          "name": "c99_compliance",
+          "type": "code_quality",
+          "description": "Uses C99 style: fixed-width types (uint8_t, uint32_t), designated initializers, no C++ features"
+        },
+        {
+          "name": "isr_reads_dr",
+          "type": "correctness",
+          "description": "ISR reads the data register to clear the RXNE flag (not just checking status)"
+        },
+        {
+          "name": "no_malloc_in_driver",
+          "type": "code_quality",
+          "description": "Driver uses only static allocation — no malloc/calloc"
+        },
+        {
+          "name": "static_assert_buffer_size",
+          "type": "code_quality",
+          "description": "Uses _Static_assert or static_assert to validate buffer size (e.g., power of 2) or struct layout at compile time"
+        },
+        {
+          "name": "documents_baud_error",
+          "type": "completeness",
+          "description": "Documents or calculates the baud rate error percentage resulting from integer division"
+        },
+        {
+          "name": "explains_rxne_clear_mechanism",
+          "type": "completeness",
+          "description": "Explains WHY reading DR clears RXNE (hardware auto-clear on read), not just doing it without explanation"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I'm porting a desktop C++ application to an STM32H7. The original code uses std::vector, std::string, std::shared_ptr, virtual functions, exceptions, and RTTI extensively. Flash is 2MB, RAM is 1MB. What's my strategy for porting this? Give me a concrete migration guide with code examples for each replacement pattern.",
+      "expected_output": "Provides a systematic migration guide: std::vector -> etl::vector or std::array, std::string -> etl::string or char buffers, std::shared_ptr -> std::unique_ptr with custom deleter or raw observing pointers, virtual -> CRTP, exceptions -> std::optional/error codes, RTTI -> compile-time type tags. Includes compiler flags (-fno-exceptions, -fno-rtti). Provides before/after code for each pattern. Addresses H7-specific cache coherency concerns.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "covers_all_features",
+          "type": "completeness",
+          "description": "Addresses all 6 features: vector, string, shared_ptr, virtual, exceptions, RTTI"
+        },
+        {
+          "name": "provides_before_after",
+          "type": "completeness",
+          "description": "Shows before (desktop) and after (embedded) code examples for at least 4 patterns"
+        },
+        {
+          "name": "mentions_compiler_flags",
+          "type": "completeness",
+          "description": "Includes -fno-exceptions and -fno-rtti compiler flags"
+        },
+        {
+          "name": "recommends_etl_by_name",
+          "type": "code_quality",
+          "description": "Specifically recommends ETL (Embedded Template Library) by name with concrete container types (etl::vector<T,N>, etl::string<N>), not just generic 'fixed-size alternatives'"
+        },
+        {
+          "name": "crtp_for_virtual",
+          "type": "code_quality",
+          "description": "Recommends CRTP as the replacement for virtual dispatch in performance-critical paths"
+        },
+        {
+          "name": "unique_ptr_over_shared",
+          "type": "code_quality",
+          "description": "Recommends std::unique_ptr (with custom deleter) over std::shared_ptr"
+        },
+        {
+          "name": "build_system_config",
+          "type": "completeness",
+          "description": "Includes CMake toolchain file example, Makefile configuration, or build system guidance for cross-compilation with the recommended flags"
+        },
+        {
+          "name": "h7_cache_coherency",
+          "type": "completeness",
+          "description": "Addresses STM32H7-specific cache coherency implications (D-cache, DMA buffer alignment to 32-byte cache lines, SCB_InvalidateDCache/SCB_CleanDCache usage)"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I got a HardFault on my STM32F4 and I captured these register values:\nCFSR = 0x00008200\nHFSR = 0x40000000\nMMFAR = 0x00000010\nBFAR = 0x00000000\nThe fault happens randomly, sometimes after 2 minutes, sometimes after 30 minutes. The PC from the exception frame points to a memcpy inside my CAN message parser. Help me debug this.",
+      "expected_output": "Decodes CFSR=0x00008200 by breaking into sub-registers: MMFSR[7:0]=0x00 (no MemManage fault), BFSR[15:8]=0x82 (BFARVALID+PRECISERR = precise BusFault), UFSR[31:16]=0x0000. Notes BFAR=0x00000000 suggests null pointer dereference. MMFAR=0x10 is stale since MMARVALID is not set. Recommends checking the CAN message pointer for null, adding a GDB watchpoint, and using ASan on host.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "decodes_cfsr_as_busfault",
+          "type": "correctness",
+          "description": "Correctly decodes CFSR=0x00008200 as a BusFault (PRECISERR + BFARVALID in BFSR byte [15:8]), NOT as a MemManage fault. BFSR byte = 0x82 = bit 7 (BFARVALID) + bit 1 (PRECISERR)."
+        },
+        {
+          "name": "identifies_null_pointer",
+          "type": "diagnosis",
+          "description": "Identifies that BFAR=0x00000000 combined with PRECISERR indicates a null pointer dereference or access to address 0x0"
+        },
+        {
+          "name": "notes_mmfar_stale",
+          "type": "correctness",
+          "description": "Notes that MMFAR=0x10 is stale/irrelevant because MMARVALID (MMFSR bit 7) is NOT set (MMFSR=0x00)"
+        },
+        {
+          "name": "recommends_debugging_steps",
+          "type": "completeness",
+          "description": "Provides actionable debugging steps (GDB watchpoint, ASan, or code review of the parser)"
+        },
+        {
+          "name": "explains_intermittent_nature",
+          "type": "diagnosis",
+          "description": "Explains why the fault is intermittent (e.g., race condition, occasional null from CAN driver, timing-dependent buffer state)"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "I'm building an ESP32-S3 data logger with ESP-IDF (not Arduino). It reads 3 analog sensors via ADC at 100Hz, stores readings in a circular buffer, and writes to SD card every 10 seconds. The system needs to run for weeks without rebooting. I'm getting random crashes after 2-3 days. My current code uses std::vector to accumulate readings and std::string for CSV formatting. How should I restructure this for long-term reliability? Show me the code.",
+      "expected_output": "Diagnoses heap fragmentation from std::vector/std::string growth and reallocation. Replaces with static ring buffer using power-of-2 capacity and bitmask indexing. Uses fixed char[] with snprintf for CSV formatting. Recommends ETL containers as alternative. Includes ESP-IDF heap monitoring (heap_caps_get_free_size, heap_caps_get_largest_free_block). Addresses PSRAM vs DRAM placement for buffers. Cites MISRA Rule 21.3.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "eliminates_std_vector",
+          "type": "code_quality",
+          "description": "Replaces std::vector with a statically-allocated ring buffer or fixed-size array"
+        },
+        {
+          "name": "eliminates_std_string",
+          "type": "code_quality",
+          "description": "Replaces std::string with fixed-size char buffers and snprintf"
+        },
+        {
+          "name": "ring_buffer_power_of_2",
+          "type": "code_quality",
+          "description": "Ring buffer uses power-of-2 capacity with bitmask indexing, validated by static_assert"
+        },
+        {
+          "name": "esp_idf_heap_monitoring",
+          "type": "completeness",
+          "description": "Includes ESP-IDF heap monitoring functions (heap_caps_get_free_size, heap_caps_get_largest_free_block, or multi_heap equivalents)"
+        },
+        {
+          "name": "recommends_etl",
+          "type": "code_quality",
+          "description": "Recommends ETL (Embedded Template Library) by name with specific container types (etl::vector<T,N>, etl::string<N>)"
+        },
+        {
+          "name": "addresses_memory_regions",
+          "type": "completeness",
+          "description": "Discusses ESP32-S3 memory regions (DRAM vs PSRAM) and appropriate placement for the data buffer"
+        },
+        {
+          "name": "provides_working_code",
+          "type": "completeness",
+          "description": "Includes complete, compilable refactored code, not just advice"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "I have an ESP32 running FreeRTOS with WiFi and BLE active. My application has 6 tasks and I keep getting stack overflow crashes in random tasks. Sometimes it's the MQTT task, sometimes the BLE handler. I've set all task stacks to 2048 bytes. The crashes seem more frequent when both WiFi and BLE are active. How do I debug and fix this?",
+      "expected_output": "Explains that 2048 bytes is too small for WiFi/BLE tasks on ESP32. Provides stack high water mark monitoring code. Recommends task-specific stack sizes (4096-8192 for network tasks, 8192+ for TLS). Shows how to enable FreeRTOS stack overflow detection. Explains ESP32 memory pressure when WiFi+BLE are both active. Discusses ESP32 task stack placement in DRAM vs PSRAM.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "identifies_insufficient_stack",
+          "type": "diagnosis",
+          "description": "Identifies that 2048 bytes is insufficient for network-related tasks on ESP32"
+        },
+        {
+          "name": "provides_stack_monitoring",
+          "type": "code_quality",
+          "description": "Shows uxTaskGetStackHighWaterMark() usage or vTaskList() for monitoring stack usage"
+        },
+        {
+          "name": "recommends_specific_stack_sizes",
+          "type": "completeness",
+          "description": "Recommends specific stack sizes for different task types (network tasks need 4096-8192+, TLS tasks need 8192+)"
+        },
+        {
+          "name": "freertos_overflow_detection",
+          "type": "code_quality",
+          "description": "Shows how to enable configCHECK_FOR_STACK_OVERFLOW and implement vApplicationStackOverflowHook"
+        },
+        {
+          "name": "explains_wifi_ble_memory_pressure",
+          "type": "diagnosis",
+          "description": "Explains that WiFi+BLE together consume significant heap/stack and create memory pressure on ESP32's limited DRAM"
+        },
+        {
+          "name": "provides_working_code",
+          "type": "completeness",
+          "description": "Includes concrete code for stack monitoring and task creation with appropriate sizes"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "I'm writing an ESP32 sensor node that reads a BME280 over I2C and publishes to MQTT every 5 seconds. It also has a deep sleep mode to save power — it should wake up, read sensor, publish, and go back to sleep. But after deep sleep wake-up, the WiFi reconnection takes 3-5 seconds and sometimes fails. The whole wake cycle should be under 2 seconds. I'm using Arduino framework. How do I optimize this?",
+      "expected_output": "Explains RTC memory preservation across deep sleep. Shows storing WiFi credentials (channel, BSSID) in RTC_DATA_ATTR to skip WiFi scan on wake. Uses static IP instead of DHCP to save 1-2 seconds. Pre-formats MQTT payload before WiFi connect. Shows proper deep sleep sequence with esp_deep_sleep_start(). Addresses BME280 forced mode for single-shot reading.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "rtc_memory_for_wifi",
+          "type": "code_quality",
+          "description": "Uses RTC_DATA_ATTR to store WiFi channel and BSSID across deep sleep cycles to skip the WiFi scan"
+        },
+        {
+          "name": "static_ip_optimization",
+          "type": "completeness",
+          "description": "Recommends static IP configuration to eliminate DHCP negotiation time"
+        },
+        {
+          "name": "proper_deep_sleep_api",
+          "type": "code_quality",
+          "description": "Uses esp_deep_sleep_start() or ESP.deepSleep() with correct timer configuration"
+        },
+        {
+          "name": "sensor_forced_mode",
+          "type": "completeness",
+          "description": "Addresses BME280 forced/single-shot mode for power-efficient single readings"
+        },
+        {
+          "name": "no_heap_in_wake_path",
+          "type": "code_quality",
+          "description": "Wake-read-publish path avoids dynamic allocation (no String, no new, uses fixed buffers)"
+        },
+        {
+          "name": "provides_working_code",
+          "type": "completeness",
+          "description": "Includes concrete code for the optimized wake-read-publish-sleep cycle"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-heap-fragmentation-esp32",
+  "expectations": [
+    {
+      "text": "identifies_heap_fragmentation",
+      "passed": true,
+      "evidence": "Root cause section states: 'Your firmware is dying from heap fragmentation, not memory exhaustion.' Explains the fragmentation mechanism clearly: 'Each new/delete pair leaves the heap slightly more fragmented. Free heap may still report plenty of bytes available, but the largest contiguous free block shrinks.'"
+    },
+    {
+      "text": "eliminates_dynamic_alloc",
+      "passed": true,
+      "evidence": "Provides concrete refactored code replacing new/delete with static arrays: 'static SensorReading readings[4]' and 'static char json_buf[256]'. The complete sensor loop uses only static and stack allocation with zero dynamic allocation in the periodic path."
+    },
+    {
+      "text": "replaces_arduino_string",
+      "passed": true,
+      "evidence": "Replaces 'new String(json)' with 'char json[128]' and snprintf: 'snprintf(json_buf, sizeof(json_buf), \"{\\\"id\\\":%u,\\\"temp\\\":%.1f,...}\"...)'. Explicitly shows before/after with Arduino String vs char[] + snprintf."
+    },
+    {
+      "text": "provides_monitoring_advice",
+      "passed": true,
+      "evidence": "Provides heap monitoring code using ESP.getFreeHeap(), ESP.getMaxAllocHeap(), ESP.getMinFreeHeap() with explanation of what each indicates. Also references esp_heap_trace.h for advanced tracing."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Provides a complete refactored sensor loop with static SensorReading readings[4], static char json_buf[256], static char topic_buf[64], and the full read_and_publish_sensors() and loop() implementations."
+    },
+    {
+      "text": "recommends_fixed_capacity_alternatives",
+      "passed": true,
+      "evidence": "Explicitly recommends ETL: 'use etl::string<N> from the Embedded Template Library (ETL)' with code example using '#include <etl/string.h>' and 'etl::string<128> json'. Also references 'etl::vector<T,N>' in the audit table."
+    },
+    {
+      "text": "cites_misra_or_standard",
+      "passed": true,
+      "evidence": "States: 'The MISRA C++ Rule 21.6.1 rationale applies directly here: on a device with 320KB DRAM and no MMU, dynamic allocation in periodic production paths is a reliability defect.'"
+    },
+    {
+      "text": "quantifies_allocation_frequency",
+      "passed": true,
+      "evidence": "Explicitly calculates: 'new SensorReading() -- called every 100ms for 4 sensors = 40 allocations/second = 3,456,000 alloc/free cycles per day'. Also: 'new String(json) -- another 10+ alloc/free cycles per second' and '240+ alloc/free cycles per second just for JSON formatting.'"
+    }
+  ]
+}

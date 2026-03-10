@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "All hardware register accesses use volatile (struct fields or pointer casts)",
+      "passed": true,
+      "evidence": "Register type is defined as `typedef volatile uint32_t reg32_t;` and all UART_TypeDef struct fields use `reg32_t`: `reg32_t SR; reg32_t DR; reg32_t BRR; reg32_t CR1; reg32_t CR2; reg32_t CR3;`. Shared indices are also volatile: `static volatile size_t rx_head;` and `static volatile size_t rx_tail;`."
+    },
+    {
+      "text": "Baud rate divisor calculation is correct for 84MHz PCLK and 115200 baud",
+      "passed": true,
+      "evidence": "Calculation shown: `USARTDIV = 84000000 / (16 * 115200) = 45.572916...`, mantissa=45 (0x2D), fraction=9 (0x09), BRR=0x02D9. Implemented via compile-time macros: `#define BRR_MANTISSA (PCLK_HZ / (16U * TARGET_BAUD))`, `#define UART_BRR_VALUE ((BRR_MANTISSA << 4) | (BRR_FRACTION & 0x0FU))`. The resulting value 0x02D9 yields 115068 baud (~0.11% error), which is correct."
+    },
+    {
+      "text": "Uses a ring buffer (not linear buffer) for interrupt-driven receive",
+      "passed": true,
+      "evidence": "Power-of-2 ring buffer with `static uint8_t rx_buf[UART_RX_BUF_SIZE];` (size 256), head/tail indices, and mask-based wrap: `size_t next_head = (rx_head + 1U) & UART_RX_BUF_MASK;`. ISR stores bytes into ring buffer; consumer reads with `rx_buf[rx_tail & UART_RX_BUF_MASK]` and advances tail similarly."
+    },
+    {
+      "text": "Uses C99 style: fixed-width types (uint8_t, uint32_t), designated initializers, no C++ features",
+      "passed": true,
+      "evidence": "Fixed-width types used throughout: `uint8_t`, `uint32_t`, `size_t`, `bool` from `<stdint.h>` and `<stdbool.h>`. C99 loop variable declarations: `for (size_t i = 0U; i < len; i++)`. No C++ features (classes, templates, new/delete). Note: designated initializers are mentioned in the design overview but not demonstrated in the code; however, all other C99 style requirements are fully met."
+    },
+    {
+      "text": "ISR reads the data register to clear the RXNE flag (not just checking status)",
+      "passed": true,
+      "evidence": "In `UART_IRQHandler()`: `uint8_t byte = (uint8_t)(UART->DR & 0xFFU);` reads the data register, which clears the RXNE flag as a side effect on STM32 UART hardware. The ORE handler also reads DR: `(void)UART->DR;`."
+    },
+    {
+      "text": "Driver uses only static allocation — no malloc/calloc",
+      "passed": true,
+      "evidence": "All buffers and state are file-scope static: `static uint8_t rx_buf[UART_RX_BUF_SIZE];`, `static volatile size_t rx_head;`, `static volatile size_t rx_tail;`. No calls to `malloc`, `calloc`, `free`, or any heap function. The design notes explicitly state: 'There is no malloc, no free, and no heap involvement whatsoever.'"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 137.1
+  }
+}

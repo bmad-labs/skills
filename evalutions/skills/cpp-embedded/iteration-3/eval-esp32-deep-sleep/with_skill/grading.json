@@ -1,0 +1,36 @@
+{
+  "eval_id": 8,
+  "eval_name": "eval-esp32-deep-sleep",
+  "expectations": [
+    {
+      "text": "rtc_memory_for_wifi",
+      "passed": true,
+      "evidence": "Uses RTC_DATA_ATTR to persist WiFi state: 'RTC_DATA_ATTR uint8_t saved_wifi_channel = 0', 'RTC_DATA_ATTR uint8_t saved_bssid[6] = {0}', 'RTC_DATA_ATTR bool wifi_state_valid = false'. Explains: 'By storing the WiFi channel number and AP BSSID (MAC address), you skip the 802.11 scan entirely.'"
+    },
+    {
+      "text": "static_ip_optimization",
+      "passed": true,
+      "evidence": "Optimization 2 is dedicated to static IP: 'DHCP negotiation adds 1-2 seconds to every wake cycle. If your network allows it, assign a static IP.' Provides IPAddress configuration before WiFi.begin() with WiFi.config(local_ip, gateway, subnet, dns)."
+    },
+    {
+      "text": "proper_deep_sleep_api",
+      "passed": true,
+      "evidence": "Uses esp_deep_sleep_start(): 'esp_sleep_enable_timer_wakeup(SLEEP_US)' and 'esp_deep_sleep_start()' in go_to_sleep() function. SLEEP_US is correctly defined as '5ULL * 1000000ULL' (microseconds)."
+    },
+    {
+      "text": "sensor_forced_mode",
+      "passed": true,
+      "evidence": "Optimization 4 is dedicated to BME280 forced mode: 'bme.setSampling(Adafruit_BME280::MODE_FORCED, ...)' and 'bme.takeForcedMeasurement()'. Explains: 'Trigger a single measurement on demand. Sensor returns to standby (~0.1 uA) automatically after one conversion.'"
+    },
+    {
+      "text": "no_heap_in_wake_path",
+      "passed": true,
+      "evidence": "Payload is built with stack-allocated char[]: 'char payload[128]; snprintf(payload, sizeof(payload), \"{\\\"temperature\\\":%.1f,...}\", ...)'. Explicitly warns: 'Never use String for building the MQTT payload. Each concatenation heap-allocates. Use snprintf with a fixed char[] buffer.'"
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Provides complete setup() with all optimizations integrated: fast_wifi_connect() with RTC memory, static IP, BME280 forced mode read before WiFi waits, MQTT publish with snprintf payload, and go_to_sleep() function. Timing table shows before/after comparison."
+    }
+  ]
+}

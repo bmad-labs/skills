@@ -1,0 +1,13 @@
+{
+  "eval_id": 8,
+  "eval_name": "eval-esp32-deep-sleep",
+  "prompt": "I'm writing an ESP32 sensor node that reads a BME280 over I2C and publishes to MQTT every 5 seconds. It also has a deep sleep mode to save power — it should wake up, read sensor, publish, and go back to sleep. But after deep sleep wake-up, the WiFi reconnection takes 3-5 seconds and sometimes fails. The whole wake cycle should be under 2 seconds. I'm using Arduino framework. How do I optimize this?",
+  "assertions": [
+    {"name": "rtc_memory_for_wifi", "type": "code_quality", "description": "Uses RTC_DATA_ATTR to store WiFi channel and BSSID across deep sleep cycles"},
+    {"name": "static_ip_optimization", "type": "completeness", "description": "Recommends static IP to eliminate DHCP negotiation time"},
+    {"name": "proper_deep_sleep_api", "type": "code_quality", "description": "Uses esp_deep_sleep_start() or ESP.deepSleep() with correct timer configuration"},
+    {"name": "sensor_forced_mode", "type": "completeness", "description": "Addresses BME280 forced/single-shot mode for power-efficient readings"},
+    {"name": "no_heap_in_wake_path", "type": "code_quality", "description": "Wake-read-publish path avoids dynamic allocation"},
+    {"name": "provides_working_code", "type": "completeness", "description": "Includes concrete code for the optimized wake-read-publish-sleep cycle"}
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-bare-metal-uart-c99",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "volatile_registers",
+      "passed": true,
+      "evidence": "All register access macros use volatile pointer casts: e.g., #define UART_SR (*(volatile uint32_t *)(UART_BASE + UART_SR_OFFSET)). All six registers (SR, DR, BRR, CR1, CR2, CR3) are accessed through volatile."
+    },
+    {
+      "text": "correct_baud_calculation",
+      "passed": true,
+      "evidence": "Calculates USARTDIV = 84000000 / (16 * 115200) = 45.5729. BRR mantissa=45 (0x2D), fraction=round(0.5729*16)=9, BRR=0x02D9. The compile-time integer math via USARTDIV_100 produces the same result."
+    },
+    {
+      "text": "ring_buffer_for_rx",
+      "passed": true,
+      "evidence": "Uses a 256-byte ring buffer with rx_head/rx_tail indices and power-of-2 masking: rx_tail = (rx_tail + 1U) & (RX_BUFFER_SIZE - 1U)."
+    },
+    {
+      "text": "c99_compliance",
+      "passed": true,
+      "evidence": "Uses uint8_t, uint32_t, stdbool.h (bool), stdint.h. No C++ features present. Includes stdbool.h for C99 bool type."
+    },
+    {
+      "text": "isr_reads_dr",
+      "passed": true,
+      "evidence": "ISR reads UART_DR when RXNE is set: uint8_t data = (uint8_t)(UART_DR & 0xFFU). This read clears the RXNE flag."
+    },
+    {
+      "text": "no_malloc_in_driver",
+      "passed": true,
+      "evidence": "All allocations are static: static volatile uint8_t rx_buffer[RX_BUFFER_SIZE], static volatile uint32_t rx_head/rx_tail. No malloc/calloc anywhere."
+    },
+    {
+      "text": "static_assert_buffer_size",
+      "passed": false,
+      "evidence": "No _Static_assert or static_assert is used anywhere in the code. The comment says buffer size 'Must be a power of 2' but this is not enforced at compile time."
+    },
+    {
+      "text": "documents_baud_error",
+      "passed": true,
+      "evidence": "Documents baud error in both the code comment and Design Notes section: 'Actual baud = 84000000 / (16 * 45.5625) = 115,246 Hz, Error = (115246 - 115200) / 115200 = ~0.04%' and notes it is within +/-3% tolerance."
+    },
+    {
+      "text": "explains_rxne_clear_mechanism",
+      "passed": false,
+      "evidence": "The response does not explicitly explain WHY reading DR clears RXNE (hardware auto-clear on read). The ISR just reads DR and there is no explanation of the auto-clear mechanism. The ORE section mentions 'reading SR then DR' clears ORE, but no equivalent explanation for RXNE."
+    }
+  ]
+}

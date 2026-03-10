@@ -1,0 +1,41 @@
+{
+  "eval_id": 6,
+  "eval_name": "eval-esp32s3-data-logger",
+  "expectations": [
+    {
+      "text": "eliminates_std_vector",
+      "passed": true,
+      "evidence": "Explicitly replaces std::vector with a statically-allocated SPSC ring buffer (SpscRingBuffer<SensorSample, 2048>) and fixed-size double-buffered flush arrays (static SensorSample s_flush_buf[2][SAMPLES_PER_FLUSH]). The summary table states: 'std::vector accumulates readings → Static double-buffered SensorSample[] arrays'."
+    },
+    {
+      "text": "eliminates_std_string",
+      "passed": true,
+      "evidence": "std::string is replaced with snprintf into a static char buffer: 'static char s_csv_buf[CSV_BUF_SIZE]' (32KB). The summary table explicitly states: 'std::string for CSV formatting → snprintf into static char[] buffer'."
+    },
+    {
+      "text": "ring_buffer_power_of_2",
+      "passed": true,
+      "evidence": "RING_BUF_CAPACITY = 2048 (power of 2). The template class includes 'static_assert((N & (N - 1)) == 0, \"N must be a power of 2 for bitmask indexing\")' and uses 'static constexpr size_t MASK = N - 1' with bitmask indexing via '& MASK' in both push() and pop()."
+    },
+    {
+      "text": "esp_idf_heap_monitoring",
+      "passed": true,
+      "evidence": "log_system_health() calls heap_caps_get_free_size(MALLOC_CAP_8BIT), heap_caps_get_largest_free_block(MALLOC_CAP_8BIT), and heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT). Fragmentation detection logic is included: warns when free_heap > 50000 but largest_block < 10000."
+    },
+    {
+      "text": "recommends_etl",
+      "passed": true,
+      "evidence": "ETL is recommended by name twice. First inline: 'The Embedded Template Library (ETL) provides etl::queue_spsc_atomic<T, N>'. Then in a dedicated 'ETL Alternative' section showing etl::queue_spsc_atomic<SensorSample, 2048>, etl::vector<SensorSample, 1000>, and etl::string<128> with install instructions."
+    },
+    {
+      "text": "addresses_memory_regions",
+      "passed": false,
+      "evidence": "DRAM is mentioned ('ESP32-S3 has ~320KB DRAM with no MMU' and 'DRAM (static)' in the memory table), but PSRAM is never discussed. The assertion requires discussion of both DRAM and PSRAM memory regions on the ESP32-S3."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Complete multi-file implementation provided: sensor_types.h, spsc_ring_buffer.h (full lock-free template), data_logger.h (constants and static storage), data_logger.cpp (timer callback, logger_task, sd_writer_task, log_system_health, ADC init, SD init, app_main). Code is self-contained and buildable."
+    }
+  ]
+}

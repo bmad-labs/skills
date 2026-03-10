@@ -1,0 +1,32 @@
+{
+  "eval_id": 5,
+  "eval_name": "eval-hardfault-decode",
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "decodes_cfsr_as_busfault",
+      "passed": true,
+      "evidence": "Correctly decodes CFSR=0x00008200 as BFSR[15:8]=0x82 with BFARVALID (bit 15) + PRECISERR (bit 9), identifies it as a BusFault. MMFSR[7:0]=0x00 explicitly noted as no MemManage faults."
+    },
+    {
+      "text": "identifies_null_pointer",
+      "passed": true,
+      "evidence": "States 'BFAR = 0x00000000 with BFARVALID set means the CPU attempted a data access at address 0x00000000 -- a classic null pointer dereference.'"
+    },
+    {
+      "text": "notes_mmfar_stale",
+      "passed": false,
+      "evidence": "Initially correctly states MMFAR is 'not valid for the current fault. Ignore it.' but then contradicts this in the summary table and primary diagnosis, treating MMFAR=0x10 as a meaningful struct offset through a null pointer."
+    },
+    {
+      "text": "recommends_debugging_steps",
+      "passed": true,
+      "evidence": "Provides extensive steps: HardFault handler with stacked register extraction, data race auditing with grep commands, SPSC ring buffer fix, DLC bounds checking, stack high-water-mark monitoring, and recommends AddressSanitizer."
+    },
+    {
+      "text": "explains_intermittent_nature",
+      "passed": true,
+      "evidence": "Identifies data race between CAN RX ISR and parser task as the cause. Explains that on a lightly-loaded CAN bus the race window is hit rarely, accounting for the 2-30 minute interval."
+    }
+  ]
+}

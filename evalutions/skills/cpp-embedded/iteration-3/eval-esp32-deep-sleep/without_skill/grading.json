@@ -1,0 +1,36 @@
+{
+  "eval_id": 8,
+  "eval_name": "eval-esp32-deep-sleep",
+  "expectations": [
+    {
+      "text": "rtc_memory_for_wifi",
+      "passed": true,
+      "evidence": "Uses RTC_DATA_ATTR: 'RTC_DATA_ATTR int savedChannel = 0', 'RTC_DATA_ATTR uint8_t savedBSSID[6] = {0}', 'RTC_DATA_ATTR bool hasWiFiState = false'. Provides fast reconnect using WiFi.begin(SSID, PASS, savedChannel, savedBSSID, true)."
+    },
+    {
+      "text": "static_ip_optimization",
+      "passed": true,
+      "evidence": "Section 2 dedicated to static IP: 'DHCP negotiation adds 500ms-2s. Assign a static IP to eliminate this entirely.' Provides IPAddress configuration and WiFi.config(localIP, gateway, subnet, dns) before WiFi.begin()."
+    },
+    {
+      "text": "proper_deep_sleep_api",
+      "passed": true,
+      "evidence": "Uses esp_deep_sleep_start(): 'esp_sleep_enable_timer_wakeup(5 * 1000000ULL)' and 'esp_deep_sleep_start()' in setup(). Also uses esp_deep_sleep_start() in goToSleep() with backoff logic."
+    },
+    {
+      "text": "sensor_forced_mode",
+      "passed": true,
+      "evidence": "Section 3 covers BME280 forced mode: 'bme.setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, ...)' and 'bme.takeForcedMeasurement()'. Reads temperature, humidity, and pressure in single-shot mode."
+    },
+    {
+      "text": "no_heap_in_wake_path",
+      "passed": false,
+      "evidence": "In publishMQTT(), a String is used for the client ID: 'String clientId = \"esp32-sensor-\" + String(ESP.getEfuseMac(), HEX)'. This performs heap allocation in the wake path. The payload uses snprintf correctly ('char payload[128]'), but the String usage in the same function is a heap allocation in the critical path."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Provides complete connectWiFi() with RTC memory + static IP, setup() that starts WiFi then reads BME280 in parallel, publishMQTT() with snprintf payload, and goToSleep() with exponential backoff. Timing table shows before/after comparison (~500-900ms after optimization)."
+    }
+  ]
+}

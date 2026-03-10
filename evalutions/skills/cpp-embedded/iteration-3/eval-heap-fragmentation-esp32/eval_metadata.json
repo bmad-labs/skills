@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-heap-fragmentation-esp32",
+  "prompt": "My ESP32 firmware keeps crashing after about 6 hours of uptime. It's a sensor hub that reads from 4 I2C sensors every 100ms and sends data over MQTT. I'm using Arduino framework with C++. Each sensor read does a `new SensorReading()` and the MQTT publish does `new String(json)`. Memory seems fine at startup but free heap drops over time. What's going on and how do I fix it?",
+  "assertions": [
+    {"name": "identifies_heap_fragmentation", "type": "diagnosis", "description": "Correctly identifies heap fragmentation as the root cause"},
+    {"name": "eliminates_dynamic_alloc", "type": "code_quality", "description": "Refactored code replaces new/delete with static allocation, pools, or pre-allocated buffers"},
+    {"name": "replaces_arduino_string", "type": "code_quality", "description": "Replaces Arduino String class with fixed-size char buffers (char[], snprintf)"},
+    {"name": "provides_monitoring_advice", "type": "completeness", "description": "Suggests heap monitoring (ESP.getFreeHeap, ESP.getMaxAllocHeap, or equivalent)"},
+    {"name": "provides_working_code", "type": "completeness", "description": "Includes concrete refactored code, not just advice"},
+    {"name": "recommends_fixed_capacity_alternatives", "type": "code_quality", "description": "Recommends ETL containers (etl::string, etl::vector) or other named fixed-capacity alternatives"},
+    {"name": "cites_misra_or_standard", "type": "completeness", "description": "References MISRA rule for dynamic memory prohibition or explains the embedded standard practice"},
+    {"name": "quantifies_allocation_frequency", "type": "diagnosis", "description": "Calculates or estimates the allocation frequency (e.g., 4 sensors x 10Hz = 40 alloc/free per second)"}
+  ]
+}

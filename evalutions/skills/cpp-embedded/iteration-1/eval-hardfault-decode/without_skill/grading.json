@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Correctly decodes CFSR bits to identify the fault type (MemManage violation with valid MMFAR)",
+      "passed": false,
+      "evidence": "The response decodes CFSR 0x00008200 as a BusFault (PRECISERR + BFARVALID in BFSR byte [15:8] = 0x82), stating: 'Precise data bus error, and BFAR contains the faulting address.' and 'MMFSR (MemManage) [7:0] 0x00 No memory management faults'. Per the grading rubric, the expected correct decode is DACCVIOL (bit 1) + MMARVALID (bit 15) in the MemManage sub-register. The response identifies a BusFault instead of a MemManage fault."
+    },
+    {
+      "text": "Interprets MMFAR=0x10 as likely null pointer + struct offset access pattern",
+      "passed": false,
+      "evidence": "The response explicitly dismisses MMFAR, stating: 'MMFAR = 0x00000010 — This register is not valid in this case (MMFSR shows no MemManage fault, and MMARVALID bit is 0). The value 0x00000010 is stale/irrelevant.' It does not interpret MMFAR=0x10 as a null pointer + struct offset pattern. Instead, it focuses on BFAR=0x00000000 as the faulting address."
+    },
+    {
+      "text": "Identifies null pointer dereference as the likely root cause",
+      "passed": true,
+      "evidence": "The response clearly states: 'The most likely scenario: NULL pointer dereference' and 'Your CAN message parser is passing a NULL pointer (or a pointer to address 0x00000000) to memcpy.' While it arrives at this conclusion through BFAR=0x0 rather than MMFAR=0x10, it does identify null pointer dereference as the root cause."
+    },
+    {
+      "text": "Provides actionable debugging steps (GDB watchpoint, ASan, or code review of the parser)",
+      "passed": true,
+      "evidence": "The response provides extensive debugging steps: (1) HardFault handler with stack frame inspection code, (2) addr2line to trace the caller ('arm-none-eabi-addr2line -e your_firmware.elf -f -p <LR_value>'), (3) CAN parser code review with example NULL-pointer patterns and NULL check additions, (4) race condition audit with code examples, (5) stack overflow checks, (6) enabling BusFault handler, and (7) runtime instrumentation with global diagnostic variables."
+    },
+    {
+      "text": "Explains why the fault is intermittent (e.g., race condition, occasional null from CAN driver)",
+      "passed": true,
+      "evidence": "The response explains: 'Race condition between CAN RX ISR and parser task: The ISR fills a buffer/queue, and the parser reads from it. If there is no proper synchronization, the parser may read a partially-written message descriptor where the data pointer is still NULL/zero.' It also lists buffer overrun, use-after-free, and stack corruption as additional explanations, and summarizes: 'The intermittent 2-30 minute timing is characteristic of a race condition that depends on specific CAN bus traffic patterns and task scheduling alignment.'"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "timing": {
+    "total_duration_seconds": 93.3
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "eval_id": 4,
+  "eval_name": "eval-desktop-to-embedded-porting",
+  "expectations": [
+    {
+      "text": "covers_all_features",
+      "passed": true,
+      "evidence": "Addresses all 6 features: (1) std::vector -> StaticVector, (2) std::string -> FixedString/char*, (3) std::shared_ptr -> ObjectPool/single owner, (4) virtual functions -> CRTP/function pointers, (5) exceptions -> Result types/error codes, (6) RTTI -> TypeTag/enum type tags."
+    },
+    {
+      "text": "provides_before_after",
+      "passed": true,
+      "evidence": "Shows before/after for all 6 patterns: std::vector BEFORE/AFTER, std::string BEFORE/AFTER with FixedString, shared_ptr BEFORE/AFTER with pool handles, virtual BEFORE (implied) and AFTER with CRTP, exceptions BEFORE/AFTER with Result type, RTTI BEFORE implied/AFTER with Component::as<T>()."
+    },
+    {
+      "text": "mentions_compiler_flags",
+      "passed": true,
+      "evidence": "Compiler Settings Baseline includes: 'CXXFLAGS += -fno-exceptions' and 'CXXFLAGS += -fno-rtti'. Also includes -fno-threadsafe-statics, -ffunction-sections, -fdata-sections, and -specs=nano.specs."
+    },
+    {
+      "text": "recommends_etl_by_name",
+      "passed": false,
+      "evidence": "ETL (Embedded Template Library) is never mentioned by name. The response implements its own StaticVector, FixedString, ObjectPool, and Result types from scratch. No reference to any named embedded library."
+    },
+    {
+      "text": "crtp_for_virtual",
+      "passed": true,
+      "evidence": "Pattern A in section 4 is dedicated to CRTP: 'template <typename Derived> class SensorBase' with 'static_cast<Derived*>(this)->read_impl()'. Comment: 'This gives you polymorphic behavior resolved entirely at compile time — zero runtime overhead.'"
+    },
+    {
+      "text": "unique_ptr_over_shared",
+      "passed": false,
+      "evidence": "The response does not recommend std::unique_ptr over std::shared_ptr. Instead it recommends ObjectPool with Handle-based access and raw pointer borrowing. std::unique_ptr is mentioned once in the translation table but not recommended as the primary alternative."
+    },
+    {
+      "text": "build_system_config",
+      "passed": true,
+      "evidence": "Provides GCC ARM flags in Makefile format: 'CXXFLAGS += -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard', -fno-exceptions, -fno-rtti, etc. Also provides linker flags including '-specs=nano.specs'."
+    },
+    {
+      "text": "h7_cache_coherency",
+      "passed": false,
+      "evidence": "Section 7 discusses memory layout and placement with linker script for STM32H7 RAM regions (DTCMRAM, RAM_D1, RAM_D2, RAM_D3), and shows placing DMA buffers in D2 RAM with __attribute__((section(\".dma_buffer\"))). However, it does not address D-cache coherency, SCB_InvalidateDCache_by_Addr, cache maintenance operations, or the 32-byte alignment requirement specific to Cortex-M7 D-cache. Placement in D2 RAM is mentioned but not the cache invalidation protocol."
+    }
+  ]
+}

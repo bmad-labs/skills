@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Correctly decodes CFSR bits to identify the fault type (MemManage violation with valid MMFAR)",
+      "passed": false,
+      "evidence": "The response decodes CFSR=0x00008200 as a BusFault (PRECISERR+BFARVALID in byte 1), stating: 'Byte 0 (MMFSR): 0x00 -- no MemManage faults' and 'Conclusion: Precise bus fault with a valid BFAR address.' Per the rubric, the correct decode is DACCVIOL (bit 1) + MMARVALID (bit 15) indicating a MemManage fault, not a BusFault. The response explicitly identifies it as a BusFault throughout."
+    },
+    {
+      "text": "Interprets MMFAR=0x10 as likely null pointer + struct offset access pattern",
+      "passed": true,
+      "evidence": "The response states: 'MMFAR = 0x00000010 in your capture is interesting. While MMARVALID is not set, if R0 or R1 is 0x00000000 and the memcpy is copying a struct, the fault may actually occur at offset 0x10 (16 bytes) into the copy -- this is the address 0x00000010.' It recognizes the null+offset pattern, though it incorrectly dismisses MMARVALID as not set and treats it as secondary to BFAR."
+    },
+    {
+      "text": "Identifies null pointer dereference as the likely root cause",
+      "passed": true,
+      "evidence": "The response clearly states: 'BFAR = 0x00000000 combined with a memcpy strongly suggests a NULL pointer dereference' and the summary table says 'Root cause: A pointer passed to memcpy is NULL due to a race condition or use-after-free between the CAN RX ISR and the parser task'. The correct conclusion (NULL pointer dereference) is reached despite the fault type misidentification."
+    },
+    {
+      "text": "Provides actionable debugging steps (GDB watchpoint, ASan, or code review of the parser)",
+      "passed": true,
+      "evidence": "The response provides all three: (1) GDB watchpoint in Step 6: 'watch *(uint32_t*)0x20001234' with condition for NULL, (2) ASan in Step 5: 'gcc -fsanitize=address,undefined ... -o test_can_parser', and (3) Code review of the parser in Step 2-3 with grep commands and specific code patterns to audit. Additionally provides HardFault handler code, MPU null guard, and defensive NULL checks."
+    },
+    {
+      "text": "Explains why the fault is intermittent (e.g., race condition, occasional null from CAN driver)",
+      "passed": true,
+      "evidence": "The response explains: 'Not a static bug -- a race condition or stale pointer that depends on timing' and provides three detailed scenarios: (A) 'Race condition between CAN RX ISR and parser task' where 'the task reads the pointer after it has been cleared (set to NULL) by the ISR but before the new message pointer is written', (B) use-after-free, and (C) missing volatile. The summary states: 'The race window is narrow -- it only manifests when the ISR and task interleave at exactly the wrong moment.'"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "timing": {
+    "total_duration_seconds": 112.1
+  }
+}

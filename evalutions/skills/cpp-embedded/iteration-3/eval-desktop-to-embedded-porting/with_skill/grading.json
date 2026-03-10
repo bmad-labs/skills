@@ -1,0 +1,46 @@
+{
+  "eval_id": 4,
+  "eval_name": "eval-desktop-to-embedded-porting",
+  "expectations": [
+    {
+      "text": "covers_all_features",
+      "passed": true,
+      "evidence": "Addresses all 6 features: (1) std::vector -> ETL vector/std::array, (2) std::string -> etl::string/char[], (3) std::shared_ptr -> unique_ptr with pool deleter, (4) virtual functions -> CRTP, (5) exceptions -> std::optional/std::expected/error codes, (6) RTTI -> enum type tags/std::variant."
+    },
+    {
+      "text": "provides_before_after",
+      "passed": true,
+      "evidence": "Shows before/after for all 6 patterns: vector (BEFORE/AFTER with etl::vector), string (BEFORE/AFTER with char[]+snprintf), shared_ptr (BEFORE/AFTER with unique_ptr+pool), virtual (BEFORE/AFTER with CRTP), exceptions (BEFORE/AFTER with std::optional), RTTI (BEFORE/AFTER with type tags)."
+    },
+    {
+      "text": "mentions_compiler_flags",
+      "passed": true,
+      "evidence": "Step 0 explicitly includes both flags in CMakeLists.txt: '-fno-exceptions  # Saves 10-30% flash; removes unwind tables' and '-fno-rtti  # Removes runtime type info tables from ROM'."
+    },
+    {
+      "text": "recommends_etl_by_name",
+      "passed": true,
+      "evidence": "Explicitly recommends ETL by name: 'Option A: Drop-in replacement with ETL (recommended when size varies at runtime)' with '#include <etl/vector.h>', 'etl::vector<SensorReading, 100>' and '#include <etl/string.h>', 'etl::string<256>'. Also shows ETL installation via PlatformIO."
+    },
+    {
+      "text": "crtp_for_virtual",
+      "passed": true,
+      "evidence": "Migration 4 is dedicated to CRTP: 'Replacement: CRTP (Curiously Recurring Template Pattern)' with complete before/after code showing 'template<typename Derived> class SensorBase' and derived classes using 'static_cast<Derived*>(this)->read_impl()'."
+    },
+    {
+      "text": "unique_ptr_over_shared",
+      "passed": true,
+      "evidence": "Migration 3 header is 'std::shared_ptr --> std::unique_ptr with Pool Deleter or Raw Observing Pointers'. Decision table shows 'shared_ptr for shared ownership -> Redesign to single owner with unique_ptr'. Code examples use 'std::unique_ptr<Calibration, CalDeleter>'."
+    },
+    {
+      "text": "build_system_config",
+      "passed": true,
+      "evidence": "Step 0 provides CMakeLists.txt with 'target_compile_options(firmware PRIVATE ...)' and 'target_link_options(firmware PRIVATE ...)' including -fno-exceptions, -fno-rtti, -fstack-usage, -Wall, -Wextra, -Werror, -Wl,--gc-sections, -Wl,--print-memory-usage."
+    },
+    {
+      "text": "h7_cache_coherency",
+      "passed": true,
+      "evidence": "Dedicated section 'Cache Coherency (Critical for STM32H7)' explains D-cache requirements and provides SCB_InvalidateDCache_by_Addr() and SCB_CleanDCache_by_Addr() code examples. States 'DMA buffers must be 32-byte aligned and sized in 32-byte multiples.'"
+    }
+  ]
+}

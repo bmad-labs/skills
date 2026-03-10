@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Correctly identifies heap fragmentation as the root cause of the crash-after-hours pattern",
+      "passed": true,
+      "evidence": "Response explicitly identifies both memory leaks and heap fragmentation: \"Your ESP32 is suffering from two compounding problems: a classic memory leak and heap fragmentation.\" It explains the mechanism: \"free memory becomes scattered into small non-contiguous chunks. You might have 50 KB free total, but no single contiguous block larger than 200 bytes -- so the next new String() that needs 256 bytes fails, and you crash.\" Also calls out Arduino String's realloc behavior as a fragmentation driver."
+    },
+    {
+      "text": "Refactored code replaces new/delete with static allocation, pools, or pre-allocated buffers",
+      "passed": true,
+      "evidence": "The refactored code uses statically allocated global arrays: \"static SensorReading g_readings[NUM_SENSORS];\" and \"static char g_jsonBuffer[JSON_BUFFER_SIZE];\". The before/after comparison shows: Before: \"SensorReading* reading = new SensorReading(); // LEAK!\" After: \"static SensorReading g_readings[NUM_SENSORS]; ... readSensor(i, g_readings[i]); // Zero allocation\". A memory pool pattern is also provided as an alternative: \"static SensorReading pool[8]; static uint8_t poolIndex = 0;\"."
+    },
+    {
+      "text": "Replaces Arduino String class with fixed-size char buffers (char[], snprintf)",
+      "passed": true,
+      "evidence": "Response replaces String with a fixed char buffer: \"static char g_jsonBuffer[JSON_BUFFER_SIZE];\" (512 bytes) and uses snprintf for JSON building: \"snprintf(buffer, bufferSize, \"{\\\"id\\\":%u,\\\"t\\\":%.2f,\\\"h\\\":%.2f,\\\"p\\\":%.1f}\", ...)\". Explicitly states the rule: \"Never use Arduino String -- Every operation allocates/reallocates on the heap\" and \"Use snprintf for string building -- Writes into a fixed buffer with bounds checking\"."
+    },
+    {
+      "text": "Suggests heap monitoring (ESP.getFreeHeap, ESP.getMaxAllocHeap, or equivalent)",
+      "passed": true,
+      "evidence": "Provides a complete reportHeapStats() function that logs ESP.getFreeHeap(), ESP.getMinFreeHeap(), and ESP.getMaxAllocHeap(). Also computes a fragmentation percentage: \"float fragPct = 100.0f * (1.0f - ((float)maxAllocHeap / (float)freeHeap));\". The function is called periodically every 60 seconds in the main loop. Additionally includes a safety net example: \"if (ESP.getMaxAllocHeap() < 4096) { ... ESP.restart(); }\"."
+    },
+    {
+      "text": "Includes concrete refactored code, not just advice",
+      "passed": true,
+      "evidence": "The response includes a complete, compilable refactored firmware (~310 lines of C++) with setup(), loop(), sensor reading, JSON serialization, MQTT publishing, WiFi management, and heap monitoring -- all using static allocation. Additionally provides before/after code comparisons for each key change."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 116.7
+  }
+}

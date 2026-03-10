@@ -1,0 +1,46 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-heap-fragmentation-esp32",
+  "expectations": [
+    {
+      "text": "identifies_heap_fragmentation",
+      "passed": true,
+      "evidence": "Correctly identifies: 'You have a classic heap fragmentation and memory leak problem.' Explains the fragmentation signature: 'getFreeHeap() stable but getMaxAllocHeap() decreasing = fragmentation (free memory exists but is in scattered small blocks).'"
+    },
+    {
+      "text": "eliminates_dynamic_alloc",
+      "passed": true,
+      "evidence": "Provides refactored code replacing new/delete with static struct: 'static SensorReading currentReading' and 'static char jsonBuffer[256]'. The complete refactored example uses only static allocations in the periodic path."
+    },
+    {
+      "text": "replaces_arduino_string",
+      "passed": true,
+      "evidence": "Shows before/after: replaces 'String* json = new String(...)' with 'char json[256]' + snprintf. States: 'Arduino String is particularly dangerous on ESP32' and recommends using char[] with C string functions."
+    },
+    {
+      "text": "provides_monitoring_advice",
+      "passed": true,
+      "evidence": "Provides printHeapStats() function using ESP.getFreeHeap(), ESP.getMaxAllocHeap(), ESP.getMinFreeHeap() with explanation of what each value means for diagnosing fragmentation vs leaks."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Provides a complete refactored example with static SensorReading currentReading, static char jsonBuffer[256], readSensors(), publishReading(), and full loop() with heap monitoring."
+    },
+    {
+      "text": "recommends_fixed_capacity_alternatives",
+      "passed": false,
+      "evidence": "The response does not mention ETL (Embedded Template Library) by name, nor etl::string, etl::vector, or any other named fixed-capacity library. It recommends char[] buffers and StaticJsonDocument, but not ETL specifically."
+    },
+    {
+      "text": "cites_misra_or_standard",
+      "passed": false,
+      "evidence": "The response does not cite MISRA rules or reference any embedded standard for dynamic memory prohibition. The 'Golden Rule' section provides good advice but does not cite any standard."
+    },
+    {
+      "text": "quantifies_allocation_frequency",
+      "passed": true,
+      "evidence": "States: 'new SensorReading() every 100ms -- 4 sensors x 10 reads/sec = 40 heap allocations per second, or 864,000 allocations over 6 hours.' Also mentions 'new String(json) per publish -- Heap alloc + internal reallocs.'"
+    }
+  ]
+}

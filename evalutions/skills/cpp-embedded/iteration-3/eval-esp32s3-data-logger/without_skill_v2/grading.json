@@ -1,0 +1,41 @@
+{
+  "eval_id": 6,
+  "eval_name": "eval-esp32s3-data-logger",
+  "expectations": [
+    {
+      "text": "eliminates_std_vector",
+      "passed": true,
+      "evidence": "std::vector is replaced with a statically-allocated FreeRTOS StreamBuffer (s_stream_buf_storage) and a pre-allocated SD write buffer (static char s_sd_write_buf[SD_WRITE_BUF_SIZE]). The design table explicitly notes: 'std::vector::push_back() → Static StreamBuffer'."
+    },
+    {
+      "text": "eliminates_std_string",
+      "passed": true,
+      "evidence": "std::string is replaced with snprintf into the pre-allocated s_sd_write_buf char array. The design table states: 'std::string for CSV → snprintf() into char[]'. The sd_writer_task uses snprintf directly with bounded output."
+    },
+    {
+      "text": "ring_buffer_power_of_2",
+      "passed": false,
+      "evidence": "RING_BUFFER_SAMPLES = 2000, which is not a power of 2. The implementation uses FreeRTOS StreamBuffer rather than a custom ring buffer, so there is no bitmask indexing and no static_assert validating power-of-2 capacity."
+    },
+    {
+      "text": "esp_idf_heap_monitoring",
+      "passed": false,
+      "evidence": "Only esp_get_minimum_free_heap_size() and esp_get_free_heap_size() are used — these are generic ESP-IDF functions that report total free heap but cannot detect fragmentation. The critical heap_caps_get_largest_free_block() function, which is needed to distinguish fragmented from unfragmented free memory, is absent."
+    },
+    {
+      "text": "recommends_etl",
+      "passed": false,
+      "evidence": "The Embedded Template Library (ETL) is not mentioned anywhere in the response. No etl:: container types are referenced."
+    },
+    {
+      "text": "addresses_memory_regions",
+      "passed": false,
+      "evidence": "The response mentions '~512KB of usable RAM' generically but does not distinguish between ESP32-S3 memory regions (DRAM vs PSRAM). There is no discussion of where buffers reside in memory or how PSRAM (if present) might be used."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Complete multi-file implementation provided: data_logger.h (with all constants, types, and API declarations), data_logger.c (ADC init, SD card management, adc_reader_task, sd_writer_task, public API), main.c (app_main), and sdkconfig.defaults. The code is self-contained and buildable."
+    }
+  ]
+}

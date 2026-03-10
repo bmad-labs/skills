@@ -1,0 +1,41 @@
+{
+  "eval_id": 6,
+  "eval_name": "eval-esp32s3-data-logger",
+  "expectations": [
+    {
+      "text": "eliminates_std_vector",
+      "passed": true,
+      "evidence": "Replaces std::vector with 'adc_sample_t samples[CIRC_BUF_CAPACITY]' inside circ_buf_t struct, which is statically allocated as 'circ_buf_t g_sample_buffer'. Design table confirms: 'std::vector::push_back() -- heap alloc on growth -> Static adc_sample_t samples[2000] -- zero alloc'."
+    },
+    {
+      "text": "eliminates_std_string",
+      "passed": true,
+      "evidence": "Uses snprintf into static char arrays: 'char buf[2][SD_BUF_SIZE]' in sd_double_buf_t and format_samples_to_buffer() uses 'snprintf(buf + offset, buf_size - offset, \"%lu,%u,%u,%u\\n\", ...)'. Design table confirms: 'std::string concatenation -> snprintf() into fixed char buf[] -- zero alloc'."
+    },
+    {
+      "text": "ring_buffer_power_of_2",
+      "passed": false,
+      "evidence": "The circular buffer uses modulo: 'cb->head = (cb->head + 1) % CIRC_BUF_CAPACITY' and 'cb->tail = (cb->tail + 1) % CIRC_BUF_CAPACITY'. No power-of-2 bitmask indexing. CIRC_BUF_CAPACITY = SAMPLES_PER_WRITE * 2 = 2000 (not a power of 2). No static_assert for power-of-2."
+    },
+    {
+      "text": "esp_idf_heap_monitoring",
+      "passed": true,
+      "evidence": "health_monitor_task uses 'esp_get_free_heap_size()' and 'esp_get_minimum_free_heap_size()'. sd_writer_task also tracks 'g_stats.free_heap_min' using 'esp_get_minimum_free_heap_size()'. Heap monitoring is logged periodically."
+    },
+    {
+      "text": "recommends_etl",
+      "passed": false,
+      "evidence": "ETL (Embedded Template Library) is not mentioned anywhere. The response implements custom circular buffer, double buffer, and uses plain C arrays throughout. No ETL containers or library name appears."
+    },
+    {
+      "text": "addresses_memory_regions",
+      "passed": false,
+      "evidence": "The response does not discuss ESP32-S3 memory regions (DRAM vs PSRAM). The memory budget table shows total static allocation (~174 KB) vs ESP32-S3 available SRAM (~512 KB) but does not discuss PSRAM, IRAM, RTC memory, or how to use different memory regions strategically."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Provides complete multi-file implementation: data_logger.h, circular_buffer.c, adc_sampler.c, sd_writer.c, main.c, CMakeLists.txt, and sdkconfig.defaults. All functional components are implemented including task creation, ADC reading, SD writing, and health monitoring."
+    }
+  ]
+}

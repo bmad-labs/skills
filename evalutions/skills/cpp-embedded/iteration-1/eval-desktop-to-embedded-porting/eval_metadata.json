@@ -1,0 +1,13 @@
+{
+  "eval_id": 4,
+  "eval_name": "desktop-to-embedded-porting",
+  "prompt": "I'm porting a desktop C++ application to an STM32H7. The original code uses std::vector, std::string, std::shared_ptr, virtual functions, exceptions, and RTTI extensively. Flash is 2MB, RAM is 1MB. What's my strategy for porting this? Give me a concrete migration guide with code examples for each replacement pattern.",
+  "assertions": [
+    "Addresses all 6 features: vector, string, shared_ptr, virtual, exceptions, RTTI",
+    "Shows before (desktop) and after (embedded) code examples for at least 4 patterns",
+    "Includes -fno-exceptions and -fno-rtti compiler flags",
+    "Recommends ETL (Embedded Template Library) or fixed-size alternatives for containers",
+    "Recommends CRTP as the replacement for virtual dispatch in performance-critical paths",
+    "Recommends std::unique_ptr (with custom deleter) over std::shared_ptr"
+  ]
+}

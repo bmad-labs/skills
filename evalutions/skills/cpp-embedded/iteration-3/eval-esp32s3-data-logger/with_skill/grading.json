@@ -1,0 +1,41 @@
+{
+  "eval_id": 6,
+  "eval_name": "eval-esp32s3-data-logger",
+  "expectations": [
+    {
+      "text": "eliminates_std_vector",
+      "passed": true,
+      "evidence": "Replaces std::vector with 'static SpscRingBuffer<SensorSample, RING_BUF_CAPACITY> s_sample_ring' where RING_BUF_CAPACITY = 2048 (power of 2). The SpscRingBuffer uses 'std::array<T, N> buf_{}' for static storage. States: 'Zero std::vector.'"
+    },
+    {
+      "text": "eliminates_std_string",
+      "passed": true,
+      "evidence": "Replaces std::string with 'static char s_csv_buf[CSV_BUF_SIZE]' and snprintf: 'snprintf(s_csv_buf + buf_offset, CSV_BUF_SIZE - buf_offset, \"%lld,%u,%u,%u\\n\", ...)'. States: 'No std::string. No std::stringstream.'"
+    },
+    {
+      "text": "ring_buffer_power_of_2",
+      "passed": true,
+      "evidence": "SpscRingBuffer has 'static_assert((N & (N - 1)) == 0, \"Capacity must be a power of 2\")' and 'static constexpr size_t MASK = N - 1'. Uses bitmask indexing: '(head + 1) & MASK' and '(tail + 1) & MASK'. RING_BUF_CAPACITY = 2048 (power of 2)."
+    },
+    {
+      "text": "esp_idf_heap_monitoring",
+      "passed": true,
+      "evidence": "health_monitor_task uses ESP-IDF functions: 'heap_caps_get_free_size(MALLOC_CAP_8BIT)', 'heap_caps_get_largest_free_block(MALLOC_CAP_8BIT)', 'heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT)'. Initial monitoring also uses 'heap_caps_get_free_size'."
+    },
+    {
+      "text": "recommends_etl",
+      "passed": false,
+      "evidence": "ETL (Embedded Template Library) is not mentioned by name in the response. The response implements its own SpscRingBuffer instead of recommending etl::queue or etl::vector. No specific ETL container types are cited."
+    },
+    {
+      "text": "addresses_memory_regions",
+      "passed": false,
+      "evidence": "The response does not discuss ESP32-S3 memory regions (DRAM vs PSRAM). The 'Key Design Decisions' section compares the designs but does not mention PSRAM, DRAM, IRAM, or RTC memory regions. The compile flags section briefly mentions '-fno-exceptions' but no memory region discussion."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Provides complete implementation across sensor_types.h, spsc_ring_buffer.h, and data_logger.cpp including full app_main(), adc_reader_task(), logger_task(), health_monitor_task(), timer init, ADC init, and SD card writer with snprintf-based CSV formatting."
+    }
+  ]
+}
