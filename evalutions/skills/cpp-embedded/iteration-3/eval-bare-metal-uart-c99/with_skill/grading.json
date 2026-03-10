@@ -1,0 +1,51 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-bare-metal-uart-c99",
+  "expectations": [
+    {
+      "text": "volatile_registers",
+      "passed": true,
+      "evidence": "Defines 'typedef volatile uint32_t reg32_t' and uses it for all register fields in UART_TypeDef struct. Explicitly explains: 'Every field is volatile because the hardware can modify these registers independently of the CPU -- without volatile, the compiler may cache a status register read in a CPU register and never re-read the hardware.'"
+    },
+    {
+      "text": "correct_baud_calculation",
+      "passed": true,
+      "evidence": "Correctly calculates: 84000000 / (16 * 115200) = 45.572916, Mantissa = 45 = 0x2D, Fraction = round(0.572916 * 16) = 9 = 0x09, BRR = 0x02D9. Actual baud = 115207.37 Hz, error = +0.006%. Macros compute this via integer arithmetic."
+    },
+    {
+      "text": "ring_buffer_for_rx",
+      "passed": true,
+      "evidence": "Implements a power-of-2 ring buffer with 'static uint8_t rx_buffer[UART_RX_BUF_SIZE]', 'static volatile uint32_t rx_head' and 'static volatile uint32_t rx_tail', with bitmask indexing: '(rx_head + 1U) & RX_BUF_MASK'."
+    },
+    {
+      "text": "c99_compliance",
+      "passed": true,
+      "evidence": "Uses C99 fixed-width types (uint8_t, uint32_t, size_t), _Static_assert, file declares 'typedef volatile uint32_t reg32_t'. No C++ features. The header guards and structure follow C99 style. Uses bool from stdbool.h."
+    },
+    {
+      "text": "isr_reads_dr",
+      "passed": true,
+      "evidence": "ISR reads DR: 'uint8_t byte = (uint8_t)(UART1->DR & 0xFFU)'. Comment explicitly states: 'Reading DR clears RXNE -- this MUST happen to deassert the IRQ.'"
+    },
+    {
+      "text": "no_malloc_in_driver",
+      "passed": true,
+      "evidence": "All memory is statically allocated: 'static uint8_t rx_buffer[UART_RX_BUF_SIZE]', 'static volatile uint32_t rx_head', 'static volatile uint32_t rx_tail'. Design section states: 'All memory (ring buffer, indices) is statically allocated. There is no malloc or dynamic allocation anywhere. This follows MISRA C Rule 21.3.'"
+    },
+    {
+      "text": "static_assert_buffer_size",
+      "passed": true,
+      "evidence": "_Static_assert is used to validate power-of-2: '_Static_assert((UART_RX_BUF_SIZE & (UART_RX_BUF_SIZE - 1)) == 0, \"UART_RX_BUF_SIZE must be a power of 2 for bitmask indexing\")' and '_Static_assert(UART_RX_BUF_SIZE >= 16 && UART_RX_BUF_SIZE <= 4096, ...)'"
+    },
+    {
+      "text": "documents_baud_error",
+      "passed": true,
+      "evidence": "Explicitly documents: 'Actual baud = 84000000 / (16 * 45.5625) = 115207 Hz, an error of +0.006% which is well within the UART tolerance of +/-2%.' The baud calculation comments also show the intermediate steps."
+    },
+    {
+      "text": "explains_rxne_clear_mechanism",
+      "passed": true,
+      "evidence": "ISR comment explains: 'IMPORTANT: Reading DR has TWO effects (read-to-clear mechanism): 1. Retrieves the received byte 2. Clears the RXNE flag in SR (hardware auto-clear on DR read). If we only checked SR without reading DR, RXNE would stay asserted and this ISR would fire endlessly (interrupt storm).'"
+    }
+  ]
+}

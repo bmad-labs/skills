@@ -1,0 +1,36 @@
+{
+  "eval_id": 7,
+  "eval_name": "eval-esp32-stack-overflow",
+  "expectations": [
+    {
+      "text": "identifies_insufficient_stack",
+      "passed": true,
+      "evidence": "States: 'Your 2048-byte uniform stack size is the problem. On ESP32, 2048 bytes is only appropriate for the simplest tasks (GPIO toggling, timer callbacks). WiFi and BLE stacks internally call deep function chains that consume far more stack than typical application code.'"
+    },
+    {
+      "text": "provides_stack_monitoring",
+      "passed": true,
+      "evidence": "Shows uxTaskGetStackHighWaterMark usage: 'UBaseType_t remaining = uxTaskGetStackHighWaterMark(NULL); printf(\"Stack remaining: %u bytes\\n\", remaining * sizeof(StackType_t))' and log_all_stack_usage() using uxTaskGetSystemState() with complete code example."
+    },
+    {
+      "text": "recommends_specific_stack_sizes",
+      "passed": true,
+      "evidence": "Provides detailed table: 'Simple GPIO / timer: 2048 min, MQTT client task: 4096 min / 6144 recommended, BLE handler / GATT: 4096 min / 8192 recommended, TLS/SSL: 8192 min / 16384 recommended'. Code shows actual xTaskCreate calls with right-sized values."
+    },
+    {
+      "text": "freertos_overflow_detection",
+      "passed": true,
+      "evidence": "Shows: '#define configCHECK_FOR_STACK_OVERFLOW 2' and implements vApplicationStackOverflowHook: 'void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) { esp_rom_printf(\"STACK OVERFLOW in task: %s\\n\", pcTaskName); for (;;); }'"
+    },
+    {
+      "text": "explains_wifi_ble_memory_pressure",
+      "passed": true,
+      "evidence": "Explains: 'ESP-IDF creates additional internal tasks for WiFi and BLE that compete for DRAM. The WiFi task alone needs ~4KB stack, the BLE controller task needs ~4KB, and the BLE host (NimBLE or Bluedroid) needs 4-8KB more... Total DRAM pressure. ESP32 has 320KB DRAM shared between all stacks, heap, and static data. WiFi alone claims ~50KB of heap. BLE (Bluedroid) claims another ~40-60KB.'"
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Provides working code for: log_all_stack_usage() with uxTaskGetSystemState(), vApplicationStackOverflowHook implementation, corrected xTaskCreate calls with right-sized stacks, static buffer alternative for json_buffer, and monitor_system_health() for ongoing monitoring."
+    }
+  ]
+}

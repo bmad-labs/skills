@@ -1,0 +1,12 @@
+{
+  "eval_id": 5,
+  "eval_name": "eval-hardfault-decode",
+  "prompt": "I got a HardFault on my STM32F4 and I captured these register values:\nCFSR = 0x00008200\nHFSR = 0x40000000\nMMFAR = 0x00000010\nBFAR = 0x00000000\nThe fault happens randomly, sometimes after 2 minutes, sometimes after 30 minutes. The PC from the exception frame points to a memcpy inside my CAN message parser. Help me debug this.",
+  "assertions": [
+    {"name": "decodes_cfsr_as_busfault", "type": "correctness", "description": "Correctly decodes CFSR=0x00008200 as a BusFault (PRECISERR + BFARVALID in BFSR byte [15:8]), NOT as a MemManage fault."},
+    {"name": "identifies_null_pointer", "type": "diagnosis", "description": "Identifies that BFAR=0x00000000 indicates a null pointer dereference"},
+    {"name": "notes_mmfar_stale", "type": "correctness", "description": "Notes that MMFAR=0x10 is stale because MMARVALID (MMFSR bit 7) is NOT set"},
+    {"name": "recommends_debugging_steps", "type": "completeness", "description": "Provides actionable debugging steps (GDB watchpoint, ASan, or code review)"},
+    {"name": "explains_intermittent_nature", "type": "diagnosis", "description": "Explains why the fault is intermittent (race condition, timing-dependent buffer state)"}
+  ]
+}

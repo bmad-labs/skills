@@ -1,0 +1,143 @@
+{
+  "skill_name": "cpp-embedded",
+  "iteration": 2,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "results": [
+        {
+          "eval_id": 1,
+          "eval_name": "eval-isr-to-task-dma",
+          "pass_rate": 0.80,
+          "passed": 4,
+          "total": 5,
+          "failed_assertions": ["power_of_2_buffer"]
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "eval-heap-fragmentation-esp32",
+          "pass_rate": 0.75,
+          "passed": 6,
+          "total": 8,
+          "failed_assertions": ["recommends_fixed_capacity_alternatives", "cites_misra_or_standard"]
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "eval-bare-metal-uart-c99",
+          "pass_rate": 0.78,
+          "passed": 7,
+          "total": 9,
+          "failed_assertions": ["static_assert_buffer_size", "explains_rxne_clear_mechanism"]
+        },
+        {
+          "eval_id": 4,
+          "eval_name": "eval-desktop-to-embedded-porting",
+          "pass_rate": 1.00,
+          "passed": 8,
+          "total": 8,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": 5,
+          "eval_name": "eval-hardfault-decode",
+          "pass_rate": 0.80,
+          "passed": 4,
+          "total": 5,
+          "failed_assertions": ["notes_mmfar_stale"]
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.826,
+        "total_passed": 29,
+        "total_assertions": 35
+      }
+    },
+    {
+      "name": "without_skill",
+      "results": [
+        {
+          "eval_id": 1,
+          "eval_name": "eval-isr-to-task-dma",
+          "pass_rate": 0.80,
+          "passed": 4,
+          "total": 5,
+          "failed_assertions": ["power_of_2_buffer"]
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "eval-heap-fragmentation-esp32",
+          "pass_rate": 0.75,
+          "passed": 6,
+          "total": 8,
+          "failed_assertions": ["recommends_fixed_capacity_alternatives", "cites_misra_or_standard"]
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "eval-bare-metal-uart-c99",
+          "pass_rate": 0.78,
+          "passed": 7,
+          "total": 9,
+          "failed_assertions": ["static_assert_buffer_size", "explains_rxne_clear_mechanism"]
+        },
+        {
+          "eval_id": 4,
+          "eval_name": "eval-desktop-to-embedded-porting",
+          "pass_rate": 0.75,
+          "passed": 6,
+          "total": 8,
+          "failed_assertions": ["unique_ptr_over_shared", "h7_cache_coherency"]
+        },
+        {
+          "eval_id": 5,
+          "eval_name": "eval-hardfault-decode",
+          "pass_rate": 0.80,
+          "passed": 4,
+          "total": 5,
+          "failed_assertions": ["notes_mmfar_stale"]
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.776,
+        "total_passed": 27,
+        "total_assertions": 35
+      }
+    }
+  ],
+  "delta": {
+    "mean_pass_rate": "+5.0%",
+    "total_passed": "+2",
+    "discriminating_evals": [
+      {
+        "eval_name": "eval-desktop-to-embedded-porting",
+        "with_skill": "8/8 (100%)",
+        "without_skill": "6/8 (75%)",
+        "delta": "+25%",
+        "discriminating_assertions": ["unique_ptr_over_shared", "h7_cache_coherency"]
+      }
+    ],
+    "non_discriminating_evals": [
+      {
+        "eval_name": "eval-isr-to-task-dma",
+        "note": "Both scored 4/5. power_of_2_buffer fails for both — double-buffer pattern chosen instead of ring buffer."
+      },
+      {
+        "eval_name": "eval-heap-fragmentation-esp32",
+        "note": "Both scored 6/8. ETL and MISRA not mentioned by either."
+      },
+      {
+        "eval_name": "eval-bare-metal-uart-c99",
+        "note": "Both scored 7/9. static_assert and RXNE explanation missing from both."
+      },
+      {
+        "eval_name": "eval-hardfault-decode",
+        "note": "Both scored 4/5. MMFAR stale handling inconsistent in both."
+      }
+    ]
+  },
+  "analyst_observations": [
+    "Eval 4 (desktop-to-embedded-porting) is the only discriminating eval: with-skill scored 100% vs 75% without-skill. The skill's design-patterns.md and stm32-pitfalls.md directly contributed to the unique_ptr and h7_cache_coherency assertions passing.",
+    "Evals 1, 2, 3, 5 show identical pass/fail patterns — the skill is not differentiating on these tasks. Key gaps: the skill mentions ETL and MISRA but the model isn't consistently applying them (eval 2). The skill has _Static_assert examples in c-patterns.md but it wasn't used (eval 3).",
+    "The notes_mmfar_stale assertion fails for both with and without skill — both responses initially note MMFAR is invalid but then contradict themselves by using it. This suggests a deeper model tendency that the skill's worked example doesn't fully overcome.",
+    "power_of_2_buffer fails for both because both responses chose double-buffering (ping-pong) which is arguably better for fixed-burst DMA — the assertion may be too prescriptive."
+  ]
+}

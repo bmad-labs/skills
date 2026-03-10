@@ -1,0 +1,47 @@
+{
+  "eval_id": 4,
+  "eval_name": "eval-desktop-to-embedded-porting",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "covers_all_features",
+      "passed": true,
+      "evidence": "All 6 features addressed: vector (Section 1), string (Section 2), shared_ptr (Section 3), virtual (Section 4), exceptions (Section 5), RTTI (Section 6)."
+    },
+    {
+      "text": "provides_before_after",
+      "passed": true,
+      "evidence": "Before/after code examples provided for vector (Section 1), string (Section 2), shared_ptr (Section 3), virtual/CRTP (Section 4), exceptions (Section 5), and RTTI (Section 6) — well over 4 patterns."
+    },
+    {
+      "text": "mentions_compiler_flags",
+      "passed": true,
+      "evidence": "Section 'Compiler Flags Starting Point' explicitly includes '-fno-exceptions -fno-rtti -fno-threadsafe-statics' in CXXFLAGS."
+    },
+    {
+      "text": "recommends_etl_by_name",
+      "passed": true,
+      "evidence": "Section 10 explicitly recommends ETL (Embedded Template Library) by name with concrete types: 'etl::vector<T, N>', 'etl::string<N>', 'etl::map<K, V, N>', and 'etl::flat_map<int, float, 32>'. Also shows CMake integration."
+    },
+    {
+      "text": "crtp_for_virtual",
+      "passed": true,
+      "evidence": "Section 4 'Replacement A: CRTP (Compile-Time Polymorphism)' provides a full CRTP example with SensorBase<Derived> replacing virtual dispatch, labeled 'zero-overhead, no vtable'."
+    },
+    {
+      "text": "unique_ptr_over_shared",
+      "passed": false,
+      "evidence": "Response does not recommend std::unique_ptr with custom deleter over std::shared_ptr. Instead, Section 3 replaces shared_ptr with static allocation and raw pointers/handles. The quick reference table lists unique_ptr replacement as 'Static allocation, pool, or scoped variable'."
+    },
+    {
+      "text": "build_system_config",
+      "passed": true,
+      "evidence": "Compiler flags shown in Makefile/CMakeLists.txt format with CXXFLAGS and LDFLAGS. Section 10 includes a CMake FetchContent example for ETL integration. Linker script provided in Section 7. However, no full cross-compilation toolchain file is shown."
+    },
+    {
+      "text": "h7_cache_coherency",
+      "passed": false,
+      "evidence": "Response addresses STM32H7 memory map and DMA buffer placement with 32-byte alignment (Section 7), but does not mention D-cache coherency issues, SCB_InvalidateDCache, or SCB_CleanDCache functions."
+    }
+  ]
+}

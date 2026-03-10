@@ -1,0 +1,47 @@
+{
+  "eval_id": 4,
+  "eval_name": "eval-desktop-to-embedded-porting",
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "covers_all_features",
+      "passed": true,
+      "evidence": "All 6 features addressed: vector (Pattern 1), string (Pattern 2), shared_ptr (Pattern 3), virtual (Pattern 4), exceptions (Pattern 5), RTTI (Pattern 6)"
+    },
+    {
+      "text": "provides_before_after",
+      "passed": true,
+      "evidence": "Before/after code examples provided for all 6 patterns: vector->etl::vector/array, string->etl::string, shared_ptr->unique_ptr, virtual->CRTP, exceptions->optional/expected, RTTI->type tags/variant"
+    },
+    {
+      "text": "mentions_compiler_flags",
+      "passed": true,
+      "evidence": "Both -fno-exceptions and -fno-rtti explicitly listed in the CMake target_compile_options block at the top, with explanations of flash savings"
+    },
+    {
+      "text": "recommends_etl_by_name",
+      "passed": true,
+      "evidence": "ETL (Embedded Template Library) recommended by name with link to etlcpp.com. Concrete types used: etl::vector<T,N>, etl::string<N>, etl::map<K,V,N>, etl::flat_map, etl::list, etl::deque, etl::set, etl::unordered_map"
+    },
+    {
+      "text": "crtp_for_virtual",
+      "passed": true,
+      "evidence": "Pattern 4 is entirely dedicated to CRTP as replacement for virtual dispatch, with full before/after code and explanation of pipeline flush costs on Cortex-M"
+    },
+    {
+      "text": "unique_ptr_over_shared",
+      "passed": true,
+      "evidence": "Pattern 3 explicitly recommends unique_ptr over shared_ptr, states 'Most uses of shared_ptr in desktop code are actually single-owner', and shows unique_ptr with custom pool deleter (Solution B)"
+    },
+    {
+      "text": "build_system_config",
+      "passed": true,
+      "evidence": "CMake configuration provided with target_compile_options and target_link_options for -fno-exceptions, -fno-rtti, -ffunction-sections, -fdata-sections, -Wl,--gc-sections, plus linker --wrap for malloc detection"
+    },
+    {
+      "text": "h7_cache_coherency",
+      "passed": true,
+      "evidence": "Dedicated 'Cache Coherency' section covers SCB_CleanDCache_by_Addr before DMA TX, SCB_InvalidateDCache_by_Addr after DMA RX, 32-byte alignment requirement, and SRAM4 placement to avoid cache issues. Linker script example with alignas(32) and .dma_buf section also provided."
+    }
+  ]
+}

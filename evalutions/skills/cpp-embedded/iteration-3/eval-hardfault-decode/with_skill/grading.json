@@ -1,0 +1,31 @@
+{
+  "eval_id": 5,
+  "eval_name": "eval-hardfault-decode",
+  "expectations": [
+    {
+      "text": "decodes_cfsr_as_busfault",
+      "passed": true,
+      "evidence": "Correctly decodes: 'BFSR = (CFSR >> 8) & 0xFF = 0x82 --> BusFault bits set'. Identifies PRECISERR (bit 1) and BFARVALID (bit 7) as the set bits. States: 'Precise data bus error -- the stacked PC points to the exact faulting instruction.'"
+    },
+    {
+      "text": "identifies_null_pointer",
+      "passed": true,
+      "evidence": "Correctly identifies: 'BFAR = 0x00000000 -- BFARVALID is set, so this is the valid faulting address. The code tried to read from or write to address 0x00000000, which is a null pointer dereference.'"
+    },
+    {
+      "text": "notes_mmfar_stale",
+      "passed": true,
+      "evidence": "Explicitly states: 'MMFAR = 0x00000010 -- MMFSR is 0x00, meaning MMARVALID is NOT set. This value is stale from a previous fault and must be completely ignored. It has no diagnostic value whatsoever.'"
+    },
+    {
+      "text": "recommends_debugging_steps",
+      "passed": true,
+      "evidence": "Provides 4 concrete debugging steps: (1) Examine stacked exception frame with HardFault handler code, (2) Use GDB watchpoint on the pointer, (3) Add defensive null checks with logging, (4) Run parser on host with AddressSanitizer."
+    },
+    {
+      "text": "explains_intermittent_nature",
+      "passed": true,
+      "evidence": "Explains: 'The intermittent nature (sometimes 2 minutes, sometimes 30 minutes) strongly suggests a race condition rather than a straightforward logic bug. If it were a simple logic error, it would fault every time the same CAN message type is processed.' The race condition scenario is fully explained."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "eval_id": 7,
+  "eval_name": "eval-esp32-stack-overflow",
+  "expectations": [
+    {
+      "text": "identifies_insufficient_stack",
+      "passed": true,
+      "evidence": "States: 'The core problem is that 2048 bytes is far too small for most ESP32 tasks, especially those involving WiFi, BLE, or MQTT.' Explains WiFi event handlers consume 3-4 KB, BLE requires 4-8 KB, and MQTT with TLS spikes stack significantly."
+    },
+    {
+      "text": "provides_stack_monitoring",
+      "passed": true,
+      "evidence": "Shows: 'UBaseType_t remaining = uxTaskGetStackHighWaterMark(NULL); ESP_LOGW(TAG, \"Stack remaining: %u words (%u bytes)\", remaining, remaining * 4)' and a monitor_task() using uxTaskGetSystemState() with uxTaskGetStackHighWaterMark per task."
+    },
+    {
+      "text": "recommends_specific_stack_sizes",
+      "passed": true,
+      "evidence": "Provides table: 'MQTT (no TLS): 4096 min, MQTT (with TLS): 8192 min / 10240 recommended, BLE (NimBLE): 4096 min / 5120 recommended, BLE (Bluedroid): 6144 min / 8192 recommended'. Code shows: '#define MQTT_TASK_STACK_SIZE (8192)', '#define BLE_HANDLER_STACK_SIZE (5120)'."
+    },
+    {
+      "text": "freertos_overflow_detection",
+      "passed": true,
+      "evidence": "Shows sdkconfig: 'CONFIG_FREERTOS_CHECK_STACKOVERFLOW=y, CONFIG_FREERTOS_CHECK_STACKOVERFLOW_CANARY=y' and implements vApplicationStackOverflowHook: 'void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) { printf(\"Stack overflow in task: %s\\n\", pcTaskName); esp_system_abort(\"Stack overflow\"); }'"
+    },
+    {
+      "text": "explains_wifi_ble_memory_pressure",
+      "passed": true,
+      "evidence": "Explains: 'When both WiFi and BLE are active, the shared radio (the ESP32 has a single 2.4 GHz radio) requires coexistence arbitration, which adds additional stack pressure.' Also: 'ESP32 has limited RAM (~320 KB total, less with WiFi+BLE active)... WiFi event handlers and callbacks can consume 3-4 KB on their own. BLE (NimBLE/Bluedroid) is even more demanding. Bluedroid in particular can require 4-8 KB.'"
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Provides working code: monitor_task() with uxTaskGetSystemState(), vApplicationStackOverflowHook, corrected xTaskCreate size defines and calls, mqtt_callback() examples with static buffer alternative, and esp_mqtt_client_config_t.task.stack_size configuration."
+    }
+  ]
+}

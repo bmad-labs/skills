@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "All hardware register accesses use volatile (struct fields or pointer casts)",
+      "passed": true,
+      "evidence": "The UART_REG macro uses volatile pointer casts: `#define UART_REG(offset) (*(volatile uint32_t *)(UART_BASE + (offset)))`. All register accesses (UART_SR, UART_DR, UART_BRR, UART_CR1, UART_CR2, UART_CR3) go through this macro. Additionally, NVIC and RCC registers in main.c also use volatile: `volatile uint32_t *iser = (volatile uint32_t *)(NVIC_ISER_BASE)` and `#define RCC_APB1ENR (*(volatile uint32_t *)(RCC_BASE + 0x40U))`."
+    },
+    {
+      "text": "Baud rate divisor calculation is correct for 84MHz PCLK and 115200 baud",
+      "passed": true,
+      "evidence": "The response shows correct calculation: USARTDIV = 84000000 / (16 * 115200) = 45.5729. Mantissa = 45 = 0x2D, Fraction = round(0.5729 * 16) = 9. BRR = (45 << 4) | 9 = 0x2D9. This is implemented as `#define UART_BRR_VALUE 0x02D9U` and applied via `UART_BRR = UART_BRR_VALUE`. The actual baud rate of 115,068 is within 0.11% error, well within tolerance."
+    },
+    {
+      "text": "Uses a ring buffer (not linear buffer) for interrupt-driven receive",
+      "passed": true,
+      "evidence": "A ring buffer is implemented with `static volatile uint8_t rx_buffer[UART_RX_BUF_SIZE]`, `rx_head` (producer/ISR), and `rx_tail` (consumer). Wrapping uses bitmask: `rx_buffer[head & UART_RX_BUF_MASK]` in the ISR and `rx_buffer[tail & UART_RX_BUF_MASK]` in recv. Buffer size is enforced as power-of-2 via `_Static_assert`. The design notes explicitly confirm: \"lock-free single-producer / single-consumer (SPSC) ring buffer\"."
+    },
+    {
+      "text": "Uses C99 style: fixed-width types (uint8_t, uint32_t), designated initializers, no C++ features",
+      "passed": true,
+      "evidence": "Fixed-width types are used throughout: `uint8_t` for data bytes, `uint32_t` for register values and indices. Includes `<stdint.h>`, `<stdbool.h>`, `<stddef.h>`. Uses C99 `_Static_assert`, `bool`, `size_t`, and inline variable declarations in `for` loops (`for (size_t i = 0u; ...)`). No C++ features (no classes, templates, namespaces, new/delete). Note: designated initializers are not used, but they are not required by the code structure (no struct initialization). The `#ifdef __cplusplus extern \"C\"` guard is standard C-compatible practice, not a C++ feature."
+    },
+    {
+      "text": "ISR reads the data register to clear the RXNE flag (not just checking status)",
+      "passed": true,
+      "evidence": "In `uart_irq_handler()`, after checking `if (sr & UART_SR_RXNE)`, the ISR reads the data register: `uint8_t data = (uint8_t)(UART_DR & 0xFFu)`. The comment confirms: \"Read the data register (also clears the RXNE flag)\". The read value is then stored into the ring buffer."
+    },
+    {
+      "text": "Driver uses only static allocation — no malloc/calloc",
+      "passed": true,
+      "evidence": "All buffers and variables are statically allocated: `static volatile uint8_t rx_buffer[UART_RX_BUF_SIZE]`, `static volatile uint32_t rx_head`, `static volatile uint32_t rx_tail`. No `#include <stdlib.h>`, no calls to `malloc`, `calloc`, `realloc`, or any dynamic memory allocation function anywhere in the code."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 117.9
+  }
+}

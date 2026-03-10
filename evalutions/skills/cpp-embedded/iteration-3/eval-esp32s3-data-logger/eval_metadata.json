@@ -1,0 +1,14 @@
+{
+  "eval_id": 6,
+  "eval_name": "eval-esp32s3-data-logger",
+  "prompt": "I'm building an ESP32-S3 data logger with ESP-IDF (not Arduino). It reads 3 analog sensors via ADC at 100Hz, stores readings in a circular buffer, and writes to SD card every 10 seconds. The system needs to run for weeks without rebooting. I'm getting random crashes after 2-3 days. My current code uses std::vector to accumulate readings and std::string for CSV formatting. How should I restructure this for long-term reliability? Show me the code.",
+  "assertions": [
+    {"name": "eliminates_std_vector", "type": "code_quality", "description": "Replaces std::vector with a statically-allocated ring buffer or fixed-size array"},
+    {"name": "eliminates_std_string", "type": "code_quality", "description": "Replaces std::string with fixed-size char buffers and snprintf"},
+    {"name": "ring_buffer_power_of_2", "type": "code_quality", "description": "Ring buffer uses power-of-2 capacity with bitmask indexing, validated by static_assert"},
+    {"name": "esp_idf_heap_monitoring", "type": "completeness", "description": "Includes ESP-IDF heap monitoring functions"},
+    {"name": "recommends_etl", "type": "code_quality", "description": "Recommends ETL by name with specific container types"},
+    {"name": "addresses_memory_regions", "type": "completeness", "description": "Discusses ESP32-S3 memory regions (DRAM vs PSRAM)"},
+    {"name": "provides_working_code", "type": "completeness", "description": "Includes complete refactored code"}
+  ]
+}

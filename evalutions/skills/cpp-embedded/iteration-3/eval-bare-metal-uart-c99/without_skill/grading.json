@@ -1,0 +1,51 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-bare-metal-uart-c99",
+  "expectations": [
+    {
+      "text": "volatile_registers",
+      "passed": true,
+      "evidence": "Register access macros use volatile: '#define UART_SR (*(volatile uint32_t *)(UART_BASE + UART_SR_OFFSET))' and similarly for DR, BRR, CR1, CR2, CR3. rx_buffer, rx_head, and rx_tail are also declared volatile."
+    },
+    {
+      "text": "correct_baud_calculation",
+      "passed": true,
+      "evidence": "Calculates USARTDIV = 84,000,000 / (16 * 115,200) = 45.572916, Mantissa = 45, Fraction = 9, BRR = 0x2D9. States actual baud ~115,246 with ~0.04% error. The compute_brr() function uses integer arithmetic with rounding."
+    },
+    {
+      "text": "ring_buffer_for_rx",
+      "passed": true,
+      "evidence": "Uses ring buffer: 'static volatile uint8_t rx_buffer[RX_BUFFER_SIZE]', 'static volatile uint16_t rx_head', 'static volatile uint16_t rx_tail', with RX_BUFFER_MASK and bitmask indexing: '(rx_head + 1U) & RX_BUFFER_MASK'."
+    },
+    {
+      "text": "c99_compliance",
+      "passed": true,
+      "evidence": "Uses C99 fixed-width types (uint8_t, uint16_t, uint32_t), bool from stdbool.h, and macros for register access. The compute_brr() function is C-style. No C++ features are used."
+    },
+    {
+      "text": "isr_reads_dr",
+      "passed": true,
+      "evidence": "ISR reads DR: 'uint8_t data = (uint8_t)(UART_DR & 0xFFU)'. Handles overrun by also reading DR to clear: '(void)UART_DR' when ORE is set."
+    },
+    {
+      "text": "no_malloc_in_driver",
+      "passed": true,
+      "evidence": "All memory is statically allocated: 'static volatile uint8_t rx_buffer[RX_BUFFER_SIZE]', static indices. No malloc, free, or new/delete anywhere in the driver."
+    },
+    {
+      "text": "static_assert_buffer_size",
+      "passed": false,
+      "evidence": "No _Static_assert is used to validate buffer size power-of-2 constraint. The comment says 'Must be a power of 2 for efficient masking' but no compile-time assertion enforces this requirement."
+    },
+    {
+      "text": "documents_baud_error",
+      "passed": true,
+      "evidence": "Explicitly calculates: 'Actual baud = 84,000,000 / (16 * 45.5625) = 84,000,000 / 728.9999 = 115,246 (~0.04% error, well within UART tolerance).'"
+    },
+    {
+      "text": "explains_rxne_clear_mechanism",
+      "passed": false,
+      "evidence": "The ISR reads DR when RXNE is set, but does not explain WHY reading DR clears RXNE. There is no explanation of the hardware auto-clear mechanism. Note 4 mentions ring buffer power-of-2 but not the RXNE clear mechanism."
+    }
+  ]
+}

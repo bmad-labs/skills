@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-isr-to-task-dma",
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "no_heap_allocation",
+      "passed": true,
+      "evidence": "No malloc, new, std::vector, or dynamic allocation anywhere. Uses xTaskCreateStatic instead of xTaskCreate, configSUPPORT_DYNAMIC_ALLOCATION set to 0, and all buffers are static arrays."
+    },
+    {
+      "text": "static_buffer_allocation",
+      "passed": true,
+      "evidence": "All buffers are statically allocated: adc_dma_buf[32] is static with __attribute__((aligned(4))), adc_work_buf[16] is static, adc_task_stack and adc_task_tcb are static. Memory budget table confirms all in .bss (static RAM)."
+    },
+    {
+      "text": "isr_safe_communication",
+      "passed": true,
+      "evidence": "Uses volatile pointer (static volatile uint16_t *ready_half_ptr) for ISR-to-task data passing, vTaskNotifyGiveFromISR/ulTaskNotifyTake for signaling, portYIELD_FROM_ISR for context switch, and correct NVIC priority configuration relative to configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY."
+    },
+    {
+      "text": "dma_buffer_alignment_appropriate",
+      "passed": true,
+      "evidence": "Uses __attribute__((aligned(4))) for the DMA buffer and explicitly states 'STM32F4 (Cortex-M4) has no D-cache, so alignas(4) is sufficient for DMA buffers. No cache maintenance needed.' No over-specification to 32-byte alignment."
+    },
+    {
+      "text": "power_of_2_buffer",
+      "passed": false,
+      "evidence": "The response uses a double-buffer (ping-pong) DMA scheme rather than a ring buffer with index masking. ADC_BURST_SIZE is 16 (power of 2) but there is no ring buffer with bitmask indexing. The design uses pointer swapping between buffer halves instead of modulo or bitmask indexing."
+    }
+  ]
+}

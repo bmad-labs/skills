@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Code does not use malloc, new, std::vector, or any dynamic allocation in the data path",
+      "passed": true,
+      "evidence": "No malloc, new, or std::vector anywhere in the code. All buffers use static arrays or std::array. Local AdcBlock variables are stack-allocated: `AdcBlock block;` in the ISR callbacks and task loop. The ring buffer internally uses `std::array<T, N> buf_{};`."
+    },
+    {
+      "text": "All buffers are statically allocated (static arrays or global with known size)",
+      "passed": true,
+      "evidence": "DMA buffer: `alignas(4) static uint16_t s_dma_buf[kAdcSamplesPerBlock * 2];` (compile-time known size of 32 samples). Ring buffer: `static SpscRingBuffer<AdcBlock, 8> s_adc_ring;` which contains `std::array<T, N> buf_{}` with N=8 known at compile time. Overflow counter: `static volatile uint32_t s_overflow_count = 0;`."
+    },
+    {
+      "text": "Uses atomic operations, volatile, or critical sections correctly for ISR-to-task data passing",
+      "passed": true,
+      "evidence": "Ring buffer uses `std::atomic<size_t> head_{0};` and `std::atomic<size_t> tail_{0};` with correct memory ordering: producer uses `head_.load(std::memory_order_relaxed)` for self-read, `tail_.load(std::memory_order_acquire)` to synchronize with consumer, and `head_.store(next, std::memory_order_release)` to publish data. Consumer mirrors this pattern. Overflow counter uses `static volatile uint32_t s_overflow_count`."
+    },
+    {
+      "text": "DMA buffer is properly aligned (alignas(32) or __attribute__((aligned(32))))",
+      "passed": false,
+      "evidence": "DMA buffer uses only 4-byte alignment: `alignas(4) static uint16_t s_dma_buf[kAdcSamplesPerBlock * 2];`. The response explicitly states 'We still align to 4 bytes for DMA.' This does not meet the 32-byte alignment requirement specified in the assertion."
+    },
+    {
+      "text": "Ring buffer capacity is a power of 2 with bitmask indexing (not modulo operator)",
+      "passed": true,
+      "evidence": "Power-of-2 enforced: `static_assert((N & (N - 1)) == 0, \"N must be a power of 2\");`. Bitmask defined: `static constexpr size_t kMask = N - 1;`. Used for indexing instead of modulo: `const size_t next = (head + 1) & kMask;` in push() and `tail_.store((tail + 1) & kMask, ...)` in pop()."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "timing": {
+    "total_duration_seconds": 114.3
+  }
+}

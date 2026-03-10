@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "eval_name": "isr-to-task-dma",
+  "prompt": "I'm working on an STM32F4 project with FreeRTOS. I need to pass ADC samples from a DMA complete ISR to a processing task. The samples come in bursts of 16 x uint16_t at 1kHz. What's the best way to do this without malloc? Write me the code.",
+  "assertions": [
+    "Code does not use malloc, new, std::vector, or any dynamic allocation in the data path",
+    "All buffers are statically allocated (static arrays or global with known size)",
+    "Uses atomic operations, volatile, or critical sections correctly for ISR-to-task data passing",
+    "DMA buffer is properly aligned (alignas(32) or __attribute__((aligned(32))))",
+    "Ring buffer capacity is a power of 2 with bitmask indexing (not modulo operator)"
+  ]
+}

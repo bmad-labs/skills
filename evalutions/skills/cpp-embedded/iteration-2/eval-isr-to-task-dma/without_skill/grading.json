@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-isr-to-task-dma",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "no_heap_allocation",
+      "passed": true,
+      "evidence": "All FreeRTOS objects use static creation variants (xMessageBufferCreateStatic, xTaskCreateStatic, xQueueCreateStatic). No malloc, new, or std::vector anywhere in the code."
+    },
+    {
+      "text": "static_buffer_allocation",
+      "passed": true,
+      "evidence": "All buffers are declared as static arrays with known sizes: ucMessageBufStorage, usDmaBuffer, uxAdcTaskStack, sPool, ucFreeQStorage, ucReadyQStorage, usDmaBuf."
+    },
+    {
+      "text": "isr_safe_communication",
+      "passed": true,
+      "evidence": "Uses FreeRTOS ISR-safe APIs: xMessageBufferSendFromISR, xQueueReceiveFromISR, xQueueSendFromISR, with portYIELD_FROM_ISR for proper context switching."
+    },
+    {
+      "text": "dma_buffer_alignment_appropriate",
+      "passed": true,
+      "evidence": "DMA buffers (usDmaBuffer, usDmaBuf) are plain static uint16_t arrays with no explicit alignment. No over-specification to 32-byte alignment. Appropriate for STM32F4 (Cortex-M4, no D-cache)."
+    },
+    {
+      "text": "power_of_2_buffer",
+      "passed": false,
+      "evidence": "No custom ring buffer with power-of-2 bitmask indexing is implemented. The solution relies on FreeRTOS Message Buffers and Queues, which internally do not use bitmask indexing. MSG_BUF_SIZE is 289 (not a power of 2), and no bitmask operation (& mask) is used for index wrapping."
+    }
+  ]
+}

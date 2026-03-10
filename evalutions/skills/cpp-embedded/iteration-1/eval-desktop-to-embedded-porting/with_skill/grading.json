@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "Addresses all 6 features: vector, string, shared_ptr, virtual, exceptions, RTTI",
+      "passed": true,
+      "evidence": "All 6 features are addressed as dedicated migration sections: Migration 1 covers std::vector (\"Migration 1: `std::vector<T>` to Fixed-Capacity Containers\"), Migration 2 covers std::string (\"Migration 2: `std::string` to Fixed-Size Strings\"), Migration 3 covers shared_ptr (\"Migration 3: `std::shared_ptr<T>` to `std::unique_ptr<T>` with Pool Deleter\"), Migration 4 covers virtual (\"Migration 4: Virtual Functions to CRTP (Static Polymorphism)\"), Migration 5 covers exceptions (\"Migration 5: Exceptions to Error Codes and `std::optional`\"), and Migration 6 covers RTTI (\"Migration 6: RTTI (`typeid`, `dynamic_cast`) to Compile-Time Type Resolution\")."
+    },
+    {
+      "text": "Shows before (desktop) and after (embedded) code examples for at least 4 patterns",
+      "passed": true,
+      "evidence": "All 6 migrations include explicit \"Desktop (before)\" and \"STM32H7 (after)\" sections with full code examples. For example, Migration 1 has \"### Desktop (before)\" with std::vector code and \"### STM32H7 (after)\" with etl::circular_buffer code; Migration 4 has \"### Desktop (before)\" with virtual class hierarchy and \"### STM32H7 (after) -- CRTP\" with CRTP template code; Migration 5 has \"### Desktop (before)\" with throw/try/catch and \"### STM32H7 (after)\" with std::optional and error codes."
+    },
+    {
+      "text": "Includes -fno-exceptions and -fno-rtti compiler flags",
+      "passed": true,
+      "evidence": "In the \"Step 0: Compiler Flags\" CMake block: \"-fno-exceptions          # Removes exception tables and unwind info (~10-20% code size reduction)\" and \"-fno-rtti                # Removes typeinfo and vtable type data\". Also reinforced: \"With `-fno-exceptions` and `-fno-rtti`, any code that uses `throw`, `try/catch`, `typeid`, or `dynamic_cast` will fail to compile -- which is exactly what you want.\""
+    },
+    {
+      "text": "Recommends ETL (Embedded Template Library) or fixed-size alternatives for containers",
+      "passed": true,
+      "evidence": "ETL is recommended extensively: \"Option A: Embedded Template Library (ETL)\" with \"ETL provides drop-in replacements for STL containers with fixed, compile-time capacities and zero heap allocation.\" Specific examples include etl::circular_buffer<SensorReading, 1000>, etl::vector<SensorReading, 64>, etl::string<64>, etl::string<128>, etl::flat_map, etl::unordered_map, and etl::variant. A full conversion cheat sheet maps each std container to its ETL equivalent."
+    },
+    {
+      "text": "Recommends CRTP as the replacement for virtual dispatch in performance-critical paths",
+      "passed": true,
+      "evidence": "Migration 4 is titled \"Virtual Functions to CRTP (Static Polymorphism)\" and provides a complete CRTP implementation: \"template<typename Derived> class Sensor { public: float read() { return static_cast<Derived*>(this)->read_impl(); } ... }\" with the comment \"Compile-time polymorphism: type resolved at compile time, calls are inlined\" and \"No vtable, no indirect branch\". It also notes to \"Keep virtual out of: Control loops (PID, motor control, signal processing), ISR callback chains, Anything running at > 1 kHz\"."
+    },
+    {
+      "text": "Recommends std::unique_ptr (with custom deleter) over std::shared_ptr",
+      "passed": true,
+      "evidence": "Migration 3 is titled \"std::shared_ptr<T> to std::unique_ptr<T> with Pool Deleter\" and explains: \"std::shared_ptr has three embedded-hostile properties: 1. Allocates a control block on the heap 2. Reference count updates are atomic 3. Non-deterministic destruction time\". The replacement uses \"using UniquePacket = std::unique_ptr<Packet, decltype(packet_deleter)>;\" with a custom deleter that returns objects to a pool. The quick reference table confirms: \"std::shared_ptr<T> -> std::unique_ptr<T, PoolDeleter>\"."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 159.6
+  }
+}

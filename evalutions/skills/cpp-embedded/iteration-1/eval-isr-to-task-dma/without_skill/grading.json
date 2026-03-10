@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Code does not use malloc, new, std::vector, or any dynamic allocation in the data path",
+      "passed": true,
+      "evidence": "All FreeRTOS objects use static allocation APIs: `xStreamBufferCreateStatic(sizeof(ucStreamStorage), ADC_BURST_BYTES, ucStreamStorage, &xStreamStruct)` and `xTaskCreateStatic(...)`. No malloc, new, or std::vector appears anywhere in the code. The response explicitly states: \"The xStreamBufferCreateStatic and xTaskCreateStatic APIs avoid the FreeRTOS heap entirely.\""
+    },
+    {
+      "text": "All buffers are statically allocated (static arrays or global with known size)",
+      "passed": true,
+      "evidence": "All buffers are static or global with compile-time sizes: `static uint8_t ucStreamStorage[ADC_STREAM_BYTES + 1]`, `static StaticStreamBuffer_t xStreamStruct`, `static StackType_t uxProcStack[PROC_TASK_STACK_WORDS]`, `static StaticTask_t xProcTCB`, `uint16_t g_adcDmaBuf[ADC_BURST_SAMPLES * 2]`, and in Option B: `static uint16_t s_buf[2][ADC_BURST_SAMPLES]`. The task-local `uint16_t rxBuf[ADC_BURST_SAMPLES]` is stack-allocated with known size."
+    },
+    {
+      "text": "Uses atomic operations, volatile, or critical sections correctly for ISR-to-task data passing",
+      "passed": true,
+      "evidence": "Option A uses FreeRTOS stream buffer APIs (`xStreamBufferSendFromISR`/`xStreamBufferReceive`) which internally handle ISR-to-task synchronization with critical sections. Option B uses `static volatile uint8_t s_writeIdx = 0;` for the shared index and `xTaskNotifyFromISR`/`xTaskNotifyWait` for synchronization. Both options call `portYIELD_FROM_ISR(xHigherPriorityTaskWoken)` correctly."
+    },
+    {
+      "text": "DMA buffer is properly aligned (alignas(32) or __attribute__((aligned(32))))",
+      "passed": false,
+      "evidence": "The DMA buffer is declared as `uint16_t g_adcDmaBuf[ADC_BURST_SAMPLES * 2] __attribute__((aligned(4)));` -- aligned to only 4 bytes, not the required 32 bytes. The assertion requires alignas(32) or __attribute__((aligned(32))) for proper cache-line alignment."
+    },
+    {
+      "text": "Ring buffer capacity is a power of 2 with bitmask indexing (not modulo operator)",
+      "passed": false,
+      "evidence": "No explicit ring buffer with bitmask indexing is implemented. Option A uses FreeRTOS stream buffer (capacity ADC_STREAM_BYTES = 128, a power of 2, but indexing is internal to FreeRTOS, not user-controlled bitmask). Option B uses a double-buffer with XOR toggle (`s_writeIdx ^= 1U`), which is not a ring buffer with bitmask indexing. Neither option implements a custom ring buffer with power-of-2 capacity and `index & (capacity - 1)` bitmask indexing."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "timing": {
+    "total_duration_seconds": 115.9
+  }
+}

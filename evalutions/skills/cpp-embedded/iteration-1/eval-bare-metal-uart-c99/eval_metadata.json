@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "bare-metal-uart-c99",
+  "prompt": "I need to write a UART driver for a custom board with an ARM Cortex-M4 MCU (not using HAL). The UART peripheral is at base address 0x40004400. I need to implement init (115200 baud, 8N1), blocking send byte, and interrupt-driven receive into a buffer. PCLK is 84MHz. Write it in C99.",
+  "assertions": [
+    "All hardware register accesses use volatile (struct fields or pointer casts)",
+    "Baud rate divisor calculation is correct for 84MHz PCLK and 115200 baud",
+    "Uses a ring buffer (not linear buffer) for interrupt-driven receive",
+    "Uses C99 style: fixed-width types (uint8_t, uint32_t), designated initializers, no C++ features",
+    "ISR reads the data register to clear the RXNE flag (not just checking status)",
+    "Driver uses only static allocation — no malloc/calloc"
+  ]
+}

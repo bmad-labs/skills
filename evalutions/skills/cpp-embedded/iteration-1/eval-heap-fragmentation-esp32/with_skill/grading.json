@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Correctly identifies heap fragmentation as the root cause of the crash-after-hours pattern",
+      "passed": true,
+      "evidence": "The response explicitly states: \"Your firmware has a textbook heap fragmentation and memory leak problem.\" It identifies two culprits: `new SensorReading()` causing \"864,000 allocations in 6 hours\" and `new String(json)` on every MQTT publish. It explains: \"the ESP32's heap allocator fragments over time. Small freed blocks become unusable for future allocations of slightly different sizes\" and \"The ESP32's allocator does not compact memory -- once it fragments, it stays fragmented until reboot.\""
+    },
+    {
+      "text": "Refactored code replaces new/delete with static allocation, pools, or pre-allocated buffers",
+      "passed": true,
+      "evidence": "The refactored code uses: (1) a static array `static SensorReading latest_readings[kNumSensors]` written in-place with zero allocations, (2) a templated `ObjectPool<T, N>` class using `alignas(T) uint8_t storage[sizeof(T)]` slots with no heap involvement, and (3) placement new for the MqttPublisher: `publisher = new (publisher_storage) MqttPublisher(mqtt_client, kMqttTopic)` into `static alignas(MqttPublisher) uint8_t publisher_storage[sizeof(MqttPublisher)]`. The before/after comparison shows `new SensorReading()` replaced by `latest_readings[i] = read_i2c_sensor(...)` with the comment \"zero allocations ever\"."
+    },
+    {
+      "text": "Replaces Arduino String class with fixed-size char buffers (char[], snprintf)",
+      "passed": true,
+      "evidence": "The MqttPublisher class uses `char payload[kMaxJsonPayload]` (512 bytes) and `char topic[kMaxTopicLen]` (64 bytes) with `snprintf` for formatting. The before/after explicitly shows `String* json = new String(...)` replaced by `char payload[512]; snprintf(payload, sizeof(payload), ...)`. The response also recommends: \"Never use Arduino String in embedded production code. Replace every instance with char[] + snprintf.\""
+    },
+    {
+      "text": "Suggests heap monitoring (ESP.getFreeHeap, ESP.getMaxAllocHeap, or equivalent)",
+      "passed": true,
+      "evidence": "The `log_heap_status()` function in main.cpp prints three ESP32 heap metrics: `ESP.getFreeHeap()`, `ESP.getMinFreeHeap()`, and `ESP.getMaxAllocHeap()`, called every 30 seconds via `kHeapCheckIntervalMs = 30000`. The response explains: \"if ESP.getMaxAllocHeap() drops while ESP.getFreeHeap() stays relatively stable, you have fragmentation.\""
+    },
+    {
+      "text": "Includes concrete refactored code, not just advice",
+      "passed": true,
+      "evidence": "The response provides four complete, compilable source files: sensor_reading.h (plain data struct), object_pool.h (templated static pool ~55 lines), mqtt_publisher.h (stack-based JSON formatting ~65 lines), and main.cpp (complete firmware ~100 lines) with setup(), loop(), sensor reading, MQTT publishing, and heap monitoring. Total refactored code is approximately 250 lines of concrete, implementation-ready C++."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 124.6
+  }
+}

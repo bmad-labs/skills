@@ -1,0 +1,47 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-heap-fragmentation-esp32",
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "identifies_heap_fragmentation",
+      "passed": true,
+      "evidence": "Lines 3-10 clearly identify heap fragmentation from repeated new/delete as the root cause, explaining how 40+ alloc/free cycles per second cause fragmentation over hours."
+    },
+    {
+      "text": "eliminates_dynamic_alloc",
+      "passed": true,
+      "evidence": "Replaces new SensorReading() with stack-local/static struct and new String() with static char buffers. Complete refactored code uses zero heap allocations in steady state."
+    },
+    {
+      "text": "replaces_arduino_string",
+      "passed": true,
+      "evidence": "Explicitly replaces Arduino String with static char[] + snprintf throughout. Includes before/after code and a table of common String patterns with their replacements."
+    },
+    {
+      "text": "provides_monitoring_advice",
+      "passed": true,
+      "evidence": "Provides concrete monitor_heap() function using ESP.getFreeHeap() and ESP.getMaxAllocHeap(), with fragmentation percentage calculation and alert thresholds."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Includes multiple concrete code blocks: ObjectPool template, stack-local approach, snprintf-based publish, and a complete refactored sensor_task_loop() with heap monitoring."
+    },
+    {
+      "text": "recommends_fixed_capacity_alternatives",
+      "passed": false,
+      "evidence": "Recommends static buffers, stack locals, object pools, and StaticJsonDocument, but never mentions ETL (etl::string, etl::vector) or any other named fixed-capacity container library."
+    },
+    {
+      "text": "cites_misra_or_standard",
+      "passed": false,
+      "evidence": "Explains why dynamic allocation is harmful in embedded contexts but does not reference MISRA rules or any formal embedded coding standard."
+    },
+    {
+      "text": "quantifies_allocation_frequency",
+      "passed": true,
+      "evidence": "Calculates 4 sensors x 10Hz = 40 allocations/second for readings, ~10/second for MQTT strings, totaling ~1,080,000 allocations over 6 hours."
+    }
+  ]
+}

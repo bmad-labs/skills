@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "heap-fragmentation-esp32",
+  "prompt": "My ESP32 firmware keeps crashing after about 6 hours of uptime. It's a sensor hub that reads from 4 I2C sensors every 100ms and sends data over MQTT. I'm using Arduino framework with C++. Each sensor read does a `new SensorReading()` and the MQTT publish does `new String(json)`. Memory seems fine at startup but free heap drops over time. What's going on and how do I fix it?",
+  "assertions": [
+    "Correctly identifies heap fragmentation as the root cause of the crash-after-hours pattern",
+    "Refactored code replaces new/delete with static allocation, pools, or pre-allocated buffers",
+    "Replaces Arduino String class with fixed-size char buffers (char[], snprintf)",
+    "Suggests heap monitoring (ESP.getFreeHeap, ESP.getMaxAllocHeap, or equivalent)",
+    "Includes concrete refactored code, not just advice"
+  ]
+}

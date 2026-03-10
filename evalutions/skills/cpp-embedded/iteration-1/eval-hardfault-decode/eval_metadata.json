@@ -1,0 +1,12 @@
+{
+  "eval_id": 5,
+  "eval_name": "hardfault-decode",
+  "prompt": "I got a HardFault on my STM32F4 and I captured these register values:\nCFSR = 0x00008200\nHFSR = 0x40000000\nMMFAR = 0x00000010\nBFAR = 0x00000000\nThe fault happens randomly, sometimes after 2 minutes, sometimes after 30 minutes. The PC from the exception frame points to a memcpy inside my CAN message parser. Help me debug this.",
+  "assertions": [
+    "Correctly decodes CFSR bits to identify the fault type (MemManage violation with valid MMFAR)",
+    "Interprets MMFAR=0x10 as likely null pointer + struct offset access pattern",
+    "Identifies null pointer dereference as the likely root cause",
+    "Provides actionable debugging steps (GDB watchpoint, ASan, or code review of the parser)",
+    "Explains why the fault is intermittent (e.g., race condition, occasional null from CAN driver)"
+  ]
+}

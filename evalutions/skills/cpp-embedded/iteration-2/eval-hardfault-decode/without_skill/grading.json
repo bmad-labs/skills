@@ -1,0 +1,32 @@
+{
+  "eval_id": 5,
+  "eval_name": "eval-hardfault-decode",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "decodes_cfsr_as_busfault",
+      "passed": true,
+      "evidence": "Correctly decodes CFSR as BusFault with BFSR=0x82, identifying BFARVALID (bit 7) and PRECISERR (bit 1). No mention of MemManage fault."
+    },
+    {
+      "text": "identifies_null_pointer",
+      "passed": true,
+      "evidence": "States 'You have a NULL pointer dereference' with BFAR=0x00000000 and BFARVALID set, indicating access to address 0x0."
+    },
+    {
+      "text": "notes_mmfar_stale",
+      "passed": false,
+      "evidence": "Initially correctly states MMFAR is 'not valid' because MMARVALID is 0, but then contradicts itself by saying 'the actual faulting address may be reflected in MMFAR even though the MMFSR bits are not set' and treats MMFAR=0x10 as a meaningful offset throughout the rest of the analysis."
+    },
+    {
+      "text": "recommends_debugging_steps",
+      "passed": true,
+      "evidence": "Provides detailed debugging steps: custom HardFault handler with stack frame capture, arm-none-eabi-addr2line usage, defensive NULL checks, enabling BusFault handler separately, and ring buffer verification."
+    },
+    {
+      "text": "explains_intermittent_nature",
+      "passed": true,
+      "evidence": "Explains intermittent nature as a race condition between CAN RX ISR and parser task, with examples of TOCTOU and double-fetch patterns."
+    }
+  ]
+}

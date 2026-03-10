@@ -1,0 +1,13 @@
+{
+  "eval_id": 7,
+  "eval_name": "eval-esp32-stack-overflow",
+  "prompt": "I have an ESP32 running FreeRTOS with WiFi and BLE active. My application has 6 tasks and I keep getting stack overflow crashes in random tasks. Sometimes it's the MQTT task, sometimes the BLE handler. I've set all task stacks to 2048 bytes. The crashes seem more frequent when both WiFi and BLE are active. How do I debug and fix this?",
+  "assertions": [
+    {"name": "identifies_insufficient_stack", "type": "diagnosis", "description": "Identifies that 2048 bytes is insufficient for network-related tasks on ESP32"},
+    {"name": "provides_stack_monitoring", "type": "code_quality", "description": "Shows uxTaskGetStackHighWaterMark() usage for monitoring stack usage"},
+    {"name": "recommends_specific_stack_sizes", "type": "completeness", "description": "Recommends specific stack sizes for different task types (network 4096-8192+, TLS 8192+)"},
+    {"name": "freertos_overflow_detection", "type": "code_quality", "description": "Shows configCHECK_FOR_STACK_OVERFLOW and vApplicationStackOverflowHook"},
+    {"name": "explains_wifi_ble_memory_pressure", "type": "diagnosis", "description": "Explains that WiFi+BLE together create significant memory pressure on ESP32"},
+    {"name": "provides_working_code", "type": "completeness", "description": "Includes concrete code for stack monitoring and task creation"}
+  ]
+}

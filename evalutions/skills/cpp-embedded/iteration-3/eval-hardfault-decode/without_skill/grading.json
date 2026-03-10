@@ -1,0 +1,31 @@
+{
+  "eval_id": 5,
+  "eval_name": "eval-hardfault-decode",
+  "expectations": [
+    {
+      "text": "decodes_cfsr_as_busfault",
+      "passed": true,
+      "evidence": "Correctly decodes BFSR = 0x82: 'Bit 7 (BFARVALID) = 1: The BFAR register holds a valid fault address. Bit 1 (PRECISERR) = 1: A precise data bus error occurred.' Identifies it as a BusFault in the CFSR breakdown table."
+    },
+    {
+      "text": "identifies_null_pointer",
+      "passed": true,
+      "evidence": "States: 'BFAR (BusFault Address Register) = 0x00000000: Since BFARVALID is set, this is the exact address that caused the bus fault: 0x00000000.' Concludes: 'NULL pointer dereference where the source pointer passed to memcpy was NULL.'"
+    },
+    {
+      "text": "notes_mmfar_stale",
+      "passed": true,
+      "evidence": "States: 'MMFAR = 0x00000010: Not relevant here since MMFSR is clear (no MemManage fault). This register value is stale/meaningless in this context.' Correctly notes MMARVALID is not set."
+    },
+    {
+      "text": "recommends_debugging_steps",
+      "passed": true,
+      "evidence": "Provides 6 concrete debugging steps: (1) examine faulting code path with objdump, (2) add NULL checks and fault trap, (3) check ISR/task synchronization, (4) instrument with HardFault handler that dumps exception frame, (5) check for stack overflow, (6) enable BusFault handler separately."
+    },
+    {
+      "text": "explains_intermittent_nature",
+      "passed": true,
+      "evidence": "States: 'The intermittent nature points to a race condition or use-after-free scenario.' Lists four possible causes including 'ISR/task race condition' and explains: 'The CAN RX interrupt writes to a buffer that the parser reads. If the pointer to the current message buffer is updated in the ISR while the parser task is mid-read, the parser can see a NULL or partially-updated pointer.'"
+    }
+  ]
+}

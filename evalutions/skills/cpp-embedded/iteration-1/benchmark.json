@@ -1,0 +1,272 @@
+{
+  "metadata": {
+    "skill_name": "cpp-embedded",
+    "skill_path": "D:\\Work\\Personal\\Sources\\skills\\skills\\cpp-embedded",
+    "executor_model": "claude-opus-4-6",
+    "analyzer_model": "claude-opus-4-6",
+    "timestamp": "2026-03-10T12:00:00Z",
+    "evals_run": [1, 2, 3, 4, 5],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "ISR-to-task DMA",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.80,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 114.3,
+        "tokens": 25022,
+        "tool_calls": 4,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "No dynamic allocation in data path", "passed": true, "evidence": "No malloc/new/std::vector used"},
+        {"text": "All buffers statically allocated", "passed": true, "evidence": "All arrays are static with compile-time sizes"},
+        {"text": "Correct ISR-to-task synchronization", "passed": true, "evidence": "std::atomic with proper memory ordering for SPSC"},
+        {"text": "DMA buffer aligned to 32 bytes", "passed": false, "evidence": "Uses alignas(4) instead of alignas(32)"},
+        {"text": "Power-of-2 ring buffer with bitmask", "passed": true, "evidence": "static_assert enforces power-of-2, uses & kMask"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "ISR-to-task DMA",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.60,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 115.9,
+        "tokens": 15071,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "No dynamic allocation in data path", "passed": true, "evidence": "Uses xStreamBufferCreateStatic, no malloc/new"},
+        {"text": "All buffers statically allocated", "passed": true, "evidence": "All arrays static or global with known sizes"},
+        {"text": "Correct ISR-to-task synchronization", "passed": true, "evidence": "Uses volatile, FreeRTOS FromISR APIs"},
+        {"text": "DMA buffer aligned to 32 bytes", "passed": false, "evidence": "Uses aligned(4) not aligned(32)"},
+        {"text": "Power-of-2 ring buffer with bitmask", "passed": false, "evidence": "Relies on FreeRTOS stream buffer internals, no explicit bitmask"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "Heap Fragmentation ESP32",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.00,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 124.6,
+        "tokens": 32866,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Identifies heap fragmentation as root cause", "passed": true, "evidence": "864,000 allocations in 6 hours identified"},
+        {"text": "Replaces new/delete with static/pools", "passed": true, "evidence": "Static array + ObjectPool<T,N> pattern"},
+        {"text": "Replaces String with char[]/snprintf", "passed": true, "evidence": "char payload[512] with snprintf"},
+        {"text": "Suggests heap monitoring", "passed": true, "evidence": "ESP.getFreeHeap/getMinFreeHeap/getMaxAllocHeap"},
+        {"text": "Includes concrete refactored code", "passed": true, "evidence": "4 complete source files (~250 lines)"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "Heap Fragmentation ESP32",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.00,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 116.7,
+        "tokens": 14723,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Identifies heap fragmentation as root cause", "passed": true, "evidence": "Memory leaks and fragmentation identified"},
+        {"text": "Replaces new/delete with static/pools", "passed": true, "evidence": "static SensorReading array + memory pool"},
+        {"text": "Replaces String with char[]/snprintf", "passed": true, "evidence": "static char g_jsonBuffer[512] with snprintf"},
+        {"text": "Suggests heap monitoring", "passed": true, "evidence": "reportHeapStats with getFreeHeap/getMaxAllocHeap"},
+        {"text": "Includes concrete refactored code", "passed": true, "evidence": "Complete firmware ~310 lines"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "Bare-metal UART C99",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.00,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 137.1,
+        "tokens": 28331,
+        "tool_calls": 4,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Volatile register accesses", "passed": true, "evidence": "typedef volatile uint32_t reg32_t"},
+        {"text": "Correct baud rate divisor", "passed": true, "evidence": "BRR = 0x02D9, ~0.11% error"},
+        {"text": "Ring buffer for RX", "passed": true, "evidence": "Power-of-2 ring buffer with mask wrapping"},
+        {"text": "C99 style", "passed": true, "evidence": "Fixed-width types, no C++ features"},
+        {"text": "ISR reads DR to clear RXNE", "passed": true, "evidence": "uint8_t byte = (uint8_t)(UART->DR & 0xFFU)"},
+        {"text": "Static allocation only", "passed": true, "evidence": "All state is file-scope static"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "Bare-metal UART C99",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.00,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 117.9,
+        "tokens": 15533,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Volatile register accesses", "passed": true, "evidence": "UART_REG macro casts to volatile uint32_t*"},
+        {"text": "Correct baud rate divisor", "passed": true, "evidence": "BRR = 0x2D9, correct for 84MHz/115200"},
+        {"text": "Ring buffer for RX", "passed": true, "evidence": "SPSC ring buffer with bitmask wrapping"},
+        {"text": "C99 style", "passed": true, "evidence": "uint8_t/uint32_t, _Static_assert, no C++"},
+        {"text": "ISR reads DR to clear RXNE", "passed": true, "evidence": "uint8_t data = (uint8_t)(UART_DR & 0xFFu)"},
+        {"text": "Static allocation only", "passed": true, "evidence": "All storage is static"}
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "Desktop-to-Embedded Porting",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.00,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 159.6,
+        "tokens": 34522,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Addresses all 6 features", "passed": true, "evidence": "Dedicated sections for each"},
+        {"text": "Before/after code examples for 4+ patterns", "passed": true, "evidence": "All 6 have before/after"},
+        {"text": "Includes -fno-exceptions -fno-rtti", "passed": true, "evidence": "In CMake config section"},
+        {"text": "Recommends ETL", "passed": true, "evidence": "etl::vector, etl::string, etl::circular_buffer"},
+        {"text": "CRTP for virtual dispatch", "passed": true, "evidence": "Primary recommendation for perf-critical paths"},
+        {"text": "unique_ptr with custom deleter", "passed": true, "evidence": "Pool deleter pattern shown"}
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "Desktop-to-Embedded Porting",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.00,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 179.8,
+        "tokens": 20083,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Addresses all 6 features", "passed": true, "evidence": "All 6 have dedicated sections"},
+        {"text": "Before/after code examples for 4+ patterns", "passed": true, "evidence": "All 6 include both"},
+        {"text": "Includes -fno-exceptions -fno-rtti", "passed": true, "evidence": "In compiler flags section"},
+        {"text": "Recommends ETL or fixed-size alternatives", "passed": true, "evidence": "Custom FixedVector, FixedString, RingBuffer"},
+        {"text": "CRTP for virtual dispatch", "passed": true, "evidence": "Dedicated CRTP section"},
+        {"text": "unique_ptr with custom deleter", "passed": true, "evidence": "PoolDeleter example shown"}
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "HardFault Register Decode",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.80,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 112.1,
+        "tokens": 25848,
+        "tool_calls": 4,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Correctly decodes CFSR as MemManage fault", "passed": false, "evidence": "Decoded as BusFault (PRECISERR+BFARVALID) instead of MemManage (DACCVIOL+MMARVALID)"},
+        {"text": "Interprets MMFAR=0x10 as null+offset", "passed": true, "evidence": "Recognized struct offset pattern"},
+        {"text": "Identifies null pointer as root cause", "passed": true, "evidence": "Correctly identified despite fault type error"},
+        {"text": "Actionable debugging steps", "passed": true, "evidence": "GDB watchpoints, ASan, MPU null guard, HardFault handler"},
+        {"text": "Explains intermittent nature", "passed": true, "evidence": "Race condition, use-after-free, missing volatile scenarios"}
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "HardFault Register Decode",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.60,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 93.3,
+        "tokens": 13030,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Correctly decodes CFSR as MemManage fault", "passed": false, "evidence": "Decoded as BusFault, stated 'No memory management faults'"},
+        {"text": "Interprets MMFAR=0x10 as null+offset", "passed": false, "evidence": "Dismissed MMFAR as stale/irrelevant"},
+        {"text": "Identifies null pointer as root cause", "passed": true, "evidence": "Arrived via BFAR=0x0 despite wrong fault type"},
+        {"text": "Actionable debugging steps", "passed": true, "evidence": "Stack frame inspection, addr2line, race audit"},
+        {"text": "Explains intermittent nature", "passed": true, "evidence": "Race condition between CAN RX ISR and parser"}
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 0.92, "stddev": 0.10, "min": 0.80, "max": 1.00},
+      "time_seconds": {"mean": 129.5, "stddev": 18.2, "min": 112.1, "max": 159.6},
+      "tokens": {"mean": 29318, "stddev": 4107, "min": 25022, "max": 34522}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.84, "stddev": 0.19, "min": 0.60, "max": 1.00},
+      "time_seconds": {"mean": 124.7, "stddev": 32.5, "min": 93.3, "max": 179.8},
+      "tokens": {"mean": 15688, "stddev": 2655, "min": 13030, "max": 20083}
+    },
+    "delta": {
+      "pass_rate": "+0.08",
+      "time_seconds": "+4.8",
+      "tokens": "+13630"
+    }
+  },
+  "notes": [
+    "Evals 2 (Heap Fragmentation), 3 (UART C99), and 4 (Porting Guide) show 100% pass rate for BOTH configurations — these assertions may not discriminate skill value well enough",
+    "Eval 5 (HardFault decode) shows the clearest skill differentiation: with_skill correctly interpreted MMFAR=0x10 as null+offset while without_skill dismissed it as irrelevant",
+    "Both configurations failed the CFSR decode on Eval 5 — interpreting it as BusFault instead of MemManage. The skill's debugging.md reference has the correct bit table but neither run decoded it correctly",
+    "Eval 1 (ISR-to-task DMA) shows moderate differentiation: with_skill implemented explicit SPSC ring buffer while without_skill relied on FreeRTOS stream buffer abstractions",
+    "With-skill runs use ~1.87x more tokens on average (29K vs 16K) due to reading skill reference files, but this translates to richer responses with more embedded-specific patterns",
+    "DMA buffer alignment assertion (alignas(32)) failed in both configurations for Eval 1 — the STM32F4 has no D-cache so alignas(4) is technically correct; this assertion may be over-specified for the F4 target"
+  ]
+}

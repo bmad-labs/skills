@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "Addresses all 6 features: vector, string, shared_ptr, virtual, exceptions, RTTI",
+      "passed": true,
+      "evidence": "All 6 features have dedicated sections: Section 1 'Replacing std::vector' (line 41), Section 2 'Replacing std::string' (line 196), Section 3 'Replacing std::shared_ptr' (line 328), Section 4 'Replacing Virtual Functions' (line 499), Section 5 'Replacing Exceptions' (line 645), Section 6 'Replacing RTTI' (line 789)."
+    },
+    {
+      "text": "Shows before (desktop) and after (embedded) code examples for at least 4 patterns",
+      "passed": true,
+      "evidence": "All 6 patterns include before/after code: vector (desktop lines 49-78, embedded lines 83-151), string (desktop lines 204-229, embedded lines 234-317), shared_ptr (desktop lines 337-368, embedded lines 374-495), virtual (desktop lines 507-545, embedded lines 550-621), exceptions (desktop lines 653-690, embedded lines 696-784), RTTI (desktop lines 797-827, embedded lines 832-930)."
+    },
+    {
+      "text": "Includes -fno-exceptions and -fno-rtti compiler flags",
+      "passed": true,
+      "evidence": "Lines 29-30: 'CXXFLAGS += -fno-exceptions        # Disable exception support' and 'CXXFLAGS += -fno-rtti              # Disable RTTI'. Also referenced in the migration checklist at line 1013."
+    },
+    {
+      "text": "Recommends ETL (Embedded Template Library) or fixed-size alternatives for containers",
+      "passed": true,
+      "evidence": "Recommends custom fixed-size alternatives throughout: FixedVector<T, N> (line 90), FixedString<N> (line 242), RingBuffer<T, N> (line 157), and ObjectPool<T, N> (line 380). Overview table at line 15: 'Fixed-capacity container or static arrays'. ETL is not mentioned by name, but fixed-size alternatives are extensively covered."
+    },
+    {
+      "text": "Recommends CRTP as the replacement for virtual dispatch in performance-critical paths",
+      "passed": true,
+      "evidence": "Section 4 is titled 'Replacing Virtual Functions with CRTP (Static Polymorphism)' (line 499). Full CRTP implementation shown lines 552-566 with SensorBase<Derived>. Line 588: '// Compile-time dispatch -- zero overhead, fully inlined'. Overview table line 18: 'CRTP static polymorphism or function pointers'."
+    },
+    {
+      "text": "Recommends std::unique_ptr (with custom deleter) over std::shared_ptr",
+      "passed": true,
+      "evidence": "Lines 479-495 show 'When unique_ptr Is Acceptable' with a PoolDeleter custom deleter: 'using PacketPtr = std::unique_ptr<Packet, PoolDeleter>;' (line 489). Overview table line 17 lists 'std::unique_ptr' as a replacement for shared_ptr. However, the primary recommendation is object pools rather than unique_ptr being the top choice."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 179.8
+  }
+}

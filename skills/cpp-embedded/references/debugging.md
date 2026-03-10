@@ -7,6 +7,8 @@
 4. [MPU Fault Analysis on Cortex-M](#4-mpu-fault-analysis-on-cortex-m)
 5. [AddressSanitizer Workflow for Host Testing](#5-addresssanitizer-workflow-for-host-testing)
 6. [GDB Watchpoint Workflow](#6-gdb-watchpoint-workflow)
+7. [NVIC Priority Confusion Diagnostic](#7-nvic-priority-confusion-diagnostic)
+8. [Static Analysis Tools](#8-static-analysis-tools)
 
 ---
 
@@ -265,19 +267,36 @@ void HardFault_Handler(void) {
     volatile uint32_t mmfar = SCB->MMFAR;   /* MemManage Fault Address */
     volatile uint32_t bfar  = SCB->BFAR;    /* BusFault Address */
 
-    /* CFSR bits — read the ARM TRM for full decode */
-    /* CFSR[0]  IACCVIOL: instruction access violation */
-    /* CFSR[1]  DACCVIOL: data access violation */
-    /* CFSR[3]  MUNSTKERR: fault on exception unstack */
-    /* CFSR[4]  MSTKERR: fault on exception stack */
-    /* CFSR[7]  MMARVALID: MMFAR is valid */
-    /* CFSR[8]  IBUSERR: instruction bus error */
-    /* CFSR[9]  PRECISERR: precise data bus error — BFAR valid */
-    /* CFSR[10] IMPRECISERR: imprecise data bus error */
-    /* CFSR[16] UNDEFINSTR: undefined instruction */
-    /* CFSR[17] INVSTATE: invalid state (e.g., bad EPSR.T bit) */
-    /* CFSR[24] UNALIGNED: unaligned access */
-    /* CFSR[25] DIVBYZERO: divide by zero */
+    /* CFSR is a 32-bit composite of three sub-registers:
+     * MMFSR [7:0]   — MemManage Fault (byte at 0xE000ED28)
+     * BFSR  [15:8]  — BusFault        (byte at 0xE000ED29)
+     * UFSR  [31:16] — UsageFault      (halfword at 0xE000ED2A)
+     *
+     * MMFSR bits (byte at 0xE000ED28):
+     *   [0] IACCVIOL   — instruction access violation (MPU/XN fault)
+     *   [1] DACCVIOL   — data access violation
+     *   [3] MUNSTKERR  — fault on exception unstack
+     *   [4] MSTKERR    — fault on exception stack
+     *   [5] MLSPERR    — fault during FP lazy stack preservation
+     *   [7] MMARVALID  — MMFAR holds valid fault address
+     *
+     * BFSR bits (byte at 0xE000ED29, offset +8 in CFSR):
+     *   [8]  IBUSERR     — instruction bus error
+     *   [9]  PRECISERR   — precise data bus error (faulting instruction = return addr)
+     *   [10] IMPRECISERR — imprecise data bus error (return addr NOT the faulting instr)
+     *   [11] UNSTKERR    — fault on exception unstack
+     *   [12] STKERR      — fault on exception stack
+     *   [13] LSPERR      — fault during FP lazy stack preservation
+     *   [15] BFARVALID   — BFAR holds valid fault address
+     *
+     * UFSR bits (halfword at 0xE000ED2A, offset +16 in CFSR):
+     *   [16] UNDEFINSTR  — undefined instruction
+     *   [17] INVSTATE    — invalid state (bad EPSR.T bit)
+     *   [18] INVPC       — illegal EXC_RETURN value
+     *   [19] NOCP        — coprocessor access fault (FPU not enabled)
+     *   [24] UNALIGNED   — unaligned access
+     *   [25] DIVBYZERO   — divide by zero
+     */
 
     /* Log to NVM or ITM before halting */
     log_fault_registers(cfsr, hfsr, mmfar, bfar);
@@ -285,6 +304,39 @@ void HardFault_Handler(void) {
     for(;;);
 }
 ```
+
+### Worked Example: Decoding CFSR = 0x00008200
+
+**Step-by-step:** Extract each sub-register from the 32-bit CFSR value:
+
+```
+CFSR = 0x00008200  (read as 32-bit word from 0xE000ED28)
+
+Step 1: Split into sub-registers:
+  UFSR = (CFSR >> 16) & 0xFFFF = 0x0000  → no usage faults
+  BFSR = (CFSR >> 8)  & 0xFF   = 0x82   → has BusFault bits set
+  MMFSR = CFSR & 0xFF          = 0x00   → no MemManage faults
+
+Step 2: Decode BFSR = 0x82 (binary: 1000_0010):
+  bit 7 (BFARVALID) = 1  → BFAR register holds the faulting address
+  bit 1 (PRECISERR) = 1  → precise data bus error
+
+Diagnosis: Precise BusFault. BFAR register contains the exact address that
+caused the fault. Read BFAR, then use `info symbol <BFAR>` in GDB to find
+what memory region was accessed. Common causes:
+  - Accessing a peripheral whose clock is not enabled (check RCC)
+  - Invalid peripheral address (typo in base address)
+  - Null pointer dereference (BFAR = 0x00000000)
+```
+
+**CRITICAL — Stale fault address registers:**
+MMFAR is **only valid** when MMFSR bit 7 (MMARVALID) is set. BFAR is **only valid**
+when BFSR bit 7 (BFARVALID) is set. If the valid bit is cleared, the address register
+contains garbage from a previous fault — **completely ignore it**. Do not mention it in
+your diagnosis, do not speculate about what it might mean, do not use it as a "clue".
+A stale MMFAR/BFAR value is indistinguishable from random noise. In the worked example
+above, MMFSR = 0x00 means MMARVALID is NOT set, so MMFAR = 0x00000010 is stale and
+must be discarded entirely. Only BFAR = 0x00000000 (with BFARVALID = 1) is meaningful.
 
 ### Step 2: Map Fault Address to Symbol in GDB
 
@@ -314,8 +366,12 @@ x/8wx $sp
 | DACCVIOL + MMARVALID, MMFAR = 0x00000000..0x0000001C | Null pointer dereference | Check pointer before use; enable MPU region 0 as no-access |
 | DACCVIOL + MMARVALID, MMFAR below stack bottom | Stack overflow into guard | Increase stack; reduce local variable sizes |
 | PRECISERR + BFARVALID | Precise bus fault | Unaligned access or invalid peripheral address |
+| BFSR: PRECISERR + BFARVALID, BFAR = peripheral addr | Accessed peripheral with clock disabled | Enable clock in RCC before accessing peripheral registers |
+| BFSR: PRECISERR + BFARVALID, BFAR = 0x00000000 | Dereferenced null pointer | Check pointer before use; add MPU null-pointer guard region |
 | UNDEFINSTR | Executed invalid opcode | Corrupted function pointer, missing `thumb` bit, or executing data |
 | INVSTATE | Invalid processor state | Function pointer missing Thumb bit (LSB must be 1 for Thumb) |
+| NOCP | Coprocessor / FPU access fault | FPU not enabled in CPACR before float operation; enable with `SCB->CPACR \|= (0xF << 20)` |
+| INVPC | Illegal EXC_RETURN value | Corrupted LR during exception return; stack corruption or mismatched exception frame |
 
 ---
 
@@ -466,3 +522,117 @@ DWT->FUNCTION0 = 0x6U;       /* Watch for write access */
 ```
 
 This will trigger a DebugMonitor exception on write, which you can handle to log the PC.
+
+---
+
+## 7. NVIC Priority Confusion Diagnostic
+
+ARM Cortex-M uses **inverted priority numbering**: lower number = higher priority. This is
+counterintuitive and causes subtle bugs, especially with FreeRTOS.
+
+### The Problem
+
+FreeRTOS defines `configMAX_SYSCALL_INTERRUPT_PRIORITY` — interrupts at or below this priority
+(numerically higher) can safely call FreeRTOS API functions (`xQueueSendFromISR`, etc.). Interrupts
+above this priority (numerically lower) must NEVER call FreeRTOS APIs.
+
+```
+Priority 0 (highest) ─── Cannot call FreeRTOS API
+Priority 1            ─── Cannot call FreeRTOS API
+Priority 2            ─── Cannot call FreeRTOS API
+─── configMAX_SYSCALL_INTERRUPT_PRIORITY = 5 (example) ───
+Priority 5            ─── Can call FreeRTOS API (this is the ceiling)
+Priority 6            ─── Can call FreeRTOS API
+...
+Priority 15 (lowest)  ─── Can call FreeRTOS API
+```
+
+### Common Mistakes
+
+**Mistake 1: Setting ISR priority too high (numerically too low)**
+```c
+/* BUG: Priority 1 is ABOVE configMAX_SYSCALL_INTERRUPT_PRIORITY */
+NVIC_SetPriority(USART1_IRQn, 1);
+
+void USART1_IRQHandler(void) {
+    BaseType_t woken = pdFALSE;
+    xQueueSendFromISR(rx_queue, &byte, &woken);  /* CRASH or silent corruption */
+    portYIELD_FROM_ISR(woken);
+}
+```
+
+**Mistake 2: Confusing `configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY` vs `configMAX_SYSCALL_INTERRUPT_PRIORITY`**
+
+- `configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY` = human-readable value (e.g., 5).
+- `configMAX_SYSCALL_INTERRUPT_PRIORITY` = hardware-shifted value (e.g., 5 << 4 = 0x50 on STM32 which uses 4 priority bits).
+
+FreeRTOS uses the shifted value internally. When setting NVIC priorities via
+`NVIC_SetPriority()` (CMSIS) or `HAL_NVIC_SetPriority()` (HAL), use the **unshifted** value.
+
+**Mistake 3: Default priority 0 on newly enabled interrupt**
+
+A newly enabled interrupt defaults to priority 0 (highest). If its handler calls any FreeRTOS
+API, the system will crash or corrupt scheduler state. Always explicitly set the priority
+before enabling:
+```c
+NVIC_SetPriority(NEW_IRQn, FREERTOS_SAFE_PRIORITY);
+NVIC_EnableIRQ(NEW_IRQn);
+```
+
+### Fix
+
+```c
+/* Verify ISR priority is safe for FreeRTOS API calls */
+#define FREERTOS_SAFE_PRIORITY  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
+
+/* Set UART ISR to a safe priority (numerically >= the threshold) */
+NVIC_SetPriority(USART1_IRQn, FREERTOS_SAFE_PRIORITY + 1);  /* Priority 6 — safe */
+```
+
+### Symptom Checklist
+
+| Symptom | Likely cause |
+|---|---|
+| Crash inside `xQueueSendFromISR` or `xSemaphoreGiveFromISR` | ISR priority above `configMAX_SYSCALL_INTERRUPT_PRIORITY` |
+| `configASSERT` fires in `port.c` with `portASSERT_IF_INTERRUPT_PRIORITY_INVALID` | Same — priority is too high for FreeRTOS API |
+| ISR works for a while then crashes under load | Priority inversion — higher-priority ISR preempts FreeRTOS critical section |
+| System hangs after enabling a new interrupt | New ISR at default priority 0 (highest) calls FreeRTOS API |
+
+---
+
+## 8. Static Analysis Tools
+
+Static analysis catches bugs at compile time that testing might miss — null dereferences, buffer
+overflows, dead code, MISRA violations. Use at least one tool in CI; two is better (each finds
+different classes of bugs).
+
+### Tool Comparison
+
+| Tool | Type | Key Strengths | MISRA Support |
+|---|---|---|---|
+| Clang-Tidy | OSS linter | Broad checks, `clang-analyzer-*` and `cppcoreguidelines-*` modules | Partial |
+| Cppcheck | OSS analyzer | Handles non-standard syntax, good for C code, low false positive rate | Partial (addon) |
+| Polyspace | Commercial | Proves absence of runtime errors (formal verification) | Full MISRA C/C++ |
+| Parasoft C/C++test | Commercial | Most extensive MISRA compliance reporting | Full MISRA C/C++ |
+| PC-lint Plus | Commercial | Lightweight, fast, decades of usage in safety-critical | Full MISRA C/C++ |
+| CodeChecker | OSS framework | Wraps Clang SA + Clang-Tidy, web UI for results | Via Clang checks |
+
+### Recommended Setup
+
+**Minimum (any project):** Clang-Tidy + Cppcheck in CI. Both are free and catch different issues.
+
+```bash
+# Clang-Tidy — run on changed files
+clang-tidy src/*.cpp -- -I include/ \
+  -checks='clang-analyzer-*,cppcoreguidelines-*,bugprone-*,performance-*'
+
+# Cppcheck — full project scan, good for C code
+cppcheck --enable=all --suppress=missingIncludeSystem \
+  --error-exitcode=1 src/
+```
+
+**Safety-critical (IEC 61508, DO-178C, ISO 26262):** Add a commercial tool (Polyspace or Parasoft)
+for full MISRA compliance certification and formal verification of absence of runtime errors.
+
+**CI integration:** Run analysis on every PR. Treat new warnings as build failures. Track warning
+count over time — it should never increase.

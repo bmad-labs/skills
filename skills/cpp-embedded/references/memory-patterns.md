@@ -9,6 +9,7 @@
 6. [std::optional for Error Handling](#6-stdoptional-for-error-handling)
 7. [Zero-Initialization Guarantee](#7-zero-initialization-guarantee)
 8. [Linker Section Placement](#8-linker-section-placement)
+9. [ESP32 Memory Patterns and Heap Fragmentation](#9-esp32-memory-patterns-and-heap-fragmentation)
 
 ---
 
@@ -209,11 +210,23 @@ void adc_processing_task() {
 }
 ```
 
+**Production alternative:** The Embedded Template Library provides `etl::queue_spsc_isr<T, N>` —
+a production-ready ISR-safe SPSC queue with fixed capacity, specifically designed for interrupt
+contexts. Consider using it instead of rolling your own if ETL is available in your project.
+
 **Memory ordering rationale:**
 - `relaxed` on producer's head read (only producer writes head)
 - `acquire` on consumer's head read (synchronizes with producer's `release` store)
 - `release` on producer's head write (makes the written data visible to consumer)
 - Same pattern mirrored for tail
+
+**Performance optimization:** Cache local copies of head/tail to reduce atomic load frequency.
+The producer caches the last-known tail value and only re-reads it when the buffer appears full.
+The consumer does the same for head. This eliminates one atomic load per push/pop in the common
+(non-empty, non-full) case.
+
+**Cache line padding (Cortex-M7):** On cores with D-cache, head and tail should be separated
+by at least 32 bytes to avoid false sharing. On cacheless Cortex-M0/M3/M4 this is unnecessary.
 
 ---
 
@@ -222,6 +235,26 @@ void adc_processing_task() {
 On Cortex-M7 (STM32H7, STM32F7) with D-cache enabled, a DMA transfer that writes to a cached
 memory region will not be visible to the CPU until the cache is invalidated. Forgetting this causes
 silent data corruption that only appears under specific cache eviction patterns.
+
+**Alignment depends on MCU family — not all Cortex-M cores have D-cache:**
+
+| MCU Core | D-Cache | DMA Alignment | Cache Maintenance |
+|---|---|---|---|
+| Cortex-M0/M0+/M3 | None | Word-aligned (4 bytes) | Not needed |
+| Cortex-M4 (STM32F4) | None | Word-aligned (4 bytes) | Not needed |
+| Cortex-M7 (STM32F7/H7) | 32-byte lines | 32-byte aligned + 32-byte size multiple | Required |
+
+```cpp
+// Cortex-M4 (STM32F4): no D-cache, word alignment is sufficient
+alignas(4) uint8_t dma_buf_m4[256];
+
+// Cortex-M7 (STM32F7/H7): must align to 32-byte cache line
+alignas(32) uint8_t dma_buf_m7[256];
+// Size must also be a 32-byte multiple to avoid sharing cache lines
+```
+
+The examples below show the full M7 workflow (worst case). For M4 and below, skip the
+cache maintenance calls and use `alignas(4)` instead of `alignas(32)`.
 
 ```cpp
 #include <cstdint>
@@ -453,3 +486,151 @@ MEMORY {
 
 Always add `static_assert(sizeof(fast_buffer) <= CCMRAM_SIZE, "Buffer too large for CCMRAM");`
 or a linker symbol check to catch overflow at build time rather than at runtime.
+
+---
+
+## 9. ESP32 Memory Patterns and Heap Fragmentation
+
+The ESP32 (Xtensa LX6/LX7 and RISC-V) has a more complex memory map than a typical Cortex-M:
+multiple non-contiguous heaps (DRAM, IRAM, PSRAM), and the Arduino/ESP-IDF frameworks make
+heavy use of dynamic allocation under the hood. This makes heap fragmentation a primary
+failure mode for long-running ESP32 firmware.
+
+### Diagnosing Heap Fragmentation on ESP32
+
+When an ESP32 application crashes after hours/days of uptime, the first suspect is heap
+fragmentation from repeated `new`/`delete` or `malloc`/`free` cycles. Monitor with:
+
+```cpp
+// ESP-IDF / Arduino: print heap health periodically
+void log_heap_status() {
+    Serial.printf("Free heap: %u bytes\n", ESP.getFreeHeap());
+    Serial.printf("Largest free block: %u bytes\n", ESP.getMaxAllocHeap());
+    Serial.printf("Min free heap ever: %u bytes\n", ESP.getMinFreeHeap());
+
+    // Key indicator: if free heap is large but max alloc block is small,
+    // the heap is fragmented — many small free chunks, no large contiguous block
+    if (ESP.getFreeHeap() > 50000 && ESP.getMaxAllocHeap() < 10000) {
+        Serial.println("WARNING: Heap is heavily fragmented!");
+    }
+}
+```
+
+### Common ESP32 Allocation Traps
+
+**Arduino `String` class:** Every concatenation, substring, or conversion allocates on the heap.
+In a loop running at 10Hz with 4 sensors, that's 40+ alloc/free cycles per second — over 3.4
+million per day. Replace with fixed-size `char[]` buffers and `snprintf`:
+
+```cpp
+// BAD: Arduino String — heap allocation on every operation
+String json = "{\"temp\":" + String(temp) + ",\"hum\":" + String(hum) + "}";
+mqtt.publish("sensor/data", json.c_str());
+
+// GOOD: Fixed buffer — zero heap allocation
+char json[128];
+snprintf(json, sizeof(json), "{\"temp\":%.1f,\"hum\":%.1f}", temp, hum);
+mqtt.publish("sensor/data", json);
+```
+
+**`new SensorReading()` in a loop:** Replace with a static array or object pool:
+
+```cpp
+// BAD: new/delete every 100ms
+SensorReading* r = new SensorReading();
+process(r);
+delete r;  // Fragments heap over time
+
+// GOOD: Static ring buffer of readings — no heap
+static SensorReading readings[4];  // One per sensor
+static uint8_t idx = 0;
+SensorReading& r = readings[idx++ % 4];
+r = read_sensor();
+process(&r);
+```
+
+### ETL for ESP32 Projects
+
+The [Embedded Template Library (ETL)](https://www.etlcpp.com) provides fixed-capacity,
+heap-free alternatives to STL containers. ETL works on ESP32 with Arduino or ESP-IDF:
+
+```cpp
+#include <etl/string.h>
+#include <etl/vector.h>
+#include <etl/queue_spsc_atomic.h>
+
+// Fixed-capacity string — no heap, 127 chars max
+etl::string<128> device_name("sensor-hub-01");
+
+// Fixed-capacity vector — no heap, 16 readings max
+etl::vector<SensorReading, 16> readings;
+readings.push_back(read_sensor());  // No reallocation ever
+
+// ISR-safe SPSC queue — no heap, no locks, perfect for ISR→task comms
+etl::queue_spsc_atomic<uint16_t, 64> adc_queue;
+```
+
+Install ETL in PlatformIO: `lib_deps = ETLCPP/Embedded Template Library`
+Install ETL in ESP-IDF: add as a component via `idf_component.yml`
+
+### MISRA Relevance for ESP32
+
+Even outside safety-critical contexts, MISRA C Rule 21.3 (no `malloc`/`calloc`/`realloc`/`free`
+in production paths) and MISRA C++ Rule 21.6.1 (no dynamic memory after init) are directly
+applicable to ESP32 firmware. The reasoning is practical, not bureaucratic: on a device with
+320KB DRAM and no MMU, heap fragmentation from continuous allocation is a reliability defect,
+not a style issue. Cite these rules when justifying the refactoring effort to eliminate dynamic
+allocation from periodic task paths.
+
+### ESP32-Specific Memory Architecture
+
+| Region | Size (ESP32) | Use for | Notes |
+|--------|-------------|---------|-------|
+| DRAM | 320KB | General data, heap | Shared between stacks, heap, static |
+| IRAM | 200KB | ISR handlers, hot code | Faster than flash; limited |
+| PSRAM | 4-8MB (optional) | Large buffers, non-realtime data | Slow (~10x DRAM latency); don't use for ISR data |
+| RTC FAST | 8KB | Data surviving deep sleep | Accessible only by PRO_CPU |
+| RTC SLOW | 8KB | ULP coprocessor data | Very limited |
+
+**PSRAM for large buffers:** `ps_malloc()` and `heap_caps_malloc(size, MALLOC_CAP_SPIRAM)` allocate
+from PSRAM. This memory is ~10× slower than DRAM (~100ns vs ~10ns access latency) but has 4-8MB
+capacity. Use PSRAM for:
+- SD card write buffers and CSV formatting buffers (not latency-sensitive)
+- MQTT payloads, JSON serialization buffers, HTTP response buffers
+- Display framebuffers, image processing scratch space
+- Any buffer >4KB that isn't accessed from ISRs or tight control loops
+
+For data loggers specifically: keep the ring buffer (ISR-to-task) in DRAM for speed, but consider
+placing the CSV format buffer and SD write buffer in PSRAM to free DRAM for real-time use.
+
+```cpp
+// Static DRAM ring buffer (fast, ISR-safe)
+static SpscRingBuffer<SensorSample, 2048> s_ring;  // ~24KB in DRAM
+
+// Large format buffer in PSRAM (slow, but only used by logger task)
+static char* s_csv_buf = nullptr;  // Allocated from PSRAM during init
+void init_buffers() {
+    s_csv_buf = (char*)heap_caps_malloc(48000, MALLOC_CAP_SPIRAM);
+    assert(s_csv_buf);  // Init-time allocation is OK
+}
+```
+
+Never use PSRAM in ISRs or tight control loops. If the ESP32 variant lacks PSRAM, all buffers
+must fit in DRAM — document the memory budget explicitly.
+
+### ESP32 Task Stack Sizing
+
+ESP-IDF/FreeRTOS defaults are often too small for complex tasks. Monitor with:
+
+```cpp
+// Check remaining stack for current task
+UBaseType_t remaining = uxTaskGetStackHighWaterMark(NULL);
+Serial.printf("Stack remaining: %u words (%u bytes)\n",
+              remaining, remaining * sizeof(StackType_t));
+```
+
+Typical stack sizes for ESP32:
+- Simple task (GPIO, timer): 2048 bytes
+- MQTT/WiFi task: 4096-8192 bytes
+- Task using `snprintf` or JSON: 4096+ bytes (printf family uses ~1KB stack)
+- Task with TLS/SSL: 8192-16384 bytes

@@ -1,0 +1,47 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-heap-fragmentation-esp32",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "identifies_heap_fragmentation",
+      "passed": true,
+      "evidence": "Lines 9-11 explicitly identify heap fragmentation as root cause: 'repeated small heap allocations of varying sizes cause heap fragmentation on the ESP32'. Summary also confirms this."
+    },
+    {
+      "text": "eliminates_dynamic_alloc",
+      "passed": true,
+      "evidence": "Replaces new SensorReading() with static array (line 44), replaces new String() with static char buffer + snprintf (lines 87-99), and provides a complete refactored example with zero heap usage in the hot path."
+    },
+    {
+      "text": "replaces_arduino_string",
+      "passed": true,
+      "evidence": "Replaces Arduino String with static char jsonBuffer[256] and snprintf (lines 84-99). Also warns that even stack-allocated String still fragments heap internally."
+    },
+    {
+      "text": "provides_monitoring_advice",
+      "passed": true,
+      "evidence": "Provides reportHeapHealth() function using ESP.getFreeHeap(), ESP.getMaxAllocHeap(), and ESP.getMinFreeHeap() with fragmentation percentage calculation and low-heap warnings (lines 210-233)."
+    },
+    {
+      "text": "provides_working_code",
+      "passed": true,
+      "evidence": "Includes complete refactored firmware example (lines 140-270) with static allocations, sensor reading, MQTT publishing, and heap monitoring — not just advice."
+    },
+    {
+      "text": "recommends_fixed_capacity_alternatives",
+      "passed": false,
+      "evidence": "Only recommends static char arrays and snprintf. No mention of ETL containers (etl::string, etl::vector) or any other named fixed-capacity container library."
+    },
+    {
+      "text": "cites_misra_or_standard",
+      "passed": false,
+      "evidence": "No reference to MISRA rules or any specific embedded standard. Provides practical reasoning ('every dynamic allocation risks fragmentation') but does not cite a specific standard or rule number."
+    },
+    {
+      "text": "quantifies_allocation_frequency",
+      "passed": true,
+      "evidence": "Calculates '4 sensors x 10 reads/sec = 40 leaked objects per second, 144,000 per hour' (line 7) and estimates '40 objects/sec x 32 bytes = 1,280 bytes/sec, ~4.6 MB/hour' (lines 17-18)."
+    }
+  ]
+}

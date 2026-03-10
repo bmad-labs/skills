@@ -1,0 +1,31 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-isr-to-task-dma",
+  "expectations": [
+    {
+      "text": "no_heap_allocation",
+      "passed": true,
+      "evidence": "All memory is statically allocated: 'static alignas(4) uint16_t dma_buffer[DMA_BUF_TOTAL_SAMPLES]', 'static AdcRingBuffer adc_rb'. The design rationale table explicitly states 'Zero malloc. MISRA C Rule 21.3 compliant. Every byte is accounted for at link time.'"
+    },
+    {
+      "text": "static_buffer_allocation",
+      "passed": true,
+      "evidence": "All buffers are statically allocated: 'static alignas(4) uint16_t dma_buffer[DMA_BUF_TOTAL_SAMPLES]' and 'static AdcRingBuffer adc_rb' at file scope. The ring buffer holds 'AdcBlock slots[ADC_RING_SLOTS]' as a fixed-size static array."
+    },
+    {
+      "text": "isr_safe_communication",
+      "passed": true,
+      "evidence": "Uses volatile head/tail ('volatile size_t head', 'volatile size_t tail'), DMB barriers ('__DMB()') before updating indices, and vTaskNotifyGiveFromISR with portYIELD_FROM_ISR. The SPSC invariant is explained: 'only the producer writes head, and only the consumer writes tail.'"
+    },
+    {
+      "text": "dma_buffer_alignment_appropriate",
+      "passed": true,
+      "evidence": "Uses 'static alignas(4) uint16_t dma_buffer[DMA_BUF_TOTAL_SAMPLES]' — 4-byte alignment only. Explicitly explains: 'STM32F4 (Cortex-M4) has no D-cache, so DMA buffers only need word alignment (alignas(4)), and no cache maintenance is required.' Scaling notes correctly state that alignas(32) is only needed for Cortex-M7/STM32H7."
+    },
+    {
+      "text": "power_of_2_buffer",
+      "passed": true,
+      "evidence": "Ring buffer capacity is #define ADC_RING_SLOTS 16U with _Static_assert((ADC_RING_SLOTS & (ADC_RING_SLOTS - 1)) == 0, ...). Bitmask indexing is used: '(head + 1U) & (ADC_RING_SLOTS - 1U)' and '(tail + 1U) & (ADC_RING_SLOTS - 1U)'. Rationale: '(index + 1) & (N - 1) is a single AND instruction -- no division, no branch.'"
+    }
+  ]
+}

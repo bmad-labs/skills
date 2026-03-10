@@ -8,7 +8,7 @@
 5. [Error Handling in C (no exceptions)](#5-error-handling-in-c-no-exceptions)
 6. [C99/C11 Useful Features](#6-c99c11-useful-features)
 7. [C and C++ Interop](#7-c-and-c-interop)
-8. [MISRA C 2012 Key Rules for Memory Safety](#8-misra-c-2012-key-rules-for-memory-safety)
+8. [MISRA C Key Rules for Memory Safety](#8-misra-c-key-rules-for-memory-safety)
 
 ---
 
@@ -248,6 +248,38 @@ uint32_t get_latest_sample(void) {
 Any memory-mapped hardware register must be `volatile`. Forgetting this is a common source of
 hard-to-reproduce bugs that disappear when you add a `printf`.
 
+### Hardware Auto-Clear Registers (Read-to-Clear)
+
+Many UART/SPI/I2C peripherals use **read-to-clear** (RTC) status mechanisms. The most common:
+reading the Data Register (DR) automatically clears the Receive Data Register Not Empty (RXNE)
+flag in the Status Register (SR). This is a hardware-level side effect — the peripheral's state
+machine clears RXNE when the CPU reads DR, not through a separate write operation.
+
+**Why this matters for ISR handlers:** In a UART RX ISR, you must read DR to retrieve the byte.
+As a hardware side effect, this read clears RXNE, which in turn deasserts the interrupt request
+line. If you only check SR without reading DR, the RXNE flag stays set and the ISR fires
+endlessly (interrupt storm). Always explain this mechanism in UART driver code — it's a common
+source of confusion for developers coming from software-only backgrounds.
+
+```c
+/* UART RX ISR — reading DR has TWO effects:
+ * 1. Retrieves the received byte
+ * 2. Clears the RXNE flag (hardware auto-clear on DR read)
+ * Without the DR read, RXNE stays asserted → interrupt fires forever */
+void USART1_IRQHandler(void) {
+    if (USART1->SR & UART_SR_RXNE) {
+        uint8_t byte = (uint8_t)(USART1->DR & 0xFFU);  /* Read clears RXNE */
+        ring_buffer_push(&rx_buf, byte);
+    }
+}
+```
+
+Other common read-to-clear patterns:
+- **ADC DR read** clears EOC (End of Conversion) flag
+- **SPI DR read** clears RXNE; **SPI DR write** clears TXE
+- **I2C SR1 read followed by DR read** clears ADDR flag (two-step clear sequence)
+- **Timer SR write-0-to-clear**: Unlike UART, timer flags require writing 0 to the specific bit
+
 ---
 
 ## 5. Error Handling in C (no exceptions)
@@ -346,6 +378,12 @@ Sensor s3 = { .id = 99 };  /* x, y, z, flags all 0 */
 
 ### _Static_assert (C11)
 
+Use `_Static_assert` (C11) to catch configuration errors and struct layout mistakes at compile
+time rather than runtime. This is especially valuable for ring buffer sizes (must be power-of-2
+for bitmask indexing) and wire-format structs (padding must not change layout). Prefer
+`_Static_assert` over `#if`/`#error` because it works inside function scope, evaluates actual
+`sizeof`/`_Alignof` expressions, and produces clearer diagnostics.
+
 ```c
 #include <stdint.h>
 
@@ -353,10 +391,17 @@ Sensor s3 = { .id = 99 };  /* x, y, z, flags all 0 */
 typedef struct { uint8_t cmd; uint16_t len; uint32_t crc; } __attribute__((packed)) PacketHeader;
 _Static_assert(sizeof(PacketHeader) == 7, "PacketHeader must be 7 bytes for wire format");
 
-/* Verify buffer sizes */
+/* Verify buffer sizes — essential for ring buffers using bitmask indexing */
 #define UART_BUF_SIZE 256
 _Static_assert((UART_BUF_SIZE & (UART_BUF_SIZE - 1)) == 0, "Buffer size must be power of 2");
+
+/* Verify alignment for DMA buffers */
+_Static_assert(_Alignof(max_align_t) >= 4, "Platform alignment insufficient for DMA");
 ```
+
+When writing UART or ring buffer drivers in C99/C11, always add a `_Static_assert` to validate
+that the buffer capacity is a power of 2. This catches misconfigurations at build time instead
+of producing silent bugs from incorrect bitmask indexing at runtime.
 
 ### _Alignas / _Alignof (C11)
 
@@ -512,9 +557,15 @@ int main(void) {
 
 ---
 
-## 8. MISRA C 2012 Key Rules for Memory Safety
+## 8. MISRA C Key Rules for Memory Safety
 
-MISRA C 2012 is the dominant coding standard for safety-critical embedded C. These are the rules
+MISRA C:2025 (published March 2025) is the current edition, covering C90/C99/C11/C18 with 225
+guidelines. It retains all critical memory safety rules from MISRA C:2012. MISRA C++:2023 targets
+C++17 with 179 guidelines, merging MISRA C++:2008 with AUTOSAR C++14.
+
+The rules below are verified current in MISRA C:2025:
+
+MISRA C is the dominant coding standard for safety-critical embedded C. These are the rules
 most relevant to memory safety. Violations are bugs waiting to happen.
 
 | Rule | Category | What it says | Why it matters |
@@ -530,7 +581,7 @@ most relevant to memory safety. Violations are bugs waiting to happen.
 | **Rule 22.1** | Required | All resources acquired must be released (files, mutexes, etc.) | Resource leak detection |
 | **Rule 1.3** | Required | No undefined behavior | Covers all UB including signed overflow, strict aliasing |
 
-**Variable-length arrays (VLAs) — Rule 18.8:** MISRA C 2012 bans VLAs (also banned in C11 as
+**Variable-length arrays (VLAs) — Rule 18.8:** MISRA C bans VLAs (also banned in C11 as
 optional feature). VLA size is runtime-determined, making stack usage statically unanalyzable.
 Always use fixed-size arrays or pools instead:
 
