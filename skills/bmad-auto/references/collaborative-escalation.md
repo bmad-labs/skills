@@ -61,3 +61,22 @@ SendMessage: {
 - Always shut down the researcher after resolution or escalation failure.
 - A "collaboration round" is defined as: one message from researcher + one response from worker +
   one fix attempt by the worker.
+
+## Communication Quality
+
+All messages between researcher and worker must be **specific and detailed** — not vague
+hand-waving. Each message must include:
+
+- **Context**: What was investigated, what the current state is, what has been tried.
+- **Specifics**: Exact file paths, line numbers, error messages, code snippets.
+- **Reasoning**: Why an approach is recommended, what trade-offs exist, what could go wrong.
+- **Actionable next step**: What exactly the recipient should do with this information.
+
+**Bad**: "I found some documentation about the issue. Try a different approach."
+
+**Good**: "I researched the SQLAlchemy connection pooling issue. The root cause is that
+`create_engine()` in `src/db/connection.py:23` uses `pool_size=5` but the app spawns 20
+worker threads (see `src/app.py:45`). Each thread needs its own connection, so the pool is
+exhausted. Fix: change `pool_size=20` and add `max_overflow=10` as a buffer. Reference:
+SQLAlchemy docs confirm pool_size should be >= worker count. I've saved the full research
+to `_bmad-output/research/connection-pooling.md`."

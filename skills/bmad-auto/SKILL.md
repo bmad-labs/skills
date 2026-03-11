@@ -106,6 +106,31 @@ You may receive messages from teammates. Collaborate via SendMessage to resolve 
 When you receive a shutdown_request, approve it.
 ```
 
+### Inter-Agent Communication Standards
+
+When agents send messages to each other (feedback, fix requests, issue reports, collaboration),
+the message must be **specific, detailed, and actionable**. Vague messages waste rounds and cause
+misunderstandings. Every message between agents must include:
+
+1. **Context** — What was done, what was being checked, what the current state is.
+2. **Specific findings** — Exact file paths, line numbers, code snippets, error messages.
+   Never say "there are issues" without listing them concretely.
+3. **Reasoning** — Why something is wrong, why a particular approach is needed, what the
+   consequences of the issue are. This helps the receiving agent make good decisions.
+4. **Actionable instructions** — What exactly needs to change. Not "fix the error handling"
+   but "In `src/auth/login.ts:45`, the catch block swallows the error silently. Wrap it in
+   a custom `AuthError` and re-throw so the caller can handle it."
+
+**Bad example:** "Code review found issues. Please fix the error handling and naming."
+
+**Good example:** "Code review found 2 issues in the authentication module:
+1. `src/auth/login.ts:45` — The catch block catches `Error` but logs and continues. This means
+   authentication failures are silently ignored. Fix: re-throw as `AuthenticationError` with the
+   original error as cause, so the route handler returns 401.
+2. `src/auth/types.ts:12` — `AuthResp` interface name is abbreviated. Project conventions
+   (per `CLAUDE.md` line 15) require full names. Rename to `AuthenticationResponse` and update
+   all 3 import sites: `login.ts:3`, `register.ts:5`, `middleware.ts:8`."
+
 For sub-agents that make implementation decisions (development, code review, spec creation),
 also append the `{CONTEXT_BLOCK}`:
 ```
@@ -132,12 +157,17 @@ infinite retry loops and makes progress visible.
 
 All steps follow the same 3-tier escalation:
 
-1. **Orchestrator feedback** (up to 2 rounds) — review issue, send fix instructions to the worker.
+1. **Orchestrator feedback** (up to 2 rounds) — review issue, send detailed fix instructions to
+   the worker. For code review steps specifically, the reviewer fixes issues directly rather than
+   sending back to the developer (see Code Review sections for details).
 2. **Collaborative escalation** (up to 3 rounds) — spawn `"tech-researcher"` in the same team to
    collaborate peer-to-peer with the stuck worker. A round = one researcher message + one worker
    response + one fix attempt. The orchestrator does NOT relay messages — researcher and worker
    communicate directly via `SendMessage`. The orchestrator monitors and only intervenes to shut down.
 3. **Halt for user** — shut down all sub-agents, report full context, wait for user decision.
+
+**All escalation messages must follow the Inter-Agent Communication Standards** — include context,
+specific findings, reasoning, and actionable instructions. Vague escalation messages waste rounds.
 
 > **Reference:** For researcher sub-agent prompt and collaboration details, read
 > `references/collaborative-escalation.md` in this skill's directory.
@@ -224,12 +254,32 @@ prompt: |
   Invoke the Skill tool with skill: "bmad-bmm-code-review"
   Review changes from the Quick Flow implementation.
   Verify alignment with tech-spec at: <path-to-tech-spec>
-  Report pass/fail with specific issues.
+
+  ## Reporting
+  If all checks pass → report PASS to team lead.
+  If issues are found → report each issue with:
+  - Exact file path and line number
+  - What is wrong and why it matters
+  - Your recommended fix approach
 ```
 
 **After sub-agent reports:**
-- Passes → shut down → Step 4. Issues found → shut down reviewer, send fix instructions to
-  "quick-developer" (still alive with context), then spawn new reviewer. Retry up to 2 rounds.
+- **Passes** → shut down → Step 4.
+- **Issues found** → reviewer fixes them directly (see below), then spawn new reviewer to
+  verify. Retry up to 2 rounds.
+
+**Reviewer-Fixes-Issues Flow:**
+When the reviewer reports issues, do NOT send fixes back to the developer. Instead:
+1. Send the reviewer a message asking it to fix the issues it found. Include:
+   - Acknowledgment of each reported issue
+   - Instruction to apply the fixes directly to the codebase
+   - Reminder to run relevant tests after fixing
+2. The reviewer already has full context of what's wrong and why — it identified the problems,
+   so it's best positioned to fix them correctly without context loss.
+3. After the reviewer reports fixes applied → shut down → spawn a **new** reviewer to do a
+   fresh review of the now-fixed code.
+4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds).
+5. After 2 rounds still failing → escalation ladder.
 
 ## Quick Flow Step 4: Functional Validation
 
@@ -365,12 +415,34 @@ prompt: |
   {CONTEXT_BLOCK}
   Invoke Skill: "bmad-bmm-code-review"
   Review code changes from the most recent story implementation.
-  Report pass/fail with specific issues.
+
+  ## Reporting
+  If all checks pass → report PASS to team lead.
+  If issues are found → report each issue with:
+  - Exact file path and line number
+  - What is wrong and why it matters (reference project standards if applicable)
+  - The code snippet causing the issue
+  - Your recommended fix approach
 ```
 
-- Passes → Step 4.5.
-- Issues → shut down reviewer, send fix instructions to "story-developer" (or spawn new one with
-  review context), then spawn new reviewer. Retry up to 2 rounds → escalation ladder.
+- **Passes** → Step 4.5.
+- **Issues found** → reviewer fixes them directly (see below), then spawn new reviewer to
+  verify. Retry up to 2 rounds → escalation ladder.
+
+**Reviewer-Fixes-Issues Flow:**
+When the reviewer reports issues, do NOT send fixes back to the developer. Instead:
+1. Send the reviewer a message asking it to fix the issues it found. The message must include:
+   - Acknowledgment of each reported issue
+   - Instruction to apply the fixes directly to the codebase
+   - Reminder to run the story's tests after fixing to ensure nothing breaks
+   - Context: the story file path and tech-spec (if any) so it understands intent
+2. The reviewer already has full context of what's wrong and why — it identified the problems,
+   so it's best positioned to fix them correctly without context loss.
+3. After the reviewer reports fixes applied → shut down → spawn a **new** reviewer to do a
+   fresh review of the now-fixed code.
+4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds).
+5. After 2 rounds still failing → escalation ladder (collaborative escalation with the
+   original "story-developer" if still alive, or a new developer with full issue context).
 
 #### Step 4.5: Functional Validation
 
@@ -432,8 +504,12 @@ When done or user stops: shut down all sub-agents → `TeamDelete`.
 6. **Align with architecture/PRD.** Misalignment → `/bmad-bmm-correct-course`.
 7. **Always attempt build validation.** Never commit code that doesn't compile.
 8. **Shut down agents after each step.** Don't leave idle agents running.
-9. **Feedback before respawn.** Send feedback to same agent for fixable issues. Only respawn
-   when transitioning steps (e.g., review back to development).
+9. **Reviewers fix their own findings.** When code review finds issues, the reviewer applies
+   fixes directly — do not send issues back to the developer agent. The reviewer has the best
+   context on what's wrong and how to fix it.
 10. **Create team once.** Don't recreate per story or epic.
 11. **Escalate before halting.** Always attempt collaborative escalation before asking user.
 12. **Automate before asking for help.** Sub-agents must investigate automation first.
+13. **Detailed inter-agent messages.** Every message between agents must include context,
+    specific findings (file paths, line numbers, snippets), reasoning, and actionable
+    instructions. See Inter-Agent Communication Standards.
