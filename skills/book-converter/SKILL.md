@@ -35,8 +35,6 @@ This initiates the complete conversion process.
 
 ## Workflow
 
-**CRITICAL: Use subagents for all formatting work to avoid polluting main context.**
-
 ### Phase 1: Setup and Extraction (Main Agent)
 
 Run the conversion script:
@@ -161,10 +159,7 @@ Return: Confirmation with summary of fixes applied."""
 )
 ```
 
-**Important**: 
-- Launch subagents in parallel batches (3-5 at a time) for efficiency
-- Each subagent must read chapter-workflow.md and formatting-standards.md
-- Follow the systematic workflow to ensure consistent quality
+**Important**: Launch subagents in parallel batches (3-5 at a time) for efficiency.
 
 **Output**: Formatted chapters in `books/book-name/chapters/`
 
@@ -189,37 +184,9 @@ The script will:
 
 **Note**: The merge script is reusable - no need to create it per book!
 
-## Critical: Chapter Formatting Requirements
+## Subagent Usage
 
-**Every subagent in Phase 3 MUST:**
-
-1. **Read chapter-workflow.md first** - Contains the complete step-by-step process
-2. **Read formatting-standards.md** - Contains all formatting rules (678 lines)
-3. **Follow the workflow systematically** - Don't skip steps
-4. **Use the three-pass approach**:
-   - First pass: Fix structure (headers, code blocks)
-   - Second pass: Fix content (paragraphs, emphasis)
-   - Third pass: Fix details (footnotes, images, links)
-5. **Complete the quality checklist** - Verify all items before finishing
-
-**Why this matters:**
-- Ensures consistent quality across all chapters
-- Prevents common mistakes (skipped issues, inconsistent style)
-- Proven process from Clean Code Collection (35k+ lines)
-- Each chapter is only formatted once - must be thorough
-
-**The workflow documents are your complete instructions - trust them!**
-
-## Subagent Usage Principles
-
-**Never process book content in main context.** Always use subagents to:
-
-1. **Keep main context clean**: Book content is large and pollutes context
-2. **Enable parallelization**: Format multiple chapters simultaneously
-3. **Isolate formatting work**: Each chapter gets fresh context
-4. **Avoid token limits**: Raw content can exceed context windows
-
-**Subagent Selection**: Always use `subagent_type="general"` for all book processing tasks.
+**Never process book content in main context.** Use `subagent_type="general"` subagents to keep main context clean, enable parallel chapter formatting, and avoid token limits with large raw content.
 
 ## Progress Tracking
 

@@ -72,10 +72,7 @@ This skill guides you through converting a book (in markdown format) into a well
 
 ### Phase 2: Planning
 
-**STOP! Before proceeding, you MUST:**
-1. Read `references/extraction-patterns.md` completely
-2. Read `references/file-templates.md` completely
-3. Only then proceed with the steps below
+**Prerequisites:** Read `references/extraction-patterns.md` and `references/file-templates.md` before proceeding.
 
 **Phase 2 Steps:**
 
@@ -129,12 +126,9 @@ This skill guides you through converting a book (in markdown format) into a well
 
 ### Phase 3: Extraction
 
-**STOP! Before proceeding, you MUST:**
-1. Have completed Phase 1 and Phase 2
-2. Have user confirmation on the plan
-3. Only then proceed with extraction
+**Prerequisites:** Phases 1-2 complete with user confirmation.
 
-**CRITICAL: You MUST use subagents (Task tool) for extraction. One subagent per topic - each subagent creates ALL files for that topic.**
+**CRITICAL: Use subagents (Task tool) for extraction — one subagent per topic, each creating ALL files for that topic.**
 
 #### Main Agent Instructions for Phase 3
 
@@ -207,64 +201,15 @@ Good/bad code examples, before/after comparisons.
 - Convert ALL code examples to target language
 ```
 
-#### Example: Filled Subagent Prompt
+#### Example: Filled Subagent Prompt (abbreviated)
 
-```markdown
-## Task: Extract Functions Knowledge Base
-
-You are extracting knowledge from a book section to create a complete topic reference.
-
-### Prerequisites - Read These Files First:
-1. `skills/skill-from-book/references/file-templates.md` - Templates for all file types
-2. `skills/skill-from-book/references/extraction-patterns.md` - Extraction rules
-
-### Source Material:
-- **Book**: /path/to/clean-code.md
-- **Section**: Chapter 3 - Functions
-- **Line range**: Read with offset=450, limit=380
-
-### Output Directory: skills/clean-code/references/functions
-
-### Files to Create (in this order):
-
-#### 1. knowledge.md (REQUIRED)
-Core concepts, definitions, and foundational understanding.
-- Extract: what makes a function clean, key terminology (side effects, arguments, abstraction levels), how functions relate to other concepts
-- Use the "Knowledge File" template
-
-#### 2. rules.md (REQUIRED)
-Specific guidelines, do's and don'ts.
-- Extract: size rules, argument limits, naming conventions, single responsibility, do one thing principle
-- Use the "Rules File" template
-
-#### 3. examples.md (REQUIRED)
-Good/bad code examples, before/after comparisons.
-- Extract: all code samples showing good vs bad functions, refactoring walkthroughs
-- Use the "Examples File" template
-
-#### 4. checklist.md (OPTIONAL)
-Quick reference for reviewing functions.
-- Create a checklist from the rules for code review
-
-### Your Instructions:
-1. Read the two prerequisite files FIRST to understand templates and extraction rules
-2. Read the book section ONCE using: offset=450, limit=380
-3. From that single read, extract content for ALL files listed above
-4. For each file:
-   - Transform content (prose → bullets, extract rules, include examples)
-   - Format using the appropriate template from file-templates.md
-   - Keep each file under 200 lines
-   - Write to skills/clean-code/references/functions/[filename].md
-5. Create files in order: knowledge.md → rules.md → examples.md → checklist.md
-
-### Content Guidance:
-Focus on practical, actionable content. Skip author anecdotes and historical context. Prioritize rules that are universally applicable.
-
-### Language Conversion:
-- Source: Java
-- Target: TypeScript
-- Convert ALL code examples to TypeScript
-```
+For a "Functions" topic from Chapter 3 (lines 450-830) of `clean-code.md`, the filled template would specify:
+- **Source**: `/path/to/clean-code.md`, offset=450, limit=380
+- **Output**: `skills/clean-code/references/functions/`
+- **Required files**: knowledge.md (key terminology, abstraction levels), rules.md (size rules, argument limits, SRP), examples.md (good vs bad functions, refactoring walkthroughs)
+- **Optional**: checklist.md (review checklist derived from rules)
+- **Content guidance**: Focus on practical, actionable content; skip anecdotes
+- **Language conversion**: Java → TypeScript
 
 #### Parallel Extraction Strategy
 
@@ -275,24 +220,18 @@ Focus on practical, actionable content. Skip author anecdotes and historical con
 
 **Must wait**: guidelines.md and workflows creation waits for ALL topic subagents to complete
 
-#### Main Agent Checklist Before Launching Subagent
+#### Pre-Launch Checklist
 
-- [ ] All placeholders replaced with actual values
-- [ ] Line offset and limit calculated from Phase 1 TOC
-- [ ] Output directory path follows naming convention
-- [ ] All required files (knowledge.md, rules.md, examples.md) listed
-- [ ] Optional files specified with clear content guidance
-- [ ] Content guidance is specific to this topic
+- [ ] All placeholders replaced with actual values (no brackets remaining)
+- [ ] Line offset/limit calculated from Phase 1 TOC
+- [ ] Output path follows naming convention; content guidance is topic-specific
 - [ ] Language conversion specified if needed
 
 ---
 
 ### Phase 4: Guidelines Creation
 
-**STOP! Before proceeding, you MUST:**
-1. Have completed all extraction tasks in Phase 3
-2. Read `references/guidelines-template.md` completely
-3. Only then proceed with guidelines creation
+**Prerequisites:** Phase 3 extraction complete. Read `references/guidelines-template.md` before proceeding.
 
 **Phase 4 Steps:**
 
@@ -306,10 +245,7 @@ Create `guidelines.md` that maps:
 
 ### Phase 5: Workflow Proposal
 
-**STOP! Before proceeding, you MUST:**
-1. Have completed Phase 4 (Guidelines)
-2. Read `references/workflow-templates.md` completely
-3. Only then proceed with workflow proposal
+**Prerequisites:** Phase 4 complete. Read `references/workflow-templates.md` before proceeding.
 
 **Phase 5 Steps:**
 
@@ -401,23 +337,11 @@ Create `guidelines.md` that maps:
 
 ## File Naming Conventions
 
-```
-skill-name/
-├── SKILL.md
-├── guidelines.md
-├── progress.md
-├── workflows/                # Step-by-step processes
-│   ├── [verb]-[noun].md      # e.g., code-review.md, bug-fix.md
-│   └── ...
-└── references/
-    ├── [category]/           # Noun, plural (e.g., functions, classes)
-    │   ├── knowledge.md      # REQUIRED: Core concepts and definitions
-    │   ├── rules.md          # REQUIRED: Specific guidelines
-    │   ├── examples.md       # REQUIRED: Good/bad examples
-    │   ├── patterns.md       # Optional: Reusable solutions
-    │   ├── smells.md         # Optional: Anti-patterns
-    │   └── checklist.md      # Optional: Quick reference
-```
+Follow the file structure defined in Phase 2. Key naming rules:
+- **Workflows**: `workflows/[verb]-[noun].md` (e.g., `code-review.md`, `bug-fix.md`)
+- **Categories**: Noun, plural (e.g., `functions/`, `classes/`)
+- **Required per category**: `knowledge.md`, `rules.md`, `examples.md`
+- **Optional per category**: `patterns.md`, `smells.md`, `checklist.md`
 
 ## Progress Tracking
 

@@ -1,6 +1,6 @@
 ---
 name: slides-generator
-description: Generate interactive presentation slides using React + Tailwind, and export to standalone single-file HTML. Triggers on keywords like "slides", "presentation", "PPT", "demo", "benchmark", or when user requests export. Uses agent-browser skill for browser verification before export (install with `npx skills add vercel-labs/agent-browser` if not available).
+description: Generate interactive presentation slides using React + Tailwind, and export to standalone single-file HTML. Triggers on keywords like "slides", "presentation", "PPT", "slide deck", or when user requests slide export. Uses agent-browser skill for browser verification before export (install with `npx skills add vercel-labs/agent-browser` if not available).
 ---
 
 # Slides Generator
@@ -619,24 +619,7 @@ agent-browser screenshot <project-folder>/verify/slide-02.png
 | Interactive | Hover elements | Visual feedback works |
 | Responsive | Change viewport | Layout adapts correctly |
 
-### 7.5 Common Issues to Check
-
-**Layout Problems:**
-- Content extending beyond viewport
-- Navigation bar hidden or overlapped
-- Cards cramped or overflowing
-
-**Animation Problems:**
-- Stuttering transitions
-- Elements not animating
-- Flash of unstyled content
-
-**Interaction Problems:**
-- Keyboard navigation not working
-- Click areas not responsive
-- Hover states missing
-
-### 7.6 Fix and Re-verify
+### 7.5 Fix and Re-verify
 
 If issues found:
 1. Fix the problematic slide JSX
@@ -704,173 +687,36 @@ When slides require custom images, diagrams, or illustrations, use the **ai-mult
 3. Save images to `source/public/images/`
 4. Reference in slides: `<img src="/images/generated-image.png" />`
 
-## Theme System
+## Theme System & Design Principles
 
-Themes are defined in [palettes.md](references/palettes.md).
-
-**Quick recommendations:**
-
-| User says | Recommend |
-|-----------|-----------|
-| "Tech", "Modern" | dark-sapphire-blue (glass) |
-| "Professional", "Business" | banking-website (flat) |
-| "Cyberpunk", "Neon" | cyberpunk (glass) |
-| "Natural", "Organic" | summer-meadow (flat) |
-| "Minimal", "Clean" | black-and-white (flat) |
-
-## Design Principles
-
-See [principles.md](references/principles.md) for:
-- Color variable usage
-- Typography scale
-- Spacing conventions
-- Component structure
+Themes are defined in [palettes.md](references/palettes.md). For theme-to-scenario mapping, see "Design Patterns by Scenario" in Step 3. For design principles (color variables, typography scale, spacing, component structure), see [principles.md](references/principles.md).
 
 ## Example Interaction
 
 ```
-User: "Create a benchmark presentation for Claude vs GPT"
+User: "Create a presentation comparing Claude vs GPT coding abilities"
 
-Claude: "I'll help create benchmark slides.
-
-Where would you like to save this presentation?
-Default: ./claude-benchmark"
-
+Claude: [Step 1] "Where would you like to save? Default: ./claude-benchmark"
 User: "OK"
 
-Claude: "What's this presentation about? Give me a brief description."
+Claude: [Step 2 - Phase 1-2] Collects topic, audience (Technical team), goal (Inform)
+Claude: [Step 2 - Phase 3] Runs ui-ux-pro-max, presents 5 style options
+User: "1" → Dark Sapphire Blue (glass)
 
-User: "Comparing Claude and GPT coding abilities for our dev team"
-
-Claude: "Who will view this?
-  - Executives / Decision makers
-  - Technical team / Developers ←
-  - General audience
-  - Customers"
-
-User: "Technical team"
-
-Claude: "What's the goal?
-  - Inform - Share findings
-  - Persuade - Recommend one model
-  - Demo - Show capabilities
-  - Report - Present data"
-
-User: "Inform"
-
-Claude: "Describe the vibe in a few words (e.g., tech, modern, professional)"
-
-User: "tech, modern, dark, sleek"
-
-Claude: [Runs ui-ux-pro-max: python3 ~/.claude/skills/ui-ux-pro-max/scripts/search.py "AI benchmark tech modern dark presentation" --design-system]
-
-Claude: "Based on design analysis, here are 5 style options:
-
-1. **Dark Sapphire Blue** (glass) - Recommended
-   Dark tech with blue accents, gradient glows
-   Typography: Sora + Source Sans 3
-   Best for: Tech products, developer tools
-
-2. **Electric City Nights** (glass)
-   Urban dark with vibrant blue highlights
-   Typography: DM Sans + Work Sans
-   Best for: Modern SaaS, tech startups
-
-3. **Purple Dark Black Blue** (glass)
-   Deep purple-blue, cyberpunk undertones
-   Typography: Outfit + Nunito Sans
-   Best for: AI/ML, futuristic topics
-
-4. **Hacker News** (glass)
-   Dark with orange accents, geek aesthetic
-   Typography: Sora + Source Sans 3
-   Best for: Developer content, technical demos
-
-5. **Space** (glass)
-   Deep space theme with gold accents
-   Typography: Manrope + Source Sans 3
-   Best for: Innovation, visionary topics
-
-Which style? (1-5)"
-
-User: "1"
-
-Claude: "Selected: Dark Sapphire Blue (glass) with Sora + Source Sans 3"
-
-Claude: "What are 3-5 key points to cover?"
-
+Claude: [Step 2 - Phase 4] "What are 3-5 key points?"
 User: "Coding ability, reasoning, context window, speed"
 
-Claude: "This topic would benefit from current benchmark data.
-Would you like me to research:
-  [ ] Current benchmark statistics
-  [ ] Model comparison data
-  [ ] Skip research"
+Claude: [Step 2.5] Offers research → User confirms → Researches benchmarks → User verifies data
 
-User: "Yes, research current benchmarks"
-
-Claude: [Conducts web search for current AI benchmarks]
-Claude: "I found the following data:
-- Claude scores 92% on HumanEval (coding)
-- GPT-4 scores 87% on HumanEval
-- Claude has 200K context, GPT-4 has 128K
-[Sources: official docs, research papers]
-
-Does this look accurate?"
-
-User: "Yes, use that"
-
-Claude: [Creates ./claude-benchmark/ folder structure]
-Claude: [Saves research to ./claude-benchmark/researches/2026-01-29-benchmark-data.md]
-Claude: [Creates ./claude-benchmark/context.md with verified data]
-Claude: [Creates ./claude-benchmark/slides.md]
-Claude: "Here's the outline:
-
-## Presentation Outline
-
-**Title**: Claude vs GPT Coding Benchmark
-**Theme**: dark-sapphire-blue (glass)
-
-**Slides**:
-1. Hero - Title and model overview
-2. Framework - Evaluation methodology
-3. Task 1 - API development
-4. Task 2 - React components
-5. Task 3 - CLI tools
-6. Summary - Results and recommendations
-
-Confirm to generate?"
-
+Claude: [Steps 3-4] Creates context.md, slides.md, presents outline:
+  1. Hero  2. Framework  3-5. Task slides  6. Summary
 User: "OK"
 
-Claude: [Creates source/ from template]
-Claude: [Generates 6 slide JSX files]
-Claude: [Updates App.jsx with imports]
-Claude: [Starts dev server: npm run dev]
-Claude: [Opens browser: agent-browser open http://localhost:5173]
-Claude: [Verifies each slide, takes screenshots]
-Claude: "Verification complete. All slides look good:
-- Layout: ✓ No overflow issues
-- Navigation: ✓ Arrow keys work
-- Animations: ✓ Smooth transitions
+Claude: [Steps 5-6] Creates source/ from template, generates 6 slide JSX files
+Claude: [Step 7] Starts dev server, verifies with agent-browser, captures screenshots
+Claude: [Step 8] Builds standalone → ./claude-benchmark/slide.html
 
-Building standalone export..."
-
-Claude: [Runs npm run build:standalone]
-Claude: [Copies to slide.html]
-Claude: [Final verification of slide.html]
-Claude: [Closes browser]
-Claude: "Presentation complete!
-
-Files created:
-- ./claude-benchmark/context.md
-- ./claude-benchmark/researches/2026-01-29-benchmark-data.md
-- ./claude-benchmark/slides.md
-- ./claude-benchmark/source/ (React project)
-- ./claude-benchmark/verify/ (verification screenshots)
-- ./claude-benchmark/slide.html ← Open this in browser
-
-Open slide.html to view your presentation."
+"Presentation complete! Open slide.html to view."
 ```
 
 ## Reference Documentation

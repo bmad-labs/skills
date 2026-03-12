@@ -1,6 +1,6 @@
 ---
 name: mcp-builder
-description: Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).
+description: Build MCP (Model Context Protocol) servers — define tool schemas with Zod/Pydantic, implement resource handlers, configure authentication, structure server responses, set tool annotations, and create evaluations. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).
 license: Complete terms in LICENSE.txt
 ---
 
@@ -50,8 +50,8 @@ Key pages to review:
 #### 1.3 Study Framework Documentation
 
 **Recommended stack:**
-- **Language**: TypeScript (high-quality SDK support and good compatibility in many execution environments e.g. MCPB. Plus AI models are good at generating TypeScript code, benefiting from its broad usage, static typing and good linting tools)
-- **Transport**: Streamable HTTP for remote servers, using stateless JSON (simpler to scale and maintain, as opposed to stateful sessions and streaming responses). stdio for local servers.
+- **Language**: TypeScript (recommended) or Python
+- **Transport**: Streamable HTTP with stateless JSON for remote servers; stdio for local servers
 
 **Load framework documentation:**
 
@@ -93,34 +93,31 @@ Create shared utilities:
 
 #### 2.3 Implement Tools
 
-For each tool:
+**Minimal tool registration example (TypeScript MCP SDK):**
 
-**Input Schema:**
-- Use Zod (TypeScript) or Pydantic (Python)
-- Include constraints and clear descriptions
-- Add examples in field descriptions
+```ts
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
 
-**Output Schema:**
-- Define `outputSchema` where possible for structured data
-- Use `structuredContent` in tool responses (TypeScript SDK feature)
-- Helps clients understand and process tool outputs
+const server = new McpServer({ name: "my-server", version: "1.0.0" });
 
-**Tool Description:**
-- Concise summary of functionality
-- Parameter descriptions
-- Return type schema
+server.tool(
+  "list_items",
+  "List items with optional status filter",
+  { status: z.enum(["open", "closed"]).optional().describe("Filter by status") },
+  async ({ status }) => {
+    const items = await fetchItems(status);
+    return { content: [{ type: "text", text: JSON.stringify(items) }] };
+  }
+);
+```
 
-**Implementation:**
-- Async/await for I/O operations
-- Proper error handling with actionable messages
-- Support pagination where applicable
-- Return both text content and structured data when using modern SDKs
-
-**Annotations:**
-- `readOnlyHint`: true/false
-- `destructiveHint`: true/false
-- `idempotentHint`: true/false
-- `openWorldHint`: true/false
+**Tool implementation checklist:**
+- Define input schemas with Zod (TypeScript) or Pydantic (Python); include constraints and descriptions
+- Define `outputSchema` where possible; use `structuredContent` for structured responses
+- Write concise tool descriptions with parameter docs and return type
+- Use async/await, actionable error messages, and pagination support
+- Set annotations: `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`
 
 ---
 
