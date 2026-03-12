@@ -1,56 +1,17 @@
 ---
 name: typescript-e2e-testing
-description: |
-  Complete E2E (end-to-end) and integration testing skill for TypeScript/NestJS projects using Jest, real infrastructure via Docker, and GWT pattern.
-
-  ALWAYS use this skill when user needs to:
-
-  **SETUP** - Initialize or configure E2E testing infrastructure:
-  - Set up E2E testing for a new project
-  - Configure docker-compose for testing (Kafka, PostgreSQL, MongoDB, Redis)
-  - Create jest-e2e.config.ts or E2E Jest configuration
-  - Set up test helpers for database, Kafka, or Redis
-  - Configure .env.e2e environment variables
-  - Create test/e2e directory structure
-
-  **WRITE** - Create or add E2E/integration tests:
-  - Write, create, add, or generate e2e tests or integration tests
-  - Test API endpoints, workflows, or complete features end-to-end
-  - Test with real databases, message brokers, or external services
-  - Test Kafka consumers/producers, event-driven workflows
-  - Working on any file ending in .e2e-spec.ts or in test/e2e/ directory
-  - Use GWT (Given-When-Then) pattern for tests
-
-  **REVIEW** - Audit or evaluate E2E tests:
-  - Review existing E2E tests for quality
-  - Check test isolation and cleanup patterns
-  - Audit GWT pattern compliance
-  - Evaluate assertion quality and specificity
-  - Check for anti-patterns (multiple WHEN actions, conditional assertions)
-
-  **RUN** - Execute or analyze E2E test results:
-  - Run E2E tests
-  - Start/stop Docker infrastructure for testing
-  - Analyze E2E test results
-  - Verify Docker services are healthy
-  - Interpret test output and failures
-
-  **DEBUG** - Fix failing or flaky E2E tests:
-  - Fix failing E2E tests
-  - Debug flaky tests or test isolation issues
-  - Troubleshoot connection errors (database, Kafka, Redis)
-  - Fix timeout issues or async operation failures
-  - Diagnose race conditions or state leakage
-  - Debug Kafka message consumption issues
-
-  **OPTIMIZE** - Improve E2E test performance:
-  - Speed up slow E2E tests
-  - Optimize Docker infrastructure startup
-  - Replace fixed waits with smart polling
-  - Reduce beforeEach cleanup time
-  - Improve test parallelization where safe
-
-  Keywords: e2e, end-to-end, integration test, e2e-spec.ts, test/e2e, Jest, supertest, NestJS, Kafka, Redpanda, PostgreSQL, MongoDB, Redis, docker-compose, GWT pattern, Given-When-Then, real infrastructure, test isolation, flaky test, MSW, nock, waitForMessages, fix e2e, debug e2e, run e2e, review e2e, optimize e2e, setup e2e
+description: >
+  E2E and integration testing for TypeScript/NestJS projects using Jest, Docker-based real infrastructure, and GWT (Given-When-Then) pattern.
+  Use when setting up E2E test infrastructure (docker-compose, jest-e2e.config.ts, .env.e2e, test helpers),
+  writing or generating e2e-spec.ts / integration tests for API endpoints or event-driven workflows,
+  reviewing tests for GWT compliance and isolation quality,
+  running E2E suites and interpreting results,
+  debugging flaky tests, timeouts, connection errors, or race conditions,
+  or optimizing test performance (smart polling, cleanup, parallelization).
+  Covers Kafka, Redpanda, PostgreSQL, MongoDB, Redis, supertest, MSW, and nock.
+  Keywords: e2e, end-to-end, integration test, e2e-spec.ts, test/e2e, Jest, NestJS, docker-compose,
+  GWT pattern, Given-When-Then, test isolation, flaky test, waitForMessages, fix e2e, debug e2e,
+  run e2e, review e2e, optimize e2e, setup e2e
 ---
 
 # E2E Testing Skill

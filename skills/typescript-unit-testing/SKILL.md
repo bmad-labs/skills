@@ -1,52 +1,21 @@
 ---
 name: typescript-unit-testing
-description: |
-  Complete unit testing skill for TypeScript/NestJS projects using Jest, @golevelup/ts-jest, and in-memory databases.
+description: >
+  Complete unit testing skill for TypeScript/NestJS projects using Jest,
+  @golevelup/ts-jest, and in-memory databases. Covers the full testing
+  lifecycle: setup (Jest config, @nestjs/testing, coverage), writing tests
+  for services, controllers, guards, interceptors, pipes, and filters,
+  reviewing test quality and coverage gaps, running and analyzing results,
+  debugging failures (mock issues, flaky tests, timeouts, open handles),
+  and optimizing test performance. Uses AAA pattern, DeepMocked/createMock,
+  .spec.ts conventions, and test data factories.
 
-  ALWAYS use this skill when user needs to:
+  Use when the user needs to write, create, add, fix, debug, run, review,
+  or optimize unit tests in TypeScript/NestJS projects, configure Jest,
+  mock dependencies, improve test coverage, or work with .spec.ts files.
 
-  **SETUP** - Initialize or configure unit testing:
-  - Set up Jest for a new project
-  - Configure test infrastructure (jest.config.ts)
-  - Install testing dependencies (@nestjs/testing, @golevelup/ts-jest)
-  - Create mock helpers or test utilities
-  - Set up coverage configuration
-
-  **WRITE** - Create or add unit tests:
-  - Write, create, add, or generate unit tests
-  - Test a service, usecase, controller, guard, interceptor, pipe, or filter
-  - Add tests for new code or features
-  - Improve test coverage or add missing tests
-  - Mock dependencies or set up test fixtures
-  - Working on any file ending in .spec.ts
-
-  **REVIEW** - Audit or evaluate unit tests:
-  - Review existing tests for quality
-  - Check test coverage and gaps
-  - Audit testing patterns and conventions
-  - Evaluate assertion quality
-
-  **RUN** - Execute or analyze test results:
-  - Run unit tests
-  - Analyze test results or coverage reports
-  - Understand test failures or successes
-  - Check which tests are passing/failing
-
-  **DEBUG** - Fix failing or broken tests:
-  - Fix failing unit tests
-  - Debug test errors or exceptions
-  - Resolve mock issues or setup problems
-  - Troubleshoot test timeouts or flaky tests
-  - Diagnose "undefined" or unexpected results
-
-  **OPTIMIZE** - Improve test performance and maintainability:
-  - Speed up slow tests
-  - Fix open handles preventing clean exit
-  - Improve test organization
-  - Reduce test execution time
-  - Clean up test code
-
-  Keywords: unit test, spec, jest, typescript, nestjs, mock, DeepMocked, createMock, AAA, test coverage, TDD, .spec.ts, testing, write test, add test, create test, fix test, debug test, run test, review test, optimize test, test setup, jest config
+  Keywords: unit test, spec, jest, typescript, nestjs, mock, DeepMocked,
+  createMock, AAA, test coverage, TDD, .spec.ts, jest config
 ---
 
 # Unit Testing Skill

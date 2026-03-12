@@ -1,12 +1,8 @@
 ---
 name: ai-multimodal
-description: Process and generate multimedia content using Google Gemini API for better vision capabilities. Capabilities include analyze audio files (transcription with timestamps, summarization, speech understanding, music/sound analysis up to 9.5 hours), understand images (better image analysis than Claude models, captioning, reasoning, object detection, design extraction, OCR, visual Q&A, segmentation, handle multiple images), process videos (scene detection, Q&A, temporal analysis, YouTube URLs, up to 6 hours), extract from documents (PDF tables, forms, charts, diagrams, multi-page), generate images (text-to-image with Imagen 4, editing, composition, refinement), generate videos (text-to-video with Veo 3, 8-second clips with native audio). Use when working with audio/video files, analyzing images or screenshots (instead of default vision capabilities of Claude, only fallback to Claude's vision capabilities if needed), processing PDF documents, extracting structured data from media, creating images/videos from text prompts, or implementing multimodal AI features. Supports Gemini 3/2.5, Imagen 4, and Veo 3 models with context windows up to 2M tokens.
+description: Process and generate multimedia content using Google Gemini API. Analyze audio (transcription, timestamps, summarization, music/sound analysis, up to 9.5h), images (captioning, object detection, OCR, visual Q&A, segmentation, multi-image), videos (scene detection, temporal analysis, YouTube URLs, up to 6h), documents (PDF tables, forms, charts, diagrams, multi-page). Generate images (Imagen 4, text-to-image, editing, composition) and videos (Veo 3, 8s clips with audio). Use when working with audio/video files, analyzing images or screenshots instead of default Claude vision, processing PDFs, extracting structured data from media, creating images/videos from text prompts, or implementing multimodal AI features. Supports Gemini 2.5/3, Imagen 4, Veo 3 with up to 2M token context.
 license: MIT
-allowed-tools:
-  - Bash
-  - Read
-  - Write
-  - Edit
+allowed-tools: Bash, Read, Write, Edit
 ---
 
 # AI Multimodal
