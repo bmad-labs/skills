@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the triage-issue sub-skill file",
+      "passed": true,
+      "evidence": "\"Primary workflow: workflows/triage-issue.md -- the 'Triage Issue' workflow for bug reports with duplicate detection.\""
+    },
+    {
+      "text": "Extracts error signature, component (payment), and symptom (checkout failing)",
+      "passed": true,
+      "evidence": "Table shows: Error signature = \"Connection timeout\", Component = \"Payment service\", User-facing symptom = \"Checkout fails\"."
+    },
+    {
+      "text": "Runs at least 2 different search queries with different JQL strategies",
+      "passed": true,
+      "evidence": "Runs 6 different search strategies: by error message text, by component, by summary keywords, broader keyword combinations (2 queries), time-scoped recent bugs, plus a Confluence CQL search."
+    },
+    {
+      "text": "Searches for both open and resolved issues",
+      "passed": true,
+      "evidence": "Strategy 1 searches all bugs (no status filter). Strategy 2 filters to open (statusCategory != Done). Strategy 5 searches recent bugs regardless of status. Analysis includes checking resolved issues as \"Possible regression\"."
+    },
+    {
+      "text": "Presents findings with confidence/similarity assessment",
+      "passed": true,
+      "evidence": "Presentation format shows assessment labels: \"LIKELY DUPLICATE\", \"POSSIBLE REGRESSION\", \"LIKELY RELATED\". Each match rated as exact duplicate, likely related, possible regression, or unrelated."
+    },
+    {
+      "text": "Offers options: create new, comment on existing, or show more details",
+      "passed": true,
+      "evidence": "Section 5 presents: \"Would you like me to: (a) Add a comment to DO-XXX... (b) Create a new bug ticket and link it... (c) Create a brand new standalone bug ticket?\" Plus Option D for regression reopening."
+    },
+    {
+      "text": "Asks which project if not specified, or searches broadly",
+      "passed": false,
+      "evidence": "The approach assumes project DO without asking. No evidence of asking about which project or searching broadly across projects."
+    },
+    {
+      "text": "References bug-report-templates.md",
+      "passed": true,
+      "evidence": "\"Summary follows references/bug-report-templates.md format\" and \"Description follows the 'Standard Bug Template' structure from references/bug-report-templates.md.\""
+    }
+  ],
+  "summary": { "passed": 7, "failed": 1, "total": 8, "pass_rate": 0.88 }
+}

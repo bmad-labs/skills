@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": false,
+      "evidence": "States 'I cannot complete this task. Without the Atlassian skill (specifically the sync-bmad-documents sub-skill and sync.mjs helper script)...'"
+    },
+    {
+      "text": "Uses sync.mjs diff to compare local vs remote",
+      "passed": false,
+      "evidence": "Lists 'No sync.mjs helper script' as a barrier. Does not use sync.mjs diff."
+    },
+    {
+      "text": "Presents results with per-section change indicators (-> push, <- pull, conflict, = unchanged)",
+      "passed": false,
+      "evidence": "Step 6 describes the indicator concepts theoretically but explicitly states this cannot be done: 'Without the sync-bmad-documents sub-skill and its sync.mjs diff command... the task cannot be completed programmatically'"
+    },
+    {
+      "text": "Shows a summary table of sections and their sync status",
+      "passed": false,
+      "evidence": "Step 7 shows a hypothetical summary table format but no actual data is produced since the task could not be completed"
+    },
+    {
+      "text": "If conflicts exist, offers to help resolve them",
+      "passed": false,
+      "evidence": "Step 8 mentions conflict resolution options conceptually but no actual conflict detection or resolution is performed"
+    }
+  ],
+  "summary": { "passed": 0, "failed": 5, "total": 5, "pass_rate": 0.0 }
+}

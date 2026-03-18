@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs spaces as the first command",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses MCP tool 'getConfluenceSpaces' instead and starts with 'getAccessibleAtlassianResources' to discover cloud ID first."
+    },
+    {
+      "text": "Uses confluence.mjs search with CQL targeting the HR space",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses MCP tool 'searchConfluenceUsingCql' instead."
+    },
+    {
+      "text": "CQL includes text or title matching 'onboarding'",
+      "passed": true,
+      "evidence": "CQL query: 'type = page AND space = \"HR\" AND text ~ \"onboarding\"'"
+    },
+    {
+      "text": "Operations are sequenced (search depends on spaces list)",
+      "passed": true,
+      "evidence": "Explicit dependency chain: 'Cloud ID discovery (Step 1) must complete before anything else' and 'Spaces listing (Step 2) must complete before the search' and 'CQL search (Step 4) depends on the confirmed space key from Steps 2-3.'"
+    }
+  ],
+  "summary": { "passed": 2, "failed": 2, "total": 4, "pass_rate": 0.5 }
+}

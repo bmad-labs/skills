@@ -66,6 +66,7 @@ The sync system uses JSON mapping files to define how BMAD document sections map
 | `jiraFieldId` | Yes | Jira API field ID (`summary`, `description`, or `customfield_NNNNN`) |
 | `jiraFieldType` | Yes | Field data type: `string`, `adf`, `array`, `option` |
 | `transform` | Yes | How to convert: `direct` (pass through) or `markdownToAdf` (convert markdown to ADF) |
+| `_needsReview` | No | Boolean flag set to `true` by `setup-mapping` on auto-detected custom fields. Highlight these to the user for confirmation. |
 
 ### Transform Types
 

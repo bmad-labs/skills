@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": false,
+      "evidence": "States 'there is no sync.mjs helper script, no sync-state tracking, no per-section diff engine, and no interactive conflict-resolution workflow'"
+    },
+    {
+      "text": "Uses sync.mjs diff to identify the conflicting section",
+      "passed": false,
+      "evidence": "Challenge table: 'No sync.mjs diff command -- Cannot automatically detect which sections have conflicts; must manually fetch and compare everything'"
+    },
+    {
+      "text": "Shows the conflict indicator for the Overview section",
+      "passed": false,
+      "evidence": "States 'the agent has no structured conflict indicator (like the !!! symbol)' and 'No per-section change indicators'"
+    },
+    {
+      "text": "Presents both the local version and the remote version side by side",
+      "passed": true,
+      "evidence": "Step 4 shows a side-by-side presentation format: '=== LOCAL VERSION (Overview section from docs/epics/auth-epic.md) ===' and '=== REMOTE VERSION (Jira description from PROJ-100) ==='"
+    },
+    {
+      "text": "Asks the user to choose: keep local, keep remote, or skip",
+      "passed": true,
+      "evidence": "Step 4: 'How would you like to resolve this conflict? 1. Keep local, 2. Keep remote, 3. Skip'"
+    },
+    {
+      "text": "Executes push or pull based on the user's choice for the conflicted section",
+      "passed": false,
+      "evidence": "Step 5 describes using mcp__plugin_atlassian_atlassian__editJiraIssue for push or manual file editing for pull, not sync.mjs push/pull. Also notes 'Without a skill, there is no sync.mjs push command'"
+    }
+  ],
+  "summary": { "passed": 2, "failed": 4, "total": 6, "pass_rate": 0.33 }
+}

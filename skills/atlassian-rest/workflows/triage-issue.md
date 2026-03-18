@@ -18,6 +18,8 @@ Gather bug details from the user:
 
 If any critical details are missing, ask follow-up questions before proceeding.
 
+If the user has not specified a Jira project, either ask which project to search in, or search broadly across all projects by omitting `project = X` from JQL. Do not assume a default project.
+
 ## Step 2: Search for Duplicates
 
 Run multiple searches to find potential duplicates or related issues.

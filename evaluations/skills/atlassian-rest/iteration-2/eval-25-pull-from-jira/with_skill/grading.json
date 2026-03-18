@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": true,
+      "evidence": "Skill Reference lists 'Workflow: workflows/sync-bmad-documents.md (bidirectional sync between local BMAD docs and Jira/Confluence)'"
+    },
+    {
+      "text": "Uses sync.mjs status to verify the document is linked to PROJ-100",
+      "passed": true,
+      "evidence": "Step 3: 'node <skill-path>/scripts/sync.mjs status docs/epics/platform-epic.md' and checks linked status"
+    },
+    {
+      "text": "Uses sync.mjs pull to fetch remote changes",
+      "passed": true,
+      "evidence": "Step 8: 'node <skill-path>/scripts/sync.mjs pull docs/epics/platform-epic.md'"
+    },
+    {
+      "text": "Reports which sections/fields were updated in the local document",
+      "passed": true,
+      "evidence": "Step 9 presents a summary table with columns Action, Section/Field, Result showing pulled sections like 'Overview', 'Story 1.1', 'Story 1.4'"
+    },
+    {
+      "text": "For epic docs, handles child story tickets if any exist remotely",
+      "passed": true,
+      "evidence": "Step 8: 'For an epic document, the pull handles child stories automatically: New remote child tickets (stories added in Jira under DO-100) are appended as new story sections in the local doc'"
+    }
+  ],
+  "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0 }
+}

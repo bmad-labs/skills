@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": true,
+      "evidence": "Workflow Followed: 'workflows/sync-bmad-documents.md -- Batch Mode (Steps B1 through B3)'"
+    },
+    {
+      "text": "Checks for memory/batch-sync-config.json, runs sync.mjs init-batch if missing",
+      "passed": true,
+      "evidence": "Phase 2: 'Check if memory/batch-sync-config.json already exists... If missing, initialize it: node <skill-path>/scripts/sync.mjs init-batch'"
+    },
+    {
+      "text": "init-batch reads _bmad/bmm/config.yaml to discover planning_artifacts and implementation_artifacts paths",
+      "passed": true,
+      "evidence": "Phase 2: 'This reads _bmad/bmm/config.yaml to auto-discover document locations from planning_artifacts and implementation_artifacts paths.'"
+    },
+    {
+      "text": "Presents the batch config to user for review before saving",
+      "passed": true,
+      "evidence": "Phase 2: 'Present the discovered config to the user for review before proceeding.'"
+    },
+    {
+      "text": "Uses sync.mjs batch to scan all configured paths",
+      "passed": true,
+      "evidence": "Phase 3: 'node <skill-path>/scripts/sync.mjs batch'"
+    },
+    {
+      "text": "Shows a summary table of all discovered documents and their sync status",
+      "passed": true,
+      "evidence": "Phase 3 shows a table with columns File, Type, Linked, Status listing documents and their sync status"
+    },
+    {
+      "text": "Processes each file that needs syncing, pausing on conflicts",
+      "passed": true,
+      "evidence": "Phase 6c: 'For sections with conflicts, show both local and remote versions side-by-side. Ask the user per section: Keep local, Keep remote, Skip'"
+    }
+  ],
+  "summary": { "passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0 }
+}

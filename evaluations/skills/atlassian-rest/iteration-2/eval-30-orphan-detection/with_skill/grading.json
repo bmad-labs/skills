@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Explains that the sync engine detects orphaned stories (sections removed locally but tickets exist remotely)",
+      "passed": true,
+      "evidence": "Step 3: 'Detects that Story 1.3's bmadSectionId is no longer present in the local document' and 'Flags Story 1.3 as orphaned'"
+    },
+    {
+      "text": "States that the orphaned ticket will be flagged for user review",
+      "passed": true,
+      "evidence": "Step 3: 'Returns a result with action: \"orphaned\", status: \"needs-user-decision\" for the Story 1.3 ticket'"
+    },
+    {
+      "text": "Does NOT offer to delete the Jira ticket",
+      "passed": true,
+      "evidence": "Step 3: 'The Jira ticket (PROJ-103) is NOT deleted, NOT modified, and NOT transitioned.' Default push does not delete. The --delete-orphans option is only mentioned as explicit opt-in with Sub-* type restriction."
+    },
+    {
+      "text": "Directs the user to archive or delete the ticket manually via Jira web UI",
+      "passed": true,
+      "evidence": "Key Safety Guardrails #6: 'The workflow documentation and troubleshooting guide both direct users to archive/delete orphaned tickets manually via the Jira web UI' and Recommended Workflow: 'Option A: Delete the Jira ticket via Jira web UI manually'"
+    },
+    {
+      "text": "Explains that delete operations are restricted in this skill",
+      "passed": true,
+      "evidence": "Key Safety Guardrails #5: 'The SKILL.md states \"This skill does not support delete operations\" for the general jira.mjs and confluence.mjs scripts' and #3: 'Only subtask-type issues can be deleted via the script. Parent issues (Story, Epic, Task, Bug) are always skipped'"
+    }
+  ],
+  "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0 }
+}

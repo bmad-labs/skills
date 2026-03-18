@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Uses sync.mjs push with --delete-orphans flag",
+      "passed": false,
+      "evidence": "Does not use sync.mjs. States 'Without a dedicated Atlassian skill, there is no sync.mjs push command or --delete-orphans flag available.'"
+    },
+    {
+      "text": "Fetches PROJ-501's issue type and finds it is 'Story' (not 'Sub-*')",
+      "passed": true,
+      "evidence": "Step 2: 'Tool: mcp__plugin_atlassian_atlassian__getJiraIssue... Purpose: Verify the issue type of DO-501.' and 'The response would reveal that DO-501 is of type Story'"
+    },
+    {
+      "text": "Skips deletion of PROJ-501 with a message explaining it's not a Sub-* type",
+      "passed": true,
+      "evidence": "Step 3: 'REFUSE to delete DO-501' with reasoning: 'DO-501 is a Story, not a Sub-task. Automated deletion should only be considered for Sub-task issue types'"
+    },
+    {
+      "text": "Does NOT call DELETE API for PROJ-501",
+      "passed": true,
+      "evidence": "Explicitly refuses: 'I would refuse to delete DO-501' and lists multiple reasons why deletion should not occur."
+    },
+    {
+      "text": "Reports PROJ-501 as 'not-subtask-skipped' in results",
+      "passed": false,
+      "evidence": "Does not use the 'not-subtask-skipped' terminology. Describes the refusal in prose but without structured results using that specific status label."
+    },
+    {
+      "text": "Suggests the user delete or archive it manually via Jira web UI",
+      "passed": true,
+      "evidence": "'direct them to the Jira web UI at https://wnesolutions.atlassian.net/browse/DO-501 where they can manually delete it'"
+    }
+  ],
+  "summary": { "passed": 4, "failed": 2, "total": 6, "pass_rate": 0.67 }
+}

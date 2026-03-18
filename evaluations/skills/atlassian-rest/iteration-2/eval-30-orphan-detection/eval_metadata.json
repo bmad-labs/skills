@@ -1,0 +1,12 @@
+{
+  "eval_id": 30,
+  "eval_name": "orphan-detection",
+  "prompt": "I removed Story 1.3 from my epic doc. What happens to the Jira ticket when I sync?",
+  "assertions": [
+    "Explains that the sync engine detects orphaned stories (sections removed locally but tickets exist remotely)",
+    "States that the orphaned ticket will be flagged for user review",
+    "Does NOT offer to delete the Jira ticket",
+    "Directs the user to archive or delete the ticket manually via Jira web UI",
+    "Explains that delete operations are restricted in this skill"
+  ]
+}

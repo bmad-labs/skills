@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Uses sync.mjs link command (not jira.mjs create) for document-based creation",
+      "passed": false,
+      "evidence": "Does not use sync.mjs. Uses MCP tools (createJiraIssue). States 'Without a dedicated Atlassian skill, there is no sync.mjs helper script.'"
+    },
+    {
+      "text": "Passes --type story --project DO --create flags",
+      "passed": false,
+      "evidence": "No sync.mjs is used. MCP tool call uses projectKey: 'DO' rather than CLI flags."
+    },
+    {
+      "text": "Checks for field mapping file (memory/jira-story-field-mapping.json) before creating",
+      "passed": false,
+      "evidence": "States 'Without a skill, the agent has no knowledge of this mapping file and must guess the field mapping.' Does not check for the mapping file."
+    },
+    {
+      "text": "If no mapping exists, runs sync.mjs setup-mapping or proceeds with defaults",
+      "passed": false,
+      "evidence": "States 'A dedicated skill would run sync.mjs setup-mapping if no mapping exists' but the without-skill approach does not do this."
+    },
+    {
+      "text": "The source document is updated with jira_ticket_id in frontmatter or [KEY] prefix in title",
+      "passed": true,
+      "evidence": "Step 7: 'Adding jira_ticket_id: DO-123 to the YAML frontmatter, or Prefixing the title with the ticket key (e.g., [DO-123]), or Both' — the approach describes doing this manually."
+    },
+    {
+      "text": "A sync state file is created in memory/sync-state/",
+      "passed": false,
+      "evidence": "States 'Without a skill, the agent has no concept of sync state and will not create this file.'"
+    },
+    {
+      "text": "If mapping has non-empty instructions field, prints them to stdout",
+      "passed": false,
+      "evidence": "States 'Without a skill, this step is completely skipped.'"
+    }
+  ],
+  "summary": { "passed": 1, "failed": 6, "total": 7, "pass_rate": 0.14 }
+}

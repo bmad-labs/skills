@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Explains that the sync engine detects orphaned stories (sections removed locally but tickets exist remotely)",
+      "passed": false,
+      "evidence": "States 'I have no knowledge of any sync mechanism between local epic documents and Jira' and lists orphan detection only as one of several possible behaviors a sync engine could have"
+    },
+    {
+      "text": "States that the orphaned ticket will be flagged for user review",
+      "passed": true,
+      "evidence": "Under 'What a Well-Designed Sync Engine Should Do': 'Flag the orphaned ticket for manual review rather than taking any destructive action'"
+    },
+    {
+      "text": "Does NOT offer to delete the Jira ticket",
+      "passed": true,
+      "evidence": "States 'NOT delete the Jira ticket automatically' and lists reasons why deletion would be inappropriate"
+    },
+    {
+      "text": "Directs the user to archive or delete the ticket manually via Jira web UI",
+      "passed": true,
+      "evidence": "'I would recommend manually handling the ticket in Jira -- either closing it with a resolution of \"Won't Do,\" moving it to a backlog, or deleting it via the Jira web UI'"
+    },
+    {
+      "text": "Explains that delete operations are restricted in this skill",
+      "passed": false,
+      "evidence": "Does not reference the skill's 'never delete' principle. Discusses delete restrictions in general terms ('Well-designed integration skills typically do not expose delete functionality') but has no knowledge of this specific skill's restriction."
+    }
+  ],
+  "summary": { "passed": 3, "failed": 2, "total": 5, "pass_rate": 0.6 }
+}

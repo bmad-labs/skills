@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads spec-to-backlog sub-skill",
+      "passed": true,
+      "evidence": "Section 1: 'The Spec to Backlog workflow was loaded from workflows/spec-to-backlog.md. This is a 7-step process.'"
+    },
+    {
+      "text": "Uses confluence.mjs get-page 98765 to fetch the spec",
+      "passed": true,
+      "evidence": "Section 2: 'node <skill-path>/scripts/confluence.mjs get-page 98765'"
+    },
+    {
+      "text": "Uses jira.mjs issue-types DO to check available types",
+      "passed": true,
+      "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Section 3 uses 'jira.mjs issue-types DO' instead of 'jira.mjs issue-types MOBILE'. The prompt specifies MOBILE project but the approach uses DO throughout."
+    },
+    {
+      "text": "Creates Epic FIRST before any child tickets",
+      "passed": true,
+      "evidence": "Section 7: 'Create Epic' command appears first, followed by 'Create child tickets (in priority order)' that use --parent DO-500."
+    },
+    {
+      "text": "Child tickets use --parent with the Epic key",
+      "passed": true,
+      "evidence": "All child create commands include '--parent DO-500', e.g.: 'jira.mjs create --project DO --type Story --summary ... --parent DO-500'"
+    },
+    {
+      "text": "Presents breakdown plan to user before creating",
+      "passed": true,
+      "evidence": "Section 6: 'Per Step 4 of the workflow, before creating anything, the following plan structure would be presented to the user for review and approval.' Includes a full table of proposed tickets."
+    },
+    {
+      "text": "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md",
+      "passed": true,
+      "evidence": "Section 9 lists all three: epic-templates.md, ticket-writing-guide.md, and breakdown-examples.md with detailed descriptions of how each was used."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

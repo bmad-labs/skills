@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs list-attachments 54321 to list all attachments",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Describes raw curl GET request to '/wiki/rest/api/content/54321/child/attachment'. States 'I cannot complete this task.'"
+    },
+    {
+      "text": "Does NOT use confluence.mjs delete-attachment or any DELETE API call",
+      "passed": false,
+      "evidence": "Describes using a DELETE API call: 'curl -s -X DELETE ... /wiki/rest/api/content/<attachment-id>'. While it notes this is blocked without credentials, it does describe the delete approach rather than refusing it on principle."
+    },
+    {
+      "text": "Informs the user that delete operations are restricted in this skill",
+      "passed": false,
+      "evidence": "Does not reference any skill restriction on deletes. Only mentions that 'delete operations are typically restricted' in general terms and that credentials are unavailable. The without-skill approach does not refuse the delete on principle."
+    },
+    {
+      "text": "Directs the user to the Atlassian web UI to delete the attachment manually",
+      "passed": true,
+      "evidence": "Section 4 'Confluence Web UI (Manual)' provides steps: 'Open the page ... Click the delete/trash icon next to it' and states 'This is the recommended approach for deleting attachments.'"
+    }
+  ],
+  "summary": { "passed": 1, "failed": 3, "total": 4, "pass_rate": 0.25 }
+}

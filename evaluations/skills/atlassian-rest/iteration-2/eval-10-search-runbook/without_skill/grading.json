@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs search (not jira.mjs) as primary search",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs at all. Uses raw curl commands against the Confluence REST API. States: 'I cannot complete this task. I have no way to authenticate with the Confluence instance without specialized Atlassian tooling.'"
+    },
+    {
+      "text": "CQL includes terms like deployment, runbook, or deploy",
+      "passed": true,
+      "evidence": "CQL query constructed: 'type=page AND (title~\"deployment runbook\" OR title~\"deploy runbook\")' and 'type=page AND text~\"deployment runbook\"'"
+    },
+    {
+      "text": "Plans to fetch full page content with confluence.mjs get-page",
+      "passed": false,
+      "evidence": "Plans to use raw curl against the REST API: 'GET https://wnesolutions.atlassian.net/wiki/rest/api/content/{pageId}?expand=body.storage,version'. Does not use confluence.mjs get-page."
+    },
+    {
+      "text": "Presents results with page title and source citation",
+      "passed": true,
+      "evidence": "Step 4 shows planned output format with page title, space, and URL: 'Page: Production Deployment Runbook, Space: ENG, URL: https://wnesolutions.atlassian.net/wiki/spaces/ENG/pages/12345678/...'"
+    }
+  ],
+  "summary": { "passed": 2, "failed": 2, "total": 4, "pass_rate": 0.5 }
+}

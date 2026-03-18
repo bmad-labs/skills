@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+      "passed": false,
+      "evidence": "Uses raw curl API call to /rest/api/3/user/search?query=Sarah%20Chen instead of jira.mjs lookup-user."
+    },
+    {
+      "text": "Uses jira.mjs create with --project DO --type Bug",
+      "passed": false,
+      "evidence": "Uses raw curl POST to /rest/api/3/issue with JSON body containing project.key: DO and issuetype.name: Bug, not jira.mjs create."
+    },
+    {
+      "text": "Includes --priority High in the create command",
+      "passed": false,
+      "evidence": "Does not use --priority flag; sets priority via JSON body \"priority\": {\"name\": \"High\"} in a curl command, not jira.mjs."
+    },
+    {
+      "text": "Includes --labels flag with backend and urgent",
+      "passed": false,
+      "evidence": "Does not use --labels flag; sets labels via JSON body \"labels\": [\"backend\", \"urgent\"] in a curl command."
+    },
+    {
+      "text": "Includes --assignee with the looked-up account ID (not a name)",
+      "passed": false,
+      "evidence": "Uses JSON body \"assignee\": {\"accountId\": \"<SARAH_CHEN_ACCOUNT_ID>\"} in a curl command, not --assignee flag with jira.mjs."
+    },
+    {
+      "text": "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+      "passed": true,
+      "evidence": "Summary: '[Login API] Timeout after 30s - Users with 50+ active sessions cannot log in' — follows [Component] [Error] - [Symptom] pattern."
+    },
+    {
+      "text": "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+      "passed": true,
+      "evidence": "ADF description mentions 'timing out after 30 seconds' and 'more than 50 active sessions' with Steps to Reproduce and Expected/Actual Behavior sections."
+    },
+    {
+      "text": "Shows a confirmation step before creating the ticket",
+      "passed": true,
+      "evidence": "Step 2: 'Before executing the create call, confirm the following with the user' with a table of all field values."
+    }
+  ],
+  "summary": { "passed": 3, "failed": 5, "total": 8, "pass_rate": 0.38 }
+}

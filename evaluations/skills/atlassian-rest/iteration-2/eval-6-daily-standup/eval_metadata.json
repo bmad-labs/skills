@@ -1,0 +1,11 @@
+{
+  "eval_id": 6,
+  "eval_name": "daily-standup",
+  "prompt": "Daily standup summary for BACKEND - last 24h changes, blockers, upcoming. No Confluence.",
+  "assertions": [
+    "Queries focus on last 24 hours (not 7 days)",
+    "Uses a compact standup format (done/doing/blocked or similar)",
+    "Does NOT use confluence.mjs create-page or update-page",
+    "Presents results directly rather than publishing"
+  ]
+}

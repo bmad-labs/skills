@@ -1,0 +1,10 @@
+{
+  "eval_id": 14,
+  "eval_name": "jql-search",
+  "prompt": "Find blocked high-priority bugs in PLATFORM with assignee and update time.",
+  "assertions": [
+    "Constructs JQL with project = DO, type = Bug, priority in High/Highest, status = Blocked",
+    "Uses jira.mjs search with the JQL query",
+    "Mentions presenting results with key, summary, assignee, and last updated"
+  ]
+}

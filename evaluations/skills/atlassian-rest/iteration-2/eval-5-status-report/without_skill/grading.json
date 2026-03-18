@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the generate-status-report sub-skill file",
+      "passed": false,
+      "evidence": "No sub-skill file loaded. States: 'No specialized skill, helper scripts, report templates, or JQL pattern references were used.'"
+    },
+    {
+      "text": "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+      "passed": true,
+      "evidence": "Ran 6 JQL queries including completed (statusCategory = Done AND resolved >= -7d), in-progress (statusCategory = In Progress), blocked (status = Blocked OR priority = Blocker), newly created, open bugs, and all non-done."
+    },
+    {
+      "text": "Uses jira.mjs search with project = DO",
+      "passed": false,
+      "evidence": "Uses MCP plugin searchJiraIssuesUsingJql, not jira.mjs search. States 'Tools Used (MCP Atlassian Plugin — No Skill)'."
+    },
+    {
+      "text": "Formats a report with sections (metrics, highlights, blockers, or similar)",
+      "passed": false,
+      "evidence": "No report was actually generated. The approach describes what would have been done but all queries returned 0 results due to wrong instance. Proposed sections listed but not produced."
+    },
+    {
+      "text": "Uses confluence.mjs create-page to publish to the ENG space",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Proposes using createConfluencePage MCP tool but could not execute because ENG space does not exist on the accessible instance."
+    },
+    {
+      "text": "Includes a date in the page title",
+      "passed": true,
+      "evidence": "Proposed title: 'Weekly Status Report - DO - 2026-03-18' includes the date."
+    },
+    {
+      "text": "References report-templates.md or jql-patterns.md",
+      "passed": false,
+      "evidence": "Does not reference these files. Notes in barriers: 'No skill/templates available — No pre-built report templates, JQL pattern references.'"
+    }
+  ],
+  "summary": { "passed": 2, "failed": 5, "total": 7, "pass_rate": 0.29 }
+}

@@ -1,0 +1,14 @@
+{
+  "eval_id": 28,
+  "eval_name": "batch-sync",
+  "prompt": "Sync all my BMAD documents in the project to Jira and Confluence.",
+  "assertions": [
+    "Loads the sync-bmad-documents sub-skill file",
+    "Checks for memory/batch-sync-config.json, runs sync.mjs init-batch if missing",
+    "init-batch reads _bmad/bmm/config.yaml to discover planning_artifacts and implementation_artifacts paths",
+    "Presents the batch config to user for review before saving",
+    "Uses sync.mjs batch to scan all configured paths",
+    "Shows a summary table of all discovered documents and their sync status",
+    "Processes each file that needs syncing, pausing on conflicts"
+  ]
+}

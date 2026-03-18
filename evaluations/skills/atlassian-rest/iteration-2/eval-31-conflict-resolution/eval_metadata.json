@@ -1,0 +1,13 @@
+{
+  "eval_id": 31,
+  "eval_name": "conflict-resolution",
+  "prompt": "My epic doc has a conflict \u2014 I changed the Overview section locally and someone updated the Jira description too. Help me resolve it.",
+  "assertions": [
+    "Loads the sync-bmad-documents sub-skill file",
+    "Uses sync.mjs diff to identify the conflicting section",
+    "Shows the \u26a1 conflict indicator for the Overview section",
+    "Presents both the local version and the remote version side by side",
+    "Asks the user to choose: keep local, keep remote, or skip",
+    "Executes push or pull based on the user's choice for the conflicted section"
+  ]
+}

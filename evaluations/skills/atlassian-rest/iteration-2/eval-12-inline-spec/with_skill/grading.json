@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Handles inline spec without needing Confluence fetch",
+      "passed": true,
+      "evidence": "Section 1: 'This is an inline spec scenario -- the requirements are provided directly in the user's message rather than from a Confluence page.' 'skip the Confluence fetch step and proceed directly to analysis using the inline requirements.'"
+    },
+    {
+      "text": "Uses jira.mjs issue-types FRONTEND to check available types",
+      "passed": false,
+      "evidence": "Section 2 uses 'jira.mjs issue-types DO' instead of 'jira.mjs issue-types FRONTEND'. The prompt specifies FRONTEND but the approach targets the DO project."
+    },
+    {
+      "text": "Maps requirement #3 (mobile Safari bug) to Bug type",
+      "passed": true,
+      "evidence": "Section 3 table: '#3 Fix: mobile Safari layout breaks on checkout page -> Bug. Rationale: Defect in existing functionality on a specific platform/browser.'"
+    },
+    {
+      "text": "Maps requirement #6 (API docs) to Task type",
+      "passed": true,
+      "evidence": "Section 3 table: '#6 Task: Update API documentation for v2 endpoints -> Task. Rationale: Non-feature supporting work -- documentation maintenance.'"
+    },
+    {
+      "text": "Maps feature requirements (#1,2,4,5) to Story type",
+      "passed": true,
+      "evidence": "Section 3 table maps #1 (dark mode toggle), #2 (notification badge), #4 (date range filtering), #5 (CSV export) all to Story type."
+    },
+    {
+      "text": "Creates Epic first, then child tickets with --parent",
+      "passed": false,
+      "evidence": "Section 4 explicitly states: 'No Epic Created. These 6 requirements are independent items across different areas... They do not form a cohesive feature set that warrants grouping under a single Epic.' No --parent flag is used in any create command."
+    },
+    {
+      "text": "Presents plan with labeled issue types before creating",
+      "passed": true,
+      "evidence": "Section 6 'Complete Breakdown Plan' shows a table with all 6 tickets labeled by type (4 Stories, 1 Bug, 1 Task) before Section 7's create commands. States: 'At this point in a real execution, the user would review and confirm before proceeding to creation.'"
+    }
+  ],
+  "summary": { "passed": 5, "failed": 2, "total": 7, "pass_rate": 0.71 }
+}

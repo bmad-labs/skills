@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the create-confluence-document sub-skill or references confluence-formatting.md",
+      "passed": false,
+      "evidence": "Does not load any sub-skill or reference file. States 'No Confluence storage format reference' as a barrier."
+    },
+    {
+      "text": "Builds storage format HTML body containing ac:structured-macro for toc",
+      "passed": true,
+      "evidence": "Body contains '<ac:structured-macro ac:name=\"toc\">' with maxLevel and minLevel parameters"
+    },
+    {
+      "text": "Includes an ac:structured-macro with ac:name='info' for the overview panel",
+      "passed": true,
+      "evidence": "Body contains '<ac:structured-macro ac:name=\"info\"><ac:parameter ac:name=\"title\">Overview</ac:parameter>'"
+    },
+    {
+      "text": "Includes ac:structured-macro with ac:name='code' for code blocks",
+      "passed": true,
+      "evidence": "Multiple code blocks with '<ac:structured-macro ac:name=\"code\">' for bash and javascript languages"
+    },
+    {
+      "text": "Includes ac:structured-macro with ac:name='expand' for troubleshooting items",
+      "passed": true,
+      "evidence": "Three expand macros for '401 Unauthorized', 'Pagination returns duplicate results', and '500 Internal Server Error'"
+    },
+    {
+      "text": "Writes the HTML body to a temporary file",
+      "passed": true,
+      "evidence": "'cat > /tmp/api-migration-guide-body.html << HTMLEOF'"
+    },
+    {
+      "text": "Uses confluence.mjs create-page with --body-file flag (not --body for long content)",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses raw curl POST to '/wiki/api/v2/pages'. Mentions confluence.mjs only hypothetically: 'if a CLI helper script (e.g., confluence.mjs) were available'."
+    },
+    {
+      "text": "Uses --space TEAM in the create command",
+      "passed": false,
+      "evidence": "Does not use --space TEAM. Uses raw REST API with spaceId parameter. States 'this task cannot be completed programmatically by the agent.'"
+    }
+  ],
+  "summary": { "passed": 5, "failed": 3, "total": 8, "pass_rate": 0.625 }
+}

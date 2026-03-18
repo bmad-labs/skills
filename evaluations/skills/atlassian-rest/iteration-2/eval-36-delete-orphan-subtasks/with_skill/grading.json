@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Uses sync.mjs push with --delete-orphans flag",
+      "passed": true,
+      "evidence": "Step 3: 'node <skill-path>/scripts/sync.mjs push <epic-doc-path> --delete-orphans'"
+    },
+    {
+      "text": "Lists all orphaned subtasks with their Jira keys and section IDs",
+      "passed": true,
+      "evidence": "Step 3 output shows: 'Found 3 orphaned subtask(s)' with keys DO-201, DO-202, DO-203 and section IDs like 'story-1.3-cache-invalidation'"
+    },
+    {
+      "text": "Fetches each orphan's issue type via jira.mjs get to verify it's a Sub-* type",
+      "passed": true,
+      "evidence": "Step 3 point 3: 'Fetches each orphan's issue type by calling internally: node <skill-path>/scripts/jira.mjs get <ORPHAN-KEY> --fields issuetype'"
+    },
+    {
+      "text": "Only offers to delete issues with type name starting with 'Sub-' (e.g., Sub-Imp, Sub-Test, Sub-Bug)",
+      "passed": true,
+      "evidence": "'Only Sub-* types are eligible for deletion. If an orphan is not a Sub-* type, the script prints: Skipping DO-XXX -- issue type \"Story\" is not a Sub-* type (deletion restricted to subtasks only)'"
+    },
+    {
+      "text": "Prompts user for confirmation (y/N) before each deletion",
+      "passed": true,
+      "evidence": "Step 3 point 4: 'Prompts for confirmation per orphan (interactive y/N prompt): Delete DO-201 [Sub-Imp] (\"story-1.3-cache-invalidation\") from Jira? (y/N):'"
+    },
+    {
+      "text": "On confirmation, calls DELETE API for the subtask",
+      "passed": true,
+      "evidence": "Step 3 point 5: 'Deletes confirmed orphans via the Jira REST API DELETE /rest/api/3/issue/<key>'"
+    },
+    {
+      "text": "Removes deleted entries from childLinks in sync state",
+      "passed": true,
+      "evidence": "Step 3 point 6: 'Updates sync state by removing deleted entries from the childLinks array in the sync state file'"
+    },
+    {
+      "text": "Reports which orphans were deleted vs kept",
+      "passed": true,
+      "evidence": "Step 4 shows results table with statuses: 'confirmed-deleted' for each orphan. Safety section mentions orphans can be 'kept' if user declines."
+    }
+  ],
+  "summary": { "passed": 8, "failed": 0, "total": 8, "pass_rate": 1.0 }
+}

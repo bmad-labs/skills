@@ -1,0 +1,13 @@
+{
+  "eval_id": 37,
+  "eval_name": "refuse-delete-story",
+  "prompt": "I removed a Story section from my epic doc. Push changes and delete the orphaned ticket PROJ-501 which is of type Story (not a subtask).",
+  "assertions": [
+    "Uses sync.mjs push with --delete-orphans flag",
+    "Fetches PROJ-501's issue type and finds it is 'Story' (not 'Sub-*')",
+    "Skips deletion of PROJ-501 with a message explaining it's not a Sub-* type",
+    "Does NOT call DELETE API for PROJ-501",
+    "Reports the ticket as skipped or refused in results, indicating it is not a Sub-* type",
+    "Suggests the user delete or archive it manually via Jira web UI"
+  ]
+}

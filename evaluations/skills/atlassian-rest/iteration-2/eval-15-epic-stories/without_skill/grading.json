@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Creates Epic first with jira.mjs create --project DO --type Epic",
+      "passed": false,
+      "evidence": "Does not use jira.mjs at all. Uses raw curl commands against the Jira REST API v3: 'curl -s -X POST' with project key DO and issuetype Epic in JSON body."
+    },
+    {
+      "text": "Captures the Epic key from the create response",
+      "passed": true,
+      "evidence": "Step 4: 'Capture the key value (e.g., DO-100) for use as the parent in subsequent story creation calls.'"
+    },
+    {
+      "text": "Uses jira.mjs lookup-user for john.doe",
+      "passed": false,
+      "evidence": "Uses raw curl: 'curl -s -X GET \"https://wnesolutions.atlassian.net/rest/api/3/user/search?query=john.doe\"' instead of jira.mjs lookup-user."
+    },
+    {
+      "text": "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+      "passed": false,
+      "evidence": "Uses raw REST API POST calls with JSON payloads, not jira.mjs create with --parent flag. Does use 'parent' field and 'priority: Medium' in the JSON but not the CLI script."
+    },
+    {
+      "text": "Story 1 includes --assignee with john.doe's account ID",
+      "passed": false,
+      "evidence": "Uses REST API JSON field '\"assignee\": {\"accountId\": \"<JOHN_DOE_ACCOUNT_ID>\"}' in the curl POST body, not jira.mjs --assignee flag."
+    },
+    {
+      "text": "Shows confirmation plan before executing",
+      "passed": true,
+      "evidence": "Step 3: 'Before executing any mutating operations, present the following plan to the user' with a table showing Epic and all 3 Stories."
+    }
+  ],
+  "summary": { "passed": 2, "failed": 4, "total": 6, "pass_rate": 0.33 }
+}

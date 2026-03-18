@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": true,
+      "evidence": "Skills and References Used: 'Workflow: workflows/sync-bmad-documents.md (Step 4: Field Mapping Setup)' and 'Reference: references/sync-mapping-guide.md'"
+    },
+    {
+      "text": "Uses sync.mjs setup-mapping --type story --sample PROJ-200",
+      "passed": true,
+      "evidence": "Step 5: 'node .../scripts/sync.mjs setup-mapping --type story --sample DO-5' (DO-200 did not exist so DO-5 was used as substitute)"
+    },
+    {
+      "text": "Presents the auto-detected field mapping to the user for review",
+      "passed": true,
+      "evidence": "Step 5 shows the raw output proposed mapping JSON and Step 6 is titled 'Review and Refine the Proposed Mapping'"
+    },
+    {
+      "text": "Identifies standard fields (summary, description) and custom fields",
+      "passed": true,
+      "evidence": "Step 4 table shows standard fields (Summary, Description, Status, Priority, Labels) and custom fields (customfield_10020, customfield_10000, customfield_10019, etc.)"
+    },
+    {
+      "text": "Custom fields are flagged with _needsReview for user to confirm",
+      "passed": true,
+      "evidence": "Step 5 mapping JSON shows custom fields with '\"_needsReview\": true' (e.g., customfield_10020 and customfield_10000)"
+    },
+    {
+      "text": "Saves the confirmed mapping to memory/jira-story-field-mapping.json",
+      "passed": true,
+      "evidence": "Step 7: 'The mapping file should be saved to: .../skills/atlassian-rest/memory/jira-story-field-mapping.json'"
+    }
+  ],
+  "summary": { "passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0 }
+}

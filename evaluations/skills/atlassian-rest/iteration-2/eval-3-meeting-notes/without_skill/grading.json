@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the capture-tasks-from-meeting-notes sub-skill file",
+      "passed": false,
+      "evidence": "Explicitly states: \"Without the atlassian-rest skill, there is no structured workflow (e.g., capture-tasks-from-meeting-notes) to guide action item extraction.\""
+    },
+    {
+      "text": "Extracts at least 4 action items from the notes",
+      "passed": true,
+      "evidence": "Extracted 5 action items in the table: Sarah (payment integration), Mike (CI pipeline tests), Lisa (API docs), Unassigned (deployment runbook), John (memory leak)."
+    },
+    {
+      "text": "Identifies Sarah, Mike, and Lisa as assignees",
+      "passed": true,
+      "evidence": "All three identified as assignees. User lookups attempted: Sarah found as Sarah (Minjung) Kang, Mike found 2 matches, Lisa found as lisa.xu."
+    },
+    {
+      "text": "Uses jira.mjs lookup-user for each unique assignee",
+      "passed": false,
+      "evidence": "Uses MCP plugin lookupJiraAccountId, not jira.mjs lookup-user. States: \"Without jira.mjs or similar helper scripts, there is no streamlined way.\""
+    },
+    {
+      "text": "Presents a table or list of extracted tasks for user confirmation before creating",
+      "passed": false,
+      "evidence": "Lists proposed tickets but notes the task \"cannot be completed\" due to wrong instance. No actual confirmation step was performed -- just a proposed ticket breakdown."
+    },
+    {
+      "text": "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+      "passed": false,
+      "evidence": "Proposes using createJiraIssue MCP tool, not jira.mjs create. Task could not be completed due to wrong Atlassian instance access."
+    },
+    {
+      "text": "References action-item-patterns.md or ticket-writing-guide.md",
+      "passed": false,
+      "evidence": "Does not reference these files. Mentions in \"What the Atlassian Skill Would Provide\" section that the skill would provide these references, confirming they were not used."
+    }
+  ],
+  "summary": { "passed": 2, "failed": 5, "total": 7, "pass_rate": 0.29 }
+}

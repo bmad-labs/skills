@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the capture-tasks-from-meeting-notes sub-skill",
+      "passed": true,
+      "evidence": "\"Workflow: workflows/capture-tasks-from-meeting-notes.md -- Followed the 7-step process.\""
+    },
+    {
+      "text": "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+      "passed": true,
+      "evidence": "All three extracted: Sarah - \"Finish PRD for the new dashboard feature\", John - \"Investigate flaky tests on auth module\", Mike - \"Implement Stripe webhook integration\"."
+    },
+    {
+      "text": "Identifies the unassigned API docs task and asks the user about it",
+      "passed": true,
+      "evidence": "Item 4 identified as \"Unassigned\" with note \"'someone' and 'nobody volunteered' explicitly indicate no owner\". Confirmation step asks user to \"Decide on assignee for task #4 (API docs -- nobody volunteered)\"."
+    },
+    {
+      "text": "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+      "passed": true,
+      "evidence": "Parsing analysis shows four patterns: \"sarah - needs to\" matched as name needs to action, \"John said he'd\" as implicit ownership, \"@mike will\" as @name will action, \"someone should\" as unassigned."
+    },
+    {
+      "text": "Presents extracted tasks for confirmation before creating",
+      "passed": true,
+      "evidence": "Step 5 presents a confirmation table with all 4 tasks. States: \"User confirmation required before proceeding. The workflow explicitly states: 'Do not proceed until the user explicitly confirms.'\""
+    }
+  ],
+  "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0 }
+}

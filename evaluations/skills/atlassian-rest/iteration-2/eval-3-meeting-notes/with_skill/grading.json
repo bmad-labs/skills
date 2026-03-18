@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the capture-tasks-from-meeting-notes sub-skill file",
+      "passed": true,
+      "evidence": "\"the atlassian-rest skill, specifically the Capture Tasks from Meeting Notes workflow (workflows/capture-tasks-from-meeting-notes.md)\""
+    },
+    {
+      "text": "Extracts at least 4 action items from the notes",
+      "passed": true,
+      "evidence": "Extracted 5 action items: Sarah (payment integration), Mike (CI pipeline), Lisa (API docs), Unassigned (deployment runbook), John (memory leak)."
+    },
+    {
+      "text": "Identifies Sarah, Mike, and Lisa as assignees",
+      "passed": true,
+      "evidence": "All three identified in the extraction table and lookup commands: \"jira.mjs lookup-user \"Sarah\"\", \"jira.mjs lookup-user \"Mike\"\", \"jira.mjs lookup-user \"Lisa\"\"."
+    },
+    {
+      "text": "Uses jira.mjs lookup-user for each unique assignee",
+      "passed": true,
+      "evidence": "Step 4 shows lookup-user calls for Sarah, Mike, Lisa, and John."
+    },
+    {
+      "text": "Presents a table or list of extracted tasks for user confirmation before creating",
+      "passed": true,
+      "evidence": "Step 5: Presents a confirmation table with columns: #, Assignee, Summary, Priority, Due Date. States \"Do not proceed until explicit confirmation.\""
+    },
+    {
+      "text": "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+      "passed": true,
+      "evidence": "Step 6 shows 5 separate jira.mjs create commands with --project DO --type Task --summary --description --assignee --priority flags for each task."
+    },
+    {
+      "text": "References action-item-patterns.md or ticket-writing-guide.md",
+      "passed": true,
+      "evidence": "\"references/action-item-patterns.md -- Used extraction patterns for name/priority/due date parsing\" and \"references/ticket-writing-guide.md -- Applied 'Verb + Object + Context' summary format\"."
+    }
+  ],
+  "summary": { "passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0 }
+}

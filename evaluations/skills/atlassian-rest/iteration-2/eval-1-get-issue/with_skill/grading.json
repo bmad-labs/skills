@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs get command (not search) to fetch the specific issue",
+      "passed": true,
+      "evidence": "Step 2: 'node .../jira.mjs get DO-123 --fields status,assignee,priority' \u2014 uses get command, not search."
+    },
+    {
+      "text": "References DO-123 as the issue key in the command",
+      "passed": true,
+      "evidence": "Step 2: 'jira.mjs get DO-123 --fields status,assignee,priority' \u2014 uses DO-123 as the issue key throughout."
+    },
+    {
+      "text": "Mentions presenting status, assignee, and priority fields to the user",
+      "passed": true,
+      "evidence": "Step 3 and Step 4: 'Status: Found at fields.status.name ... Assignee: Found at fields.assignee.displayName ... Priority: Found at fields.priority.name' and presents example output with all three fields."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  }
+}

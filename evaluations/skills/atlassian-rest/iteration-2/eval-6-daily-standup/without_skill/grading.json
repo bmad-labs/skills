@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Queries focus on last 24 hours (not 7 days)",
+      "passed": true,
+      "evidence": "All queries use 24h scope: \"startOfDay(-1), now()\" for status changes, and mentions \"last 24 hours\" throughout. No 7-day queries present."
+    },
+    {
+      "text": "Uses a compact standup format (done/doing/blocked or similar)",
+      "passed": true,
+      "evidence": "Proposed output format has compact sections: \"Done Since Yesterday\", \"Status Changes (Last 24h)\", \"Blocked\", \"In Progress Today\", \"Up Next (Sprint Backlog)\" with tables and one-line metrics footer."
+    },
+    {
+      "text": "Does NOT use confluence.mjs create-page or update-page",
+      "passed": true,
+      "evidence": "Step 5: \"The report is rendered as markdown directly to the user. No Confluence page creation or update is performed.\""
+    },
+    {
+      "text": "Presents results directly rather than publishing",
+      "passed": true,
+      "evidence": "\"This respects the explicit instruction to not publish.\" Results presented directly as markdown."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 }
+}

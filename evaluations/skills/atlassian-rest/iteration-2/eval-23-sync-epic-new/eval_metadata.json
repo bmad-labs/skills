@@ -1,0 +1,15 @@
+{
+  "eval_id": 23,
+  "eval_name": "sync-epic-new",
+  "prompt": "Sync this epic doc at docs/epics/auth-epic.md to Jira. It's not linked to any ticket yet.",
+  "assertions": [
+    "Loads the sync-bmad-documents sub-skill file",
+    "Uses sync.mjs status to check the document's current state",
+    "Detects or confirms the document type as 'epic'",
+    "Asks the user which Jira project to sync to",
+    "Asks whether to create a new epic or link to an existing one",
+    "Uses sync.mjs link with appropriate flags (--type epic --project <KEY> --create or --ticket <KEY>)",
+    "Confirms that jira_ticket_id was added to the document frontmatter",
+    "References sync-mapping-guide.md if field mapping is needed"
+  ]
+}

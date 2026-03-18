@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Loads spec-to-backlog sub-skill",
+      "passed": false,
+      "evidence": "Challenges section states: 'No structured workflow or sub-skill: There is no guided multi-step process (like a spec-to-backlog sub-skill) to orchestrate the decomposition.'"
+    },
+    {
+      "text": "Uses confluence.mjs get-page 98765 to fetch the spec",
+      "passed": false,
+      "evidence": "Uses MCP tool instead: 'Tool: mcp__plugin_atlassian_atlassian__getConfluencePage with pageId: 98765'. Does not use confluence.mjs."
+    },
+    {
+      "text": "Uses jira.mjs issue-types DO to check available types",
+      "passed": false,
+      "evidence": "Uses MCP tool 'mcp__plugin_atlassian_atlassian__getJiraProjectIssueTypesMetadata' with projectIdOrKey: 'DO' instead of jira.mjs issue-types."
+    },
+    {
+      "text": "Creates Epic FIRST before any child tickets",
+      "passed": true,
+      "evidence": "Step 5: 'Create the Epic' comes before Step 6: 'Create Child Stories and Tasks'. 'The returned issue key (e.g., DO-100) is captured for use as the parent of all child tickets.'"
+    },
+    {
+      "text": "Child tickets use --parent with the Epic key",
+      "passed": false,
+      "evidence": "Uses MCP tool createJiraIssue with 'parent: \"DO-100\"' field, not the --parent CLI flag with jira.mjs. The approach does not use jira.mjs at all."
+    },
+    {
+      "text": "Presents breakdown plan to user before creating",
+      "passed": true,
+      "evidence": "Step 4: 'Before creating any issues, the agent should present the proposed breakdown to the user for review.' Includes a table format."
+    },
+    {
+      "text": "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md",
+      "passed": false,
+      "evidence": "Challenges section states: 'No reference templates: Without access to files like epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md, the agent has no conventions.'"
+    }
+  ],
+  "summary": { "passed": 2, "failed": 5, "total": 7, "pass_rate": 0.29 }
+}

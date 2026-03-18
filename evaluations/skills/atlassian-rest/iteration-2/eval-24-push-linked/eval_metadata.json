@@ -1,0 +1,12 @@
+{
+  "eval_id": 24,
+  "eval_name": "push-linked",
+  "prompt": "I already linked my tech spec to PROJ-200. Push the latest local changes to Jira.",
+  "assertions": [
+    "Loads the sync-bmad-documents sub-skill file",
+    "Uses sync.mjs status to confirm the document is linked",
+    "Does NOT ask for link setup (skips to sync since already linked)",
+    "Uses sync.mjs push to send local changes to the Jira ticket",
+    "Reports push results showing which fields were updated"
+  ]
+}

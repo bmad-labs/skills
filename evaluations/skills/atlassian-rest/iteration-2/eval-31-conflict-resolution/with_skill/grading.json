@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": true,
+      "evidence": "Workflow Reference: 'This approach follows the Sync BMAD Documents workflow (workflows/sync-bmad-documents.md), specifically: Step 5, Step 6, Step 7, Step 8, Step 9'"
+    },
+    {
+      "text": "Uses sync.mjs diff to identify the conflicting section",
+      "passed": true,
+      "evidence": "Step 1: 'node <skill-path>/scripts/sync.mjs diff <epic-doc-path>'"
+    },
+    {
+      "text": "Shows the conflict indicator for the Overview section",
+      "passed": true,
+      "evidence": "Step 1: 'Lightning bolt -- both changed (conflict)' and 'the Overview section should show the lightning bolt conflict indicator'"
+    },
+    {
+      "text": "Presents both the local version and the remote version side by side",
+      "passed": true,
+      "evidence": "Step 3: 'Present both versions to the user: Local version (your changes): [contents...] Remote version (Jira changes): [contents...]'"
+    },
+    {
+      "text": "Asks the user to choose: keep local, keep remote, or skip",
+      "passed": true,
+      "evidence": "Step 4: 'offer three options per conflicting section: 1. Keep local, 2. Keep remote, 3. Skip'"
+    },
+    {
+      "text": "Executes push or pull based on the user's choice for the conflicted section",
+      "passed": true,
+      "evidence": "Step 5: 'If user chooses Keep local: node <skill-path>/scripts/sync.mjs push <epic-doc-path>' and 'If user chooses Keep remote: node <skill-path>/scripts/sync.mjs pull <epic-doc-path>'"
+    }
+  ],
+  "summary": { "passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0 }
+}

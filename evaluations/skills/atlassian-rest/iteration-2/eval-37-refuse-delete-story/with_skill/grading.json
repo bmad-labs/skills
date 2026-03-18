@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Uses sync.mjs push with --delete-orphans flag",
+      "passed": true,
+      "evidence": "Command 1: 'sync.mjs push <epic-file-path>' and shows --delete-orphans flag: 'node <skill-path>/scripts/sync.mjs push <epic-file-path> --delete-orphans'"
+    },
+    {
+      "text": "Fetches PROJ-501's issue type and finds it is 'Story' (not 'Sub-*')",
+      "passed": true,
+      "evidence": "Reason B: 'DO-501 is of type Story, which is not a Sub-* issue type. Even if --delete-orphans were run, the script would skip DO-501.'"
+    },
+    {
+      "text": "Skips deletion of PROJ-501 with a message explaining it's not a Sub-* type",
+      "passed": true,
+      "evidence": "'this skill cannot delete DO-501 because it is a Story-type issue. Only Sub-task (Sub-*) issue types can be deleted via the --delete-orphans flag.'"
+    },
+    {
+      "text": "Does NOT call DELETE API for PROJ-501",
+      "passed": true,
+      "evidence": "Summary table shows: 'Delete DO-501 | REFUSED | Story-type issues cannot be deleted by this skill'"
+    },
+    {
+      "text": "Reports PROJ-501 as 'not-subtask-skipped' in results",
+      "passed": false,
+      "evidence": "The approach describes DO-501 as 'REFUSED' in the summary table, not explicitly using the term 'not-subtask-skipped' in results. The approach references the blanket no-delete policy as primary reason rather than the Sub-* type check reporting mechanism."
+    },
+    {
+      "text": "Suggests the user delete or archive it manually via Jira web UI",
+      "passed": true,
+      "evidence": "'To delete DO-501, go to: https://wnesolutions.atlassian.net/browse/DO-501 and delete it from the issue actions menu.'"
+    }
+  ],
+  "summary": { "passed": 5, "failed": 1, "total": 6, "pass_rate": 0.83 }
+}

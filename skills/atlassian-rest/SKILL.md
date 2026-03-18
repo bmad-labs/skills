@@ -87,6 +87,7 @@ jira.mjs create --project PROJ --type Task --summary "Implement feature X" \
   --labels "backend,urgent" --components "API,Auth"
 jira.mjs create --project PROJ --type Story --summary "User login" --parent PROJ-100
 ```
+When creating child stories under an Epic, include `--priority Medium` unless the user specifies a different priority.
 
 ### Edit Issue
 ```bash
@@ -198,7 +199,7 @@ confluence.mjs create-page --space TEAM --title "Sub Page" \
   --body "<h2>Heading</h2><p>Content</p>" --parent 12345
 confluence.mjs create-page --space TEAM --title "Full Doc" --body-file /tmp/body.html
 ```
-The `--body` flag accepts plain text (auto-wrapped in `<p>` tags) or raw HTML storage format (if it starts with `<`). Use `--body-file` for long documents that would exceed shell argument limits.
+The `--body` flag accepts **markdown** (recommended), plain text, or raw HTML storage format (if it starts with `<`). The script automatically converts markdown to Confluence storage format — headings, lists, tables, and code blocks (converted to `ac:structured-macro ac:name="code"` with language detection) are all handled. Prefer writing markdown and letting the script handle conversion rather than manually constructing storage format XHTML. Use `--body-file` for long documents that would exceed shell argument limits.
 
 ### Update Page
 ```bash

@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs spaces as the first command",
+      "passed": true,
+      "evidence": "Step 1: 'node <skill-path>/scripts/confluence.mjs spaces --max 50'"
+    },
+    {
+      "text": "Uses confluence.mjs search with CQL targeting the HR space",
+      "passed": true,
+      "evidence": "Step 2: 'node <skill-path>/scripts/confluence.mjs search 'type = page AND space = HR AND text ~ \"onboarding\"' --max 10'"
+    },
+    {
+      "text": "CQL includes text or title matching 'onboarding'",
+      "passed": true,
+      "evidence": "CQL contains 'text ~ \"onboarding\"' for full-text search"
+    },
+    {
+      "text": "Operations are sequenced (search depends on spaces list)",
+      "passed": true,
+      "evidence": "Explicitly states 'Step 1 must execute first. The user refers to \"HR space\" but the actual Confluence space key is unknown until we list all spaces.' and 'Step 2 depends on Step 1 output.'"
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 }
+}

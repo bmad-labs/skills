@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs get command (not search) to fetch the specific issue",
+      "passed": false,
+      "evidence": "Uses raw curl commands against the REST API directly (curl -s -u ... /rest/api/3/issue/DO-123), not jira.mjs get."
+    },
+    {
+      "text": "References DO-123 as the issue key in the command",
+      "passed": true,
+      "evidence": "Multiple references to DO-123 throughout, e.g. 'GET https://wnesolutions.atlassian.net/rest/api/3/issue/DO-123?fields=status,assignee,priority'"
+    },
+    {
+      "text": "Mentions presenting status, assignee, and priority fields to the user",
+      "passed": true,
+      "evidence": "Step 3/4: 'Status: .fields.status.name ... Assignee: .fields.assignee.displayName ... Priority: .fields.priority.name' and shows formatted output with all three fields."
+    }
+  ],
+  "summary": { "passed": 2, "failed": 1, "total": 3, "pass_rate": 0.67 }
+}

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": true,
+      "evidence": "States 'This task follows the Sync BMAD Documents workflow (workflows/sync-bmad-documents.md), entering at Step 2'"
+    },
+    {
+      "text": "Uses sync.mjs status to confirm the document is linked",
+      "passed": true,
+      "evidence": "Step 2: 'node <skill-path>/scripts/sync.mjs status <file-path>' — 'Expected output: linked: true, ticket key DO-200'"
+    },
+    {
+      "text": "Does NOT ask for link setup (skips to sync since already linked)",
+      "passed": true,
+      "evidence": "States 'Since the user confirms the link already exists, this should return linked status. If it does, skip to Step 3 (diff).' and Assumptions: 'no sync.mjs link step is needed.'"
+    },
+    {
+      "text": "Uses sync.mjs push to send local changes to the Jira ticket",
+      "passed": true,
+      "evidence": "Step 6: 'node <skill-path>/scripts/sync.mjs push <file-path>'"
+    },
+    {
+      "text": "Reports push results showing which fields were updated",
+      "passed": true,
+      "evidence": "Step 7: Summary table showing 'Action | Section/Field | Result' with pushed fields like 'Overview -> Updated DO-200 description'"
+    }
+  ],
+  "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0 }
+}

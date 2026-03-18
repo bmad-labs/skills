@@ -1,0 +1,13 @@
+{
+  "eval_id": 29,
+  "eval_name": "prd-to-confluence",
+  "prompt": "Link my PRD document at docs/prd/platform-prd.md to Confluence and push it.",
+  "assertions": [
+    "Loads the sync-bmad-documents sub-skill file",
+    "Uses sync.mjs status to detect document type as 'prd' and target as 'confluence'",
+    "Asks the user which Confluence space to publish to",
+    "Uses sync.mjs link with --type prd --space <KEY> --create",
+    "Confirms confluence_page_id was added to the document frontmatter",
+    "Content is converted from markdown to Confluence storage format (markdownToStorage)"
+  ]
+}

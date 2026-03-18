@@ -1,0 +1,11 @@
+{
+  "eval_id": 13,
+  "eval_name": "transition",
+  "prompt": "Move PROJ-456 to Done and add a deployment comment.",
+  "assertions": [
+    "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+    "Does NOT guess or hardcode a transition ID",
+    "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+    "Uses jira.mjs comment PROJ-456 with the deployment message"
+  ]
+}

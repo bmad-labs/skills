@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads triage-issue sub-skill",
+      "passed": true,
+      "evidence": "\"Following the workflows/triage-issue.md workflow with reference to references/bug-report-templates.md and references/jql-patterns.md.\""
+    },
+    {
+      "text": "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+      "passed": true,
+      "evidence": "Search 2a: text ~ \"NullPointerException UserService getProfile\". Search 2b: text ~ \"UserService\". Search 2c: summary ~ \"NullPointerException\". Search 2e: text ~ \"getProfile\". All three elements covered across multiple queries."
+    },
+    {
+      "text": "Includes DO project in JQL",
+      "passed": true,
+      "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses project = DO in all JQL queries, not BACKEND as specified in the prompt."
+    },
+    {
+      "text": "Checks for resolved similar issues (regression detection)",
+      "passed": true,
+      "evidence": "Analysis criteria include: \"Status: Open = likely duplicate; Resolved = possible regression; Closed = may be different issue\". Option C explicitly handles regression: \"Create New Ticket and Link as Regression\" with comment noting regression of DO-78."
+    },
+    {
+      "text": "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual",
+      "passed": true,
+      "evidence": "Option A create command uses structured description with: \"## Error\", \"## Where\" (component), \"## Stack Trace\", \"## Trigger\" (steps), \"## Frequency\", \"## Severity\" sections. Follows Error Message Bug Template from bug-report-templates.md."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}
