@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads spec-to-backlog sub-skill",
+      "passed": true,
+      "evidence": "Section 1 states: 'The Spec to Backlog workflow sub-skill was loaded from skills/spec-to-backlog.md' with its 7-step process."
+    },
+    {
+      "text": "Uses confluence.mjs get-page 98765 to fetch the spec",
+      "passed": true,
+      "evidence": "Section 2 shows: 'node <skill-path>/scripts/confluence.mjs get-page 98765'."
+    },
+    {
+      "text": "Uses jira.mjs issue-types MOBILE to check available types",
+      "passed": true,
+      "evidence": "Section 3 shows: 'node <skill-path>/scripts/jira.mjs issue-types MOBILE'."
+    },
+    {
+      "text": "Creates Epic FIRST before any child tickets",
+      "passed": true,
+      "evidence": "Section 7 shows 'Create Epic' command first, captures key 'MOBILE-200', then all child tickets use '--parent MOBILE-200'."
+    },
+    {
+      "text": "Child tickets use --parent with the Epic key",
+      "passed": true,
+      "evidence": "Section 7 child ticket commands all include '--parent MOBILE-200'."
+    },
+    {
+      "text": "Presents breakdown plan to user before creating",
+      "passed": true,
+      "evidence": "Section 6 shows a full breakdown table with 10 child tickets presented to user with: 'Please review the proposed breakdown. You can request changes... before I create the tickets.'"
+    },
+    {
+      "text": "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md",
+      "passed": true,
+      "evidence": "Section 9 Reference Files table lists all three: 'references/epic-templates.md', 'references/ticket-writing-guide.md', and 'references/breakdown-examples.md'."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

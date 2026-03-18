@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Handles inline spec without needing Confluence fetch",
+      "passed": true,
+      "evidence": "Analyzes the requirements document directly without fetching from Confluence. States 'Take the User Profile Enhancement requirements document and create individual Jira tickets'."
+    },
+    {
+      "text": "Uses jira.mjs issue-types FRONTEND to check available types",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Mentions using MCP tool 'getJiraProjectIssueTypesMetadata' but not the skill's script."
+    },
+    {
+      "text": "Maps requirement #3 (mobile Safari bug) to Bug type",
+      "passed": true,
+      "evidence": "Ticket #3 'Fix profile save bug on mobile Safari' is mapped to Bug type in the breakdown table."
+    },
+    {
+      "text": "Maps requirement #6 (API docs) to Task type",
+      "passed": true,
+      "evidence": "Ticket #6 'Update API documentation for new endpoints' is mapped to Task type in the breakdown table."
+    },
+    {
+      "text": "Maps feature requirements (#1,2,4,5) to Story type",
+      "passed": true,
+      "evidence": "Tickets #1 (avatar upload), #2 (bio field), #4 (completion percentage), #5 (social media) are all mapped to Story type."
+    },
+    {
+      "text": "Creates Epic first, then child tickets with --parent",
+      "passed": false,
+      "evidence": "No Epic creation is mentioned. The approach creates individual tickets without an Epic parent or --parent flag."
+    },
+    {
+      "text": "Presents plan with labeled issue types before creating",
+      "passed": true,
+      "evidence": "Presents a table with #, Requirement, Ticket Type, and Priority columns before describing creation steps."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 2,
+    "total": 7,
+    "pass_rate": 0.71
+  }
+}

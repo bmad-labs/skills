@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs search (not jira.mjs) as primary search",
+      "passed": true,
+      "evidence": "Section 3 shows confluence.mjs search as the primary command. Section 2 explicitly states 'Confluence relevance: HIGH' and 'prioritize and lead with Confluence results'. While a supplementary Jira search is mentioned, it is clearly secondary."
+    },
+    {
+      "text": "CQL includes terms like deployment, runbook, or deploy",
+      "passed": true,
+      "evidence": "Primary CQL: 'text ~ \"deployment runbook\"'. Broadened CQL includes 'deploy to production' and 'release runbook'. Label search uses 'label = \"runbook\" AND text ~ \"deployment\"'."
+    },
+    {
+      "text": "Plans to fetch full page content with confluence.mjs get-page",
+      "passed": true,
+      "evidence": "Section 4 states: 'fetch each page's full content using get-page' with exact command 'confluence.mjs get-page <pageId>' and an example with page ID 78901."
+    },
+    {
+      "text": "Presents results with page title and source citation",
+      "passed": true,
+      "evidence": "Section 5 describes citing sources with 'page title, Confluence space key, and a direct URL' and shows an example citation format."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

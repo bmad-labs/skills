@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+      "passed": true,
+      "evidence": "Step 1 shows: 'jira.mjs lookup-user \"Sarah Chen\"' before the create command in Step 3."
+    },
+    {
+      "text": "Uses jira.mjs create with --project PLATFORM --type Bug",
+      "passed": true,
+      "evidence": "Step 3 command includes '--project PLATFORM --type Bug'."
+    },
+    {
+      "text": "Includes --priority High in the create command",
+      "passed": true,
+      "evidence": "Step 3 command includes '--priority High'."
+    },
+    {
+      "text": "Includes --labels flag with backend and urgent",
+      "passed": true,
+      "evidence": "Step 3 command includes '--labels \"backend,urgent\"'."
+    },
+    {
+      "text": "Includes --assignee with the looked-up account ID (not a name)",
+      "passed": true,
+      "evidence": "Step 3 command includes '--assignee <accountId>' with note 'Replace <accountId> with the actual account ID returned from Step 1'."
+    },
+    {
+      "text": "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+      "passed": true,
+      "evidence": "Summary is 'Fix login endpoint timeout when user has more than 50 active sessions' — follows Verb + Object + Context pattern as noted in Design Decisions."
+    },
+    {
+      "text": "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+      "passed": true,
+      "evidence": "Description explicitly mentions 'times out after 30 seconds' and 'more than 50 active sessions' in multiple sections."
+    },
+    {
+      "text": "Shows a confirmation step before creating the ticket",
+      "passed": true,
+      "evidence": "Step 2 shows a full confirmation prompt with 'Shall I proceed?' before Step 3 creates the issue."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

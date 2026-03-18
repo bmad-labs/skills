@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Describes REST API 'GET /rest/api/3/issue/PROJ-456/transitions' but not the skill's script."
+    },
+    {
+      "text": "Does NOT guess or hardcode a transition ID",
+      "passed": true,
+      "evidence": "Step 1 explicitly queries available transitions first: 'Before transitioning an issue, you must look up the transition ID that corresponds to Done'. Uses example ID '31' only after describing the lookup step."
+    },
+    {
+      "text": "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Describes REST API POST to /rest/api/3/issue/PROJ-456/transitions with transition ID."
+    },
+    {
+      "text": "Uses jira.mjs comment PROJ-456 with the deployment message",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Describes REST API POST to /rest/api/3/issue/PROJ-456/comment with the deployment message."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  }
+}

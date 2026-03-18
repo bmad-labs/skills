@@ -1,0 +1,71 @@
+{
+  "skill_name": "multi-repo-git-ops",
+  "evals": [
+    {
+      "id": 1,
+      "name": "commit-message-format",
+      "prompt": "I just added a new search-by-date feature to the booking module in om-newblink-bl-service. The files changed are src/booking/search-by-date.use-case.ts and src/booking/search-by-date.use-case.spec.ts. This is for BMAD story 2-4-booking-search. Write the git commit command for me.",
+      "expected_output": "A git commit command with: conventional commit format (feat(booking): ...), imperative mood, lowercase description, no period, story reference in body/footer, NO Co-Authored-By trailer",
+      "assertions": [
+        { "text": "Uses feat: or feat(booking): type prefix", "type": "contains_pattern" },
+        { "text": "Description uses imperative mood and starts lowercase", "type": "format_check" },
+        { "text": "Description does not end with a period", "type": "format_check" },
+        { "text": "Includes Story: 2-4-booking-search in body or footer", "type": "contains_pattern" },
+        { "text": "Does NOT contain Co-Authored-By", "type": "absence_check" },
+        { "text": "Adds specific files, not git add . or git add -A", "type": "format_check" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "breaking-change-commit",
+      "prompt": "We need to commit a breaking change in om-blk-auth-service. We removed the old /api/v1/auth/login endpoint and replaced it with OAuth2 flow at /api/v2/auth/login. Files changed: src/auth/login.controller.ts, src/auth/login.service.ts, src/auth/dto/login.dto.ts. Story 3-1-auth-migration. Write the commit command.",
+      "expected_output": "A commit with breaking change indicator (! or BREAKING CHANGE footer), major bump implications, migration details in footer, NO Co-Authored-By",
+      "assertions": [
+        { "text": "Contains ! before colon OR BREAKING CHANGE footer", "type": "contains_pattern" },
+        { "text": "Includes BREAKING CHANGE: footer with migration details", "type": "contains_pattern" },
+        { "text": "Uses feat or refactor type", "type": "contains_pattern" },
+        { "text": "Does NOT contain Co-Authored-By", "type": "absence_check" },
+        { "text": "References story 3-1-auth-migration", "type": "contains_pattern" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "non-releasable-commit-types",
+      "prompt": "I need to commit three separate changes across services: 1) Added unit tests for the scheduler cron parser in om-blk-scheduler-service (src/scheduler/cron-parser.spec.ts), 2) Updated the CI workflow in om-newblink-github-workflow (.github/workflows/ci.yml), 3) Refactored the booking date utility in om-newblink-bl-service without changing behavior (src/booking/date.util.ts). Write all three commit commands.",
+      "expected_output": "Three separate commits using test:, ci:, and refactor: types respectively. None should use feat: or fix:. No Co-Authored-By on any.",
+      "assertions": [
+        { "text": "Uses test: or test(scheduler): for the test commit", "type": "contains_pattern" },
+        { "text": "Uses ci: for the CI workflow commit", "type": "contains_pattern" },
+        { "text": "Uses refactor: or refactor(booking): for the refactor commit", "type": "contains_pattern" },
+        { "text": "Does NOT use feat: or fix: for any of these", "type": "absence_check" },
+        { "text": "Does NOT contain Co-Authored-By in any commit", "type": "absence_check" },
+        { "text": "Each commit is in the correct service directory", "type": "format_check" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "parent-submodule-pointer-update",
+      "prompt": "Story 1-2-user-authentication PRs have been merged in om-blk-auth-service and om-newblink-blink-bff-service. Now I need to update the parent repo's submodule pointers. What are the exact commands?",
+      "expected_output": "Commands to checkout default branches, pull, then commit in parent with chore: type, listing updated services. No Co-Authored-By.",
+      "assertions": [
+        { "text": "Uses chore: type for parent repo commit", "type": "contains_pattern" },
+        { "text": "Lists both services in commit body", "type": "contains_pattern" },
+        { "text": "Does NOT contain Co-Authored-By", "type": "absence_check" },
+        { "text": "Checks out default branch and pulls for each service before updating parent", "type": "format_check" },
+        { "text": "Uses git add with specific service paths, not git add -A", "type": "format_check" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "dependency-update-commit",
+      "prompt": "I upgraded @nestjs/core from v10 to v11 in om-blk-auth-service. The package.json and package-lock.json changed. Write the commit.",
+      "expected_output": "A commit using deps: type (not chore: or build:), which is a releasable unit triggering a patch bump. No Co-Authored-By.",
+      "assertions": [
+        { "text": "Uses deps: type prefix", "type": "contains_pattern" },
+        { "text": "Does NOT use chore: or build: for this dependency update", "type": "absence_check" },
+        { "text": "Does NOT contain Co-Authored-By", "type": "absence_check" },
+        { "text": "Mentions the specific package and version in description", "type": "format_check" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs link-types to discover available link type names",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Describes REST API 'GET /rest/api/3/issueLinkType' but not the skill's script."
+    },
+    {
+      "text": "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+      "passed": true,
+      "evidence": "Step 2 creates a Blocks link with PROJ-100 as outwardIssue (blocks) and PROJ-200 as inwardIssue (is blocked by)."
+    },
+    {
+      "text": "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+      "passed": true,
+      "evidence": "Step 3 creates a Relates link between PROJ-100 (outwardIssue) and PROJ-50 (inwardIssue)."
+    },
+    {
+      "text": "Uses jira.mjs link command for both operations",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Describes REST API POST to /rest/api/3/issueLink for both operations."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.50
+  }
+}

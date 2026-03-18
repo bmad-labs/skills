@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Creates Epic first with jira.mjs create --project ENG --type Epic",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Uses MCP tool 'createJiraIssue' with projectKey ENG and issueTypeName Epic."
+    },
+    {
+      "text": "Captures the Epic key from the create response",
+      "passed": true,
+      "evidence": "Step 4 states 'Output: The Epic's issue key (e.g., ENG-100) is needed as the parent for the stories'."
+    },
+    {
+      "text": "Uses jira.mjs lookup-user for john.doe",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Uses MCP tool 'lookupJiraAccountId' with searchString 'john.doe@company.com'."
+    },
+    {
+      "text": "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+      "passed": false,
+      "evidence": "Does not use jira.mjs with --parent flag. Uses MCP tool createJiraIssue with parent parameter set to Epic key and priority Medium."
+    },
+    {
+      "text": "Story 1 includes --assignee with john.doe's account ID",
+      "passed": false,
+      "evidence": "Does not use jira.mjs --assignee flag. Story 1 uses MCP tool with 'assignee_account_id' from the lookup step."
+    },
+    {
+      "text": "Shows confirmation plan before executing",
+      "passed": false,
+      "evidence": "No user confirmation step is described. The approach goes directly from planning to execution steps."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 5,
+    "total": 6,
+    "pass_rate": 0.17
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "eval_id": 9,
+  "eval_name": "search-auth",
+  "prompt": "Search company knowledge about authentication system - login, OAuth, known issues.",
+  "assertions": [
+    "Loads search-company-knowledge sub-skill",
+    "Searches Confluence for documentation pages about authentication/login/OAuth",
+    "Searches Jira for related issues or bugs",
+    "Uses both confluence.mjs search and jira.mjs search",
+    "Plans to fetch full content from top results",
+    "Synthesizes information from multiple sources with citations",
+    "References search-patterns.md or query-languages.md"
+  ]
+}

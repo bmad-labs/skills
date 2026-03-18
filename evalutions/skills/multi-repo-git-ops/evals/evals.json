@@ -1,0 +1,89 @@
+{
+  "skill_name": "multi-repo-git-ops",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to start working on story 2-3-implement-jwt-auth which affects om-blk-auth-service and om-newblink-blink-bff-service. Set up the branches for me.",
+      "expected_output": "Derive branch feat/2-3-implement-jwt-auth, lookup default branches from .gitmodules, create same branch in both services, push with -u",
+      "assertions": [
+        {"text": "Branch name is feat/2-3-implement-jwt-auth", "type": "exact"},
+        {"text": "Looks up default branch from .gitmodules", "type": "behavior"},
+        {"text": "Same branch name in both services", "type": "behavior"},
+        {"text": "Pulls latest before branching", "type": "behavior"},
+        {"text": "Pushes with -u for upstream tracking", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I just finished implementing changes for story 1-1-user-registration in om-blk-auth-service and om-newblink-iam-service. Help me commit and push everything properly.",
+      "expected_output": "Commit separately per service with conventional format and story key, add specific files, push services before parent",
+      "assertions": [
+        {"text": "Commits in each service separately", "type": "behavior"},
+        {"text": "Uses conventional commit format with story key", "type": "behavior"},
+        {"text": "Adds specific files not git add .", "type": "behavior"},
+        {"text": "Pushes services before parent", "type": "behavior"},
+        {"text": "Knows om-newblink-iam-service uses dev not develop", "type": "knowledge"}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The PRs for story 3-2-add-kafka-events have been merged in om-blk-scheduler-service and om-newblink-pushevent-service. Update the parent repo.",
+      "expected_output": "Checkout default branch and pull in each service, stage both submodule paths, commit parent with story reference",
+      "assertions": [
+        {"text": "Checks out default branch in each service", "type": "behavior"},
+        {"text": "Pulls latest in each service", "type": "behavior"},
+        {"text": "Returns to parent root before staging", "type": "behavior"},
+        {"text": "Stages specific submodule paths", "type": "behavior"},
+        {"text": "Commit message references story and lists services", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I just pulled the latest from main and now my submodules are out of sync. Some services show detached HEAD. How do I fix this?",
+      "expected_output": "Check for uncommitted work, sync URLs, update submodules, explain detached HEAD, show re-attach option",
+      "assertions": [
+        {"text": "Checks for uncommitted work first", "type": "behavior"},
+        {"text": "Runs git submodule sync", "type": "behavior"},
+        {"text": "Runs git submodule update --recursive", "type": "behavior"},
+        {"text": "Explains detached HEAD is normal", "type": "education"},
+        {"text": "Shows how to re-attach to tracked branches", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Give me a quick overview of what's going on across all my services - which ones have changes and what branches they're on",
+      "expected_output": "Efficient foreach command filtering to interesting services, compare against default branches from .gitmodules",
+      "assertions": [
+        {"text": "Uses efficient foreach not manual per-service", "type": "behavior"},
+        {"text": "Filters to only show interesting services", "type": "behavior"},
+        {"text": "Shows branch and change status", "type": "behavior"},
+        {"text": "Compares against default branch from .gitmodules", "type": "behavior"},
+        {"text": "Checks parent repo status too", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Create a feature branch feat/OMPBLINK-50000-fix-search off develop in om-newblink-bl-service",
+      "expected_output": "Detect develop is wrong for this service (uses dev), warn user, correct to dev, verify via .gitmodules",
+      "assertions": [
+        {"text": "Detects develop is wrong for this service", "type": "knowledge"},
+        {"text": "Warns user explicitly before proceeding", "type": "behavior"},
+        {"text": "Corrects to dev and proceeds", "type": "behavior"},
+        {"text": "Verifies via .gitmodules lookup", "type": "behavior"},
+        {"text": "Pushes with -u for upstream tracking", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Push my changes on develop in om-blk-alert-service to origin",
+      "expected_output": "Warn about auto-deploy to dev environment, require user confirmation, review commits, no force-push",
+      "assertions": [
+        {"text": "Warns about auto-deploy to dev environment", "type": "knowledge"},
+        {"text": "Requires user confirmation before push", "type": "behavior"},
+        {"text": "Reviews commits before pushing", "type": "behavior"},
+        {"text": "No force-push", "type": "behavior"},
+        {"text": "Checks for uncommitted changes", "type": "behavior"}
+      ]
+    }
+  ]
+}

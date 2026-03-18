@@ -1,0 +1,11 @@
+{
+  "eval_id": 17,
+  "eval_name": "create-page",
+  "prompt": "Create Confluence ADR page in TEAM space with Context/Decision/Consequences/Status sections.",
+  "assertions": [
+    "Uses confluence.mjs create-page with --space TEAM",
+    "Title includes 'Architecture Decision Record' and 'Microservices Migration'",
+    "Body contains sections for Context, Decision, Consequences, and Status",
+    "Body uses HTML storage format (h2 tags or similar) or plain text that will be auto-wrapped"
+  ]
+}

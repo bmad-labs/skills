@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the generate-status-report sub-skill file",
+      "passed": true,
+      "evidence": "Section 1 states: 'File: skills/generate-status-report.md (the \"Generate Status Report\" sub-skill)' with its 5-step process."
+    },
+    {
+      "text": "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+      "passed": true,
+      "evidence": "Section 3 shows 6 queries: completed (statusCategory = Done, resolved >= -7d), in-progress (statusCategory = In Progress), blocked (status = Blocked), newly created, open bugs, and stale items."
+    },
+    {
+      "text": "Uses jira.mjs search with project = PHOENIX",
+      "passed": true,
+      "evidence": "All 6 queries use 'jira.mjs search' with 'project = PHOENIX' in the JQL."
+    },
+    {
+      "text": "Formats a report with sections (metrics, highlights, blockers, or similar)",
+      "passed": true,
+      "evidence": "Section 5 shows a report template with: Executive Summary, Completed This Week, In Progress, Blockers & Risks, Upcoming Work, and Metrics sections."
+    },
+    {
+      "text": "Uses confluence.mjs create-page to publish to the ENG space",
+      "passed": true,
+      "evidence": "Section 6 shows: 'confluence.mjs create-page --space ENG --title \"Weekly Status Report - PHOENIX - 2026-03-18\" --body ...'."
+    },
+    {
+      "text": "Includes a date in the page title",
+      "passed": true,
+      "evidence": "Page title is 'Weekly Status Report - PHOENIX - 2026-03-18' which includes the date."
+    },
+    {
+      "text": "References report-templates.md or jql-patterns.md",
+      "passed": true,
+      "evidence": "Section 7 Reference Files table lists both 'references/report-templates.md' and 'references/jql-patterns.md' with detailed usage."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

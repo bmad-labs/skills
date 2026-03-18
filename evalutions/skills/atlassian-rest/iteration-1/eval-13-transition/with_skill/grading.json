@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+      "passed": true,
+      "evidence": "Step 1 shows: 'jira.mjs transitions PROJ-456' as the first command, before any transition or comment."
+    },
+    {
+      "text": "Does NOT guess or hardcode a transition ID",
+      "passed": true,
+      "evidence": "Step 2 uses '<transition-id-for-Done>' as a placeholder, explicitly stating the ID comes from Step 1. Section 2 explains why: 'Transition IDs are not universal' and 'Always list transitions first to get the correct ID -- don't guess.'"
+    },
+    {
+      "text": "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+      "passed": true,
+      "evidence": "Step 2 shows: 'jira.mjs transition PROJ-456 <transition-id-for-Done>'."
+    },
+    {
+      "text": "Uses jira.mjs comment PROJ-456 with the deployment message",
+      "passed": true,
+      "evidence": "Step 3 shows: 'jira.mjs comment PROJ-456 \"Deployed to production in release v2.3.1\"'."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

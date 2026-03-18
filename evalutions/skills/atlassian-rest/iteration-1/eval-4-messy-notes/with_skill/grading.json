@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the capture-tasks-from-meeting-notes sub-skill",
+      "passed": true,
+      "evidence": "Section 1 states: 'Workflow: skills/capture-tasks-from-meeting-notes.md (Capture Tasks from Meeting Notes)'."
+    },
+    {
+      "text": "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+      "passed": true,
+      "evidence": "Section 2 parsing shows: Sarah's 'Write PRD for mobile push notifications', John's 'Fix flaky test suite blocking CI', Mike's 'Investigate Stripe webhook failures'."
+    },
+    {
+      "text": "Identifies the unassigned API docs task and asks the user about it",
+      "passed": true,
+      "evidence": "Section 3 explicitly identifies 'update the API docs' as unassigned ('someone should... nobody volunteered') and asks 'Would you like to assign someone?' in the confirmation table."
+    },
+    {
+      "text": "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+      "passed": true,
+      "evidence": "Section 2 parsing logic shows: 'Sarah mentioned she'll handle' (ownership phrase), 'John: needs to fix' (name + verb), 'Mike said he'd look into' (ownership phrase), and 'should' (medium confidence pattern)."
+    },
+    {
+      "text": "Presents extracted tasks for confirmation before creating",
+      "passed": true,
+      "evidence": "Section 5 shows a full confirmation table with all 4 items including notes about unassigned item and priority rationale, ending with 'Please confirm, edit, or remove any items before I create the tickets.'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

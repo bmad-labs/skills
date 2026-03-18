@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the capture-tasks-from-meeting-notes sub-skill file",
+      "passed": false,
+      "evidence": "No sub-skill file is loaded or referenced. The approach works without any skill framework."
+    },
+    {
+      "text": "Extracts at least 4 action items from the notes",
+      "passed": true,
+      "evidence": "Extracted exactly 4 action items: (1) DB query optimization for Sarah, (2) monitoring dashboards for Mike, (3) integration tests for Lisa, (4) fix checkout bug for Mike."
+    },
+    {
+      "text": "Identifies Sarah, Mike, and Lisa as assignees",
+      "passed": true,
+      "evidence": "Table lists Sarah Chen, Mike Rodriguez, and Lisa Park as assignees across the 4 items."
+    },
+    {
+      "text": "Uses jira.mjs lookup-user for each unique assignee",
+      "passed": false,
+      "evidence": "Does not mention jira.mjs. Describes needing REST API calls to resolve names to account IDs but cannot execute them."
+    },
+    {
+      "text": "Presents a table or list of extracted tasks for user confirmation before creating",
+      "passed": true,
+      "evidence": "Presents a table of 4 action items with #, Action Item, Assignee, Priority, and Due Date columns, plus detailed ticket breakdown."
+    },
+    {
+      "text": "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+      "passed": false,
+      "evidence": "Does not mention jira.mjs. Shows a REST API JSON payload example but no jira.mjs create commands."
+    },
+    {
+      "text": "References action-item-patterns.md or ticket-writing-guide.md",
+      "passed": false,
+      "evidence": "No reference to action-item-patterns.md or ticket-writing-guide.md anywhere in the approach."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 4,
+    "total": 7,
+    "pass_rate": 0.43
+  }
+}

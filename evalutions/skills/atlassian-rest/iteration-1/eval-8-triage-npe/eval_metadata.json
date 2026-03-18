@@ -1,0 +1,12 @@
+{
+  "eval_id": 8,
+  "eval_name": "triage-npe",
+  "prompt": "Triage NullPointerException in UserService.getProfile() at line 342 in BACKEND.",
+  "assertions": [
+    "Loads triage-issue sub-skill",
+    "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+    "Includes BACKEND project in JQL",
+    "Checks for resolved similar issues (regression detection)",
+    "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual"
+  ]
+}

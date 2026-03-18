@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the capture-tasks-from-meeting-notes sub-skill",
+      "passed": false,
+      "evidence": "No sub-skill file is loaded or referenced."
+    },
+    {
+      "text": "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+      "passed": true,
+      "evidence": "Extracted: Sarah's 'Write PRD for mobile push notifications', John's 'Fix flaky test suite blocking CI', and Mike's 'Investigate Stripe webhook failures'."
+    },
+    {
+      "text": "Identifies the unassigned API docs task and asks the user about it",
+      "passed": false,
+      "evidence": "Identifies the unassigned API docs task (ticket #3, 'Update API documentation') but does not ask the user about it - just labels it as 'Unassigned' and moves on."
+    },
+    {
+      "text": "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+      "passed": true,
+      "evidence": "Correctly parsed: 'Sarah mentioned she'll handle' (implicit volunteering), 'John: needs to fix' (name: task), 'Mike said he'd look into' (name + verb), and 'someone should update' (unassigned)."
+    },
+    {
+      "text": "Presents extracted tasks for confirmation before creating",
+      "passed": false,
+      "evidence": "Presents a table of extracted tasks but does not ask for user confirmation before creating. The approach notes it cannot create tickets without the skill anyway."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.40
+  }
+}

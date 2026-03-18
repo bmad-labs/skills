@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs get command (not search) to fetch the specific issue",
+      "passed": true,
+      "evidence": "Step 2 shows: 'node .../jira.mjs get PROJ-123 --fields summary,status,assignee,priority' — uses get, not search."
+    },
+    {
+      "text": "References PROJ-123 as the issue key in the command",
+      "passed": true,
+      "evidence": "The command explicitly includes 'get PROJ-123' as the issue key."
+    },
+    {
+      "text": "Mentions presenting status, assignee, and priority fields to the user",
+      "passed": true,
+      "evidence": "Step 3 shows a table with Status, Assignee, and Priority fields. The --fields flag also includes 'status,assignee,priority'."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  }
+}

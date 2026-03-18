@@ -1,0 +1,14 @@
+{
+  "eval_id": 3,
+  "eval_name": "meeting-notes",
+  "prompt": "Extract action items from sprint planning meeting notes and create Jira tickets in PLATFORM.",
+  "assertions": [
+    "Loads the capture-tasks-from-meeting-notes sub-skill file",
+    "Extracts at least 4 action items from the notes",
+    "Identifies Sarah, Mike, and Lisa as assignees",
+    "Uses jira.mjs lookup-user for each unique assignee",
+    "Presents a table or list of extracted tasks for user confirmation before creating",
+    "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+    "References action-item-patterns.md or ticket-writing-guide.md"
+  ]
+}

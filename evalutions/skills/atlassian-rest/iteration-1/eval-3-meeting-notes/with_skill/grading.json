@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the capture-tasks-from-meeting-notes sub-skill file",
+      "passed": true,
+      "evidence": "Section 1 states: 'Primary workflow: skills/capture-tasks-from-meeting-notes.md' and describes the 7-step workflow."
+    },
+    {
+      "text": "Extracts at least 4 action items from the notes",
+      "passed": true,
+      "evidence": "Section 2 'Extracted Action Items' table lists 4 items: Sarah's DB optimization, Mike's monitoring dashboards, Lisa's integration tests, Mike's checkout bug fix."
+    },
+    {
+      "text": "Identifies Sarah, Mike, and Lisa as assignees",
+      "passed": true,
+      "evidence": "The extracted items table shows Sarah Chen, Mike Rodriguez, and Lisa Park as assignees."
+    },
+    {
+      "text": "Uses jira.mjs lookup-user for each unique assignee",
+      "passed": true,
+      "evidence": "Section 3 Step 4 shows three lookup-user commands for 'Sarah Chen', 'Mike Rodriguez', and 'Lisa Park'."
+    },
+    {
+      "text": "Presents a table or list of extracted tasks for user confirmation before creating",
+      "passed": true,
+      "evidence": "Section 4 shows a confirmation table with all 4 tasks including Type, Summary, Assignee, Priority, Due Date columns, with 'Do not proceed until the user explicitly confirms.'"
+    },
+    {
+      "text": "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+      "passed": true,
+      "evidence": "Section 3 Step 6 shows 4 separate 'jira.mjs create' commands with --project, --type, --summary, --description, --assignee, --priority flags. Note: --parent is not used, but the tasks are standalone tickets in PLATFORM, which is appropriate since no Epic was mentioned."
+    },
+    {
+      "text": "References action-item-patterns.md or ticket-writing-guide.md",
+      "passed": true,
+      "evidence": "Section 5 Reference Files table explicitly lists both 'references/action-item-patterns.md' and 'references/ticket-writing-guide.md' with detailed usage descriptions."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

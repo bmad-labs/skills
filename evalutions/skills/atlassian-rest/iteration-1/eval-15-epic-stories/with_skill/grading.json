@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Creates Epic first with jira.mjs create --project ENG --type Epic",
+      "passed": true,
+      "evidence": "Step 2 shows: 'jira.mjs create --project ENG --type Epic --summary \"Q2 Performance Initiative\"'."
+    },
+    {
+      "text": "Captures the Epic key from the create response",
+      "passed": true,
+      "evidence": "Step 2 states: 'Expected output: Issue key, e.g., ENG-201. This key is captured and used as --parent for all child stories.'"
+    },
+    {
+      "text": "Uses jira.mjs lookup-user for john.doe",
+      "passed": true,
+      "evidence": "Step 3 shows: 'jira.mjs lookup-user \"john.doe@company.com\"' with note about capturing the account ID."
+    },
+    {
+      "text": "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+      "passed": true,
+      "evidence": "Steps 4, 5, 6 each show 'jira.mjs create --project ENG --type Story ... --priority Medium --parent ENG-201'."
+    },
+    {
+      "text": "Story 1 includes --assignee with john.doe's account ID",
+      "passed": true,
+      "evidence": "Step 4 (Story 1) includes '--assignee <accountId-from-step-3>' while Steps 5 and 6 do not include --assignee."
+    },
+    {
+      "text": "Shows confirmation plan before executing",
+      "passed": true,
+      "evidence": "Step 1 shows a full confirmation plan with Epic and all 3 Stories detailed, ending with 'Shall I proceed?'"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

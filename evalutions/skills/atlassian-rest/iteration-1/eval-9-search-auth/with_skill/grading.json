@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads search-company-knowledge sub-skill",
+      "passed": true,
+      "evidence": "Section 1 states: 'Loaded the Search Company Knowledge workflow from skills/search-company-knowledge.md' with its 5-step process."
+    },
+    {
+      "text": "Searches Confluence for documentation pages about authentication/login/OAuth",
+      "passed": true,
+      "evidence": "Section 3 shows 4 Confluence CQL searches covering 'authentication AND login', 'OAuth', 'SSO OR identity provider OR SAML OR OIDC', and architecture decision records about auth."
+    },
+    {
+      "text": "Searches Jira for related issues or bugs",
+      "passed": true,
+      "evidence": "Section 3 shows 3 Jira JQL searches: bugs/incidents related to authentication, epics/stories for auth features, and open/unresolved auth issues."
+    },
+    {
+      "text": "Uses both confluence.mjs search and jira.mjs search",
+      "passed": true,
+      "evidence": "Section 3 explicitly shows 4 'confluence.mjs search' commands and 3 'jira.mjs search' commands."
+    },
+    {
+      "text": "Plans to fetch full content from top results",
+      "passed": true,
+      "evidence": "Section 4 describes fetching top 3-5 results using 'confluence.mjs get-page <pageId>' and 'jira.mjs get <ISSUE-KEY>' commands."
+    },
+    {
+      "text": "Synthesizes information from multiple sources with citations",
+      "passed": true,
+      "evidence": "Section 5 shows a synthesis plan with structured sections (Overview, OAuth Providers, Known Issues, Related Work) with explicit citation format including source page titles, spaces, and dates."
+    },
+    {
+      "text": "References search-patterns.md or query-languages.md",
+      "passed": true,
+      "evidence": "Section 7 Reference Files table lists both 'references/search-patterns.md' and 'references/query-languages.md'."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

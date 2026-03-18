@@ -1,0 +1,11 @@
+{
+  "eval_id": 10,
+  "eval_name": "search-runbook",
+  "prompt": "Search Confluence specifically for the deployment runbook.",
+  "assertions": [
+    "Uses confluence.mjs search (not jira.mjs) as primary search",
+    "CQL includes terms like deployment, runbook, or deploy",
+    "Plans to fetch full page content with confluence.mjs get-page",
+    "Presents results with page title and source citation"
+  ]
+}

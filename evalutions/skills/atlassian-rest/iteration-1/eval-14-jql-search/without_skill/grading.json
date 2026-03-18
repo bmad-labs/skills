@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Constructs JQL with project = PLATFORM, type = Bug, priority in High/Highest, status = Blocked",
+      "passed": true,
+      "evidence": "Constructs JQL 'project = PLATFORM AND issuetype = Bug AND priority = High AND status = Blocked' and later suggests broadening to 'priority in (High, Highest, Critical)'."
+    },
+    {
+      "text": "Uses jira.mjs search with the JQL query",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Uses MCP tool 'searchJiraIssuesUsingJql' directly instead of the skill's script."
+    },
+    {
+      "text": "Mentions presenting results with key, summary, assignee, and last updated",
+      "passed": true,
+      "evidence": "Step 7 states 'For each issue, extract and display: Issue key, Summary, Assignee display name, Last updated timestamp'."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 1,
+    "total": 3,
+    "pass_rate": 0.67
+  }
+}

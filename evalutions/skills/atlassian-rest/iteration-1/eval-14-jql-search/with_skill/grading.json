@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Constructs JQL with project = PLATFORM, type = Bug, priority in High/Highest, status = Blocked",
+      "passed": true,
+      "evidence": "Section 1 shows JQL: 'project = PLATFORM AND issuetype = Bug AND priority IN (Highest, High) AND status = Blocked ORDER BY updated DESC'."
+    },
+    {
+      "text": "Uses jira.mjs search with the JQL query",
+      "passed": true,
+      "evidence": "Section 2 shows: 'jira.mjs search' with the full JQL query and '--max 50'."
+    },
+    {
+      "text": "Mentions presenting results with key, summary, assignee, and last updated",
+      "passed": true,
+      "evidence": "Section 3 shows a presentation table with columns: Issue Key, Summary, Priority, Assignee, Last Updated."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  }
+}
