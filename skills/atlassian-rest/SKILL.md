@@ -52,7 +52,7 @@ When the user asks you to do something with Jira or Confluence, follow these pri
 
 4. **Compose operations naturally.** Many user requests require multiple script calls. For example, "assign PROJ-123 to Sarah" requires: (a) `lookup-user "Sarah"` to get the account ID, then (b) `edit PROJ-123 --assignee <accountId>`.
 
-5. **Use workflows for complex tasks.** If the user's request matches one of the workflow sub-skills (see Workflows section below), read the corresponding file and follow its step-by-step process.
+5. **Use workflows for complex tasks.** If the user's request matches one of the workflows below, read the corresponding file and follow its step-by-step process.
 
 6. **Read reference docs when needed.** Before writing JQL/CQL queries, consult `references/query-languages.md`. Before creating tickets, consult `references/ticket-writing-guide.md`. The reference docs exist to help you produce high-quality output — use them.
 
@@ -176,17 +176,17 @@ confluence.mjs descendants 12345       # Get child pages
 
 ## Workflows
 
-For complex multi-step operations, read the corresponding sub-skill file and follow its process:
+For complex multi-step operations, read the corresponding workflow file and follow its process:
 
 | Workflow | When to use | File |
 |----------|-------------|------|
-| **Capture Tasks from Meeting Notes** | User provides meeting notes and wants Jira tasks created from action items | `skills/capture-tasks-from-meeting-notes.md` |
-| **Generate Status Report** | User wants a project status report, sprint summary, or weekly update | `skills/generate-status-report.md` |
-| **Search Company Knowledge** | User wants to find information across Confluence pages and Jira issues | `skills/search-company-knowledge.md` |
-| **Spec to Backlog** | User has a Confluence spec and wants it broken into an Epic + child tickets | `skills/spec-to-backlog.md` |
-| **Triage Issue** | User reports a bug and wants duplicate checking before filing | `skills/triage-issue.md` |
-| **Create Confluence Document** | User wants a professional Confluence page with macros, images, and structured formatting | `skills/create-confluence-document.md` |
-| **Sync BMAD Documents** | User wants to sync local BMAD docs (epics, tech specs, PRDs, architecture) with Jira or Confluence, or link a document to a ticket/page | `skills/sync-bmad-documents.md` |
+| **Capture Tasks from Meeting Notes** | User provides meeting notes and wants Jira tasks created from action items | `workflows/capture-tasks-from-meeting-notes.md` |
+| **Generate Status Report** | User wants a project status report, sprint summary, or weekly update | `workflows/generate-status-report.md` |
+| **Search Company Knowledge** | User wants to find information across Confluence pages and Jira issues | `workflows/search-company-knowledge.md` |
+| **Spec to Backlog** | User has a Confluence spec and wants it broken into an Epic + child tickets | `workflows/spec-to-backlog.md` |
+| **Triage Issue** | User reports a bug and wants duplicate checking before filing | `workflows/triage-issue.md` |
+| **Create Confluence Document** | User wants a professional Confluence page with macros, images, and structured formatting | `workflows/create-confluence-document.md` |
+| **Sync BMAD Documents** | User wants to sync local BMAD docs (epics, tech specs, PRDs, architecture) with Jira or Confluence, or link a document to a ticket/page | `workflows/sync-bmad-documents.md` |
 
 ---
 
