@@ -158,7 +158,7 @@ function printUsage() {
   node confluence.mjs get-page <pageId> [--format storage|view]
   node confluence.mjs create-page --space S --title T --body B [--parent P] [--body-file F]
   node confluence.mjs update-page <pageId> --title T --body B [--body-file F]
-  node confluence.mjs comment <pageId> <body>
+  node confluence.mjs comment <pageId> <body> [--body-file F]
   node confluence.mjs spaces [--max N]
   node confluence.mjs descendants <pageId>
   node confluence.mjs attach <pageId> <filePath> [--comment C]
@@ -282,13 +282,13 @@ async function cmdUpdatePage(env, positional, flags) {
   console.log(JSON.stringify(data, null, 2));
 }
 
-async function cmdComment(env, positional, _flags) {
+async function cmdComment(env, positional, flags) {
   const pageId = positional[0];
-  const bodyRaw = positional[1];
+  const bodyRaw = flags['body-file'] ? readFileSync(flags['body-file'], 'utf-8') : positional[1];
 
   if (!pageId || !bodyRaw) {
-    console.error('Error: pageId and body are required.');
-    console.error('Usage: node confluence.mjs comment <pageId> <body>');
+    console.error('Error: pageId and (body or --body-file) are required.');
+    console.error('Usage: node confluence.mjs comment <pageId> <body> | --body-file F');
     process.exit(1);
   }
 
