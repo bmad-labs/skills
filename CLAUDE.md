@@ -78,7 +78,7 @@ npx skills add bmad-labs/skills -g
 
 ## Evaluations and Benchmarks
 
-Evaluation and benchmark results for each skill are stored in `evalutions/skills/<skill-name>/`:
+!IMPORTANT: Evaluation and benchmark results for each skill are stored in `evalutions/skills/<skill-name>/`:
 
 ## Troubleshooting
 

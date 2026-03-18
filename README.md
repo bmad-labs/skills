@@ -109,6 +109,8 @@ If you only need specific skills, add them individually to your project's `.clau
 - `github:bmad-labs/skills/skills/ui-ux-pro-max`
 - `github:bmad-labs/skills/skills/slides-generator`
 - `github:bmad-labs/skills/skills/ai-multimodal`
+- `github:bmad-labs/skills/skills/atlassian-rest`
+- `github:bmad-labs/skills/skills/multi-repo-git-ops`
 
 ### Troubleshooting
 
@@ -175,6 +177,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [ui-ux-pro-max](skills/ui-ux-pro-max) | UI/UX design intelligence with 50 styles, 21 palettes, multiple frameworks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter) | Creative |
 | [slides-generator](skills/slides-generator) | Generate interactive presentation slides using React + Tailwind, export to PDF or HTML | Productivity |
 | [ai-multimodal](skills/ai-multimodal) | Process and generate multimedia content using Google Gemini API (audio, images, videos, documents) | Data |
+| [atlassian-rest](skills/atlassian-rest) | Jira & Confluence integration via REST APIs — tickets, epics, pages, status reports, triage, bidirectional BMAD document sync | Productivity |
+| [multi-repo-git-ops](skills/multi-repo-git-ops) | Git operations across multi-repo systems with submodules — branching, committing, pushing, syncing across parent and service repos | Development |
 
 ## Recommended Skills from Other Repositories
 
