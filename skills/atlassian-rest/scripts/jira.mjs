@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-// Jira REST API v3 CLI — Node.js 18+ (zero dependencies)
+// Jira REST API v3 CLI — Node.js 18+
+
+import { markdownToAdf } from 'marklassian';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -72,16 +74,13 @@ async function request(path, { method = 'GET', body, query } = {}) {
   return res.json();
 }
 
-function textToAdf(text) {
-  const paragraphs = (text || '').split(/\n\n+/).filter(Boolean);
-  return {
-    type: 'doc',
-    version: 1,
-    content: paragraphs.map((p) => ({
-      type: 'paragraph',
-      content: [{ type: 'text', text: p.trim() }],
-    })),
-  };
+/**
+ * Convert text to ADF via marklassian.
+ * Handles literal \n sequences from shell arguments.
+ */
+function toAdf(text) {
+  const normalized = (text || '').replace(/\\n/g, '\n');
+  return markdownToAdf(normalized);
 }
 
 // ---------------------------------------------------------------------------
@@ -172,7 +171,7 @@ async function cmdCreate(_positional, flags) {
   };
 
   if (flags.description) {
-    fields.description = textToAdf(flags.description);
+    fields.description = toAdf(flags.description);
   }
   if (flags.priority) {
     fields.priority = { name: flags.priority };
@@ -199,7 +198,7 @@ async function cmdEdit(positional, flags) {
 
   const fields = {};
   if (flags.summary) fields.summary = flags.summary;
-  if (flags.description) fields.description = textToAdf(flags.description);
+  if (flags.description) fields.description = toAdf(flags.description);
   if (flags.priority) fields.priority = { name: flags.priority };
   if (flags.assignee) fields.assignee = { id: flags.assignee };
   if (flags.labels) fields.labels = flags.labels.split(',').map((l) => l.trim());
@@ -220,7 +219,7 @@ async function cmdComment(positional, _flags) {
 
   const data = await request(`/issue/${key}/comment`, {
     method: 'POST',
-    body: { body: textToAdf(body) },
+    body: { body: toAdf(body) },
   });
 
   console.log(JSON.stringify({ id: data.id, created: data.created }, null, 2));
@@ -299,7 +298,7 @@ async function cmdWorklog(positional, flags) {
 
   const body = { timeSpent };
   if (flags.comment) {
-    body.comment = textToAdf(flags.comment);
+    body.comment = toAdf(flags.comment);
   }
 
   const data = await request(`/issue/${key}/worklog`, { method: 'POST', body });
