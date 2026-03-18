@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 
-// BMAD Document ↔ Jira/Confluence Sync Engine — Node.js 18+ (zero dependencies)
+// BMAD Document ↔ Jira/Confluence Sync Engine — Node.js 18+
 
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, unlinkSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { resolve, dirname, basename, join } from 'node:path';
+import { createInterface } from 'node:readline';
+import { markdownToAdf as mdToAdf } from 'marklassian';
+import { markdownToStorage, storageToMarkdown } from './confluence-format.mjs';
 
 // ---------------------------------------------------------------------------
 // Helpers (shared patterns from jira.mjs / confluence.mjs)
@@ -66,6 +69,28 @@ async function request(url, { method = 'GET', body, query } = {}) {
   }
   if (res.status === 204) return null;
   return res.json();
+}
+
+async function deleteIssue(issueKey) {
+  const url = `${jiraBaseUrl()}/issue/${issueKey}`;
+  const res = await fetch(url, {
+    method: 'DELETE',
+    headers: { Authorization: authHeader(), Accept: 'application/json' },
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Failed to delete ${issueKey}: ${res.status} ${res.statusText} ${detail}`);
+  }
+}
+
+function askConfirmation(question) {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim().toLowerCase() === 'y');
+    });
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -452,234 +477,11 @@ function extractStories(sections) {
 }
 
 // ---------------------------------------------------------------------------
-// Markdown ↔ ADF conversion
+// Markdown ↔ ADF conversion (using marklassian)
 // ---------------------------------------------------------------------------
 
 function markdownToAdf(markdown) {
-  const lines = (markdown || '').split('\n');
-  const content = [];
-  let i = 0;
-
-  while (i < lines.length) {
-    const line = lines[i];
-
-    // Empty line — skip
-    if (/^\s*$/.test(line)) { i++; continue; }
-
-    // Heading
-    const headingMatch = line.match(/^(#{1,6})\s+(.*)/);
-    if (headingMatch) {
-      content.push({
-        type: 'heading',
-        attrs: { level: headingMatch[1].length },
-        content: parseInlineMarks(headingMatch[2].trim()),
-      });
-      i++;
-      continue;
-    }
-
-    // Code fence
-    if (/^```/.test(line)) {
-      const langMatch = line.match(/^```(\w*)/);
-      const lang = langMatch?.[1] || null;
-      const codeLines = [];
-      i++;
-      while (i < lines.length && !/^```/.test(lines[i])) {
-        codeLines.push(lines[i]);
-        i++;
-      }
-      i++; // skip closing ```
-      const node = { type: 'codeBlock', content: [{ type: 'text', text: codeLines.join('\n') }] };
-      if (lang) node.attrs = { language: lang };
-      content.push(node);
-      continue;
-    }
-
-    // Unordered list
-    if (/^[\s]*[-*]\s+/.test(line)) {
-      const items = [];
-      while (i < lines.length && /^[\s]*[-*]\s+/.test(lines[i])) {
-        const text = lines[i].replace(/^[\s]*[-*]\s+/, '');
-        items.push({
-          type: 'listItem',
-          content: [{ type: 'paragraph', content: parseInlineMarks(text) }],
-        });
-        i++;
-      }
-      content.push({ type: 'bulletList', content: items });
-      continue;
-    }
-
-    // Ordered list
-    if (/^\s*\d+\.\s+/.test(line)) {
-      const items = [];
-      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
-        const text = lines[i].replace(/^\s*\d+\.\s+/, '');
-        items.push({
-          type: 'listItem',
-          content: [{ type: 'paragraph', content: parseInlineMarks(text) }],
-        });
-        i++;
-      }
-      content.push({ type: 'orderedList', content: items });
-      continue;
-    }
-
-    // Horizontal rule
-    if (/^---+\s*$/.test(line)) {
-      content.push({ type: 'rule' });
-      i++;
-      continue;
-    }
-
-    // Blockquote
-    if (/^>\s?/.test(line)) {
-      const quoteLines = [];
-      while (i < lines.length && /^>\s?/.test(lines[i])) {
-        quoteLines.push(lines[i].replace(/^>\s?/, ''));
-        i++;
-      }
-      content.push({
-        type: 'blockquote',
-        content: [{ type: 'paragraph', content: parseInlineMarks(quoteLines.join('\n')) }],
-      });
-      continue;
-    }
-
-    // Table
-    if (/^\|/.test(line)) {
-      const tableRows = [];
-      while (i < lines.length && /^\|/.test(lines[i])) {
-        const row = lines[i];
-        // Skip separator row
-        if (/^\|[\s-:|]+\|$/.test(row)) { i++; continue; }
-        const cells = row.split('|').slice(1, -1).map((c) => c.trim());
-        tableRows.push(cells);
-        i++;
-      }
-      if (tableRows.length > 0) {
-        const headerRow = tableRows[0];
-        const bodyRows = tableRows.slice(1);
-        const tableNode = {
-          type: 'table',
-          content: [
-            {
-              type: 'tableRow',
-              content: headerRow.map((cell) => ({
-                type: 'tableHeader',
-                content: [{ type: 'paragraph', content: parseInlineMarks(cell) }],
-              })),
-            },
-            ...bodyRows.map((row) => ({
-              type: 'tableRow',
-              content: row.map((cell) => ({
-                type: 'tableCell',
-                content: [{ type: 'paragraph', content: parseInlineMarks(cell) }],
-              })),
-            })),
-          ],
-        };
-        content.push(tableNode);
-      }
-      continue;
-    }
-
-    // Regular paragraph — collect contiguous non-empty lines
-    const paraLines = [];
-    while (i < lines.length && !/^\s*$/.test(lines[i]) && !/^#{1,6}\s/.test(lines[i]) && !/^```/.test(lines[i]) && !/^[-*]\s+/.test(lines[i]) && !/^\d+\.\s+/.test(lines[i]) && !/^\|/.test(lines[i]) && !/^---+\s*$/.test(lines[i]) && !/^>\s?/.test(lines[i])) {
-      paraLines.push(lines[i]);
-      i++;
-    }
-    if (paraLines.length > 0) {
-      content.push({
-        type: 'paragraph',
-        content: parseInlineMarks(paraLines.join('\n')),
-      });
-    }
-  }
-
-  return { type: 'doc', version: 1, content };
-}
-
-function parseInlineMarks(text) {
-  // Iterative inline mark parsing: **bold**, *italic*, `code`, [text](url)
-  // Uses index-based scanning to avoid recursion and infinite loop risks
-  const nodes = [];
-  let i = 0;
-  let plainStart = 0;
-
-  function flushPlain() {
-    if (i > plainStart) {
-      nodes.push({ type: 'text', text: text.slice(plainStart, i) });
-    }
-  }
-
-  while (i < text.length) {
-    // Bold: **text**
-    if (text[i] === '*' && text[i + 1] === '*') {
-      const end = text.indexOf('**', i + 2);
-      if (end !== -1 && end > i + 2) {
-        flushPlain();
-        nodes.push({ type: 'text', text: text.slice(i + 2, end), marks: [{ type: 'strong' }] });
-        i = end + 2;
-        plainStart = i;
-        continue;
-      }
-    }
-
-    // Italic: *text* (but not **)
-    if (text[i] === '*' && text[i + 1] !== '*') {
-      const end = text.indexOf('*', i + 1);
-      if (end !== -1 && end > i + 1 && text[end + 1] !== '*') {
-        flushPlain();
-        nodes.push({ type: 'text', text: text.slice(i + 1, end), marks: [{ type: 'em' }] });
-        i = end + 1;
-        plainStart = i;
-        continue;
-      }
-    }
-
-    // Inline code: `text`
-    if (text[i] === '`') {
-      const end = text.indexOf('`', i + 1);
-      if (end !== -1 && end > i + 1) {
-        flushPlain();
-        nodes.push({ type: 'text', text: text.slice(i + 1, end), marks: [{ type: 'code' }] });
-        i = end + 1;
-        plainStart = i;
-        continue;
-      }
-    }
-
-    // Link: [text](url)
-    if (text[i] === '[') {
-      const closeBracket = text.indexOf(']', i + 1);
-      if (closeBracket !== -1 && text[closeBracket + 1] === '(') {
-        const closeParen = text.indexOf(')', closeBracket + 2);
-        if (closeParen !== -1) {
-          flushPlain();
-          const linkText = text.slice(i + 1, closeBracket);
-          const href = text.slice(closeBracket + 2, closeParen);
-          nodes.push({ type: 'text', text: linkText, marks: [{ type: 'link', attrs: { href } }] });
-          i = closeParen + 1;
-          plainStart = i;
-          continue;
-        }
-      }
-    }
-
-    i++;
-  }
-
-  // Flush remaining plain text
-  flushPlain();
-
-  // If nothing was parsed, return at least one text node
-  if (nodes.length === 0) {
-    nodes.push({ type: 'text', text: text });
-  }
-
-  return nodes;
+  return mdToAdf(markdown || '');
 }
 
 function adfToMarkdown(adf) {
@@ -747,212 +549,7 @@ function inlineNodesToMd(nodes) {
   }).join('');
 }
 
-// ---------------------------------------------------------------------------
-// Markdown ↔ Confluence Storage Format conversion
-// ---------------------------------------------------------------------------
-
-function markdownToStorage(markdown) {
-  const lines = (markdown || '').split('\n');
-  const parts = [];
-  let i = 0;
-
-  while (i < lines.length) {
-    const line = lines[i];
-
-    // Empty line
-    if (/^\s*$/.test(line)) { i++; continue; }
-
-    // Heading
-    const hMatch = line.match(/^(#{1,6})\s+(.*)/);
-    if (hMatch) {
-      const level = hMatch[1].length;
-      parts.push(`<h${level}>${inlineMarkdownToHtml(hMatch[2].trim())}</h${level}>`);
-      i++;
-      continue;
-    }
-
-    // Code fence
-    if (/^```/.test(line)) {
-      const langMatch = line.match(/^```(\w*)/);
-      const lang = langMatch?.[1] || 'none';
-      const codeLines = [];
-      i++;
-      while (i < lines.length && !/^```/.test(lines[i])) {
-        codeLines.push(lines[i]);
-        i++;
-      }
-      i++; // skip closing
-      parts.push(
-        `<ac:structured-macro ac:name="code">` +
-        `<ac:parameter ac:name="language">${lang}</ac:parameter>` +
-        `<ac:plain-text-body><![CDATA[${codeLines.join('\n')}]]></ac:plain-text-body>` +
-        `</ac:structured-macro>`
-      );
-      continue;
-    }
-
-    // Unordered list
-    if (/^[\s]*[-*]\s+/.test(line)) {
-      const items = [];
-      while (i < lines.length && /^[\s]*[-*]\s+/.test(lines[i])) {
-        items.push(lines[i].replace(/^[\s]*[-*]\s+/, ''));
-        i++;
-      }
-      parts.push('<ul>' + items.map((t) => `<li>${inlineMarkdownToHtml(t)}</li>`).join('') + '</ul>');
-      continue;
-    }
-
-    // Ordered list
-    if (/^\s*\d+\.\s+/.test(line)) {
-      const items = [];
-      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
-        items.push(lines[i].replace(/^\s*\d+\.\s+/, ''));
-        i++;
-      }
-      parts.push('<ol>' + items.map((t) => `<li>${inlineMarkdownToHtml(t)}</li>`).join('') + '</ol>');
-      continue;
-    }
-
-    // Horizontal rule
-    if (/^---+\s*$/.test(line)) {
-      parts.push('<hr />');
-      i++;
-      continue;
-    }
-
-    // Blockquote
-    if (/^>\s?/.test(line)) {
-      const quoteLines = [];
-      while (i < lines.length && /^>\s?/.test(lines[i])) {
-        quoteLines.push(lines[i].replace(/^>\s?/, ''));
-        i++;
-      }
-      parts.push(`<blockquote><p>${inlineMarkdownToHtml(quoteLines.join('<br />'))}</p></blockquote>`);
-      continue;
-    }
-
-    // Table
-    if (/^\|/.test(line)) {
-      const rows = [];
-      let isHeader = true;
-      while (i < lines.length && /^\|/.test(lines[i])) {
-        if (/^\|[\s-:|]+\|$/.test(lines[i])) { i++; isHeader = false; continue; }
-        const cells = lines[i].split('|').slice(1, -1).map((c) => c.trim());
-        rows.push({ cells, header: isHeader });
-        isHeader = false;
-        i++;
-      }
-      let table = '<table>';
-      for (const row of rows) {
-        table += '<tr>';
-        const tag = row.header ? 'th' : 'td';
-        for (const cell of row.cells) {
-          table += `<${tag}>${inlineMarkdownToHtml(cell)}</${tag}>`;
-        }
-        table += '</tr>';
-      }
-      table += '</table>';
-      parts.push(table);
-      continue;
-    }
-
-    // Paragraph
-    const paraLines = [];
-    while (i < lines.length && !/^\s*$/.test(lines[i]) && !/^#{1,6}\s/.test(lines[i]) && !/^```/.test(lines[i]) && !/^[-*]\s+/.test(lines[i]) && !/^\d+\.\s+/.test(lines[i]) && !/^\|/.test(lines[i]) && !/^---+\s*$/.test(lines[i]) && !/^>\s?/.test(lines[i])) {
-      paraLines.push(lines[i]);
-      i++;
-    }
-    if (paraLines.length > 0) {
-      parts.push(`<p>${inlineMarkdownToHtml(paraLines.join('<br />'))}</p>`);
-    }
-  }
-
-  return parts.join('\n');
-}
-
-function escapeHtml(text) {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function inlineMarkdownToHtml(text) {
-  let html = escapeHtml(text);
-  // Bold
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Italic
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  // Inline code
-  html = html.replace(/`(.+?)`/g, '<code>$1</code>');
-  // Links
-  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
-  return html;
-}
-
-function htmlInlineToMarkdown(html) {
-  // Convert inline HTML formatting to markdown BEFORE stripping tags
-  let md = html || '';
-  md = md.replace(/<strong>(.*?)<\/strong>/g, '**$1**');
-  md = md.replace(/<em>(.*?)<\/em>/g, '*$1*');
-  md = md.replace(/<code>(.*?)<\/code>/g, '`$1`');
-  md = md.replace(/<a href="(.*?)">(.*?)<\/a>/g, '[$2]($1)');
-  md = md.replace(/<br\s*\/?>/gi, '\n');
-  return stripHtmlTags(md);
-}
-
-function storageToMarkdown(html) {
-  let md = html || '';
-
-  // Headings — preserve inline formatting
-  md = md.replace(/<h(\d)>(.*?)<\/h\d>/gi, (_m, level, text) => '#'.repeat(parseInt(level)) + ' ' + htmlInlineToMarkdown(text));
-
-  // Code blocks (Confluence macro)
-  md = md.replace(/<ac:structured-macro ac:name="code">.*?<ac:parameter ac:name="language">(.*?)<\/ac:parameter>.*?<ac:plain-text-body><!\[CDATA\[(.*?)\]\]><\/ac:plain-text-body>.*?<\/ac:structured-macro>/gs, (_m, lang, code) => '```' + (lang || '') + '\n' + code + '\n```');
-
-  // Lists — preserve inline formatting
-  md = md.replace(/<ul>(.*?)<\/ul>/gs, (_m, inner) => {
-    const items = [...inner.matchAll(/<li>(.*?)<\/li>/gs)].map((m) => '- ' + htmlInlineToMarkdown(m[1]));
-    return items.join('\n');
-  });
-  md = md.replace(/<ol>(.*?)<\/ol>/gs, (_m, inner) => {
-    const items = [...inner.matchAll(/<li>(.*?)<\/li>/gs)].map((m, idx) => `${idx + 1}. ` + htmlInlineToMarkdown(m[1]));
-    return items.join('\n');
-  });
-
-  // Tables — preserve inline formatting
-  md = md.replace(/<table>(.*?)<\/table>/gs, (_m, inner) => {
-    const rows = [...inner.matchAll(/<tr>(.*?)<\/tr>/gs)].map((rowMatch) => {
-      const cells = [...rowMatch[1].matchAll(/<t[hd]>(.*?)<\/t[hd]>/gs)].map((c) => htmlInlineToMarkdown(c[1]));
-      return '| ' + cells.join(' | ') + ' |';
-    });
-    if (rows.length > 0) {
-      const colCount = (rows[0].match(/\|/g) || []).length - 1;
-      const sep = '| ' + Array(colCount).fill('---').join(' | ') + ' |';
-      return [rows[0], sep, ...rows.slice(1)].join('\n');
-    }
-    return '';
-  });
-
-  // Blockquotes — preserve inline formatting
-  md = md.replace(/<blockquote>(.*?)<\/blockquote>/gs, (_m, inner) => '> ' + htmlInlineToMarkdown(inner));
-
-  // HR
-  md = md.replace(/<hr\s*\/?>/gi, '---');
-
-  // Paragraphs — preserve inline formatting
-  md = md.replace(/<p>(.*?)<\/p>/gs, (_m, inner) => htmlInlineToMarkdown(inner));
-  md = md.replace(/<br\s*\/?>/gi, '\n');
-
-  // Strip any remaining HTML tags
-  md = stripHtmlTags(md);
-
-  // Clean up extra blank lines
-  md = md.replace(/\n{3,}/g, '\n\n').trim();
-
-  return md;
-}
-
-function stripHtmlTags(text) {
-  return (text || '').replace(/<[^>]+>/g, '');
-}
+// Confluence storage format conversion now imported from confluence-format.mjs
 
 // ---------------------------------------------------------------------------
 // Document rebuilding
@@ -1098,6 +695,9 @@ async function cmdStatus(positional, _flags) {
   const link = findLink(parsed);
   const state = loadSyncState(absPath);
   const mapping = loadFieldMapping(docType);
+  if (mapping?.instructions) {
+    console.log(`\n📋 Mapping instructions for "${docType}":\n   ${mapping.instructions}\n`);
+  }
 
   const result = {
     file: absPath,
@@ -1265,6 +865,9 @@ async function cmdPush(positional, _flags) {
 
   checkEnv();
   const mapping = loadFieldMapping(state.docType);
+  if (mapping?.instructions) {
+    console.log(`\n📋 Mapping instructions for "${state.docType}":\n   ${mapping.instructions}\n`);
+  }
   const results = [];
 
   if (state.target === 'jira') {
@@ -1346,11 +949,51 @@ async function cmdPush(positional, _flags) {
         }
       }
 
-      // Detect orphaned stories
+      // Detect orphaned stories (section removed from local doc but ticket exists in Jira)
       const currentIds = stories.map((s) => s.id);
       const orphaned = existingLinks.filter((cl) => !currentIds.includes(cl.bmadSectionId));
-      for (const o of orphaned) {
-        results.push({ action: 'orphaned', target: o.remoteId, section: o.bmadSectionId, status: 'needs-user-decision' });
+      if (orphaned.length > 0 && _flags['delete-orphans']) {
+        console.log(`\n⚠️  Found ${orphaned.length} orphaned subtask(s) — section removed from local doc but Jira ticket still exists:`);
+        for (const o of orphaned) {
+          console.log(`   - ${o.remoteId} (section: "${o.bmadSectionId}")`);
+        }
+        for (const o of orphaned) {
+          // Safety check: only allow deletion of Sub-* issue types
+          let issueTypeName = '';
+          try {
+            const issueData = jira('get', o.remoteId, '--fields', 'issuetype');
+            issueTypeName = issueData?.fields?.issuetype?.name || '';
+          } catch { /* ignore — will block deletion */ }
+
+          if (!issueTypeName.startsWith('Sub-')) {
+            console.log(`   ⊘ Skipping ${o.remoteId} — issue type "${issueTypeName}" is not a Sub-* type (deletion restricted to subtasks only)`);
+            o.orphaned = true;
+            results.push({ action: 'orphaned', target: o.remoteId, section: o.bmadSectionId, status: 'not-subtask-skipped' });
+            continue;
+          }
+
+          const confirmed = await askConfirmation(`\n   Delete ${o.remoteId} [${issueTypeName}] ("${o.bmadSectionId}") from Jira? (y/N): `);
+          if (confirmed) {
+            try {
+              await deleteIssue(o.remoteId);
+              // Remove from childLinks
+              const idx = existingLinks.indexOf(o);
+              if (idx !== -1) existingLinks.splice(idx, 1);
+              results.push({ action: 'deleted', target: o.remoteId, section: o.bmadSectionId, status: 'deleted' });
+            } catch (err) {
+              console.error(`   ✗ ${err.message}`);
+              o.orphaned = true;
+              results.push({ action: 'orphaned', target: o.remoteId, section: o.bmadSectionId, status: 'delete-failed' });
+            }
+          } else {
+            o.orphaned = true;
+            results.push({ action: 'orphaned', target: o.remoteId, section: o.bmadSectionId, status: 'kept' });
+          }
+        }
+      } else {
+        for (const o of orphaned) {
+          results.push({ action: 'orphaned', target: o.remoteId, section: o.bmadSectionId, status: 'needs-user-decision' });
+        }
       }
 
       state.childLinks = existingLinks;
@@ -1596,6 +1239,7 @@ async function cmdSetupMapping(_positional, flags) {
       issueType: issue.fields?.issuetype?.name || (docType === 'epic' ? 'Epic' : 'Story'),
       sampleTicket: sample,
       createdAt: new Date().toISOString(),
+      instructions: '',
       fieldMappings: [],
     };
 
@@ -1659,6 +1303,7 @@ async function cmdSetupMapping(_positional, flags) {
       spaceKey: page.spaceId || '',
       samplePageId: sample,
       createdAt: new Date().toISOString(),
+      instructions: '',
       titleSource: 'frontmatter.title',
       titleFallback: 'heading.1',
       bodyTransform: 'markdownToStorage',
@@ -1860,7 +1505,7 @@ Commands:
   link <file> --type T --project P --create    Create new Jira ticket and link
   link <file> --type T --page-id ID            Link to existing Confluence page
   link <file> --type T --space S --create      Create new Confluence page and link
-  push <file>                                  Push local changes to remote
+  push <file> [--delete-orphans]               Push local changes to remote
   pull <file>                                  Pull remote changes to local
   diff <file>                                  Show per-section diff
   setup-mapping --type T --sample KEY          Setup field mapping from sample

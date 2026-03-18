@@ -29,6 +29,7 @@ The sync system uses JSON mapping files to define how BMAD document sections map
   "issueType": "Epic | Story | Task",
   "sampleTicket": "PROJ-100",
   "createdAt": "ISO-8601 timestamp",
+  "instructions": "Optional natural-language instructions for the agent (e.g., always set priority, add labels, use specific issue type for children)",
   "fieldMappings": [
     {
       "bmadSource": "frontmatter.<key> | section | title",
@@ -48,6 +49,12 @@ The sync system uses JSON mapping files to define how BMAD document sections map
   }
 }
 ```
+
+### Top-Level Properties
+
+| Property | Required | Description |
+|----------|----------|-------------|
+| `instructions` | No | Natural-language instructions for the agent. Printed to stdout during `push` and `link` operations so the calling agent can follow them. Example: "Always set priority to High, add label 'team-alpha'" |
 
 ### Field Mapping Properties
 
@@ -196,6 +203,7 @@ The `childMapping` section enables automatic handling of child items within a pa
   "spaceKey": "TEAM",
   "samplePageId": "12345",
   "createdAt": "ISO-8601 timestamp",
+  "instructions": "Optional natural-language instructions for the agent",
   "titleSource": "frontmatter.<key> | heading.1",
   "titleFallback": "heading.1",
   "bodyTransform": "markdownToStorage",

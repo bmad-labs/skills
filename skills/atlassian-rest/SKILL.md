@@ -52,9 +52,16 @@ When the user asks you to do something with Jira or Confluence, follow these pri
 
 4. **Compose operations naturally.** Many user requests require multiple script calls. For example, "assign PROJ-123 to Sarah" requires: (a) `lookup-user "Sarah"` to get the account ID, then (b) `edit PROJ-123 --assignee <accountId>`.
 
-5. **Use workflows for complex tasks.** If the user's request matches one of the workflows below, read the corresponding file and follow its step-by-step process.
+5. **Prefer sync.mjs for document-based operations.** When creating Jira issues from a local markdown file (story docs, specs, epics), use the sync workflow instead of raw `jira.mjs create`:
+   - First check if a field mapping exists: `ls <skill-path>/memory/jira-<docType>-field-mapping.json`
+   - If no mapping exists, create one: `node <skill-path>/scripts/sync.mjs setup-mapping --type <docType> --sample <EXISTING-TICKET-KEY>` (uses an existing ticket to auto-detect custom fields)
+   - Then link & create: `node <skill-path>/scripts/sync.mjs link <file> --type <docType> --project <KEY> --create`
+   - This automatically: (a) maps doc sections to Jira fields per the mapping config, (b) updates the source document with the Jira link, (c) stores sync state for future push/pull
+   - Only use `jira.mjs create` for ad-hoc issues not backed by a local document.
 
-6. **Read reference docs when needed.** Before writing JQL/CQL queries, consult `references/query-languages.md`. Before creating tickets, consult `references/ticket-writing-guide.md`. The reference docs exist to help you produce high-quality output — use them.
+6. **Use workflows for complex tasks.** If the user's request matches one of the workflows below, read the corresponding file and follow its step-by-step process.
+
+7. **Read reference docs when needed.** Before writing JQL/CQL queries, consult `references/query-languages.md`. Before creating tickets, consult `references/ticket-writing-guide.md`. The reference docs exist to help you produce high-quality output — use them.
 
 ---
 
@@ -119,6 +126,52 @@ jira.mjs lookup-user "john"            # Returns account ID needed for --assigne
 ### Worklog
 ```bash
 jira.mjs worklog PROJ-123 --time 2h --comment "Code review"
+```
+
+---
+
+## Document Sync Operations
+
+Script: `node <skill-path>/scripts/sync.mjs <command> [args]`
+
+When creating Jira/Confluence items from local markdown documents, prefer sync.mjs over raw jira.mjs/confluence.mjs — it auto-updates the source document with links and maintains sync state.
+
+### Setup Field Mapping (first time per doc type)
+```bash
+sync.mjs setup-mapping --type story --sample PROJ-200   # Auto-detect fields from existing ticket
+sync.mjs setup-mapping --type epic --sample PROJ-100    # Creates memory/jira-epic-field-mapping.json
+```
+Field mappings are stored in `<skill-path>/memory/` and define how markdown sections map to Jira fields. See `references/sync-mapping-guide.md` for the full schema.
+
+### Link & Create from Document
+```bash
+sync.mjs link <file> --type story --project PROJ --create    # Create Jira issue + update doc
+sync.mjs link <file> --type epic --project PROJ --create     # Create epic + child stories
+sync.mjs link <file> --type story --ticket PROJ-123          # Link to existing ticket
+```
+
+### Push/Pull Changes
+```bash
+sync.mjs push <file>                    # Push local changes to Jira/Confluence
+sync.mjs push <file> --delete-orphans   # Push + prompt to delete orphaned Sub-* subtasks
+sync.mjs pull <file>                    # Pull remote changes to local
+sync.mjs diff <file>                    # Show per-section diff
+sync.mjs status <file>                  # Show sync status
+```
+When `push` reports orphaned subtasks (sections removed from local doc), ask the user if they want to delete them, then run with `--delete-orphans`. Only `Sub-*` issue types can be deleted — parent issues are skipped.
+
+### Custom Instructions in Mapping Config
+The field mapping JSON (`memory/jira-<docType>-field-mapping.json`) supports an `instructions` field for additional agent guidance:
+```json
+{
+  "instructions": "Always set priority to High. Add label 'team-alpha'. Use Sub-Imp type for child items."
+}
+```
+When present, instructions are printed to stdout during `push` and `link` operations so the calling agent can follow them.
+
+### Batch Operations
+```bash
+sync.mjs batch                # Scan all linked docs and report status
 ```
 
 ---

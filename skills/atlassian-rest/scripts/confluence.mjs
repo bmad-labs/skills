@@ -2,7 +2,7 @@
 
 /**
  * Confluence REST API v2 CLI — subcommand-based interface.
- * Node.js 18+ — zero dependencies, uses built-in fetch.
+ * Node.js 18+ — uses built-in fetch.
  *
  * Usage:
  *   node confluence.mjs search <CQL> [--max N]
@@ -20,6 +20,7 @@
 
 import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
+import { markdownToStorage } from './confluence-format.mjs';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -149,17 +150,7 @@ async function requestRaw(method, path, { email, token, domain, body, params, ex
   return text ? JSON.parse(text) : null;
 }
 
-/**
- * Convert plain text / markdown body into Confluence storage format.
- * If content already starts with `<`, assume it's storage format.
- */
-function toStorageFormat(content) {
-  if (content.startsWith('<')) return content;
-  return content
-    .split(/\n{2,}/)
-    .map((para) => `<p>${para.replace(/\n/g, '<br />')}</p>`)
-    .join('\n');
-}
+// toStorageFormat replaced by shared markdownToStorage from confluence-format.mjs
 
 function printUsage() {
   console.log(`Usage:
@@ -240,7 +231,7 @@ async function cmdCreatePage(env, _positional, flags) {
     title,
     body: {
       representation: 'storage',
-      value: toStorageFormat(bodyRaw),
+      value: markdownToStorage(bodyRaw),
     },
   };
 
@@ -280,7 +271,7 @@ async function cmdUpdatePage(env, positional, flags) {
     title,
     body: {
       representation: 'storage',
-      value: toStorageFormat(bodyRaw),
+      value: markdownToStorage(bodyRaw),
     },
     version: {
       number: currentVersion + 1,
@@ -304,7 +295,7 @@ async function cmdComment(env, positional, _flags) {
   const payload = {
     body: {
       representation: 'storage',
-      value: toStorageFormat(bodyRaw),
+      value: markdownToStorage(bodyRaw),
     },
   };
 

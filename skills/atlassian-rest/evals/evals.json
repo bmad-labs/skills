@@ -438,6 +438,126 @@
         "Directs the user to the Jira web UI to delete issues manually",
         "References the skill's 'Never delete' principle"
       ]
+    },
+    {
+      "id": 33,
+      "prompt": "Update the description of OMPBLINK-100 with rich markdown content: a heading '## Release Notes', bold and italic text, a bullet list of 3 items, a table with columns Feature/Status/Owner, and a JavaScript code block.",
+      "expected_output": "Should use jira.mjs edit with markdown description that marklassian converts to valid ADF with headings, bold, italic, lists, tables, and code blocks.",
+      "files": [],
+      "expectations": [
+        "Uses jira.mjs edit command with --description flag",
+        "Description contains markdown heading (## syntax)",
+        "Description contains **bold** and *italic* inline formatting",
+        "Description contains a bullet list (- item syntax)",
+        "Description contains a markdown table (| col | syntax)",
+        "Description contains a fenced code block (```js syntax)",
+        "marklassian converts the markdown to valid ADF — not raw markdown text rendered in Jira",
+        "Literal \\n from shell arguments are converted to real newlines before ADF conversion"
+      ]
+    },
+    {
+      "id": 34,
+      "prompt": "Create a Confluence page in TEAM space titled 'API Integration Guide' with headings, bullet lists, an ordered list, and a Python code block showing a sample API call.",
+      "expected_output": "Should use confluence.mjs create-page with markdown body that marked converts to HTML with Confluence code macros.",
+      "files": [],
+      "expectations": [
+        "Uses confluence.mjs create-page with --space TEAM",
+        "The --body content includes markdown formatting",
+        "Code blocks are converted to <ac:structured-macro ac:name=\"code\"> Confluence macros",
+        "The ac:structured-macro includes <ac:parameter ac:name=\"language\">python</ac:parameter>",
+        "Headings are converted to <h1>-<h6> HTML tags",
+        "Bullet lists are converted to <ul><li> HTML",
+        "Ordered lists are converted to <ol><li> HTML",
+        "marked library handles the conversion (toStorageFormat uses marked, not custom parser)"
+      ]
+    },
+    {
+      "id": 35,
+      "prompt": "I have a story document at _bmad-output/user-story-2.md. Create a Jira story from it in OMPBLINK project and make sure the document gets updated with the Jira link.",
+      "expected_output": "Should use sync.mjs link --create instead of jira.mjs create. Should auto-update document with Jira link.",
+      "files": [],
+      "expectations": [
+        "Uses sync.mjs link command (not jira.mjs create) for document-based creation",
+        "Passes --type story --project OMPBLINK --create flags",
+        "Checks for field mapping file (memory/jira-story-field-mapping.json) before creating",
+        "If no mapping exists, runs sync.mjs setup-mapping or proceeds with defaults",
+        "The source document is updated with jira_ticket_id in frontmatter or [KEY] prefix in title",
+        "A sync state file is created in memory/sync-state/",
+        "If mapping has non-empty instructions field, prints them to stdout"
+      ]
+    },
+    {
+      "id": 36,
+      "prompt": "I removed 3 story sections from my epic doc. Push changes and clean up the orphaned Sub-Imp subtasks in Jira.",
+      "expected_output": "Should push with --delete-orphans, verify each orphan is Sub-* type, prompt for confirmation before each delete.",
+      "files": [],
+      "expectations": [
+        "Uses sync.mjs push with --delete-orphans flag",
+        "Lists all orphaned subtasks with their Jira keys and section IDs",
+        "Fetches each orphan's issue type via jira.mjs get to verify it's a Sub-* type",
+        "Only offers to delete issues with type name starting with 'Sub-' (e.g., Sub-Imp, Sub-Test, Sub-Bug)",
+        "Prompts user for confirmation (y/N) before each deletion",
+        "On confirmation, calls DELETE API for the subtask",
+        "Removes deleted entries from childLinks in sync state",
+        "Reports which orphans were deleted vs kept"
+      ]
+    },
+    {
+      "id": 37,
+      "prompt": "I removed a Story section from my epic doc. Push changes and delete the orphaned ticket PROJ-501 which is of type Story (not a subtask).",
+      "expected_output": "Should detect PROJ-501 is a Story (not Sub-*) and refuse to delete it, even with --delete-orphans.",
+      "files": [],
+      "expectations": [
+        "Uses sync.mjs push with --delete-orphans flag",
+        "Fetches PROJ-501's issue type and finds it is 'Story' (not 'Sub-*')",
+        "Skips deletion of PROJ-501 with a message explaining it's not a Sub-* type",
+        "Does NOT call DELETE API for PROJ-501",
+        "Reports PROJ-501 as 'not-subtask-skipped' in results",
+        "Suggests the user delete or archive it manually via Jira web UI"
+      ]
+    },
+    {
+      "id": 38,
+      "prompt": "Set up field mapping for my epic docs syncing to OMPBLINK. Use OMPBLINK-100 as a sample. I want to add custom instructions: 'Always set priority to High and add label team-oms'.",
+      "expected_output": "Should run setup-mapping, generate mapping with instructions field, let user edit instructions.",
+      "files": [],
+      "expectations": [
+        "Uses sync.mjs setup-mapping --type epic --sample OMPBLINK-100",
+        "Generated mapping JSON includes 'instructions' field (empty string by default)",
+        "User's custom instructions are added to the instructions field",
+        "Mapping is saved to memory/jira-epic-field-mapping.json",
+        "Auto-detects standard fields (summary, description) from the sample ticket",
+        "Custom fields are flagged with _needsReview for user confirmation",
+        "The instructions field value is: 'Always set priority to High and add label team-oms'"
+      ]
+    },
+    {
+      "id": 39,
+      "prompt": "Push my epic doc to Jira. The mapping config has instructions that say 'Always add label qa-review and set component to Backend'.",
+      "expected_output": "Should load mapping, print instructions to stdout so agent follows them, then push with the additional label and component.",
+      "files": [],
+      "expectations": [
+        "Loads field mapping from memory/jira-epic-field-mapping.json",
+        "Prints mapping instructions to stdout (the 'Always add label qa-review...' text)",
+        "The agent reads and follows the instructions from the mapping config",
+        "Push operation includes the label 'qa-review' and component 'Backend' as instructed",
+        "Standard field mappings are also applied (summary, description, etc.)",
+        "Reports push results showing which fields were updated"
+      ]
+    },
+    {
+      "id": 40,
+      "prompt": "Create a Jira comment on PROJ-123 with markdown formatting: bold text, a bullet list, and an inline code snippet.",
+      "expected_output": "Should use jira.mjs comment with markdown that marklassian converts to ADF.",
+      "files": [],
+      "expectations": [
+        "Uses jira.mjs comment PROJ-123 with markdown-formatted body",
+        "Comment body contains **bold** text",
+        "Comment body contains a bullet list (- items)",
+        "Comment body contains inline `code` backticks",
+        "marklassian converts the comment body to valid ADF (not raw markdown)",
+        "The comment renders correctly in Jira with proper formatting"
+      ]
     }
   ]
 }
