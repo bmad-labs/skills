@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs link-types to discover available link type names",
+      "passed": true,
+      "evidence": "Step 1 shows: 'jira.mjs link-types' to list available link types before creating any links."
+    },
+    {
+      "text": "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+      "passed": true,
+      "evidence": "Step 2 shows: 'jira.mjs link PROJ-100 PROJ-200 --type \"Blocks\"'."
+    },
+    {
+      "text": "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+      "passed": true,
+      "evidence": "Step 3 shows: 'jira.mjs link PROJ-100 PROJ-50 --type \"relates to\"'."
+    },
+    {
+      "text": "Uses jira.mjs link command for both operations",
+      "passed": true,
+      "evidence": "Both Steps 2 and 3 use 'jira.mjs link' command with appropriate arguments."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Queries focus on last 24 hours (not 7 days)",
+      "passed": true,
+      "evidence": "Section 1 states 'Changed from the default 7 days to last 24 hours / since yesterday (-1d, startOfDay(-1))'. Queries use 'startOfDay(-1), now()' for time bounds."
+    },
+    {
+      "text": "Uses a compact standup format (done/doing/blocked or similar)",
+      "passed": true,
+      "evidence": "Section 3 shows a compact format with 'Done Since Yesterday', 'Blocked', 'In Progress Today', and 'Up Next' sections, explicitly described as 'the classic 3-question standup format'."
+    },
+    {
+      "text": "Does NOT use confluence.mjs create-page or update-page",
+      "passed": true,
+      "evidence": "Section 4 states: 'No confluence.mjs commands would be invoked at all' and 'Step 5 (Publish) was skipped entirely'."
+    },
+    {
+      "text": "Presents results directly rather than publishing",
+      "passed": true,
+      "evidence": "Section 4 confirms: 'Output is rendered as markdown directly in the conversation (Step 4: \"Display the full generated report in markdown format\")'."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

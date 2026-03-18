@@ -1,0 +1,14 @@
+{
+  "eval_id": 11,
+  "eval_name": "spec-to-backlog",
+  "prompt": "Read Confluence spec (page 98765) and create backlog in MOBILE with Epic + children.",
+  "assertions": [
+    "Loads spec-to-backlog sub-skill",
+    "Uses confluence.mjs get-page 98765 to fetch the spec",
+    "Uses jira.mjs issue-types MOBILE to check available types",
+    "Creates Epic FIRST before any child tickets",
+    "Child tickets use --parent with the Epic key",
+    "Presents breakdown plan to user before creating",
+    "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs get command (not search) to fetch the specific issue",
+      "passed": false,
+      "evidence": "Does not mention jira.mjs at all. Describes using curl with Jira REST API or CLI tools like jira-cli, but not the skill's jira.mjs script."
+    },
+    {
+      "text": "References PROJ-123 as the issue key in the command",
+      "passed": false,
+      "evidence": "References PROJ-123 in curl example URL '/rest/api/3/issue/PROJ-123' but not in a jira.mjs command."
+    },
+    {
+      "text": "Mentions presenting status, assignee, and priority fields to the user",
+      "passed": true,
+      "evidence": "Describes parsing 'response.fields.status.name', 'response.fields.assignee.displayName', and 'response.fields.priority.name' and mentions fields=status,assignee,priority in the curl query parameter."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 2,
+    "total": 3,
+    "pass_rate": 0.33
+  }
+}

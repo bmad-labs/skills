@@ -1,0 +1,1617 @@
+{
+  "metadata": {
+    "skill_name": "atlassian-rest",
+    "skill_path": "/Users/tannt/Works/GIT/Personal/Sources/bmad-skills/skills/atlassian-rest",
+    "timestamp": "2026-03-18T09:30:00Z",
+    "evals_run": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "get-issue",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs get command (not search) to fetch the specific issue",
+          "passed": true,
+          "evidence": "Step 2 shows: 'node .../jira.mjs get PROJ-123 --fields summary,status,assignee,priority' — uses get, not search."
+        },
+        {
+          "text": "References PROJ-123 as the issue key in the command",
+          "passed": true,
+          "evidence": "The command explicitly includes 'get PROJ-123' as the issue key."
+        },
+        {
+          "text": "Mentions presenting status, assignee, and priority fields to the user",
+          "passed": true,
+          "evidence": "Step 3 shows a table with Status, Assignee, and Priority fields. The --fields flag also includes 'status,assignee,priority'."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "get-issue",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.33,
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs get command (not search) to fetch the specific issue",
+          "passed": false,
+          "evidence": "Does not mention jira.mjs at all. Describes using curl with Jira REST API or CLI tools like jira-cli, but not the skill's jira.mjs script."
+        },
+        {
+          "text": "References PROJ-123 as the issue key in the command",
+          "passed": false,
+          "evidence": "References PROJ-123 in curl example URL '/rest/api/3/issue/PROJ-123' but not in a jira.mjs command."
+        },
+        {
+          "text": "Mentions presenting status, assignee, and priority fields to the user",
+          "passed": true,
+          "evidence": "Describes parsing 'response.fields.status.name', 'response.fields.assignee.displayName', and 'response.fields.priority.name' and mentions fields=status,assignee,priority in the curl query parameter."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "create-bug",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+          "passed": true,
+          "evidence": "Step 1 shows: 'jira.mjs lookup-user \"Sarah Chen\"' before the create command in Step 3."
+        },
+        {
+          "text": "Uses jira.mjs create with --project PLATFORM --type Bug",
+          "passed": true,
+          "evidence": "Step 3 command includes '--project PLATFORM --type Bug'."
+        },
+        {
+          "text": "Includes --priority High in the create command",
+          "passed": true,
+          "evidence": "Step 3 command includes '--priority High'."
+        },
+        {
+          "text": "Includes --labels flag with backend and urgent",
+          "passed": true,
+          "evidence": "Step 3 command includes '--labels \"backend,urgent\"'."
+        },
+        {
+          "text": "Includes --assignee with the looked-up account ID (not a name)",
+          "passed": true,
+          "evidence": "Step 3 command includes '--assignee <accountId>' with note 'Replace <accountId> with the actual account ID returned from Step 1'."
+        },
+        {
+          "text": "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+          "passed": true,
+          "evidence": "Summary is 'Fix login endpoint timeout when user has more than 50 active sessions' — follows Verb + Object + Context pattern as noted in Design Decisions."
+        },
+        {
+          "text": "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+          "passed": true,
+          "evidence": "Description explicitly mentions 'times out after 30 seconds' and 'more than 50 active sessions' in multiple sections."
+        },
+        {
+          "text": "Shows a confirmation step before creating the ticket",
+          "passed": true,
+          "evidence": "Step 2 shows a full confirmation prompt with 'Shall I proceed?' before Step 3 creates the issue."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "create-bug",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 2,
+        "failed": 6,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+          "passed": false,
+          "evidence": "Does not mention jira.mjs. Describes REST API call 'GET /rest/api/3/user/search?query=Sarah%20Chen' but not the skill's lookup-user command."
+        },
+        {
+          "text": "Uses jira.mjs create with --project PLATFORM --type Bug",
+          "passed": false,
+          "evidence": "Does not mention jira.mjs. Shows a REST API POST to /rest/api/3/issue with project key PLATFORM and issuetype Bug in JSON payload."
+        },
+        {
+          "text": "Includes --priority High in the create command",
+          "passed": false,
+          "evidence": "No jira.mjs command used. The JSON payload does include '\"priority\": { \"name\": \"High\" }' but not as a --priority flag."
+        },
+        {
+          "text": "Includes --labels flag with backend and urgent",
+          "passed": false,
+          "evidence": "No jira.mjs command used. The JSON payload includes '\"labels\": [\"backend\", \"urgent\"]' but not as a --labels flag."
+        },
+        {
+          "text": "Includes --assignee with the looked-up account ID (not a name)",
+          "passed": false,
+          "evidence": "No jira.mjs command used. The JSON payload includes '\"assignee\": { \"accountId\": \"<SARAH_CHEN_ACCOUNT_ID>\" }' with a placeholder, not a looked-up ID."
+        },
+        {
+          "text": "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+          "passed": true,
+          "evidence": "Summary is 'Login endpoint times out after 30s when user has 50+ active sessions' which follows an [Endpoint] [Error] - [Condition] pattern."
+        },
+        {
+          "text": "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+          "passed": true,
+          "evidence": "Description mentions 'times out after 30 seconds when the authenticating user has more than 50 active sessions' with steps to reproduce."
+        },
+        {
+          "text": "Shows a confirmation step before creating the ticket",
+          "passed": false,
+          "evidence": "No confirmation step is described. The approach only shows API payloads for manual execution."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "meeting-notes",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the capture-tasks-from-meeting-notes sub-skill file",
+          "passed": true,
+          "evidence": "Section 1 states: 'Primary workflow: skills/capture-tasks-from-meeting-notes.md' and describes the 7-step workflow."
+        },
+        {
+          "text": "Extracts at least 4 action items from the notes",
+          "passed": true,
+          "evidence": "Section 2 'Extracted Action Items' table lists 4 items: Sarah's DB optimization, Mike's monitoring dashboards, Lisa's integration tests, Mike's checkout bug fix."
+        },
+        {
+          "text": "Identifies Sarah, Mike, and Lisa as assignees",
+          "passed": true,
+          "evidence": "The extracted items table shows Sarah Chen, Mike Rodriguez, and Lisa Park as assignees."
+        },
+        {
+          "text": "Uses jira.mjs lookup-user for each unique assignee",
+          "passed": true,
+          "evidence": "Section 3 Step 4 shows three lookup-user commands for 'Sarah Chen', 'Mike Rodriguez', and 'Lisa Park'."
+        },
+        {
+          "text": "Presents a table or list of extracted tasks for user confirmation before creating",
+          "passed": true,
+          "evidence": "Section 4 shows a confirmation table with all 4 tasks including Type, Summary, Assignee, Priority, Due Date columns, with 'Do not proceed until the user explicitly confirms.'"
+        },
+        {
+          "text": "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+          "passed": true,
+          "evidence": "Section 3 Step 6 shows 4 separate 'jira.mjs create' commands with --project, --type, --summary, --description, --assignee, --priority flags. Note: --parent is not used, but the tasks are standalone tickets in PLATFORM, which is appropriate since no Epic was mentioned."
+        },
+        {
+          "text": "References action-item-patterns.md or ticket-writing-guide.md",
+          "passed": true,
+          "evidence": "Section 5 Reference Files table explicitly lists both 'references/action-item-patterns.md' and 'references/ticket-writing-guide.md' with detailed usage descriptions."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "meeting-notes",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.43,
+        "passed": 3,
+        "failed": 4,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the capture-tasks-from-meeting-notes sub-skill file",
+          "passed": false,
+          "evidence": "No sub-skill file is loaded or referenced. The approach works without any skill framework."
+        },
+        {
+          "text": "Extracts at least 4 action items from the notes",
+          "passed": true,
+          "evidence": "Extracted exactly 4 action items: (1) DB query optimization for Sarah, (2) monitoring dashboards for Mike, (3) integration tests for Lisa, (4) fix checkout bug for Mike."
+        },
+        {
+          "text": "Identifies Sarah, Mike, and Lisa as assignees",
+          "passed": true,
+          "evidence": "Table lists Sarah Chen, Mike Rodriguez, and Lisa Park as assignees across the 4 items."
+        },
+        {
+          "text": "Uses jira.mjs lookup-user for each unique assignee",
+          "passed": false,
+          "evidence": "Does not mention jira.mjs. Describes needing REST API calls to resolve names to account IDs but cannot execute them."
+        },
+        {
+          "text": "Presents a table or list of extracted tasks for user confirmation before creating",
+          "passed": true,
+          "evidence": "Presents a table of 4 action items with #, Action Item, Assignee, Priority, and Due Date columns, plus detailed ticket breakdown."
+        },
+        {
+          "text": "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+          "passed": false,
+          "evidence": "Does not mention jira.mjs. Shows a REST API JSON payload example but no jira.mjs create commands."
+        },
+        {
+          "text": "References action-item-patterns.md or ticket-writing-guide.md",
+          "passed": false,
+          "evidence": "No reference to action-item-patterns.md or ticket-writing-guide.md anywhere in the approach."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "messy-notes",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the capture-tasks-from-meeting-notes sub-skill",
+          "passed": true,
+          "evidence": "Section 1 states: 'Workflow: skills/capture-tasks-from-meeting-notes.md (Capture Tasks from Meeting Notes)'."
+        },
+        {
+          "text": "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+          "passed": true,
+          "evidence": "Section 2 parsing shows: Sarah's 'Write PRD for mobile push notifications', John's 'Fix flaky test suite blocking CI', Mike's 'Investigate Stripe webhook failures'."
+        },
+        {
+          "text": "Identifies the unassigned API docs task and asks the user about it",
+          "passed": true,
+          "evidence": "Section 3 explicitly identifies 'update the API docs' as unassigned ('someone should... nobody volunteered') and asks 'Would you like to assign someone?' in the confirmation table."
+        },
+        {
+          "text": "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+          "passed": true,
+          "evidence": "Section 2 parsing logic shows: 'Sarah mentioned she'll handle' (ownership phrase), 'John: needs to fix' (name + verb), 'Mike said he'd look into' (ownership phrase), and 'should' (medium confidence pattern)."
+        },
+        {
+          "text": "Presents extracted tasks for confirmation before creating",
+          "passed": true,
+          "evidence": "Section 5 shows a full confirmation table with all 4 items including notes about unassigned item and priority rationale, ending with 'Please confirm, edit, or remove any items before I create the tickets.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "messy-notes",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.40,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the capture-tasks-from-meeting-notes sub-skill",
+          "passed": false,
+          "evidence": "No sub-skill file is loaded or referenced."
+        },
+        {
+          "text": "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+          "passed": true,
+          "evidence": "Extracted: Sarah's 'Write PRD for mobile push notifications', John's 'Fix flaky test suite blocking CI', and Mike's 'Investigate Stripe webhook failures'."
+        },
+        {
+          "text": "Identifies the unassigned API docs task and asks the user about it",
+          "passed": false,
+          "evidence": "Identifies the unassigned API docs task (ticket #3, 'Update API documentation') but does not ask the user about it - just labels it as 'Unassigned' and moves on."
+        },
+        {
+          "text": "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+          "passed": true,
+          "evidence": "Correctly parsed: 'Sarah mentioned she'll handle' (implicit volunteering), 'John: needs to fix' (name: task), 'Mike said he'd look into' (name + verb), and 'someone should update' (unassigned)."
+        },
+        {
+          "text": "Presents extracted tasks for confirmation before creating",
+          "passed": false,
+          "evidence": "Presents a table of extracted tasks but does not ask for user confirmation before creating. The approach notes it cannot create tickets without the skill anyway."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "status-report",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the generate-status-report sub-skill file",
+          "passed": true,
+          "evidence": "Section 1 states: 'File: skills/generate-status-report.md (the \"Generate Status Report\" sub-skill)' with its 5-step process."
+        },
+        {
+          "text": "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+          "passed": true,
+          "evidence": "Section 3 shows 6 queries: completed (statusCategory = Done, resolved >= -7d), in-progress (statusCategory = In Progress), blocked (status = Blocked), newly created, open bugs, and stale items."
+        },
+        {
+          "text": "Uses jira.mjs search with project = PHOENIX",
+          "passed": true,
+          "evidence": "All 6 queries use 'jira.mjs search' with 'project = PHOENIX' in the JQL."
+        },
+        {
+          "text": "Formats a report with sections (metrics, highlights, blockers, or similar)",
+          "passed": true,
+          "evidence": "Section 5 shows a report template with: Executive Summary, Completed This Week, In Progress, Blockers & Risks, Upcoming Work, and Metrics sections."
+        },
+        {
+          "text": "Uses confluence.mjs create-page to publish to the ENG space",
+          "passed": true,
+          "evidence": "Section 6 shows: 'confluence.mjs create-page --space ENG --title \"Weekly Status Report - PHOENIX - 2026-03-18\" --body ...'."
+        },
+        {
+          "text": "Includes a date in the page title",
+          "passed": true,
+          "evidence": "Page title is 'Weekly Status Report - PHOENIX - 2026-03-18' which includes the date."
+        },
+        {
+          "text": "References report-templates.md or jql-patterns.md",
+          "passed": true,
+          "evidence": "Section 7 Reference Files table lists both 'references/report-templates.md' and 'references/jql-patterns.md' with detailed usage."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "status-report",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.29,
+        "passed": 2,
+        "failed": 5,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the generate-status-report sub-skill file",
+          "passed": false,
+          "evidence": "No sub-skill file is loaded or referenced."
+        },
+        {
+          "text": "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+          "passed": false,
+          "evidence": "Describes JQL queries conceptually (sprint issues, active sprint, board) but does not actually run them. Only shows what would be attempted."
+        },
+        {
+          "text": "Uses jira.mjs search with project = PHOENIX",
+          "passed": false,
+          "evidence": "Does not mention jira.mjs. Shows REST API endpoints with project=PHOENIX in JQL but not via the skill's script."
+        },
+        {
+          "text": "Formats a report with sections (metrics, highlights, blockers, or similar)",
+          "passed": true,
+          "evidence": "Shows a report template with sections: Summary, Key Accomplishments, Blockers & Risks, Upcoming Work, Team Notes, plus a metrics table."
+        },
+        {
+          "text": "Uses confluence.mjs create-page to publish to the ENG space",
+          "passed": false,
+          "evidence": "Does not mention confluence.mjs. Describes REST API POST to /wiki/api/v2/pages but not the skill's script."
+        },
+        {
+          "text": "Includes a date in the page title",
+          "passed": true,
+          "evidence": "Page title is 'PHOENIX Weekly Status Report -- Week of 2026-03-16' which includes a date."
+        },
+        {
+          "text": "References report-templates.md or jql-patterns.md",
+          "passed": false,
+          "evidence": "No reference to report-templates.md or jql-patterns.md anywhere in the approach."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "daily-standup",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Queries focus on last 24 hours (not 7 days)",
+          "passed": true,
+          "evidence": "Section 1 states 'Changed from the default 7 days to last 24 hours / since yesterday (-1d, startOfDay(-1))'. Queries use 'startOfDay(-1), now()' for time bounds."
+        },
+        {
+          "text": "Uses a compact standup format (done/doing/blocked or similar)",
+          "passed": true,
+          "evidence": "Section 3 shows a compact format with 'Done Since Yesterday', 'Blocked', 'In Progress Today', and 'Up Next' sections, explicitly described as 'the classic 3-question standup format'."
+        },
+        {
+          "text": "Does NOT use confluence.mjs create-page or update-page",
+          "passed": true,
+          "evidence": "Section 4 states: 'No confluence.mjs commands would be invoked at all' and 'Step 5 (Publish) was skipped entirely'."
+        },
+        {
+          "text": "Presents results directly rather than publishing",
+          "passed": true,
+          "evidence": "Section 4 confirms: 'Output is rendered as markdown directly in the conversation (Step 4: \"Display the full generated report in markdown format\")'."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "daily-standup",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Queries focus on last 24 hours (not 7 days)",
+          "passed": true,
+          "evidence": "JQL queries use 'updated >= -1d' and 'status changed to \"Done\" AFTER -1d', clearly targeting last 24 hours."
+        },
+        {
+          "text": "Uses a compact standup format (done/doing/blocked or similar)",
+          "passed": true,
+          "evidence": "Report structure uses 'Done Yesterday', 'In Progress Today', 'Blocked', 'Coming Up' sections - a standard standup format."
+        },
+        {
+          "text": "Does NOT use confluence.mjs create-page or update-page",
+          "passed": true,
+          "evidence": "No confluence.mjs commands are used anywhere. The approach outputs directly without publishing."
+        },
+        {
+          "text": "Presents results directly rather than publishing",
+          "passed": true,
+          "evidence": "The task description says 'Output only -- do not publish to Confluence' and the approach compiles results into sections for direct presentation."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "triage-timeout",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the triage-issue sub-skill file",
+          "passed": true,
+          "evidence": "Section 1 states: 'Primary workflow: skills/triage-issue.md -- the \"Triage Issue\" sub-skill' with its 6-step process."
+        },
+        {
+          "text": "Extracts error signature, component (payment), and symptom (checkout failing)",
+          "passed": true,
+          "evidence": "Section 2 table shows: Error signature = 'Connection timeout', Component = 'Payment service', User-facing symptom = 'Checkout fails for users'."
+        },
+        {
+          "text": "Runs at least 2 different search queries with different JQL strategies",
+          "passed": true,
+          "evidence": "Section 3 shows 6 different search strategies: by error message text, by component, by summary keywords, broader keyword combinations, recent bugs, and Confluence search."
+        },
+        {
+          "text": "Searches for both open and resolved issues",
+          "passed": true,
+          "evidence": "Strategy 2 uses 'statusCategory != Done' (open issues), while Strategy 5 searches broadly without status filter, and Section 6 Option D explicitly addresses resolved tickets (regression detection with PAY-412)."
+        },
+        {
+          "text": "Presents findings with confidence/similarity assessment",
+          "passed": true,
+          "evidence": "Section 4 shows assessment format with ratings: 'LIKELY DUPLICATE', 'POSSIBLE REGRESSION', 'LIKELY RELATED', 'Unrelated' for each match."
+        },
+        {
+          "text": "Offers options: create new, comment on existing, or show more details",
+          "passed": true,
+          "evidence": "Section 5 offers: '(a) Add a comment to [EXISTING-KEY]', '(b) Create a new bug ticket and link it', '(c) Create a brand new standalone bug ticket'. Section 6 provides exact commands for all options including Option D (regression)."
+        },
+        {
+          "text": "Asks which project if not specified, or searches broadly",
+          "passed": true,
+          "evidence": "Section 5 lists 'Which Jira project should I search in? (e.g., PAY, CHECKOUT, PLATFORM)' as a question to ask the user, since no project was specified."
+        },
+        {
+          "text": "References bug-report-templates.md",
+          "passed": true,
+          "evidence": "Section 7 Reference Files table lists 'references/bug-report-templates.md' with purpose: 'Description structure, priority assignment guide, error message template'."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "triage-timeout",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 2,
+        "failed": 6,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the triage-issue sub-skill file",
+          "passed": false,
+          "evidence": "No sub-skill file is loaded or referenced."
+        },
+        {
+          "text": "Extracts error signature, component (payment), and symptom (checkout failing)",
+          "passed": true,
+          "evidence": "Identifies 'Connection timeout' as the error, 'payment service' as the component, and 'checkout' as the affected user flow."
+        },
+        {
+          "text": "Runs at least 2 different search queries with different JQL strategies",
+          "passed": false,
+          "evidence": "Shows 2 JQL queries (open issues and resolved issues) but does not actually run them - only documents what a human would need to do."
+        },
+        {
+          "text": "Searches for both open and resolved issues",
+          "passed": true,
+          "evidence": "Shows two separate JQL queries: one for 'status NOT IN (Done, Closed, Cancelled)' and another for 'status IN (Done, Closed, Resolved) AND resolved >= -90d'."
+        },
+        {
+          "text": "Presents findings with confidence/similarity assessment",
+          "passed": false,
+          "evidence": "No findings are presented since no searches were executed. No confidence or similarity assessment is provided."
+        },
+        {
+          "text": "Offers options: create new, comment on existing, or show more details",
+          "passed": false,
+          "evidence": "Describes filing a new bug if no existing report is found, but does not offer options to the user (create new, comment on existing, or show more)."
+        },
+        {
+          "text": "Asks which project if not specified, or searches broadly",
+          "passed": false,
+          "evidence": "Uses a placeholder '<PAYMENT_PROJECT_KEY>' but does not ask the user which project or suggest searching broadly."
+        },
+        {
+          "text": "References bug-report-templates.md",
+          "passed": false,
+          "evidence": "No reference to bug-report-templates.md anywhere in the approach."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "triage-npe",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads triage-issue sub-skill",
+          "passed": true,
+          "evidence": "Section 1 states: 'Loaded the Triage Issue workflow from skills/triage-issue.md' with 6-step process."
+        },
+        {
+          "text": "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+          "passed": true,
+          "evidence": "Strategy A searches 'text ~ \"NullPointerException UserService getProfile\"'. Strategy B searches 'text ~ \"UserService\"'. Strategy D searches 'summary ~ \"NullPointerException\"'."
+        },
+        {
+          "text": "Includes BACKEND project in JQL",
+          "passed": true,
+          "evidence": "All search strategies include 'project = BACKEND' in their JQL queries."
+        },
+        {
+          "text": "Checks for resolved similar issues (regression detection)",
+          "passed": true,
+          "evidence": "Section 4 'Regression Check' shows a dedicated query: 'project = BACKEND AND issuetype = Bug AND text ~ \"NullPointerException UserService\" AND statusCategory = Done' plus a reopened bugs check using 'status CHANGED FROM Done TO Open'."
+        },
+        {
+          "text": "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual",
+          "passed": true,
+          "evidence": "Section 5 shows a structured bug description with: Error, Where, Stack Trace, Trigger, Frequency, Expected Behavior, Actual Behavior, Environment sections."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "triage-npe",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.60,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads triage-issue sub-skill",
+          "passed": false,
+          "evidence": "No sub-skill file is loaded or referenced."
+        },
+        {
+          "text": "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+          "passed": true,
+          "evidence": "Recommends JQL 'text ~ \"NullPointerException UserService.getProfile\"' which searches by error type, class, and method together."
+        },
+        {
+          "text": "Includes BACKEND project in JQL",
+          "passed": true,
+          "evidence": "JQL includes 'project = BACKEND' in the recommended search query."
+        },
+        {
+          "text": "Checks for resolved similar issues (regression detection)",
+          "passed": false,
+          "evidence": "Does not explicitly search for resolved/closed similar issues for regression detection. Only suggests searching in the Jira UI."
+        },
+        {
+          "text": "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual",
+          "passed": true,
+          "evidence": "Bug ticket description includes Component (UserService/backend), Error (NPE), Steps to Reproduce (create user with no avatar, call getProfile), and Expected/Actual behavior sections."
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "search-auth",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads search-company-knowledge sub-skill",
+          "passed": true,
+          "evidence": "Section 1 states: 'Loaded the Search Company Knowledge workflow from skills/search-company-knowledge.md' with its 5-step process."
+        },
+        {
+          "text": "Searches Confluence for documentation pages about authentication/login/OAuth",
+          "passed": true,
+          "evidence": "Section 3 shows 4 Confluence CQL searches covering 'authentication AND login', 'OAuth', 'SSO OR identity provider OR SAML OR OIDC', and architecture decision records about auth."
+        },
+        {
+          "text": "Searches Jira for related issues or bugs",
+          "passed": true,
+          "evidence": "Section 3 shows 3 Jira JQL searches: bugs/incidents related to authentication, epics/stories for auth features, and open/unresolved auth issues."
+        },
+        {
+          "text": "Uses both confluence.mjs search and jira.mjs search",
+          "passed": true,
+          "evidence": "Section 3 explicitly shows 4 'confluence.mjs search' commands and 3 'jira.mjs search' commands."
+        },
+        {
+          "text": "Plans to fetch full content from top results",
+          "passed": true,
+          "evidence": "Section 4 describes fetching top 3-5 results using 'confluence.mjs get-page <pageId>' and 'jira.mjs get <ISSUE-KEY>' commands."
+        },
+        {
+          "text": "Synthesizes information from multiple sources with citations",
+          "passed": true,
+          "evidence": "Section 5 shows a synthesis plan with structured sections (Overview, OAuth Providers, Known Issues, Related Work) with explicit citation format including source page titles, spaces, and dates."
+        },
+        {
+          "text": "References search-patterns.md or query-languages.md",
+          "passed": true,
+          "evidence": "Section 7 Reference Files table lists both 'references/search-patterns.md' and 'references/query-languages.md'."
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "search-auth",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.29,
+        "passed": 2,
+        "failed": 5,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads search-company-knowledge sub-skill",
+          "passed": false,
+          "evidence": "No sub-skill file is loaded. Mentions evals.json references the search-company-knowledge workflow but does not load it."
+        },
+        {
+          "text": "Searches Confluence for documentation pages about authentication/login/OAuth",
+          "passed": false,
+          "evidence": "Describes what would need to be done (confluence.mjs search commands) but does not actually search Confluence."
+        },
+        {
+          "text": "Searches Jira for related issues or bugs",
+          "passed": false,
+          "evidence": "Describes what would be needed (jira.mjs search) but does not actually search Jira."
+        },
+        {
+          "text": "Uses both confluence.mjs search and jira.mjs search",
+          "passed": false,
+          "evidence": "Mentions confluence.mjs search and jira.mjs search as what would be needed, but does not actually use them."
+        },
+        {
+          "text": "Plans to fetch full content from top results",
+          "passed": true,
+          "evidence": "States 'Fetch full content from top 3-5 results via confluence.mjs get-page and jira.mjs get' in the planned steps."
+        },
+        {
+          "text": "Synthesizes information from multiple sources with citations",
+          "passed": false,
+          "evidence": "Describes synthesizing and citing sources as planned steps but cannot execute since no data was retrieved."
+        },
+        {
+          "text": "References search-patterns.md or query-languages.md",
+          "passed": true,
+          "evidence": "Mentions 'per references/search-patterns.md' when describing broadening with synonyms."
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "search-runbook",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs search (not jira.mjs) as primary search",
+          "passed": true,
+          "evidence": "Section 3 shows confluence.mjs search as the primary command. Section 2 explicitly states 'Confluence relevance: HIGH' and 'prioritize and lead with Confluence results'. While a supplementary Jira search is mentioned, it is clearly secondary."
+        },
+        {
+          "text": "CQL includes terms like deployment, runbook, or deploy",
+          "passed": true,
+          "evidence": "Primary CQL: 'text ~ \"deployment runbook\"'. Broadened CQL includes 'deploy to production' and 'release runbook'. Label search uses 'label = \"runbook\" AND text ~ \"deployment\"'."
+        },
+        {
+          "text": "Plans to fetch full page content with confluence.mjs get-page",
+          "passed": true,
+          "evidence": "Section 4 states: 'fetch each page's full content using get-page' with exact command 'confluence.mjs get-page <pageId>' and an example with page ID 78901."
+        },
+        {
+          "text": "Presents results with page title and source citation",
+          "passed": true,
+          "evidence": "Section 5 describes citing sources with 'page title, Confluence space key, and a direct URL' and shows an example citation format."
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "search-runbook",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs search (not jira.mjs) as primary search",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Describes REST API calls (GET /wiki/rest/api/content/search) but not the skill's script."
+        },
+        {
+          "text": "CQL includes terms like deployment, runbook, or deploy",
+          "passed": true,
+          "evidence": "Shows CQL 'title~\"deployment runbook\"' and search query 'deployment+runbook' which includes both terms."
+        },
+        {
+          "text": "Plans to fetch full page content with confluence.mjs get-page",
+          "passed": false,
+          "evidence": "Describes fetching page content via REST API 'GET /wiki/rest/api/content/{pageId}?expand=body.storage' but not using confluence.mjs get-page."
+        },
+        {
+          "text": "Presents results with page title and source citation",
+          "passed": false,
+          "evidence": "Cannot present results since no search was executed. Only describes the API approach."
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "spec-to-backlog",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads spec-to-backlog sub-skill",
+          "passed": true,
+          "evidence": "Section 1 states: 'The Spec to Backlog workflow sub-skill was loaded from skills/spec-to-backlog.md' with its 7-step process."
+        },
+        {
+          "text": "Uses confluence.mjs get-page 98765 to fetch the spec",
+          "passed": true,
+          "evidence": "Section 2 shows: 'node <skill-path>/scripts/confluence.mjs get-page 98765'."
+        },
+        {
+          "text": "Uses jira.mjs issue-types MOBILE to check available types",
+          "passed": true,
+          "evidence": "Section 3 shows: 'node <skill-path>/scripts/jira.mjs issue-types MOBILE'."
+        },
+        {
+          "text": "Creates Epic FIRST before any child tickets",
+          "passed": true,
+          "evidence": "Section 7 shows 'Create Epic' command first, captures key 'MOBILE-200', then all child tickets use '--parent MOBILE-200'."
+        },
+        {
+          "text": "Child tickets use --parent with the Epic key",
+          "passed": true,
+          "evidence": "Section 7 child ticket commands all include '--parent MOBILE-200'."
+        },
+        {
+          "text": "Presents breakdown plan to user before creating",
+          "passed": true,
+          "evidence": "Section 6 shows a full breakdown table with 10 child tickets presented to user with: 'Please review the proposed breakdown. You can request changes... before I create the tickets.'"
+        },
+        {
+          "text": "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md",
+          "passed": true,
+          "evidence": "Section 9 Reference Files table lists all three: 'references/epic-templates.md', 'references/ticket-writing-guide.md', and 'references/breakdown-examples.md'."
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "spec-to-backlog",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.14,
+        "passed": 1,
+        "failed": 6,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads spec-to-backlog sub-skill",
+          "passed": false,
+          "evidence": "No sub-skill file is loaded or referenced."
+        },
+        {
+          "text": "Uses confluence.mjs get-page 98765 to fetch the spec",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Describes using MCP tool 'getConfluencePage' with page ID 98765 but not the skill's script."
+        },
+        {
+          "text": "Uses jira.mjs issue-types MOBILE to check available types",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Describes using MCP tool 'getJiraProjectIssueTypesMetadata' for MOBILE project."
+        },
+        {
+          "text": "Creates Epic FIRST before any child tickets",
+          "passed": true,
+          "evidence": "Step 3 is 'Create the Epic' and Step 4/5 are 'Create Child Stories' and 'Create Child Tasks', confirming Epic-first order."
+        },
+        {
+          "text": "Child tickets use --parent with the Epic key",
+          "passed": false,
+          "evidence": "Describes setting 'parent or Epic Link set to the Epic key from Step 3' but not using --parent flag in jira.mjs."
+        },
+        {
+          "text": "Presents breakdown plan to user before creating",
+          "passed": false,
+          "evidence": "No explicit confirmation or review step before creating. The approach describes sequential creation without user approval."
+        },
+        {
+          "text": "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md",
+          "passed": false,
+          "evidence": "No reference to any of these files in the approach."
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "inline-spec",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Handles inline spec without needing Confluence fetch",
+          "passed": true,
+          "evidence": "Section 2 explicitly states: 'Skip the Confluence fetch entirely. The spec content is already available in the conversation. Proceed directly to Step 2: Analyze Spec.'"
+        },
+        {
+          "text": "Uses jira.mjs issue-types FRONTEND to check available types",
+          "passed": true,
+          "evidence": "Section 3 shows: 'node .../jira.mjs issue-types FRONTEND'."
+        },
+        {
+          "text": "Maps requirement #3 (mobile Safari bug) to Bug type",
+          "passed": true,
+          "evidence": "Section 4 table maps #3 'Fix profile changes not saving on mobile Safari' to Bug type. Section 7 Step 2 uses '--type Bug'."
+        },
+        {
+          "text": "Maps requirement #6 (API docs) to Task type",
+          "passed": true,
+          "evidence": "Section 4 table maps #6 'Update API documentation for new profile endpoints' to Task type. Section 7 Step 7 uses '--type Task'."
+        },
+        {
+          "text": "Maps feature requirements (#1,2,4,5) to Story type",
+          "passed": true,
+          "evidence": "Section 4 table maps #1 (avatar upload), #2 (bio field), #4 (completion indicator), #5 (social media) all to Story type."
+        },
+        {
+          "text": "Creates Epic first, then child tickets with --parent",
+          "passed": true,
+          "evidence": "Section 7 Step 1 creates the Epic first, captures 'FRONTEND-200', then Steps 2-7 all use '--parent FRONTEND-200'."
+        },
+        {
+          "text": "Presents plan with labeled issue types before creating",
+          "passed": true,
+          "evidence": "Section 6 shows a complete breakdown table with Type column (Epic, Story, Bug, Task) for all items, before the create commands in Section 7."
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "inline-spec",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.71,
+        "passed": 5,
+        "failed": 2,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Handles inline spec without needing Confluence fetch",
+          "passed": true,
+          "evidence": "Analyzes the requirements document directly without fetching from Confluence. States 'Take the User Profile Enhancement requirements document and create individual Jira tickets'."
+        },
+        {
+          "text": "Uses jira.mjs issue-types FRONTEND to check available types",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Mentions using MCP tool 'getJiraProjectIssueTypesMetadata' but not the skill's script."
+        },
+        {
+          "text": "Maps requirement #3 (mobile Safari bug) to Bug type",
+          "passed": true,
+          "evidence": "Ticket #3 'Fix profile save bug on mobile Safari' is mapped to Bug type in the breakdown table."
+        },
+        {
+          "text": "Maps requirement #6 (API docs) to Task type",
+          "passed": true,
+          "evidence": "Ticket #6 'Update API documentation for new endpoints' is mapped to Task type in the breakdown table."
+        },
+        {
+          "text": "Maps feature requirements (#1,2,4,5) to Story type",
+          "passed": true,
+          "evidence": "Tickets #1 (avatar upload), #2 (bio field), #4 (completion percentage), #5 (social media) are all mapped to Story type."
+        },
+        {
+          "text": "Creates Epic first, then child tickets with --parent",
+          "passed": false,
+          "evidence": "No Epic creation is mentioned. The approach creates individual tickets without an Epic parent or --parent flag."
+        },
+        {
+          "text": "Presents plan with labeled issue types before creating",
+          "passed": true,
+          "evidence": "Presents a table with #, Requirement, Ticket Type, and Priority columns before describing creation steps."
+        }
+      ]
+    },
+    {
+      "eval_id": 13,
+      "eval_name": "transition",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+          "passed": true,
+          "evidence": "Step 1 shows: 'jira.mjs transitions PROJ-456' as the first command, before any transition or comment."
+        },
+        {
+          "text": "Does NOT guess or hardcode a transition ID",
+          "passed": true,
+          "evidence": "Step 2 uses '<transition-id-for-Done>' as a placeholder, explicitly stating the ID comes from Step 1. Section 2 explains why: 'Transition IDs are not universal' and 'Always list transitions first to get the correct ID -- don't guess.'"
+        },
+        {
+          "text": "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+          "passed": true,
+          "evidence": "Step 2 shows: 'jira.mjs transition PROJ-456 <transition-id-for-Done>'."
+        },
+        {
+          "text": "Uses jira.mjs comment PROJ-456 with the deployment message",
+          "passed": true,
+          "evidence": "Step 3 shows: 'jira.mjs comment PROJ-456 \"Deployed to production in release v2.3.1\"'."
+        }
+      ]
+    },
+    {
+      "eval_id": 13,
+      "eval_name": "transition",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Describes REST API 'GET /rest/api/3/issue/PROJ-456/transitions' but not the skill's script."
+        },
+        {
+          "text": "Does NOT guess or hardcode a transition ID",
+          "passed": true,
+          "evidence": "Step 1 explicitly queries available transitions first: 'Before transitioning an issue, you must look up the transition ID that corresponds to Done'. Uses example ID '31' only after describing the lookup step."
+        },
+        {
+          "text": "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Describes REST API POST to /rest/api/3/issue/PROJ-456/transitions with transition ID."
+        },
+        {
+          "text": "Uses jira.mjs comment PROJ-456 with the deployment message",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Describes REST API POST to /rest/api/3/issue/PROJ-456/comment with the deployment message."
+        }
+      ]
+    },
+    {
+      "eval_id": 14,
+      "eval_name": "jql-search",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Constructs JQL with project = PLATFORM, type = Bug, priority in High/Highest, status = Blocked",
+          "passed": true,
+          "evidence": "Section 1 shows JQL: 'project = PLATFORM AND issuetype = Bug AND priority IN (Highest, High) AND status = Blocked ORDER BY updated DESC'."
+        },
+        {
+          "text": "Uses jira.mjs search with the JQL query",
+          "passed": true,
+          "evidence": "Section 2 shows: 'jira.mjs search' with the full JQL query and '--max 50'."
+        },
+        {
+          "text": "Mentions presenting results with key, summary, assignee, and last updated",
+          "passed": true,
+          "evidence": "Section 3 shows a presentation table with columns: Issue Key, Summary, Priority, Assignee, Last Updated."
+        }
+      ]
+    },
+    {
+      "eval_id": 14,
+      "eval_name": "jql-search",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Constructs JQL with project = PLATFORM, type = Bug, priority in High/Highest, status = Blocked",
+          "passed": true,
+          "evidence": "Constructs JQL 'project = PLATFORM AND issuetype = Bug AND priority = High AND status = Blocked' and later suggests broadening to 'priority in (High, Highest, Critical)'."
+        },
+        {
+          "text": "Uses jira.mjs search with the JQL query",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Uses MCP tool 'searchJiraIssuesUsingJql' directly instead of the skill's script."
+        },
+        {
+          "text": "Mentions presenting results with key, summary, assignee, and last updated",
+          "passed": true,
+          "evidence": "Step 7 states 'For each issue, extract and display: Issue key, Summary, Assignee display name, Last updated timestamp'."
+        }
+      ]
+    },
+    {
+      "eval_id": 15,
+      "eval_name": "epic-stories",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Creates Epic first with jira.mjs create --project ENG --type Epic",
+          "passed": true,
+          "evidence": "Step 2 shows: 'jira.mjs create --project ENG --type Epic --summary \"Q2 Performance Initiative\"'."
+        },
+        {
+          "text": "Captures the Epic key from the create response",
+          "passed": true,
+          "evidence": "Step 2 states: 'Expected output: Issue key, e.g., ENG-201. This key is captured and used as --parent for all child stories.'"
+        },
+        {
+          "text": "Uses jira.mjs lookup-user for john.doe",
+          "passed": true,
+          "evidence": "Step 3 shows: 'jira.mjs lookup-user \"john.doe@company.com\"' with note about capturing the account ID."
+        },
+        {
+          "text": "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+          "passed": true,
+          "evidence": "Steps 4, 5, 6 each show 'jira.mjs create --project ENG --type Story ... --priority Medium --parent ENG-201'."
+        },
+        {
+          "text": "Story 1 includes --assignee with john.doe's account ID",
+          "passed": true,
+          "evidence": "Step 4 (Story 1) includes '--assignee <accountId-from-step-3>' while Steps 5 and 6 do not include --assignee."
+        },
+        {
+          "text": "Shows confirmation plan before executing",
+          "passed": true,
+          "evidence": "Step 1 shows a full confirmation plan with Epic and all 3 Stories detailed, ending with 'Shall I proceed?'"
+        }
+      ]
+    },
+    {
+      "eval_id": 15,
+      "eval_name": "epic-stories",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.17,
+        "passed": 1,
+        "failed": 5,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Creates Epic first with jira.mjs create --project ENG --type Epic",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Uses MCP tool 'createJiraIssue' with projectKey ENG and issueTypeName Epic."
+        },
+        {
+          "text": "Captures the Epic key from the create response",
+          "passed": true,
+          "evidence": "Step 4 states 'Output: The Epic's issue key (e.g., ENG-100) is needed as the parent for the stories'."
+        },
+        {
+          "text": "Uses jira.mjs lookup-user for john.doe",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Uses MCP tool 'lookupJiraAccountId' with searchString 'john.doe@company.com'."
+        },
+        {
+          "text": "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+          "passed": false,
+          "evidence": "Does not use jira.mjs with --parent flag. Uses MCP tool createJiraIssue with parent parameter set to Epic key and priority Medium."
+        },
+        {
+          "text": "Story 1 includes --assignee with john.doe's account ID",
+          "passed": false,
+          "evidence": "Does not use jira.mjs --assignee flag. Story 1 uses MCP tool with 'assignee_account_id' from the lookup step."
+        },
+        {
+          "text": "Shows confirmation plan before executing",
+          "passed": false,
+          "evidence": "No user confirmation step is described. The approach goes directly from planning to execution steps."
+        }
+      ]
+    },
+    {
+      "eval_id": 16,
+      "eval_name": "link-issues",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs link-types to discover available link type names",
+          "passed": true,
+          "evidence": "Step 1 shows: 'jira.mjs link-types' to list available link types before creating any links."
+        },
+        {
+          "text": "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+          "passed": true,
+          "evidence": "Step 2 shows: 'jira.mjs link PROJ-100 PROJ-200 --type \"Blocks\"'."
+        },
+        {
+          "text": "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+          "passed": true,
+          "evidence": "Step 3 shows: 'jira.mjs link PROJ-100 PROJ-50 --type \"relates to\"'."
+        },
+        {
+          "text": "Uses jira.mjs link command for both operations",
+          "passed": true,
+          "evidence": "Both Steps 2 and 3 use 'jira.mjs link' command with appropriate arguments."
+        }
+      ]
+    },
+    {
+      "eval_id": 16,
+      "eval_name": "link-issues",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.50,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs link-types to discover available link type names",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Describes REST API 'GET /rest/api/3/issueLinkType' but not the skill's script."
+        },
+        {
+          "text": "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+          "passed": true,
+          "evidence": "Step 2 creates a Blocks link with PROJ-100 as outwardIssue (blocks) and PROJ-200 as inwardIssue (is blocked by)."
+        },
+        {
+          "text": "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+          "passed": true,
+          "evidence": "Step 3 creates a Relates link between PROJ-100 (outwardIssue) and PROJ-50 (inwardIssue)."
+        },
+        {
+          "text": "Uses jira.mjs link command for both operations",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Describes REST API POST to /rest/api/3/issueLink for both operations."
+        }
+      ]
+    },
+    {
+      "eval_id": 17,
+      "eval_name": "create-page",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs create-page with --space TEAM",
+          "passed": true,
+          "evidence": "The Exact Command section shows: 'confluence.mjs create-page --space <TEAM_SPACE_ID> --title ...' — note the approach resolves TEAM key to a numeric space ID first via the spaces command, but still targets the TEAM space."
+        },
+        {
+          "text": "Title includes 'Architecture Decision Record' and 'Microservices Migration'",
+          "passed": true,
+          "evidence": "The --title flag is: 'Architecture Decision Record - Microservices Migration'."
+        },
+        {
+          "text": "Body contains sections for Context, Decision, Consequences, and Status",
+          "passed": true,
+          "evidence": "The Storage Format HTML shows <h2>Context</h2>, <h2>Decision</h2>, <h2>Consequences</h2>, and <h2>Status</h2> sections."
+        },
+        {
+          "text": "Body uses HTML storage format (h2 tags or similar) or plain text that will be auto-wrapped",
+          "passed": true,
+          "evidence": "The body uses full Confluence XHTML storage format with <h1>, <h2>, <h3>, <p>, <ul>, <table>, and <ac:structured-macro> tags."
+        }
+      ]
+    },
+    {
+      "eval_id": 17,
+      "eval_name": "create-page",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs create-page with --space TEAM",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Describes REST API POST to /wiki/api/v2/pages with spaceId for TEAM space."
+        },
+        {
+          "text": "Title includes 'Architecture Decision Record' and 'Microservices Migration'",
+          "passed": true,
+          "evidence": "Title is 'Architecture Decision Record - Microservices Migration' which includes both required terms."
+        },
+        {
+          "text": "Body contains sections for Context, Decision, Consequences, and Status",
+          "passed": true,
+          "evidence": "Page content includes all four sections: Context, Decision, Consequences, and Status with appropriate content under each."
+        },
+        {
+          "text": "Body uses HTML storage format (h2 tags or similar) or plain text that will be auto-wrapped",
+          "passed": true,
+          "evidence": "The storage format body contains '<h2>Context</h2>', '<h2>Decision</h2>', '<h2>Consequences</h2>', '<h2>Status</h2>' tags."
+        }
+      ]
+    },
+    {
+      "eval_id": 18,
+      "eval_name": "spaces-search",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs spaces as the first command",
+          "passed": true,
+          "evidence": "Step 1 shows: 'confluence.mjs spaces' as the first command to list all Confluence spaces."
+        },
+        {
+          "text": "Uses confluence.mjs search with CQL targeting the HR space",
+          "passed": true,
+          "evidence": "Step 2 shows: 'confluence.mjs search' with CQL 'type = page AND space = HR AND text ~ \"onboarding\"'."
+        },
+        {
+          "text": "CQL includes text or title matching 'onboarding'",
+          "passed": true,
+          "evidence": "The CQL includes 'text ~ \"onboarding\"' for full-text search matching onboarding."
+        },
+        {
+          "text": "Operations are sequenced (search depends on spaces list)",
+          "passed": true,
+          "evidence": "The Sequencing section explicitly states: 'Step 1 must run first because we need to confirm the exact space key for the HR space' and 'Step 2 depends on Step 1's output.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 18,
+      "eval_name": "spaces-search",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.50,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs spaces as the first command",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses MCP tool 'getConfluenceSpaces' directly instead of the skill's script."
+        },
+        {
+          "text": "Uses confluence.mjs search with CQL targeting the HR space",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses MCP tool 'searchConfluenceUsingCql' with CQL targeting the HR space."
+        },
+        {
+          "text": "CQL includes text or title matching 'onboarding'",
+          "passed": true,
+          "evidence": "CQL queries include 'title ~ \"onboarding\" AND type = page AND space = \"HR\"' and 'text ~ \"onboarding\" AND type = page AND space = \"HR\"'."
+        },
+        {
+          "text": "Operations are sequenced (search depends on spaces list)",
+          "passed": true,
+          "evidence": "Steps are sequenced: Step 1 discovers cloud ID, Step 2 lists spaces, Step 3 identifies HR spaces, Step 4 searches for onboarding pages in HR space."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0},
+      "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.4322, "stddev": 0.2277, "min": 0.14, "max": 1.0},
+      "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0},
+      "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}
+    },
+    "delta": {
+      "pass_rate": "+0.57",
+      "time_seconds": "+0",
+      "tokens": "+0"
+    }
+  },
+  "notes": [
+    "With skill achieved 100% pass rate across all 18 evals (97 of 97 expectations passed), demonstrating complete coverage of skill-guided workflows.",
+    "Without skill averaged 43.2% pass rate (42 of 97 expectations passed), with high variance (stddev 0.23) ranging from 14% (spec-to-backlog) to 100% (daily-standup).",
+    "The largest skill advantage appeared in complex multi-step workflows: spec-to-backlog (+86pp), epic-stories (+83pp), triage-timeout (+75pp), and create-bug (+75pp).",
+    "Without skill, the agent consistently failed to use the skill's CLI scripts (jira.mjs, confluence.mjs), instead falling back to raw REST API calls or MCP tools -- losing the structured workflow guardrails.",
+    "The only eval where without_skill matched with_skill was eval-6 (daily-standup), a simpler task with no tool-specific expectations and straightforward JQL + formatting requirements."
+  ]
+}

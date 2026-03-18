@@ -1,0 +1,443 @@
+{
+  "skill_name": "atlassian-rest",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "What's the current status of PROJ-123? Also tell me who's assigned to it and what priority it is.",
+      "expected_output": "Should use jira.mjs get PROJ-123 to fetch issue details directly. Should NOT use search.",
+      "files": [],
+      "expectations": [
+        "Uses jira.mjs get command (not search) to fetch the specific issue",
+        "References PROJ-123 as the issue key in the command",
+        "Mentions presenting status, assignee, and priority fields to the user"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a high-priority bug ticket in the PLATFORM project for the API team. The login endpoint is timing out after 30 seconds when users have more than 50 active sessions. Assign it to Sarah Chen and label it as 'backend' and 'urgent'.",
+      "expected_output": "Should compose lookup-user then create with all flags. Should confirm before creating.",
+      "files": [],
+      "expectations": [
+        "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+        "Uses jira.mjs create with --project PLATFORM --type Bug",
+        "Includes --priority High in the create command",
+        "Includes --labels flag with backend and urgent",
+        "Includes --assignee with the looked-up account ID (not a name)",
+        "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+        "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+        "Shows a confirmation step before creating the ticket"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Extract action items from sprint planning meeting notes and create Jira tickets in PLATFORM.",
+      "expected_output": "Should trigger capture-tasks workflow, extract 4 items, lookup users, confirm, create.",
+      "files": [],
+      "expectations": [
+        "Loads the capture-tasks-from-meeting-notes sub-skill file",
+        "Extracts at least 4 action items from the notes",
+        "Identifies Sarah, Mike, and Lisa as assignees",
+        "Uses jira.mjs lookup-user for each unique assignee",
+        "Presents a table or list of extracted tasks for user confirmation before creating",
+        "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+        "References action-item-patterns.md or ticket-writing-guide.md"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Parse messy meeting notes with mixed action item formats and unassigned items.",
+      "expected_output": "Should handle mixed formats and ask about unassigned item.",
+      "files": [],
+      "expectations": [
+        "Loads the capture-tasks-from-meeting-notes sub-skill",
+        "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+        "Identifies the unassigned API docs task and asks the user about it",
+        "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+        "Presents extracted tasks for confirmation before creating"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Generate weekly status report for PHOENIX and publish to Confluence in ENG space.",
+      "expected_output": "Should run multiple JQL queries, format report, publish to Confluence.",
+      "files": [],
+      "expectations": [
+        "Loads the generate-status-report sub-skill file",
+        "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+        "Uses jira.mjs search with project = PHOENIX",
+        "Formats a report with sections (metrics, highlights, blockers, or similar)",
+        "Uses confluence.mjs create-page to publish to the ENG space",
+        "Includes a date in the page title",
+        "References report-templates.md or jql-patterns.md"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Daily standup summary for BACKEND - last 24h changes, blockers, upcoming. No Confluence.",
+      "expected_output": "Should adapt for daily format and respect no-publish request.",
+      "files": [],
+      "expectations": [
+        "Queries focus on last 24 hours (not 7 days)",
+        "Uses a compact standup format (done/doing/blocked or similar)",
+        "Does NOT use confluence.mjs create-page or update-page",
+        "Presents results directly rather than publishing"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Triage 'Connection timeout' errors in payment service during checkout.",
+      "expected_output": "Should trigger triage workflow with multiple search strategies.",
+      "files": [],
+      "expectations": [
+        "Loads the triage-issue sub-skill file",
+        "Extracts error signature, component (payment), and symptom (checkout failing)",
+        "Runs at least 2 different search queries with different JQL strategies",
+        "Searches for both open and resolved issues",
+        "Presents findings with confidence/similarity assessment",
+        "Offers options: create new, comment on existing, or show more details",
+        "Asks which project if not specified, or searches broadly",
+        "References bug-report-templates.md"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Triage NullPointerException in UserService.getProfile() at line 342 in BACKEND.",
+      "expected_output": "Should triage with specific error signature and check for regressions.",
+      "files": [],
+      "expectations": [
+        "Loads triage-issue sub-skill",
+        "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+        "Includes BACKEND project in JQL",
+        "Checks for resolved similar issues (regression detection)",
+        "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Search company knowledge about authentication system - login, OAuth, known issues.",
+      "expected_output": "Should search Confluence and Jira in parallel, synthesize, cite.",
+      "files": [],
+      "expectations": [
+        "Loads search-company-knowledge sub-skill",
+        "Searches Confluence for documentation pages about authentication/login/OAuth",
+        "Searches Jira for related issues or bugs",
+        "Uses both confluence.mjs search and jira.mjs search",
+        "Plans to fetch full content from top results",
+        "Synthesizes information from multiple sources with citations",
+        "References search-patterns.md or query-languages.md"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Search Confluence specifically for the deployment runbook.",
+      "expected_output": "Should target Confluence specifically, not Jira.",
+      "files": [],
+      "expectations": [
+        "Uses confluence.mjs search (not jira.mjs) as primary search",
+        "CQL includes terms like deployment, runbook, or deploy",
+        "Plans to fetch full page content with confluence.mjs get-page",
+        "Presents results with page title and source citation"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Read Confluence spec (page 98765) and create backlog in MOBILE with Epic + children.",
+      "expected_output": "Should follow spec-to-backlog workflow: fetch, analyze, Epic first, then children.",
+      "files": [],
+      "expectations": [
+        "Loads spec-to-backlog sub-skill",
+        "Uses confluence.mjs get-page 98765 to fetch the spec",
+        "Uses jira.mjs issue-types MOBILE to check available types",
+        "Creates Epic FIRST before any child tickets",
+        "Child tickets use --parent with the Epic key",
+        "Presents breakdown plan to user before creating",
+        "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "Break inline requirements into tickets in FRONTEND with correct issue types.",
+      "expected_output": "Should map requirements to Story/Bug/Task types intelligently.",
+      "files": [],
+      "expectations": [
+        "Handles inline spec without needing Confluence fetch",
+        "Uses jira.mjs issue-types FRONTEND to check available types",
+        "Maps requirement #3 (mobile Safari bug) to Bug type",
+        "Maps requirement #6 (API docs) to Task type",
+        "Maps feature requirements (#1,2,4,5) to Story type",
+        "Creates Epic first, then child tickets with --parent",
+        "Presents plan with labeled issue types before creating"
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Move PROJ-456 to Done and add a deployment comment.",
+      "expected_output": "Should list transitions first to get correct ID, then transition and comment.",
+      "files": [],
+      "expectations": [
+        "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+        "Does NOT guess or hardcode a transition ID",
+        "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+        "Uses jira.mjs comment PROJ-456 with the deployment message"
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Find blocked high-priority bugs in PLATFORM with assignee and update time.",
+      "expected_output": "Should construct correct JQL and present in table format.",
+      "files": [],
+      "expectations": [
+        "Constructs JQL with project = PLATFORM, type = Bug, priority in High/Highest, status = Blocked",
+        "Uses jira.mjs search with the JQL query",
+        "Mentions presenting results with key, summary, assignee, and last updated"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Create Epic 'Q2 Performance Initiative' in ENG with 3 child stories, assign #1 to john.doe.",
+      "expected_output": "Should create Epic first, capture key, then 3 stories with parent link.",
+      "files": [],
+      "expectations": [
+        "Creates Epic first with jira.mjs create --project ENG --type Epic",
+        "Captures the Epic key from the create response",
+        "Uses jira.mjs lookup-user for john.doe",
+        "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+        "Story 1 includes --assignee with john.doe's account ID",
+        "Shows confirmation plan before executing"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Link PROJ-100 blocks PROJ-200, and PROJ-100 relates to PROJ-50.",
+      "expected_output": "Should list link types first, then create both links.",
+      "files": [],
+      "expectations": [
+        "Uses jira.mjs link-types to discover available link type names",
+        "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+        "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+        "Uses jira.mjs link command for both operations"
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Create Confluence ADR page in TEAM space with Context/Decision/Consequences/Status sections.",
+      "expected_output": "Should create page with structured HTML storage format body.",
+      "files": [],
+      "expectations": [
+        "Uses confluence.mjs create-page with --space TEAM",
+        "Title includes 'Architecture Decision Record' and 'Microservices Migration'",
+        "Body contains sections for Context, Decision, Consequences, and Status",
+        "Body uses HTML storage format (h2 tags or similar) or plain text that will be auto-wrapped"
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "List Confluence spaces then search for onboarding pages in HR space.",
+      "expected_output": "Should sequence: list spaces first, then search targeting HR.",
+      "files": [],
+      "expectations": [
+        "Uses confluence.mjs spaces as the first command",
+        "Uses confluence.mjs search with CQL targeting the HR space",
+        "CQL includes text or title matching 'onboarding'",
+        "Operations are sequenced (search depends on spaces list)"
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "Upload the architecture diagram at ./docs/arch-diagram.png to Confluence page 54321, then update the page body to embed it at 600px width centered.",
+      "expected_output": "Should use attach to upload, then update-page with ac:image referencing the attachment.",
+      "files": [],
+      "expectations": [
+        "Uses confluence.mjs attach 54321 ./docs/arch-diagram.png to upload the file",
+        "Uses confluence.mjs get-page 54321 to fetch current page content before updating",
+        "Uses confluence.mjs update-page 54321 with body containing ac:image macro",
+        "The ac:image tag references ri:attachment with ri:filename matching the uploaded file",
+        "Image width is set to 600 (diagram sizing per formatting guide)",
+        "Image alignment is center"
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "List all attachments on Confluence page 54321 and delete the one called 'old-screenshot.png'.",
+      "expected_output": "Should list attachments but refuse to delete. Directs user to Atlassian web UI.",
+      "files": [],
+      "expectations": [
+        "Uses confluence.mjs list-attachments 54321 to list all attachments",
+        "Does NOT use confluence.mjs delete-attachment or any DELETE API call",
+        "Informs the user that delete operations are restricted in this skill",
+        "Directs the user to the Atlassian web UI to delete the attachment manually"
+      ]
+    },
+    {
+      "id": 21,
+      "prompt": "Create a professional technical document in Confluence TEAM space titled 'API Migration Guide'. It should have a table of contents, an overview info panel, sections for Background, Migration Steps (with code blocks), and a Troubleshooting section with expand/collapse for each issue. Use --body-file since it'll be long.",
+      "expected_output": "Should follow create-confluence-document workflow, build storage format HTML with macros, write to temp file, use --body-file.",
+      "files": [],
+      "expectations": [
+        "Loads the create-confluence-document sub-skill or references confluence-formatting.md",
+        "Builds storage format HTML body containing ac:structured-macro for toc",
+        "Includes an ac:structured-macro with ac:name='info' for the overview panel",
+        "Includes ac:structured-macro with ac:name='code' for code blocks",
+        "Includes ac:structured-macro with ac:name='expand' for troubleshooting items",
+        "Writes the HTML body to a temporary file",
+        "Uses confluence.mjs create-page with --body-file flag (not --body for long content)",
+        "Uses --space TEAM in the create command"
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "Create a status report page in Confluence ENG space with two-column layout showing overall status (green lozenge) on the left and sprint progress on the right. Include tables for completed and in-progress tickets, and a warning panel for risks. Upload the burndown chart from ./charts/burndown.png and embed it at 800px.",
+      "expected_output": "Should create page with layout macros, status lozenges, tables, warning panel, then attach and embed image.",
+      "files": [],
+      "expectations": [
+        "References confluence-formatting.md for the status report template or macros",
+        "Body contains ac:layout with ac:layout-section type='two_equal'",
+        "Body contains ac:structured-macro for status lozenge with colour Green",
+        "Body contains table elements for completed and in-progress tickets",
+        "Body contains ac:structured-macro with ac:name='warning' for risks panel",
+        "Uses confluence.mjs create-page to create the page first",
+        "Uses confluence.mjs attach to upload the burndown chart after page creation",
+        "Updates the page to embed the image with ac:image at width 800",
+        "Uses --body-file for the long storage format content"
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "Sync this epic doc at docs/epics/auth-epic.md to Jira. It's not linked to any ticket yet.",
+      "expected_output": "Should load sync-bmad-documents workflow, detect doc type, ask user for direction/project, then link and push.",
+      "files": [],
+      "expectations": [
+        "Loads the sync-bmad-documents sub-skill file",
+        "Uses sync.mjs status to check the document's current state",
+        "Detects or confirms the document type as 'epic'",
+        "Asks the user which Jira project to sync to",
+        "Asks whether to create a new epic or link to an existing one",
+        "Uses sync.mjs link with appropriate flags (--type epic --project <KEY> --create or --ticket <KEY>)",
+        "Confirms that jira_ticket_id was added to the document frontmatter",
+        "References sync-mapping-guide.md if field mapping is needed"
+      ]
+    },
+    {
+      "id": 24,
+      "prompt": "I already linked my tech spec to PROJ-200. Push the latest local changes to Jira.",
+      "expected_output": "Should check status, detect it's linked, then push changes directly.",
+      "files": [],
+      "expectations": [
+        "Loads the sync-bmad-documents sub-skill file",
+        "Uses sync.mjs status to confirm the document is linked",
+        "Does NOT ask for link setup (skips to sync since already linked)",
+        "Uses sync.mjs push to send local changes to the Jira ticket",
+        "Reports push results showing which fields were updated"
+      ]
+    },
+    {
+      "id": 25,
+      "prompt": "Pull the latest changes from Jira ticket PROJ-100 into my local epic doc at docs/epics/platform-epic.md.",
+      "expected_output": "Should check link, then pull remote changes to local document.",
+      "files": [],
+      "expectations": [
+        "Loads the sync-bmad-documents sub-skill file",
+        "Uses sync.mjs status to verify the document is linked to PROJ-100",
+        "Uses sync.mjs pull to fetch remote changes",
+        "Reports which sections/fields were updated in the local document",
+        "For epic docs, handles child story tickets if any exist remotely"
+      ]
+    },
+    {
+      "id": 26,
+      "prompt": "Check what's changed between my local epic doc and the Jira ticket since the last sync.",
+      "expected_output": "Should run diff and present per-section change indicators.",
+      "files": [],
+      "expectations": [
+        "Loads the sync-bmad-documents sub-skill file",
+        "Uses sync.mjs diff to compare local vs remote",
+        "Presents results with per-section change indicators (→ push, ← pull, ⚡ conflict, = unchanged)",
+        "Shows a summary table of sections and their sync status",
+        "If conflicts exist, offers to help resolve them"
+      ]
+    },
+    {
+      "id": 27,
+      "prompt": "Set up field mapping for syncing tech specs with Jira stories. Use PROJ-200 as a sample ticket.",
+      "expected_output": "Should run setup-mapping workflow, auto-detect fields, present for review.",
+      "files": [],
+      "expectations": [
+        "Loads the sync-bmad-documents sub-skill file",
+        "Uses sync.mjs setup-mapping --type story --sample PROJ-200",
+        "Presents the auto-detected field mapping to the user for review",
+        "Identifies standard fields (summary, description) and custom fields",
+        "Custom fields are flagged with _needsReview for user to confirm",
+        "Saves the confirmed mapping to memory/jira-story-field-mapping.json"
+      ]
+    },
+    {
+      "id": 28,
+      "prompt": "Sync all my BMAD documents in the project to Jira and Confluence.",
+      "expected_output": "Should use batch mode: init config from BMAD config, scan, present status, process each file.",
+      "files": [],
+      "expectations": [
+        "Loads the sync-bmad-documents sub-skill file",
+        "Checks for memory/batch-sync-config.json, runs sync.mjs init-batch if missing",
+        "init-batch reads _bmad/bmm/config.yaml to discover planning_artifacts and implementation_artifacts paths",
+        "Presents the batch config to user for review before saving",
+        "Uses sync.mjs batch to scan all configured paths",
+        "Shows a summary table of all discovered documents and their sync status",
+        "Processes each file that needs syncing, pausing on conflicts"
+      ]
+    },
+    {
+      "id": 29,
+      "prompt": "Link my PRD document at docs/prd/platform-prd.md to Confluence and push it.",
+      "expected_output": "Should detect PRD type, target Confluence, ask for space, create page, push content.",
+      "files": [],
+      "expectations": [
+        "Loads the sync-bmad-documents sub-skill file",
+        "Uses sync.mjs status to detect document type as 'prd' and target as 'confluence'",
+        "Asks the user which Confluence space to publish to",
+        "Uses sync.mjs link with --type prd --space <KEY> --create",
+        "Confirms confluence_page_id was added to the document frontmatter",
+        "Content is converted from markdown to Confluence storage format (markdownToStorage)"
+      ]
+    },
+    {
+      "id": 30,
+      "prompt": "I removed Story 1.3 from my epic doc. What happens to the Jira ticket when I sync?",
+      "expected_output": "Should explain orphan detection and that deletion is restricted to web UI.",
+      "files": [],
+      "expectations": [
+        "Explains that the sync engine detects orphaned stories (sections removed locally but tickets exist remotely)",
+        "States that the orphaned ticket will be flagged for user review",
+        "Does NOT offer to delete the Jira ticket",
+        "Directs the user to archive or delete the ticket manually via Jira web UI",
+        "Explains that delete operations are restricted in this skill"
+      ]
+    },
+    {
+      "id": 31,
+      "prompt": "My epic doc has a conflict — I changed the Overview section locally and someone updated the Jira description too. Help me resolve it.",
+      "expected_output": "Should run diff, identify the conflict, show both versions, let user choose.",
+      "files": [],
+      "expectations": [
+        "Loads the sync-bmad-documents sub-skill file",
+        "Uses sync.mjs diff to identify the conflicting section",
+        "Shows the ⚡ conflict indicator for the Overview section",
+        "Presents both the local version and the remote version side by side",
+        "Asks the user to choose: keep local, keep remote, or skip",
+        "Executes push or pull based on the user's choice for the conflicted section"
+      ]
+    },
+    {
+      "id": 32,
+      "prompt": "Delete the Jira epic PROJ-500 and all its child stories.",
+      "expected_output": "Should refuse to delete. Directs user to Jira web UI.",
+      "files": [],
+      "expectations": [
+        "Does NOT use any delete API call or command",
+        "Does NOT attempt to transition tickets to a 'deleted' or 'cancelled' state as a workaround",
+        "Informs the user that delete operations are restricted in this skill",
+        "Directs the user to the Jira web UI to delete issues manually",
+        "References the skill's 'Never delete' principle"
+      ]
+    }
+  ]
+}

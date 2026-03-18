@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Handles inline spec without needing Confluence fetch",
+      "passed": true,
+      "evidence": "Section 2 explicitly states: 'Skip the Confluence fetch entirely. The spec content is already available in the conversation. Proceed directly to Step 2: Analyze Spec.'"
+    },
+    {
+      "text": "Uses jira.mjs issue-types FRONTEND to check available types",
+      "passed": true,
+      "evidence": "Section 3 shows: 'node .../jira.mjs issue-types FRONTEND'."
+    },
+    {
+      "text": "Maps requirement #3 (mobile Safari bug) to Bug type",
+      "passed": true,
+      "evidence": "Section 4 table maps #3 'Fix profile changes not saving on mobile Safari' to Bug type. Section 7 Step 2 uses '--type Bug'."
+    },
+    {
+      "text": "Maps requirement #6 (API docs) to Task type",
+      "passed": true,
+      "evidence": "Section 4 table maps #6 'Update API documentation for new profile endpoints' to Task type. Section 7 Step 7 uses '--type Task'."
+    },
+    {
+      "text": "Maps feature requirements (#1,2,4,5) to Story type",
+      "passed": true,
+      "evidence": "Section 4 table maps #1 (avatar upload), #2 (bio field), #4 (completion indicator), #5 (social media) all to Story type."
+    },
+    {
+      "text": "Creates Epic first, then child tickets with --parent",
+      "passed": true,
+      "evidence": "Section 7 Step 1 creates the Epic first, captures 'FRONTEND-200', then Steps 2-7 all use '--parent FRONTEND-200'."
+    },
+    {
+      "text": "Presents plan with labeled issue types before creating",
+      "passed": true,
+      "evidence": "Section 6 shows a complete breakdown table with Type column (Epic, Story, Bug, Task) for all items, before the create commands in Section 7."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Queries focus on last 24 hours (not 7 days)",
+      "passed": true,
+      "evidence": "JQL queries use 'updated >= -1d' and 'status changed to \"Done\" AFTER -1d', clearly targeting last 24 hours."
+    },
+    {
+      "text": "Uses a compact standup format (done/doing/blocked or similar)",
+      "passed": true,
+      "evidence": "Report structure uses 'Done Yesterday', 'In Progress Today', 'Blocked', 'Coming Up' sections - a standard standup format."
+    },
+    {
+      "text": "Does NOT use confluence.mjs create-page or update-page",
+      "passed": true,
+      "evidence": "No confluence.mjs commands are used anywhere. The approach outputs directly without publishing."
+    },
+    {
+      "text": "Presents results directly rather than publishing",
+      "passed": true,
+      "evidence": "The task description says 'Output only -- do not publish to Confluence' and the approach compiles results into sections for direct presentation."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.00
+  }
+}

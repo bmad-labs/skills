@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs spaces as the first command",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses MCP tool 'getConfluenceSpaces' directly instead of the skill's script."
+    },
+    {
+      "text": "Uses confluence.mjs search with CQL targeting the HR space",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses MCP tool 'searchConfluenceUsingCql' with CQL targeting the HR space."
+    },
+    {
+      "text": "CQL includes text or title matching 'onboarding'",
+      "passed": true,
+      "evidence": "CQL queries include 'title ~ \"onboarding\" AND type = page AND space = \"HR\"' and 'text ~ \"onboarding\" AND type = page AND space = \"HR\"'."
+    },
+    {
+      "text": "Operations are sequenced (search depends on spaces list)",
+      "passed": true,
+      "evidence": "Steps are sequenced: Step 1 discovers cloud ID, Step 2 lists spaces, Step 3 identifies HR spaces, Step 4 searches for onboarding pages in HR space."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.50
+  }
+}

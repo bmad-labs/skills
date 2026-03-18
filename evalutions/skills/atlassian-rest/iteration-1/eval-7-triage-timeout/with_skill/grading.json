@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the triage-issue sub-skill file",
+      "passed": true,
+      "evidence": "Section 1 states: 'Primary workflow: skills/triage-issue.md -- the \"Triage Issue\" sub-skill' with its 6-step process."
+    },
+    {
+      "text": "Extracts error signature, component (payment), and symptom (checkout failing)",
+      "passed": true,
+      "evidence": "Section 2 table shows: Error signature = 'Connection timeout', Component = 'Payment service', User-facing symptom = 'Checkout fails for users'."
+    },
+    {
+      "text": "Runs at least 2 different search queries with different JQL strategies",
+      "passed": true,
+      "evidence": "Section 3 shows 6 different search strategies: by error message text, by component, by summary keywords, broader keyword combinations, recent bugs, and Confluence search."
+    },
+    {
+      "text": "Searches for both open and resolved issues",
+      "passed": true,
+      "evidence": "Strategy 2 uses 'statusCategory != Done' (open issues), while Strategy 5 searches broadly without status filter, and Section 6 Option D explicitly addresses resolved tickets (regression detection with PAY-412)."
+    },
+    {
+      "text": "Presents findings with confidence/similarity assessment",
+      "passed": true,
+      "evidence": "Section 4 shows assessment format with ratings: 'LIKELY DUPLICATE', 'POSSIBLE REGRESSION', 'LIKELY RELATED', 'Unrelated' for each match."
+    },
+    {
+      "text": "Offers options: create new, comment on existing, or show more details",
+      "passed": true,
+      "evidence": "Section 5 offers: '(a) Add a comment to [EXISTING-KEY]', '(b) Create a new bug ticket and link it', '(c) Create a brand new standalone bug ticket'. Section 6 provides exact commands for all options including Option D (regression)."
+    },
+    {
+      "text": "Asks which project if not specified, or searches broadly",
+      "passed": true,
+      "evidence": "Section 5 lists 'Which Jira project should I search in? (e.g., PAY, CHECKOUT, PLATFORM)' as a question to ask the user, since no project was specified."
+    },
+    {
+      "text": "References bug-report-templates.md",
+      "passed": true,
+      "evidence": "Section 7 Reference Files table lists 'references/bug-report-templates.md' with purpose: 'Description structure, priority assignment guide, error message template'."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

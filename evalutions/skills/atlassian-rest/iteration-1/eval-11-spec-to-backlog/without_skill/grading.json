@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads spec-to-backlog sub-skill",
+      "passed": false,
+      "evidence": "No sub-skill file is loaded or referenced."
+    },
+    {
+      "text": "Uses confluence.mjs get-page 98765 to fetch the spec",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Describes using MCP tool 'getConfluencePage' with page ID 98765 but not the skill's script."
+    },
+    {
+      "text": "Uses jira.mjs issue-types MOBILE to check available types",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Describes using MCP tool 'getJiraProjectIssueTypesMetadata' for MOBILE project."
+    },
+    {
+      "text": "Creates Epic FIRST before any child tickets",
+      "passed": true,
+      "evidence": "Step 3 is 'Create the Epic' and Step 4/5 are 'Create Child Stories' and 'Create Child Tasks', confirming Epic-first order."
+    },
+    {
+      "text": "Child tickets use --parent with the Epic key",
+      "passed": false,
+      "evidence": "Describes setting 'parent or Epic Link set to the Epic key from Step 3' but not using --parent flag in jira.mjs."
+    },
+    {
+      "text": "Presents breakdown plan to user before creating",
+      "passed": false,
+      "evidence": "No explicit confirmation or review step before creating. The approach describes sequential creation without user approval."
+    },
+    {
+      "text": "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md",
+      "passed": false,
+      "evidence": "No reference to any of these files in the approach."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 6,
+    "total": 7,
+    "pass_rate": 0.14
+  }
+}

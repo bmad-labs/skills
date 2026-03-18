@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads triage-issue sub-skill",
+      "passed": true,
+      "evidence": "Section 1 states: 'Loaded the Triage Issue workflow from skills/triage-issue.md' with 6-step process."
+    },
+    {
+      "text": "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+      "passed": true,
+      "evidence": "Strategy A searches 'text ~ \"NullPointerException UserService getProfile\"'. Strategy B searches 'text ~ \"UserService\"'. Strategy D searches 'summary ~ \"NullPointerException\"'."
+    },
+    {
+      "text": "Includes BACKEND project in JQL",
+      "passed": true,
+      "evidence": "All search strategies include 'project = BACKEND' in their JQL queries."
+    },
+    {
+      "text": "Checks for resolved similar issues (regression detection)",
+      "passed": true,
+      "evidence": "Section 4 'Regression Check' shows a dedicated query: 'project = BACKEND AND issuetype = Bug AND text ~ \"NullPointerException UserService\" AND statusCategory = Done' plus a reopened bugs check using 'status CHANGED FROM Done TO Open'."
+    },
+    {
+      "text": "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual",
+      "passed": true,
+      "evidence": "Section 5 shows a structured bug description with: Error, Where, Stack Trace, Trigger, Frequency, Expected Behavior, Actual Behavior, Environment sections."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

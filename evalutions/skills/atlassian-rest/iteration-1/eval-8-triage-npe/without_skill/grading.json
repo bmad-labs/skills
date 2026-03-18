@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads triage-issue sub-skill",
+      "passed": false,
+      "evidence": "No sub-skill file is loaded or referenced."
+    },
+    {
+      "text": "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+      "passed": true,
+      "evidence": "Recommends JQL 'text ~ \"NullPointerException UserService.getProfile\"' which searches by error type, class, and method together."
+    },
+    {
+      "text": "Includes BACKEND project in JQL",
+      "passed": true,
+      "evidence": "JQL includes 'project = BACKEND' in the recommended search query."
+    },
+    {
+      "text": "Checks for resolved similar issues (regression detection)",
+      "passed": false,
+      "evidence": "Does not explicitly search for resolved/closed similar issues for regression detection. Only suggests searching in the Jira UI."
+    },
+    {
+      "text": "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual",
+      "passed": true,
+      "evidence": "Bug ticket description includes Component (UserService/backend), Error (NPE), Steps to Reproduce (create user with no avatar, call getProfile), and Expected/Actual behavior sections."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.60
+  }
+}

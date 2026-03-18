@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs search (not jira.mjs) as primary search",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Describes REST API calls (GET /wiki/rest/api/content/search) but not the skill's script."
+    },
+    {
+      "text": "CQL includes terms like deployment, runbook, or deploy",
+      "passed": true,
+      "evidence": "Shows CQL 'title~\"deployment runbook\"' and search query 'deployment+runbook' which includes both terms."
+    },
+    {
+      "text": "Plans to fetch full page content with confluence.mjs get-page",
+      "passed": false,
+      "evidence": "Describes fetching page content via REST API 'GET /wiki/rest/api/content/{pageId}?expand=body.storage' but not using confluence.mjs get-page."
+    },
+    {
+      "text": "Presents results with page title and source citation",
+      "passed": false,
+      "evidence": "Cannot present results since no search was executed. Only describes the API approach."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+      "passed": false,
+      "evidence": "Does not mention jira.mjs. Describes REST API call 'GET /rest/api/3/user/search?query=Sarah%20Chen' but not the skill's lookup-user command."
+    },
+    {
+      "text": "Uses jira.mjs create with --project PLATFORM --type Bug",
+      "passed": false,
+      "evidence": "Does not mention jira.mjs. Shows a REST API POST to /rest/api/3/issue with project key PLATFORM and issuetype Bug in JSON payload."
+    },
+    {
+      "text": "Includes --priority High in the create command",
+      "passed": false,
+      "evidence": "No jira.mjs command used. The JSON payload does include '\"priority\": { \"name\": \"High\" }' but not as a --priority flag."
+    },
+    {
+      "text": "Includes --labels flag with backend and urgent",
+      "passed": false,
+      "evidence": "No jira.mjs command used. The JSON payload includes '\"labels\": [\"backend\", \"urgent\"]' but not as a --labels flag."
+    },
+    {
+      "text": "Includes --assignee with the looked-up account ID (not a name)",
+      "passed": false,
+      "evidence": "No jira.mjs command used. The JSON payload includes '\"assignee\": { \"accountId\": \"<SARAH_CHEN_ACCOUNT_ID>\" }' with a placeholder, not a looked-up ID."
+    },
+    {
+      "text": "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+      "passed": true,
+      "evidence": "Summary is 'Login endpoint times out after 30s when user has 50+ active sessions' which follows an [Endpoint] [Error] - [Condition] pattern."
+    },
+    {
+      "text": "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+      "passed": true,
+      "evidence": "Description mentions 'times out after 30 seconds when the authenticating user has more than 50 active sessions' with steps to reproduce."
+    },
+    {
+      "text": "Shows a confirmation step before creating the ticket",
+      "passed": false,
+      "evidence": "No confirmation step is described. The approach only shows API payloads for manual execution."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 6,
+    "total": 8,
+    "pass_rate": 0.25
+  }
+}

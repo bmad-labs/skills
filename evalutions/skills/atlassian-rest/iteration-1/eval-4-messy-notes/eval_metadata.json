@@ -1,0 +1,12 @@
+{
+  "eval_id": 4,
+  "eval_name": "messy-notes",
+  "prompt": "Parse messy meeting notes with mixed action item formats and unassigned items.",
+  "assertions": [
+    "Loads the capture-tasks-from-meeting-notes sub-skill",
+    "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+    "Identifies the unassigned API docs task and asks the user about it",
+    "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+    "Presents extracted tasks for confirmation before creating"
+  ]
+}

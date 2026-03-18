@@ -1,0 +1,14 @@
+{
+  "eval_id": 5,
+  "eval_name": "status-report",
+  "prompt": "Generate weekly status report for PHOENIX and publish to Confluence in ENG space.",
+  "assertions": [
+    "Loads the generate-status-report sub-skill file",
+    "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+    "Uses jira.mjs search with project = PHOENIX",
+    "Formats a report with sections (metrics, highlights, blockers, or similar)",
+    "Uses confluence.mjs create-page to publish to the ENG space",
+    "Includes a date in the page title",
+    "References report-templates.md or jql-patterns.md"
+  ]
+}

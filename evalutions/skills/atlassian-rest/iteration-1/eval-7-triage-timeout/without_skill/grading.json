@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the triage-issue sub-skill file",
+      "passed": false,
+      "evidence": "No sub-skill file is loaded or referenced."
+    },
+    {
+      "text": "Extracts error signature, component (payment), and symptom (checkout failing)",
+      "passed": true,
+      "evidence": "Identifies 'Connection timeout' as the error, 'payment service' as the component, and 'checkout' as the affected user flow."
+    },
+    {
+      "text": "Runs at least 2 different search queries with different JQL strategies",
+      "passed": false,
+      "evidence": "Shows 2 JQL queries (open issues and resolved issues) but does not actually run them - only documents what a human would need to do."
+    },
+    {
+      "text": "Searches for both open and resolved issues",
+      "passed": true,
+      "evidence": "Shows two separate JQL queries: one for 'status NOT IN (Done, Closed, Cancelled)' and another for 'status IN (Done, Closed, Resolved) AND resolved >= -90d'."
+    },
+    {
+      "text": "Presents findings with confidence/similarity assessment",
+      "passed": false,
+      "evidence": "No findings are presented since no searches were executed. No confidence or similarity assessment is provided."
+    },
+    {
+      "text": "Offers options: create new, comment on existing, or show more details",
+      "passed": false,
+      "evidence": "Describes filing a new bug if no existing report is found, but does not offer options to the user (create new, comment on existing, or show more)."
+    },
+    {
+      "text": "Asks which project if not specified, or searches broadly",
+      "passed": false,
+      "evidence": "Uses a placeholder '<PAYMENT_PROJECT_KEY>' but does not ask the user which project or suggest searching broadly."
+    },
+    {
+      "text": "References bug-report-templates.md",
+      "passed": false,
+      "evidence": "No reference to bug-report-templates.md anywhere in the approach."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 6,
+    "total": 8,
+    "pass_rate": 0.25
+  }
+}

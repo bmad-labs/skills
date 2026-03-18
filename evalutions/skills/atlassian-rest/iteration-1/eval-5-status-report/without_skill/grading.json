@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the generate-status-report sub-skill file",
+      "passed": false,
+      "evidence": "No sub-skill file is loaded or referenced."
+    },
+    {
+      "text": "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+      "passed": false,
+      "evidence": "Describes JQL queries conceptually (sprint issues, active sprint, board) but does not actually run them. Only shows what would be attempted."
+    },
+    {
+      "text": "Uses jira.mjs search with project = PHOENIX",
+      "passed": false,
+      "evidence": "Does not mention jira.mjs. Shows REST API endpoints with project=PHOENIX in JQL but not via the skill's script."
+    },
+    {
+      "text": "Formats a report with sections (metrics, highlights, blockers, or similar)",
+      "passed": true,
+      "evidence": "Shows a report template with sections: Summary, Key Accomplishments, Blockers & Risks, Upcoming Work, Team Notes, plus a metrics table."
+    },
+    {
+      "text": "Uses confluence.mjs create-page to publish to the ENG space",
+      "passed": false,
+      "evidence": "Does not mention confluence.mjs. Describes REST API POST to /wiki/api/v2/pages but not the skill's script."
+    },
+    {
+      "text": "Includes a date in the page title",
+      "passed": true,
+      "evidence": "Page title is 'PHOENIX Weekly Status Report -- Week of 2026-03-16' which includes a date."
+    },
+    {
+      "text": "References report-templates.md or jql-patterns.md",
+      "passed": false,
+      "evidence": "No reference to report-templates.md or jql-patterns.md anywhere in the approach."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 5,
+    "total": 7,
+    "pass_rate": 0.29
+  }
+}
