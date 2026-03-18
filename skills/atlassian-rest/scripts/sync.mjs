@@ -142,6 +142,17 @@ function ensureDir(dir) {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 }
 
+function writeTempContent(content, label) {
+  const tmpFile = join(SYNC_STATE_DIR, `_tmp_${label}_${Date.now()}.md`);
+  ensureDir(SYNC_STATE_DIR);
+  writeFileSync(tmpFile, content, 'utf8');
+  return tmpFile;
+}
+
+function cleanupTemp(tmpFile) {
+  try { unlinkSync(tmpFile); } catch { /* ignore */ }
+}
+
 // ---------------------------------------------------------------------------
 // Simple YAML parser (flat key-value: strings, arrays, booleans)
 // ---------------------------------------------------------------------------
@@ -749,11 +760,14 @@ async function cmdLink(positional, flags) {
       // Build description from Overview section
       const overview = parsed.sections.find((s) => /^Overview$/i.test(s.title));
       const descArgs = ['create', '--project', flags.project, '--type', issueType, '--summary', summary];
+      let tmpDescFile;
       if (overview) {
-        descArgs.push('--description', overview.content.trim());
+        tmpDescFile = writeTempContent(overview.content.trim(), 'desc');
+        descArgs.push('--description-file', tmpDescFile);
       }
 
       const result = jira(...descArgs);
+      if (tmpDescFile) cleanupTemp(tmpDescFile);
       linkId = result.key;
       console.error(`Created ${issueType}: ${linkId}`);
 
@@ -764,10 +778,13 @@ async function cmdLink(positional, flags) {
         for (const story of stories) {
           const storyArgs = ['create', '--project', flags.project, '--type', 'Story',
             '--summary', story.title, '--parent', linkId];
+          let tmpStoryFile;
           if (story.content) {
-            storyArgs.push('--description', story.content.trim());
+            tmpStoryFile = writeTempContent(story.content.trim(), 'desc');
+            storyArgs.push('--description-file', tmpStoryFile);
           }
           const storyResult = jira(...storyArgs);
+          if (tmpStoryFile) cleanupTemp(tmpStoryFile);
           console.error(`  Created Story: ${storyResult.key} — ${story.title}`);
           childLinks.push({
             bmadSectionId: story.id,
@@ -875,13 +892,15 @@ async function cmdPush(positional, _flags) {
     if (mapping) {
       const editArgs = [state.linkId];
       const customFields = {};
+      let tmpDescFile;
       for (const fm of mapping.fieldMappings || []) {
         const value = extractBmadValue(parsed, fm);
         if (value === null) continue;
         if (fm.jiraFieldId === 'summary') {
           editArgs.push('--summary', value);
         } else if (fm.jiraFieldId === 'description') {
-          editArgs.push('--description', value);
+          tmpDescFile = writeTempContent(value, 'desc');
+          editArgs.push('--description-file', tmpDescFile);
         } else if (fm.jiraFieldId.startsWith('customfield_')) {
           // Custom fields — build body for direct API call
           if (fm.transform === 'markdownToAdf') {
@@ -893,7 +912,10 @@ async function cmdPush(positional, _flags) {
       }
       if (editArgs.length > 1) {
         jira('edit', ...editArgs);
+        if (tmpDescFile) cleanupTemp(tmpDescFile);
         results.push({ action: 'pushed', target: state.linkId, status: 'updated' });
+      } else if (tmpDescFile) {
+        cleanupTemp(tmpDescFile);
       }
       // Push custom fields via direct API call
       if (Object.keys(customFields).length > 0) {
@@ -908,12 +930,17 @@ async function cmdPush(positional, _flags) {
       const h1 = parsed.sections.find((s) => s.level === 1);
       const overview = parsed.sections.find((s) => /^Overview$/i.test(s.title));
       const editArgs = [state.linkId];
+      let tmpFallbackFile;
       if (h1) editArgs.push('--summary', h1.title);
-      if (overview) editArgs.push('--description', overview.content.trim());
+      if (overview) {
+        tmpFallbackFile = writeTempContent(overview.content.trim(), 'desc');
+        editArgs.push('--description-file', tmpFallbackFile);
+      }
       if (editArgs.length > 1) {
         jira('edit', ...editArgs);
         results.push({ action: 'pushed', target: state.linkId, status: 'updated' });
       }
+      if (tmpFallbackFile) cleanupTemp(tmpFallbackFile);
     }
 
     // Handle child stories for epics
@@ -928,7 +955,9 @@ async function cmdPush(positional, _flags) {
         if (existing) {
           if (storyHash !== existing.localHash) {
             // Story changed, update ticket
-            jira('edit', existing.remoteId, '--summary', story.title, '--description', story.content.trim());
+            const tmpEditFile = writeTempContent(story.content.trim(), 'desc');
+            jira('edit', existing.remoteId, '--summary', story.title, '--description-file', tmpEditFile);
+            cleanupTemp(tmpEditFile);
             existing.localHash = storyHash;
             existing.remoteHash = storyHash;
             results.push({ action: 'pushed', target: existing.remoteId, section: story.id, status: 'updated' });
@@ -936,9 +965,11 @@ async function cmdPush(positional, _flags) {
         } else {
           // New story, create ticket
           const projectKey = mapping?.projectKey || state.linkId.replace(/-\d+$/, '');
+          const tmpNewFile = writeTempContent(story.content.trim(), 'desc');
           const storyResult = jira('create', '--project', projectKey, '--type', 'Story',
             '--summary', story.title, '--parent', state.linkId,
-            '--description', story.content.trim());
+            '--description-file', tmpNewFile);
+          cleanupTemp(tmpNewFile);
           existingLinks.push({
             bmadSectionId: story.id,
             remoteId: storyResult.key,

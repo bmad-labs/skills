@@ -63,6 +63,21 @@ When the user asks you to do something with Jira or Confluence, follow these pri
 
 7. **Read reference docs when needed.** Before writing JQL/CQL queries, consult `references/query-languages.md`. Before creating tickets, consult `references/ticket-writing-guide.md`. The reference docs exist to help you produce high-quality output — use them.
 
+### Passing Long Content to Scripts
+
+For descriptions, comments, or page bodies longer than ~200 characters or containing special
+characters (backticks, quotes, `$`, newlines), **write the content to a temp file** and use the
+file-based flag:
+
+| Inline Flag | File Flag | Commands |
+|-------------|-----------|----------|
+| `--description "text"` | `--description-file /tmp/desc.md` | jira create, jira edit |
+| `<body>` (positional) | `--body-file /tmp/body.md` | jira comment, confluence comment |
+| `--body "text"` | `--body-file /tmp/body.md` | confluence create-page, update-page |
+| `--comment "text"` | `--comment-file /tmp/comment.md` | jira worklog |
+
+Write **plain markdown** to the file — scripts handle conversion to ADF (Jira) or storage format (Confluence) automatically. Prefer file-based input to avoid shell escaping issues.
+
 ---
 
 ## Jira Operations
@@ -86,6 +101,9 @@ jira.mjs create --project PROJ --type Task --summary "Implement feature X" \
   --description "Details here" --priority High --assignee <accountId> \
   --labels "backend,urgent" --components "API,Auth"
 jira.mjs create --project PROJ --type Story --summary "User login" --parent PROJ-100
+# For long descriptions, use a file:
+jira.mjs create --project PROJ --type Task --summary "Feature X" \
+  --description-file /tmp/desc.md --priority High
 ```
 When creating child stories under an Epic, include `--priority Medium` unless the user specifies a different priority.
 
@@ -98,6 +116,8 @@ jira.mjs edit PROJ-123 --labels "backend,v2" --components "API"
 ### Comments
 ```bash
 jira.mjs comment PROJ-123 "Fixed in PR #456"
+# For long comments, use a file:
+jira.mjs comment PROJ-123 --body-file /tmp/comment.md
 ```
 
 ### Transitions (move ticket status)
@@ -211,6 +231,8 @@ Version is auto-incremented — no need to track it manually. Use `--body-file` 
 ### Comments
 ```bash
 confluence.mjs comment 12345 "Reviewed and approved"
+# For long comments, use a file:
+confluence.mjs comment 12345 --body-file /tmp/comment.md
 ```
 
 ### Attachments

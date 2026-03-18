@@ -2,6 +2,7 @@
 
 // Jira REST API v3 CLI — Node.js 18+
 
+import { readFileSync } from 'node:fs';
 import { markdownToAdf } from 'marklassian';
 
 // ---------------------------------------------------------------------------
@@ -81,6 +82,17 @@ async function request(path, { method = 'GET', body, query } = {}) {
 function toAdf(text) {
   const normalized = (text || '').replace(/\\n/g, '\n');
   return markdownToAdf(normalized);
+}
+
+/**
+ * Read content from a --<field>-file flag, falling back to the inline --<field> flag.
+ */
+function readContentFlag(flags, fieldName) {
+  const fileFlag = `${fieldName}-file`;
+  if (flags[fileFlag]) {
+    return readFileSync(flags[fileFlag], 'utf-8');
+  }
+  return flags[fieldName] || null;
 }
 
 // ---------------------------------------------------------------------------
@@ -170,8 +182,9 @@ async function cmdCreate(_positional, flags) {
     summary,
   };
 
-  if (flags.description) {
-    fields.description = toAdf(flags.description);
+  const description = readContentFlag(flags, 'description');
+  if (description) {
+    fields.description = toAdf(description);
   }
   if (flags.priority) {
     fields.priority = { name: flags.priority };
@@ -198,7 +211,8 @@ async function cmdEdit(positional, flags) {
 
   const fields = {};
   if (flags.summary) fields.summary = flags.summary;
-  if (flags.description) fields.description = toAdf(flags.description);
+  const editDesc = readContentFlag(flags, 'description');
+  if (editDesc) fields.description = toAdf(editDesc);
   if (flags.priority) fields.priority = { name: flags.priority };
   if (flags.assignee) fields.assignee = { id: flags.assignee };
   if (flags.labels) fields.labels = flags.labels.split(',').map((l) => l.trim());
@@ -213,9 +227,14 @@ async function cmdEdit(positional, flags) {
   console.log(JSON.stringify({ updated: key }, null, 2));
 }
 
-async function cmdComment(positional, _flags) {
+async function cmdComment(positional, flags) {
   const key = requirePositional(positional, 0, 'issueKey');
-  const body = requirePositional(positional, 1, 'body');
+  const body = readContentFlag(flags, 'body') || positional[1];
+
+  if (!body) {
+    console.error('Missing required argument: <body> or --body-file');
+    process.exit(1);
+  }
 
   const data = await request(`/issue/${key}/comment`, {
     method: 'POST',
@@ -297,8 +316,9 @@ async function cmdWorklog(positional, flags) {
   }
 
   const body = { timeSpent };
-  if (flags.comment) {
-    body.comment = toAdf(flags.comment);
+  const comment = readContentFlag(flags, 'comment');
+  if (comment) {
+    body.comment = toAdf(comment);
   }
 
   const data = await request(`/issue/${key}/worklog`, { method: 'POST', body });
@@ -316,13 +336,15 @@ Commands:
   search <JQL> [--max N]                         Search issues via JQL
   get <issueKey> [--fields f1,f2]                Get issue details
   create --project P --type T --summary S        Create issue
-         [--description D] [--priority P]
-         [--assignee A] [--parent EPIC]
+         [--description D | --description-file F]
+         [--priority P] [--assignee A] [--parent EPIC]
          [--labels L1,L2] [--components C1,C2]
-  edit <issueKey> [--summary S] [--description D]
+  edit <issueKey> [--summary S]                  Update issue
+       [--description D | --description-file F]
        [--priority P] [--assignee A]
-       [--labels L1,L2] [--components C1,C2]     Update issue
+       [--labels L1,L2] [--components C1,C2]
   comment <issueKey> <body>                      Add comment
+  comment <issueKey> --body-file F               Add comment from file
   transitions <issueKey>                         List available transitions
   transition <issueKey> <transitionId>           Transition issue
   projects                                       List visible projects
@@ -330,7 +352,11 @@ Commands:
   link <fromKey> <toKey> --type T                Link two issues
   link-types                                     Get available link types
   lookup-user <query>                            Find user account ID
-  worklog <issueKey> --time T [--comment C]      Add worklog entry
+  worklog <issueKey> --time T                    Add worklog entry
+         [--comment C | --comment-file F]
+
+File flags (--*-file) read content from a file instead of a shell argument.
+Use for long content or content with special characters (backticks, quotes, $).
 
 Environment variables (required):
   ATLASSIAN_EMAIL    Your Atlassian account email
