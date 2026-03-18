@@ -1,0 +1,15 @@
+{
+  "eval_id": 34,
+  "eval_name": "confluence-markdown-page",
+  "prompt": "Create a Confluence page in TEAM space titled 'API Integration Guide' with headings, bullet lists, an ordered list, and a Python code block showing a sample API call.",
+  "assertions": [
+    "Uses confluence.mjs create-page with --space TEAM",
+    "The --body content includes markdown formatting",
+    "Code blocks are converted to <ac:structured-macro ac:name=\"code\"> Confluence macros",
+    "The ac:structured-macro includes <ac:parameter ac:name=\"language\">python</ac:parameter>",
+    "Headings are converted to <h1>-<h6> HTML tags",
+    "Bullet lists are converted to <ul><li> HTML",
+    "Ordered lists are converted to <ol><li> HTML",
+    "marked library handles the conversion (toStorageFormat uses marked, not custom parser)"
+  ]
+}

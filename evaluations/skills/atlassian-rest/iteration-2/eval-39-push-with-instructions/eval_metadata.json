@@ -1,0 +1,13 @@
+{
+  "eval_id": 39,
+  "eval_name": "push-with-instructions",
+  "prompt": "Push my epic doc to Jira. The mapping config has instructions that say 'Always add label qa-review and set component to Backend'.",
+  "assertions": [
+    "Loads field mapping from memory/jira-epic-field-mapping.json",
+    "Prints mapping instructions to stdout (the 'Always add label qa-review...' text)",
+    "The agent reads and follows the instructions from the mapping config",
+    "Push operation includes the label 'qa-review' and component 'Backend' as instructed",
+    "Standard field mappings are also applied (summary, description, etc.)",
+    "Reports push results showing which fields were updated"
+  ]
+}

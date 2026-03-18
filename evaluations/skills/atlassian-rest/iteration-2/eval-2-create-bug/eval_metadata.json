@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "eval_name": "create-bug",
+  "prompt": "Create a high-priority bug ticket in the PLATFORM project for the API team. The login endpoint is timing out after 30 seconds when users have more than 50 active sessions. Assign it to Sarah Chen and label it as 'backend' and 'urgent'.",
+  "assertions": [
+    "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+    "Uses jira.mjs create with --project DO --type Bug",
+    "Includes --priority High in the create command",
+    "Includes --labels flag with backend and urgent",
+    "Includes --assignee with the looked-up account ID (not a name)",
+    "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+    "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+    "Shows a confirmation step before creating the ticket"
+  ]
+}

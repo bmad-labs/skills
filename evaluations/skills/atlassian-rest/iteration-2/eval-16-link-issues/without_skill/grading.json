@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs link-types to discover available link type names",
+      "passed": false,
+      "evidence": "Uses raw REST API call 'GET /rest/api/3/issueLinkType' instead of jira.mjs link-types. States: 'I do not have access to Atlassian MCP tools or helper scripts in this session.'"
+    },
+    {
+      "text": "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+      "passed": true,
+      "evidence": "Step 2 shows POST to /rest/api/3/issueLink with type 'Blocks', outwardIssue DO-100, inwardIssue DO-200. 'outwardIssue (DO-100) blocks inwardIssue (DO-200).'"
+    },
+    {
+      "text": "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+      "passed": true,
+      "evidence": "Step 3 shows POST to /rest/api/3/issueLink with type 'Relates', outwardIssue DO-100, inwardIssue DO-50."
+    },
+    {
+      "text": "Uses jira.mjs link command for both operations",
+      "passed": false,
+      "evidence": "Uses raw REST API POST calls to /rest/api/3/issueLink instead of jira.mjs link command. States: 'I do not have access to Atlassian MCP tools or helper scripts in this session.'"
+    }
+  ],
+  "summary": { "passed": 2, "failed": 2, "total": 4, "pass_rate": 0.5 }
+}

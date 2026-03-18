@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Uses sync.mjs setup-mapping --type epic --sample DO-100",
+      "passed": false,
+      "evidence": "States 'I cannot complete this task.' and 'No sync.mjs helper script available'. Describes the command hypothetically but cannot run it."
+    },
+    {
+      "text": "Generated mapping JSON includes 'instructions' field (empty string by default)",
+      "passed": false,
+      "evidence": "Cannot generate the mapping. Shows a hypothetical JSON structure but does not actually produce it."
+    },
+    {
+      "text": "User's custom instructions are added to the instructions field",
+      "passed": false,
+      "evidence": "Shows hypothetical JSON with instructions field but states 'Cannot wire custom instructions into the mapping for downstream operations.'"
+    },
+    {
+      "text": "Mapping is saved to memory/jira-epic-field-mapping.json",
+      "passed": false,
+      "evidence": "States 'Cannot save mapping to memory/jira-epic-field-mapping.json with proper structure.'"
+    },
+    {
+      "text": "Auto-detects standard fields (summary, description) from the sample ticket",
+      "passed": false,
+      "evidence": "States 'No field discovery automation — Cannot auto-detect standard vs. custom fields from the sample issue.'"
+    },
+    {
+      "text": "Custom fields are flagged with _needsReview for user confirmation",
+      "passed": true,
+      "evidence": "The hypothetical JSON includes '\"_needsReview\": true' for custom fields like 'customfield_10001' with 'detectedName': 'Epic Name'."
+    },
+    {
+      "text": "The instructions field value is: 'Always set priority to High and add label team-oms'",
+      "passed": false,
+      "evidence": "Shows the correct instructions text in a hypothetical example but cannot actually create the file."
+    }
+  ],
+  "summary": { "passed": 1, "failed": 6, "total": 7, "pass_rate": 0.14 }
+}

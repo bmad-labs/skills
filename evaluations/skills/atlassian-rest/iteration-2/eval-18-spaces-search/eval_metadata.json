@@ -1,0 +1,11 @@
+{
+  "eval_id": 18,
+  "eval_name": "spaces-search",
+  "prompt": "List Confluence spaces then search for onboarding pages in HR space.",
+  "assertions": [
+    "Uses confluence.mjs spaces as the first command",
+    "Uses confluence.mjs search with CQL targeting the HR space",
+    "CQL includes text or title matching 'onboarding'",
+    "Operations are sequenced (search depends on spaces list)"
+  ]
+}

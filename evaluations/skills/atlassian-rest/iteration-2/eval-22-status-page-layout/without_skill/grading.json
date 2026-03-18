@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "References confluence-formatting.md for the status report template or macros",
+      "passed": false,
+      "evidence": "Does not reference confluence-formatting.md. States 'No reference documentation — I cannot consult references/confluence-formatting.md' as a barrier."
+    },
+    {
+      "text": "Body contains ac:layout with ac:layout-section type='two_equal'",
+      "passed": true,
+      "evidence": "Body contains '<ac:layout><ac:layout-section ac:type=\"two_equal\">'"
+    },
+    {
+      "text": "Body contains ac:structured-macro for status lozenge with colour Green",
+      "passed": true,
+      "evidence": "'<ac:structured-macro ac:name=\"status\"><ac:parameter ac:name=\"colour\">Green</ac:parameter><ac:parameter ac:name=\"title\">On Track</ac:parameter>'"
+    },
+    {
+      "text": "Body contains table elements for completed and in-progress tickets",
+      "passed": true,
+      "evidence": "Two tables: '<h2>Completed Tickets</h2><table>' and '<h2>In-Progress Tickets</h2><table>' with ticket data"
+    },
+    {
+      "text": "Body contains ac:structured-macro with ac:name='warning' for risks panel",
+      "passed": true,
+      "evidence": "'<ac:structured-macro ac:name=\"warning\"><ac:parameter ac:name=\"title\">Risks &amp; Blockers</ac:parameter>'"
+    },
+    {
+      "text": "Uses confluence.mjs create-page to create the page first",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs directly. Mentions it hypothetically: 'confluence.mjs create-page --space ENG --title \"Sprint 14 Status Report\" --body-file /tmp/status-report-body.html' but states it is unavailable. Says 'I cannot execute any of these steps'."
+    },
+    {
+      "text": "Uses confluence.mjs attach to upload the burndown chart after page creation",
+      "passed": false,
+      "evidence": "Mentions 'confluence.mjs attach 98765 ./charts/burndown.png' only hypothetically. States this cannot be done without the skill."
+    },
+    {
+      "text": "Updates the page to embed the image with ac:image at width 800",
+      "passed": true,
+      "evidence": "Body contains '<ac:image ac:width=\"800\"><ri:attachment ri:filename=\"burndown.png\" />' and describes update-page step"
+    },
+    {
+      "text": "Uses --body-file for the long storage format content",
+      "passed": false,
+      "evidence": "Mentions --body-file only hypothetically. Cannot execute without the skill."
+    }
+  ],
+  "summary": { "passed": 5, "failed": 4, "total": 9, "pass_rate": 0.56 }
+}

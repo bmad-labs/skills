@@ -1,0 +1,15 @@
+{
+  "eval_id": 21,
+  "eval_name": "rich-confluence-doc",
+  "prompt": "Create a professional technical document in Confluence TEAM space titled 'API Migration Guide'. It should have a table of contents, an overview info panel, sections for Background, Migration Steps (with code blocks), and a Troubleshooting section with expand/collapse for each issue. Use --body-file since it'll be long.",
+  "assertions": [
+    "Loads the create-confluence-document sub-skill or references confluence-formatting.md",
+    "Builds storage format HTML body containing ac:structured-macro for toc",
+    "Includes an ac:structured-macro with ac:name='info' for the overview panel",
+    "Includes ac:structured-macro with ac:name='code' for code blocks",
+    "Includes ac:structured-macro with ac:name='expand' for troubleshooting items",
+    "Writes the HTML body to a temporary file",
+    "Uses confluence.mjs create-page with --body-file flag (not --body for long content)",
+    "Uses --space TEAM in the create command"
+  ]
+}

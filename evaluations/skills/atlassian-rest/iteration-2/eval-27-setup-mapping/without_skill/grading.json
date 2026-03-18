@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": false,
+      "evidence": "States 'Without the skill: There is no sub-skill file to load, no sync.mjs script, and no mapping guide.'"
+    },
+    {
+      "text": "Uses sync.mjs setup-mapping --type story --sample PROJ-200",
+      "passed": false,
+      "evidence": "Describes what the skill would run but explicitly states 'Without the skill, the agent must build the entire mapping workflow from scratch'. Actual execution was blocked."
+    },
+    {
+      "text": "Presents the auto-detected field mapping to the user for review",
+      "passed": false,
+      "evidence": "Presents a hypothetical mapping structure but notes 'the task was further blocked by the OAuth integration not having access to wnesolutions.atlassian.net'"
+    },
+    {
+      "text": "Identifies standard fields (summary, description) and custom fields",
+      "passed": false,
+      "evidence": "Step 4 lists hypothetical standard and custom fields but these were not actually discovered from the sample ticket -- they are guesses based on general Jira knowledge"
+    },
+    {
+      "text": "Custom fields are flagged with _needsReview for user to confirm",
+      "passed": false,
+      "evidence": "The hypothetical mapping includes _needsReview flags but notes 'No _needsReview flagging: Custom fields are not automatically flagged for user review' as a challenge without the skill"
+    },
+    {
+      "text": "Saves the confirmed mapping to memory/jira-story-field-mapping.json",
+      "passed": false,
+      "evidence": "Step 6 mentions saving to 'memory/jira-story-field-mapping.json' but notes 'No persistence convention: Agent may save the mapping to the wrong location or in the wrong format'"
+    }
+  ],
+  "summary": { "passed": 0, "failed": 6, "total": 6, "pass_rate": 0.0 }
+}

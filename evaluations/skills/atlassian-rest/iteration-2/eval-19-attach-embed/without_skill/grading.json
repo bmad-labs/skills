@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs attach 54321 ./docs/arch-diagram.png to upload the file",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses raw curl: 'POST /wiki/rest/api/content/54321/child/attachment'. States 'I cannot complete this task.'"
+    },
+    {
+      "text": "Uses confluence.mjs get-page 54321 to fetch current page content before updating",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses raw curl GET request to fetch page content."
+    },
+    {
+      "text": "Uses confluence.mjs update-page 54321 with body containing ac:image macro",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses raw curl PUT request to update the page."
+    },
+    {
+      "text": "The ac:image tag references ri:attachment with ri:filename matching the uploaded file",
+      "passed": true,
+      "evidence": "<ri:attachment ri:filename=\"arch-diagram.png\" /> in the ac:image macro"
+    },
+    {
+      "text": "Image width is set to 600 (diagram sizing per formatting guide)",
+      "passed": true,
+      "evidence": "ac:width=\"600\" in the ac:image macro"
+    },
+    {
+      "text": "Image alignment is center",
+      "passed": true,
+      "evidence": "ac:align=\"center\" in the ac:image macro"
+    }
+  ],
+  "summary": { "passed": 3, "failed": 3, "total": 6, "pass_rate": 0.5 }
+}

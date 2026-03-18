@@ -1,0 +1,15 @@
+{
+  "eval_id": 33,
+  "eval_name": "rich-markdown-edit",
+  "prompt": "Update the description of OMPBLINK-100 with rich markdown content: a heading '## Release Notes', bold and italic text, a bullet list of 3 items, a table with columns Feature/Status/Owner, and a JavaScript code block.",
+  "assertions": [
+    "Uses jira.mjs edit command with --description flag",
+    "Description contains markdown heading (## syntax)",
+    "Description contains **bold** and *italic* inline formatting",
+    "Description contains a bullet list (- item syntax)",
+    "Description contains a markdown table (| col | syntax)",
+    "Description contains a fenced code block (```js syntax)",
+    "marklassian converts the markdown to valid ADF \u2014 not raw markdown text rendered in Jira",
+    "Literal \\n from shell arguments are converted to real newlines before ADF conversion"
+  ]
+}

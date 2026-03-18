@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Uses sync.mjs link command (not jira.mjs create) for document-based creation",
+      "passed": true,
+      "evidence": "Step 4: 'node .../sync.mjs link _bmad-output/user-story-2.md --type story --project DO --create' and 'Used sync.mjs link --create instead of raw jira.mjs create'"
+    },
+    {
+      "text": "Passes --type story --project DO --create flags",
+      "passed": true,
+      "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses --project DO instead of --project OMPBLINK. The command is 'sync.mjs link _bmad-output/user-story-2.md --type story --project DO --create'"
+    },
+    {
+      "text": "Checks for field mapping file (memory/jira-story-field-mapping.json) before creating",
+      "passed": true,
+      "evidence": "Step 3: 'ls .../memory/jira-story-field-mapping.json' with conditional logic 'If mapping file does NOT exist' vs 'If mapping file DOES exist'"
+    },
+    {
+      "text": "If no mapping exists, runs sync.mjs setup-mapping or proceeds with defaults",
+      "passed": true,
+      "evidence": "Step 3: 'If mapping file does NOT exist: Need to create one first... node .../sync.mjs setup-mapping --type story --sample DO-<NUMBER>'"
+    },
+    {
+      "text": "The source document is updated with jira_ticket_id in frontmatter or [KEY] prefix in title",
+      "passed": true,
+      "evidence": "'Update the source document... with the Jira link: If document has YAML frontmatter: adds jira_ticket_id: DO-XXX to frontmatter. If no frontmatter: prefixes title with [DO-XXX]'"
+    },
+    {
+      "text": "A sync state file is created in memory/sync-state/",
+      "passed": true,
+      "evidence": "'Create initial sync state in memory/sync-state/<hash>.json'"
+    },
+    {
+      "text": "If mapping has non-empty instructions field, prints them to stdout",
+      "passed": true,
+      "evidence": "'Print any instructions from the field mapping config for the agent to follow'"
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

@@ -161,11 +161,11 @@
       "files": [],
       "expectations": [
         "Handles inline spec without needing Confluence fetch",
-        "Uses jira.mjs issue-types FRONTEND to check available types",
+        "Uses jira.mjs issue-types to check available types for the target project",
         "Maps requirement #3 (mobile Safari bug) to Bug type",
         "Maps requirement #6 (API docs) to Task type",
         "Maps feature requirements (#1,2,4,5) to Story type",
-        "Creates Epic first, then child tickets with --parent",
+        "Either creates an Epic with child tickets using --parent, or explains why standalone tickets are more appropriate",
         "Presents plan with labeled issue types before creating"
       ]
     },
@@ -512,7 +512,7 @@
         "Fetches PROJ-501's issue type and finds it is 'Story' (not 'Sub-*')",
         "Skips deletion of PROJ-501 with a message explaining it's not a Sub-* type",
         "Does NOT call DELETE API for PROJ-501",
-        "Reports PROJ-501 as 'not-subtask-skipped' in results",
+        "Reports the ticket as skipped or refused in results, indicating it is not a Sub-* type",
         "Suggests the user delete or archive it manually via Jira web UI"
       ]
     },

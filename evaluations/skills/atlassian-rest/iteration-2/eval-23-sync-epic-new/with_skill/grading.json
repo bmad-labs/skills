@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": true,
+      "evidence": "Step 0: 'Read the Sync Workflow... File: <skill-path>/workflows/sync-bmad-documents.md' and 'File: <skill-path>/references/sync-mapping-guide.md'"
+    },
+    {
+      "text": "Uses sync.mjs status to check the document's current state",
+      "passed": true,
+      "evidence": "Step 3: 'node .../sync.mjs status docs/epics/auth-epic.md'"
+    },
+    {
+      "text": "Detects or confirms the document type as 'epic'",
+      "passed": true,
+      "evidence": "Step 2: 'Given the file is located in docs/epics/ and named auth-epic.md, this is almost certainly an epic document type. Confirm by inspecting the document for epic detection signals.'"
+    },
+    {
+      "text": "Asks the user which Jira project to sync to",
+      "passed": true,
+      "evidence": "Step 4: 'Target: Which Jira project key? Answer: DO — specified in the task.' and 'the workflow says to confirm with the user before mutating. Present these choices and get confirmation.'"
+    },
+    {
+      "text": "Asks whether to create a new epic or link to an existing one",
+      "passed": true,
+      "evidence": "Step 4: 'Action: Create new ticket/page, or link to existing one? Answer: Create new'"
+    },
+    {
+      "text": "Uses sync.mjs link with appropriate flags (--type epic --project <KEY> --create or --ticket <KEY>)",
+      "passed": true,
+      "evidence": "Step 6: 'node .../sync.mjs link docs/epics/auth-epic.md --type epic --project DO --create'"
+    },
+    {
+      "text": "Confirms that jira_ticket_id was added to the document frontmatter",
+      "passed": true,
+      "evidence": "Step 7: 'Read docs/epics/auth-epic.md and confirm jira_ticket_id was added to the frontmatter' with example showing 'jira_ticket_id: DO-XXX'"
+    },
+    {
+      "text": "References sync-mapping-guide.md if field mapping is needed",
+      "passed": true,
+      "evidence": "Step 0: 'File: <skill-path>/references/sync-mapping-guide.md' and Step 5c: 'following the schema in references/sync-mapping-guide.md'"
+    }
+  ],
+  "summary": { "passed": 8, "failed": 0, "total": 8, "pass_rate": 1.0 }
+}

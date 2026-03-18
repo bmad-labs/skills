@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs attach 54321 ./docs/arch-diagram.png to upload the file",
+      "passed": true,
+      "evidence": "Step 1: 'node <skill-path>/scripts/confluence.mjs attach 54321 ./docs/arch-diagram.png --comment \"Architecture diagram\"'"
+    },
+    {
+      "text": "Uses confluence.mjs get-page 54321 to fetch current page content before updating",
+      "passed": true,
+      "evidence": "Step 2: 'node <skill-path>/scripts/confluence.mjs get-page 54321'"
+    },
+    {
+      "text": "Uses confluence.mjs update-page 54321 with body containing ac:image macro",
+      "passed": true,
+      "evidence": "Step 3: 'node <skill-path>/scripts/confluence.mjs update-page 54321 --title \"Existing Page Title\" --body-file /tmp/page-54321-body.html' with body containing ac:image macro"
+    },
+    {
+      "text": "The ac:image tag references ri:attachment with ri:filename matching the uploaded file",
+      "passed": true,
+      "evidence": "<ri:attachment ri:filename=\"arch-diagram.png\" />"
+    },
+    {
+      "text": "Image width is set to 600 (diagram sizing per formatting guide)",
+      "passed": true,
+      "evidence": "ac:width=\"600\" — explicitly states 'Width 600 — Recommended for diagrams/flowcharts per the sizing guidelines table'"
+    },
+    {
+      "text": "Image alignment is center",
+      "passed": true,
+      "evidence": "ac:align=\"center\" — states 'Per the reference: Always set ac:align=\"center\" for standalone images.'"
+    }
+  ],
+  "summary": { "passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0 }
+}

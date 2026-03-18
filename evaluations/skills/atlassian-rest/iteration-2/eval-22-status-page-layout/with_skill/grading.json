@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "References confluence-formatting.md for the status report template or macros",
+      "passed": true,
+      "evidence": "States 'references/confluence-formatting.md — Status Report template, layout macros, image embedding, status lozenges, warning panels, tables'"
+    },
+    {
+      "text": "Body contains ac:layout with ac:layout-section type='two_equal'",
+      "passed": true,
+      "evidence": "Body contains '<ac:layout><ac:layout-section ac:type=\"two_equal\">'"
+    },
+    {
+      "text": "Body contains ac:structured-macro for status lozenge with colour Green",
+      "passed": true,
+      "evidence": "'<ac:structured-macro ac:name=\"status\"><ac:parameter ac:name=\"colour\">Green</ac:parameter><ac:parameter ac:name=\"title\">ON TRACK</ac:parameter>'"
+    },
+    {
+      "text": "Body contains table elements for completed and in-progress tickets",
+      "passed": true,
+      "evidence": "Two tables: '<h2>Completed This Week</h2><table>' and '<h2>In Progress</h2><table>' with ticket data"
+    },
+    {
+      "text": "Body contains ac:structured-macro with ac:name='warning' for risks panel",
+      "passed": true,
+      "evidence": "'<ac:structured-macro ac:name=\"warning\"><ac:parameter ac:name=\"title\">Risks &amp; Blockers</ac:parameter>'"
+    },
+    {
+      "text": "Uses confluence.mjs create-page to create the page first",
+      "passed": true,
+      "evidence": "'node .../confluence.mjs create-page --space ENG --title \"Sprint 14 Status Report — 2026-03-18\" --body-file /tmp/confluence-status-report-body.html'"
+    },
+    {
+      "text": "Uses confluence.mjs attach to upload the burndown chart after page creation",
+      "passed": true,
+      "evidence": "'node .../confluence.mjs attach <pageId> ./charts/burndown.png --comment \"Sprint 14 burndown chart\"'"
+    },
+    {
+      "text": "Updates the page to embed the image with ac:image at width 800",
+      "passed": true,
+      "evidence": "Body contains '<ac:image ac:width=\"800\" ac:align=\"center\" ac:layout=\"center\"><ri:attachment ri:filename=\"burndown.png\" />' and update-page command is shown for if filename correction is needed"
+    },
+    {
+      "text": "Uses --body-file for the long storage format content",
+      "passed": true,
+      "evidence": "'--body-file /tmp/confluence-status-report-body.html' — states 'Uses --body-file because the body content is lengthy (well over 2000 characters)'"
+    }
+  ],
+  "summary": { "passed": 9, "failed": 0, "total": 9, "pass_rate": 1.0 }
+}

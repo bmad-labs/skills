@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": false,
+      "evidence": "No sync-bmad-documents sub-skill loaded. States 'Without a dedicated skill or sync tooling, the agent must manually perform each sub-step'"
+    },
+    {
+      "text": "Uses sync.mjs status to detect document type as 'prd' and target as 'confluence'",
+      "passed": false,
+      "evidence": "No sync.mjs status used. Step 1 uses generic file Read tool instead. Notes 'No document type awareness' as a challenge."
+    },
+    {
+      "text": "Asks the user which Confluence space to publish to",
+      "passed": true,
+      "evidence": "Step 2: 'Option A: Ask the user which Confluence space key to use (e.g., \"TEAM\", \"ENG\", \"DOCS\")'"
+    },
+    {
+      "text": "Uses sync.mjs link with --type prd --space <KEY> --create",
+      "passed": false,
+      "evidence": "No sync.mjs link used. Step 4 uses mcp__plugin_atlassian_atlassian__createConfluencePage directly instead."
+    },
+    {
+      "text": "Confirms confluence_page_id was added to the document frontmatter",
+      "passed": true,
+      "evidence": "Step 5: 'Add or update frontmatter fields in docs/prd/platform-prd.md with the Confluence page ID, space key, and sync timestamp' with example YAML showing confluence_page_id"
+    },
+    {
+      "text": "Content is converted from markdown to Confluence storage format (markdownToStorage)",
+      "passed": false,
+      "evidence": "Challenge 2: 'The agent has no access to a proper markdown-to-Confluence-storage converter (like marklassian). Manual conversion is unreliable.' No markdownToStorage transform used."
+    }
+  ],
+  "summary": { "passed": 2, "failed": 4, "total": 6, "pass_rate": 0.33 }
+}

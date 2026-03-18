@@ -1,0 +1,13 @@
+{
+  "eval_id": 15,
+  "eval_name": "epic-stories",
+  "prompt": "Create Epic 'Q2 Performance Initiative' in ENG with 3 child stories, assign #1 to john.doe.",
+  "assertions": [
+    "Creates Epic first with jira.mjs create --project DO --type Epic",
+    "Captures the Epic key from the create response",
+    "Uses jira.mjs lookup-user for john.doe",
+    "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+    "Story 1 includes --assignee with john.doe's account ID",
+    "Shows confirmation plan before executing"
+  ]
+}

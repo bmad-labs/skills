@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs search (not jira.mjs) as primary search",
+      "passed": true,
+      "evidence": "Steps 2-4 all use confluence.mjs search as primary. Jira search is explicitly labeled 'Optional Secondary Jira Search' in Step 6. 'Confluence-first approach -- The user explicitly asked about Confluence, so that is the primary search target.'"
+    },
+    {
+      "text": "CQL includes terms like deployment, runbook, or deploy",
+      "passed": true,
+      "evidence": "CQL queries include: 'title ~ \"deployment runbook\"', 'text ~ \"deployment runbook\"', 'title ~ \"runbook\"', 'text ~ \"deployment\" AND label = \"runbook\"'"
+    },
+    {
+      "text": "Plans to fetch full page content with confluence.mjs get-page",
+      "passed": true,
+      "evidence": "Step 5: 'For the top 3-5 most relevant results from the searches above, retrieve full page content' using 'confluence.mjs get-page <pageId>'"
+    },
+    {
+      "text": "Presents results with page title and source citation",
+      "passed": true,
+      "evidence": "Step 7: 'List each matching Confluence page with title, space, page ID, and direct URL', 'Cite sources with links (e.g., https://wnesolutions.atlassian.net/wiki/...)'"
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 }
+}

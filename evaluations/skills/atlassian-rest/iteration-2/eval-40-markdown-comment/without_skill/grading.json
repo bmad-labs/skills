@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs comment PROJ-123 with markdown-formatted body",
+      "passed": false,
+      "evidence": "Does not use jira.mjs. Uses raw curl commands. States 'Without a dedicated Atlassian skill or helper scripts (such as jira.mjs with marklassian for automatic markdown-to-ADF conversion).'"
+    },
+    {
+      "text": "Comment body contains **bold** text",
+      "passed": false,
+      "evidence": "Does not use markdown **bold** syntax. Constructs ADF JSON manually with 'marks: [{ \"type\": \"strong\" }]' instead."
+    },
+    {
+      "text": "Comment body contains a bullet list (- items)",
+      "passed": false,
+      "evidence": "Does not use markdown - item syntax. Constructs ADF bulletList JSON manually."
+    },
+    {
+      "text": "Comment body contains inline `code` backticks",
+      "passed": false,
+      "evidence": "Does not use markdown backtick syntax. Constructs ADF code mark JSON manually with 'marks: [{ \"type\": \"code\" }]'."
+    },
+    {
+      "text": "marklassian converts the comment body to valid ADF (not raw markdown)",
+      "passed": false,
+      "evidence": "States 'No marklassian / markdown-to-ADF converter' and 'Must manually construct verbose ADF JSON instead of writing simple markdown.'"
+    },
+    {
+      "text": "The comment renders correctly in Jira with proper formatting",
+      "passed": true,
+      "evidence": "The manually constructed ADF JSON is structurally correct with proper strong marks, bulletList, and code marks. If credentials were available, it would render correctly."
+    }
+  ],
+  "summary": { "passed": 1, "failed": 5, "total": 6, "pass_rate": 0.17 }
+}

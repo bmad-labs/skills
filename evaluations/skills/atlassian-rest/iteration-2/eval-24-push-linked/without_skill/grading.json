@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": false,
+      "evidence": "Does not load any sub-skill file. States 'No skill workflow — The sync-bmad-documents.md workflow defines the exact 9-step process for this operation, unavailable without the skill.'"
+    },
+    {
+      "text": "Uses sync.mjs status to confirm the document is linked",
+      "passed": false,
+      "evidence": "Does not use sync.mjs. States 'No sync.mjs script — The skill's sync.mjs script handles status checking, diffing, field mapping, ADF conversion, and push execution — none of this is available without the skill.'"
+    },
+    {
+      "text": "Does NOT ask for link setup (skips to sync since already linked)",
+      "passed": true,
+      "evidence": "Correctly assumes the link exists based on user statement: 'The user says the tech spec is already linked to DO-200.' Does not attempt link setup."
+    },
+    {
+      "text": "Uses sync.mjs push to send local changes to the Jira ticket",
+      "passed": false,
+      "evidence": "Does not use sync.mjs. Describes raw curl PUT request to '/rest/api/3/issue/DO-200'. States 'I cannot complete this task.'"
+    },
+    {
+      "text": "Reports push results showing which fields were updated",
+      "passed": false,
+      "evidence": "Shows a hypothetical result format but states 'none of these steps can be completed' without the skill."
+    }
+  ],
+  "summary": { "passed": 1, "failed": 4, "total": 5, "pass_rate": 0.2 }
+}

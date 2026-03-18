@@ -1,0 +1,13 @@
+{
+  "eval_id": 27,
+  "eval_name": "setup-mapping",
+  "prompt": "Set up field mapping for syncing tech specs with Jira stories. Use PROJ-200 as a sample ticket.",
+  "assertions": [
+    "Loads the sync-bmad-documents sub-skill file",
+    "Uses sync.mjs setup-mapping --type story --sample PROJ-200",
+    "Presents the auto-detected field mapping to the user for review",
+    "Identifies standard fields (summary, description) and custom fields",
+    "Custom fields are flagged with _needsReview for user to confirm",
+    "Saves the confirmed mapping to memory/jira-story-field-mapping.json"
+  ]
+}

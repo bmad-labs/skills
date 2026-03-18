@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the create-confluence-document sub-skill or references confluence-formatting.md",
+      "passed": true,
+      "evidence": "States 'workflows/create-confluence-document.md — the 6-step workflow' and 'references/confluence-formatting.md — storage format XHTML syntax for TOC, panels, code blocks, expand/collapse macros'"
+    },
+    {
+      "text": "Builds storage format HTML body containing ac:structured-macro for toc",
+      "passed": true,
+      "evidence": "Body contains '<ac:structured-macro ac:name=\"toc\"><ac:parameter ac:name=\"maxLevel\">3</ac:parameter>'"
+    },
+    {
+      "text": "Includes an ac:structured-macro with ac:name='info' for the overview panel",
+      "passed": true,
+      "evidence": "Body contains '<ac:structured-macro ac:name=\"info\"><ac:parameter ac:name=\"title\">API Migration Guide — Summary</ac:parameter>'"
+    },
+    {
+      "text": "Includes ac:structured-macro with ac:name='code' for code blocks",
+      "passed": true,
+      "evidence": "Multiple code blocks with '<ac:structured-macro ac:name=\"code\">' with language, title, and linenumbers parameters"
+    },
+    {
+      "text": "Includes ac:structured-macro with ac:name='expand' for troubleshooting items",
+      "passed": true,
+      "evidence": "Five expand macros: '<ac:structured-macro ac:name=\"expand\">' for 401, 400, 404, 429, and 502 troubleshooting items"
+    },
+    {
+      "text": "Writes the HTML body to a temporary file",
+      "passed": true,
+      "evidence": "'cat > /tmp/confluence-body.html << HTMLEOF'"
+    },
+    {
+      "text": "Uses confluence.mjs create-page with --body-file flag (not --body for long content)",
+      "passed": true,
+      "evidence": "'node <skill-path>/scripts/confluence.mjs create-page --space TEAM --title \"API Migration Guide\" --body-file /tmp/confluence-body.html'"
+    },
+    {
+      "text": "Uses --space TEAM in the create command",
+      "passed": true,
+      "evidence": "'--space TEAM' in the create-page command"
+    }
+  ],
+  "summary": { "passed": 8, "failed": 0, "total": 8, "pass_rate": 1.0 }
+}

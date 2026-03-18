@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Creates Epic first with jira.mjs create --project DO --type Epic",
+      "passed": true,
+      "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Step 4 uses '--project DO --type Epic' instead of '--project ENG --type Epic'. The prompt specifies ENG project but the approach uses DO."
+    },
+    {
+      "text": "Captures the Epic key from the create response",
+      "passed": true,
+      "evidence": "Step 4: 'Expected output: The newly created Epic key, e.g., DO-101. Record this key for use as the --parent in subsequent story creation.'"
+    },
+    {
+      "text": "Uses jira.mjs lookup-user for john.doe",
+      "passed": true,
+      "evidence": "Step 3: 'jira.mjs lookup-user \"john.doe\"' -- 'This returns the account ID (e.g., 5f1234567890abcdef123456) needed for assignment in Step 5.'"
+    },
+    {
+      "text": "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+      "passed": false,
+      "evidence": "Steps 5-7 create 3 child stories with '--parent DO-101 --type Story' but none of the create commands include '--priority Medium'. Priority is not specified in any story creation command."
+    },
+    {
+      "text": "Story 1 includes --assignee with john.doe's account ID",
+      "passed": true,
+      "evidence": "Step 5: 'jira.mjs create --project DO --type Story --summary \"Optimize database query performance\" ... --parent DO-101 --assignee <accountId-from-step-3>'"
+    },
+    {
+      "text": "Shows confirmation plan before executing",
+      "passed": true,
+      "evidence": "Key Skill Principles Applied: 'Confirm before mutating (Steps 4-7): Each create command should be confirmed with the user before execution.'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "pass_rate": 0.83
+  }
+}

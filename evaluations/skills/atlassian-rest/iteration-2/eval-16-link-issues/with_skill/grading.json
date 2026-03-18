@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs link-types to discover available link type names",
+      "passed": true,
+      "evidence": "Step 1: 'jira.mjs link-types' -- 'Before creating any links, list the available link types to confirm the exact type names supported by this Jira instance. The SKILL.md explicitly instructs: \"List available link types first.\"'"
+    },
+    {
+      "text": "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+      "passed": true,
+      "evidence": "Step 2: 'jira.mjs link DO-100 DO-200 --type \"Blocks\"' -- 'This creates a link where DO-100 blocks DO-200.'"
+    },
+    {
+      "text": "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+      "passed": true,
+      "evidence": "Step 3: 'jira.mjs link DO-100 DO-50 --type \"relates to\"' -- 'This creates a symmetric \"relates to\" link between DO-100 and DO-50.'"
+    },
+    {
+      "text": "Uses jira.mjs link command for both operations",
+      "passed": true,
+      "evidence": "Both link operations use 'jira.mjs link': Step 2 'jira.mjs link DO-100 DO-200 --type \"Blocks\"' and Step 3 'jira.mjs link DO-100 DO-50 --type \"relates to\"'"
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 }
+}

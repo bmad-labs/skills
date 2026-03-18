@@ -1,0 +1,14 @@
+{
+  "eval_id": 35,
+  "eval_name": "sync-story-doc",
+  "prompt": "I have a story document at _bmad-output/user-story-2.md. Create a Jira story from it in OMPBLINK project and make sure the document gets updated with the Jira link.",
+  "assertions": [
+    "Uses sync.mjs link command (not jira.mjs create) for document-based creation",
+    "Passes --type story --project DO --create flags",
+    "Checks for field mapping file (memory/jira-story-field-mapping.json) before creating",
+    "If no mapping exists, runs sync.mjs setup-mapping or proceeds with defaults",
+    "The source document is updated with jira_ticket_id in frontmatter or [KEY] prefix in title",
+    "A sync state file is created in memory/sync-state/",
+    "If mapping has non-empty instructions field, prints them to stdout"
+  ]
+}

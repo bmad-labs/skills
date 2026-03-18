@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": true,
+      "evidence": "Skill References Used: 'workflows/sync-bmad-documents.md -- full sync workflow (Steps 1-9)' and 'references/sync-mapping-guide.md'"
+    },
+    {
+      "text": "Uses sync.mjs status to detect document type as 'prd' and target as 'confluence'",
+      "passed": true,
+      "evidence": "Step 2: 'node <skill-path>/scripts/sync.mjs status docs/prd/platform-prd.md' and Step 1 confirms 'PRD documents target Confluence (not Jira)'"
+    },
+    {
+      "text": "Asks the user which Confluence space to publish to",
+      "passed": true,
+      "evidence": "Step 3: 'ask the user: 1. Which Confluence space key? (e.g., TEAM, ENG, PROD)'"
+    },
+    {
+      "text": "Uses sync.mjs link with --type prd --space <KEY> --create",
+      "passed": true,
+      "evidence": "Step 3 Option A: 'node <skill-path>/scripts/sync.mjs link docs/prd/platform-prd.md --type prd --space <SPACE_KEY> --create'"
+    },
+    {
+      "text": "Confirms confluence_page_id was added to the document frontmatter",
+      "passed": true,
+      "evidence": "Step 3: 'Add confluence_page_id to the document's YAML frontmatter (or prefix the title with [PageID] if no frontmatter)'"
+    },
+    {
+      "text": "Content is converted from markdown to Confluence storage format (markdownToStorage)",
+      "passed": true,
+      "evidence": "Step 8: 'Convert each markdown section to Confluence storage format' and Key Decision 5: 'markdownToStorage transform -- Confluence uses HTML-based storage format, not markdown'"
+    }
+  ],
+  "summary": { "passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0 }
+}

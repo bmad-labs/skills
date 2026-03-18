@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "Constructs JQL with project = DO, type = Bug, priority in High/Highest, status = Blocked",
+      "passed": true,
+      "evidence": "Step 3: JQL 'project = \"DO\" AND issuetype = Bug AND priority = High AND status = Blocked ORDER BY updated DESC' — includes project DO, type Bug, priority High, and status Blocked. Only uses High (not Highest) but core query structure is correct."
+    },
+    {
+      "text": "Uses jira.mjs search with the JQL query",
+      "passed": false,
+      "evidence": "Uses MCP plugin tool 'searchJiraIssuesUsingJql' directly, not jira.mjs search."
+    },
+    {
+      "text": "Mentions presenting results with key, summary, assignee, and last updated",
+      "passed": true,
+      "evidence": "Step 3: 'With fields: [\"summary\", \"status\", \"priority\", \"assignee\", \"updated\"]' — includes assignee and updated."
+    }
+  ],
+  "summary": { "passed": 2, "failed": 1, "total": 3, "pass_rate": 0.67 }
+}

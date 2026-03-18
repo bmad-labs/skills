@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs edit command with --description flag",
+      "passed": true,
+      "evidence": "Step 3 shows: 'node .../jira.mjs edit DO-100 --description \"## Release Notes...\"'"
+    },
+    {
+      "text": "Description contains markdown heading (## syntax)",
+      "passed": true,
+      "evidence": "The --description argument starts with '## Release Notes'"
+    },
+    {
+      "text": "Description contains **bold** and *italic* inline formatting",
+      "passed": true,
+      "evidence": "Description contains '**critical performance improvements** and *new user-facing features*'"
+    },
+    {
+      "text": "Description contains a bullet list (- item syntax)",
+      "passed": true,
+      "evidence": "Description contains '- Upgraded authentication module to support OAuth 2.0' and two more - items"
+    },
+    {
+      "text": "Description contains a markdown table (| col | syntax)",
+      "passed": true,
+      "evidence": "Description contains '| Feature | Status | Owner |' table with 3 data rows"
+    },
+    {
+      "text": "Description contains a fenced code block (```js syntax)",
+      "passed": true,
+      "evidence": "Description contains '```javascript' fenced code block with releaseConfig"
+    },
+    {
+      "text": "marklassian converts the markdown to valid ADF — not raw markdown text rendered in Jira",
+      "passed": true,
+      "evidence": "'marklassian handles all the markdown-to-ADF conversion automatically' and 'the script's toAdf() function... Passes the normalized markdown through marklassian's markdownToAdf()'"
+    },
+    {
+      "text": "Literal \\n from shell arguments are converted to real newlines before ADF conversion",
+      "passed": true,
+      "evidence": "'Replaces literal \\n sequences (from shell arguments) with actual newline characters' and '\\n literal sequences in the shell string are converted to actual newlines by the toAdf() function before markdown parsing'"
+    }
+  ],
+  "summary": { "passed": 8, "failed": 0, "total": 8, "pass_rate": 1.0 }
+}

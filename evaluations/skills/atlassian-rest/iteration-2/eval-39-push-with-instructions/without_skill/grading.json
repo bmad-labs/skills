@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads field mapping from memory/jira-epic-field-mapping.json",
+      "passed": true,
+      "evidence": "Step 2: 'cat memory/jira-epic-field-mapping.json' -- the approach describes locating and reading the mapping config file."
+    },
+    {
+      "text": "Prints mapping instructions to stdout (the 'Always add label qa-review...' text)",
+      "passed": true,
+      "evidence": "Step 2: 'The agent must print the instructions to stdout so the user can see them: Mapping instructions: \"Always add label qa-review and set component to Backend\"'"
+    },
+    {
+      "text": "The agent reads and follows the instructions from the mapping config",
+      "passed": true,
+      "evidence": "Step 3: 'The agent must interpret the natural language instructions from the config' with detailed breakdown of each instruction."
+    },
+    {
+      "text": "Push operation includes the label 'qa-review' and component 'Backend' as instructed",
+      "passed": true,
+      "evidence": "Step 7: 'labels: [\"qa-review\"]' and 'components: [{\"name\": \"Backend\"}]' from mapping instructions. Step 9 shows 'labels: Added \"qa-review\"' and 'components: Set to \"Backend\"'"
+    },
+    {
+      "text": "Standard field mappings are also applied (summary, description, etc.)",
+      "passed": true,
+      "evidence": "Step 4 mapping table shows summary, description mapped. Step 7 includes summary and description in the create/edit call."
+    },
+    {
+      "text": "Reports push results showing which fields were updated",
+      "passed": true,
+      "evidence": "Step 9 shows detailed push results with field-level reporting: summary, description, labels, components."
+    }
+  ],
+  "summary": { "passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0 }
+}

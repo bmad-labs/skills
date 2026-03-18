@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": false,
+      "evidence": "States 'I cannot complete this task' and explicitly notes 'This baseline evaluation explicitly excludes using the skill or its scripts.'"
+    },
+    {
+      "text": "Uses sync.mjs status to verify the document is linked to PROJ-100",
+      "passed": false,
+      "evidence": "Mentions sync.mjs status only in the 'Alternative Approaches Considered' section as something the skill would do, not what was actually done"
+    },
+    {
+      "text": "Uses sync.mjs pull to fetch remote changes",
+      "passed": false,
+      "evidence": "Mentions sync.mjs pull only as an alternative approach: 'node skills/atlassian-rest/scripts/sync.mjs pull docs/epics/platform-epic.md' under 'Using the Atlassian Skill's sync.mjs Script' section, not actually used"
+    },
+    {
+      "text": "Reports which sections/fields were updated in the local document",
+      "passed": false,
+      "evidence": "Step 6 describes what a report would look like but explicitly states 'Blocker: No Jira API token or user credentials are available' -- no actual update or report was produced"
+    },
+    {
+      "text": "For epic docs, handles child story tickets if any exist remotely",
+      "passed": false,
+      "evidence": "Step 4 describes fetching child stories via JQL but marks it as 'Blocker: Same authentication blocker as Step 2' -- not actually handled"
+    }
+  ],
+  "summary": { "passed": 0, "failed": 5, "total": 5, "pass_rate": 0.0 }
+}

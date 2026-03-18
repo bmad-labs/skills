@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Loads search-company-knowledge sub-skill",
+      "passed": true,
+      "evidence": "Workflow Used: workflows/search-company-knowledge.md -- a 5-step workflow for searching across Jira and Confluence to find and synthesize information."
+    },
+    {
+      "text": "Searches Confluence for documentation pages about authentication/login/OAuth",
+      "passed": true,
+      "evidence": "confluence.mjs search 'text ~ \"authentication\" AND type = page' --max 10, confluence.mjs search 'text ~ \"login\" AND type = page' --max 10, confluence.mjs search 'text ~ \"OAuth\" AND type = page' --max 10"
+    },
+    {
+      "text": "Searches Jira for related issues or bugs",
+      "passed": true,
+      "evidence": "jira.mjs search 'project = DO AND text ~ \"authentication\"' --max 10 and multiple other Jira searches including specific bug search: jira.mjs search 'project = DO AND issuetype = Bug AND text ~ \"authentication\" ORDER BY updated DESC' --max 10"
+    },
+    {
+      "text": "Uses both confluence.mjs search and jira.mjs search",
+      "passed": true,
+      "evidence": "Step 2 shows 3 confluence.mjs search commands and 5 jira.mjs search commands"
+    },
+    {
+      "text": "Plans to fetch full content from top results",
+      "passed": true,
+      "evidence": "Step 3: Fetch Details -- 'fetch full content for the top 3-5 most relevant results from each platform' using confluence.mjs get-page <pageId> and jira.mjs get <issueKey>"
+    },
+    {
+      "text": "Synthesizes information from multiple sources with citations",
+      "passed": true,
+      "evidence": "Step 4: Synthesize -- 'Summarize key findings', 'Cite sources -- include Confluence page titles with links and Jira issue keys with links'"
+    },
+    {
+      "text": "References search-patterns.md or query-languages.md",
+      "passed": true,
+      "evidence": "Reference Files Consulted: references/search-patterns.md and references/query-languages.md"
+    }
+  ],
+  "summary": { "passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0 }
+}

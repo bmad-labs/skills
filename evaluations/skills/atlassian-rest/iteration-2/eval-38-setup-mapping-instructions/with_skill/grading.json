@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Uses sync.mjs setup-mapping --type epic --sample DO-100",
+      "passed": true,
+      "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses --sample DO-100, not OMPBLINK-100. Step 3: 'node <skill-path>/scripts/sync.mjs setup-mapping --type epic --sample DO-100'"
+    },
+    {
+      "text": "Generated mapping JSON includes 'instructions' field (empty string by default)",
+      "passed": true,
+      "evidence": "Step 5 shows the instructions field in the mapping JSON. The approach describes adding the instructions field to the generated mapping, and the schema shows it as a top-level property."
+    },
+    {
+      "text": "User's custom instructions are added to the instructions field",
+      "passed": true,
+      "evidence": "Step 5: '\"instructions\": \"Always set priority to High and add label team-oms\"'"
+    },
+    {
+      "text": "Mapping is saved to memory/jira-epic-field-mapping.json",
+      "passed": true,
+      "evidence": "Step 3: 'Save the mapping to <skill-path>/memory/jira-epic-field-mapping.json'"
+    },
+    {
+      "text": "Auto-detects standard fields (summary, description) from the sample ticket",
+      "passed": true,
+      "evidence": "Step 3: 'Auto-identify field meanings by name and type (summary, description, custom fields...)' and mapping JSON shows summary and description field mappings."
+    },
+    {
+      "text": "Custom fields are flagged with _needsReview for user confirmation",
+      "passed": false,
+      "evidence": "The approach mentions 'Allow corrections to... Custom field IDs' in Step 4 but does not explicitly mention the _needsReview flag in the generated mapping output."
+    },
+    {
+      "text": "The instructions field value is: 'Always set priority to High and add label team-oms'",
+      "passed": true,
+      "evidence": "Step 5: '\"instructions\": \"Always set priority to High and add label team-oms\"'"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "total": 7,
+    "pass_rate": 0.86
+  }
+}

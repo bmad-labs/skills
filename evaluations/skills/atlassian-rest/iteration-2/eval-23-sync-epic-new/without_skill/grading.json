@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": false,
+      "evidence": "Does not load any sub-skill file. States 'no sync sub-skill, no sync.mjs helper script, no sync-mapping-guide.md'."
+    },
+    {
+      "text": "Uses sync.mjs status to check the document's current state",
+      "passed": false,
+      "evidence": "Does not use sync.mjs. States 'Without a skill, the agent has no sync.mjs status command.' Instead manually inspects frontmatter."
+    },
+    {
+      "text": "Detects or confirms the document type as 'epic'",
+      "passed": true,
+      "evidence": "Step 2: 'the agent reasons from directory naming conventions that this is an \"epic\" document and should be synced as a Jira Epic issue type.'"
+    },
+    {
+      "text": "Asks the user which Jira project to sync to",
+      "passed": true,
+      "evidence": "Step 3: 'I see this is an epic document... Which Jira project should I sync it to?'"
+    },
+    {
+      "text": "Asks whether to create a new epic or link to an existing one",
+      "passed": true,
+      "evidence": "Step 4: 'Should I create a new Epic in the DO project, or link it to an existing Epic ticket?'"
+    },
+    {
+      "text": "Uses sync.mjs link with appropriate flags (--type epic --project <KEY> --create or --ticket <KEY>)",
+      "passed": false,
+      "evidence": "Does not use sync.mjs. Uses MCP tool 'createJiraIssue' instead. States 'A skill would use sync.mjs link --type epic --project DO --create' but this is hypothetical."
+    },
+    {
+      "text": "Confirms that jira_ticket_id was added to the document frontmatter",
+      "passed": true,
+      "evidence": "Step 8: 'the agent should update docs/epics/auth-epic.md to add the Jira ticket reference in the YAML frontmatter: jira_ticket_id: DO-50'"
+    },
+    {
+      "text": "References sync-mapping-guide.md if field mapping is needed",
+      "passed": false,
+      "evidence": "Does not reference sync-mapping-guide.md. States 'Without a sync-mapping-guide.md reference, the agent must guess the mapping.'"
+    }
+  ],
+  "summary": { "passed": 4, "failed": 4, "total": 8, "pass_rate": 0.5 }
+}

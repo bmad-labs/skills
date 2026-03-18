@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs create-page with --space TEAM",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Uses raw curl commands. States 'No confluence.mjs script' under barriers."
+    },
+    {
+      "text": "The --body content includes markdown formatting",
+      "passed": false,
+      "evidence": "The approach describes writing markdown content but acknowledges it cannot be used directly. The actual REST call requires storage format XHTML, not markdown."
+    },
+    {
+      "text": "Code blocks are converted to <ac:structured-macro ac:name=\"code\"> Confluence macros",
+      "passed": true,
+      "evidence": "The manually constructed storage format includes '<ac:structured-macro ac:name=\"code\">' with CDATA wrapping."
+    },
+    {
+      "text": "The ac:structured-macro includes <ac:parameter ac:name=\"language\">python</ac:parameter>",
+      "passed": true,
+      "evidence": "Storage format includes '<ac:parameter ac:name=\"language\">python</ac:parameter>'"
+    },
+    {
+      "text": "Headings are converted to <h1>-<h6> HTML tags",
+      "passed": true,
+      "evidence": "Storage format includes '<h1>', '<h2>', '<h3>' tags."
+    },
+    {
+      "text": "Bullet lists are converted to <ul><li> HTML",
+      "passed": true,
+      "evidence": "Storage format includes '<ul><li>' structures."
+    },
+    {
+      "text": "Ordered lists are converted to <ol><li> HTML",
+      "passed": true,
+      "evidence": "Storage format includes '<ol><li>' for the token steps."
+    },
+    {
+      "text": "marked library handles the conversion (toStorageFormat uses marked, not custom parser)",
+      "passed": false,
+      "evidence": "The approach explicitly states 'Without the marked-based conversion in confluence-format.mjs, the agent would need to manually author the full Confluence storage format XHTML.' The marked library is not used."
+    }
+  ],
+  "summary": { "passed": 5, "failed": 3, "total": 8, "pass_rate": 0.625 }
+}

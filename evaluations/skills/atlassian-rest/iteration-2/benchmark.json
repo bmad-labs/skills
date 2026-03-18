@@ -1,0 +1,3792 @@
+{
+  "metadata": {
+    "skill_name": "atlassian-rest",
+    "skill_path": "/Users/tannt/Works/GIT/Personal/Sources/bmad-skills/skills/atlassian-rest",
+    "timestamp": "2026-03-18T11:30:00Z",
+    "evals_run": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "get-issue",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs get command (not search) to fetch the specific issue",
+          "passed": true,
+          "evidence": "Step 2: 'node .../jira.mjs get DO-123 --fields status,assignee,priority' \u2014 uses get command, not search."
+        },
+        {
+          "text": "References DO-123 as the issue key in the command",
+          "passed": true,
+          "evidence": "Step 2: 'jira.mjs get DO-123 --fields status,assignee,priority' \u2014 uses DO-123 as the issue key throughout."
+        },
+        {
+          "text": "Mentions presenting status, assignee, and priority fields to the user",
+          "passed": true,
+          "evidence": "Step 3 and Step 4: 'Status: Found at fields.status.name ... Assignee: Found at fields.assignee.displayName ... Priority: Found at fields.priority.name' and presents example output with all three fields."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "get-issue",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs get command (not search) to fetch the specific issue",
+          "passed": false,
+          "evidence": "Uses raw curl commands against the REST API directly (curl -s -u ... /rest/api/3/issue/DO-123), not jira.mjs get."
+        },
+        {
+          "text": "References DO-123 as the issue key in the command",
+          "passed": true,
+          "evidence": "Multiple references to DO-123 throughout, e.g. 'GET https://wnesolutions.atlassian.net/rest/api/3/issue/DO-123?fields=status,assignee,priority'"
+        },
+        {
+          "text": "Mentions presenting status, assignee, and priority fields to the user",
+          "passed": true,
+          "evidence": "Step 3/4: 'Status: .fields.status.name ... Assignee: .fields.assignee.displayName ... Priority: .fields.priority.name' and shows formatted output with all three fields."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "create-bug",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+          "passed": true,
+          "evidence": "Step 4: \"node .../jira.mjs lookup-user \"Sarah Chen\"\" -- explicitly looks up the account ID before the create command."
+        },
+        {
+          "text": "Uses jira.mjs create with --project DO --type Bug",
+          "passed": true,
+          "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses --project DO instead of --project PLATFORM as specified in the prompt. The project was changed to match the actual Jira instance."
+        },
+        {
+          "text": "Includes --priority High in the create command",
+          "passed": true,
+          "evidence": "The create command includes \"--priority High\"."
+        },
+        {
+          "text": "Includes --labels flag with backend and urgent",
+          "passed": true,
+          "evidence": "The create command includes \"--labels \"backend,urgent\"\"."
+        },
+        {
+          "text": "Includes --assignee with the looked-up account ID (not a name)",
+          "passed": true,
+          "evidence": "\"--assignee <accountId>\" with note \"Replace <accountId> with the actual account ID retrieved in Step 4.\""
+        },
+        {
+          "text": "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+          "passed": true,
+          "evidence": "Summary: \"Fix login endpoint timeout when user has more than 50 active sessions\" -- concise and descriptive, follows Verb + Object + Context pattern from ticket-writing-guide.md."
+        },
+        {
+          "text": "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+          "passed": true,
+          "evidence": "Description includes \"times out after 30 seconds when the authenticating user has more than 50 active sessions\" and detailed Steps to Reproduce, Expected/Actual Behavior sections."
+        },
+        {
+          "text": "Shows a confirmation step before creating the ticket",
+          "passed": true,
+          "evidence": "Step 6: \"Per the skill principle 'confirm before mutating,' present the full ticket details to the user... Ask: 'I'm about to create this bug ticket in DO. Does everything look correct?'\""
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "create-bug",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.38,
+        "passed": 3,
+        "failed": 5,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+          "passed": false,
+          "evidence": "Uses raw curl API call to /rest/api/3/user/search?query=Sarah%20Chen instead of jira.mjs lookup-user."
+        },
+        {
+          "text": "Uses jira.mjs create with --project DO --type Bug",
+          "passed": false,
+          "evidence": "Uses raw curl POST to /rest/api/3/issue with JSON body containing project.key: DO and issuetype.name: Bug, not jira.mjs create."
+        },
+        {
+          "text": "Includes --priority High in the create command",
+          "passed": false,
+          "evidence": "Does not use --priority flag; sets priority via JSON body \"priority\": {\"name\": \"High\"} in a curl command, not jira.mjs."
+        },
+        {
+          "text": "Includes --labels flag with backend and urgent",
+          "passed": false,
+          "evidence": "Does not use --labels flag; sets labels via JSON body \"labels\": [\"backend\", \"urgent\"] in a curl command."
+        },
+        {
+          "text": "Includes --assignee with the looked-up account ID (not a name)",
+          "passed": false,
+          "evidence": "Uses JSON body \"assignee\": {\"accountId\": \"<SARAH_CHEN_ACCOUNT_ID>\"} in a curl command, not --assignee flag with jira.mjs."
+        },
+        {
+          "text": "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+          "passed": true,
+          "evidence": "Summary: '[Login API] Timeout after 30s - Users with 50+ active sessions cannot log in' \u2014 follows [Component] [Error] - [Symptom] pattern."
+        },
+        {
+          "text": "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+          "passed": true,
+          "evidence": "ADF description mentions 'timing out after 30 seconds' and 'more than 50 active sessions' with Steps to Reproduce and Expected/Actual Behavior sections."
+        },
+        {
+          "text": "Shows a confirmation step before creating the ticket",
+          "passed": true,
+          "evidence": "Step 2: 'Before executing the create call, confirm the following with the user' with a table of all field values."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "meeting-notes",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the capture-tasks-from-meeting-notes sub-skill file",
+          "passed": true,
+          "evidence": "\"the atlassian-rest skill, specifically the Capture Tasks from Meeting Notes workflow (workflows/capture-tasks-from-meeting-notes.md)\""
+        },
+        {
+          "text": "Extracts at least 4 action items from the notes",
+          "passed": true,
+          "evidence": "Extracted 5 action items: Sarah (payment integration), Mike (CI pipeline), Lisa (API docs), Unassigned (deployment runbook), John (memory leak)."
+        },
+        {
+          "text": "Identifies Sarah, Mike, and Lisa as assignees",
+          "passed": true,
+          "evidence": "All three identified in the extraction table and lookup commands: \"jira.mjs lookup-user \"Sarah\"\", \"jira.mjs lookup-user \"Mike\"\", \"jira.mjs lookup-user \"Lisa\"\"."
+        },
+        {
+          "text": "Uses jira.mjs lookup-user for each unique assignee",
+          "passed": true,
+          "evidence": "Step 4 shows lookup-user calls for Sarah, Mike, Lisa, and John."
+        },
+        {
+          "text": "Presents a table or list of extracted tasks for user confirmation before creating",
+          "passed": true,
+          "evidence": "Step 5: Presents a confirmation table with columns: #, Assignee, Summary, Priority, Due Date. States \"Do not proceed until explicit confirmation.\""
+        },
+        {
+          "text": "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+          "passed": true,
+          "evidence": "Step 6 shows 5 separate jira.mjs create commands with --project DO --type Task --summary --description --assignee --priority flags for each task."
+        },
+        {
+          "text": "References action-item-patterns.md or ticket-writing-guide.md",
+          "passed": true,
+          "evidence": "\"references/action-item-patterns.md -- Used extraction patterns for name/priority/due date parsing\" and \"references/ticket-writing-guide.md -- Applied 'Verb + Object + Context' summary format\"."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "meeting-notes",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.29,
+        "passed": 2,
+        "failed": 5,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the capture-tasks-from-meeting-notes sub-skill file",
+          "passed": false,
+          "evidence": "Explicitly states: \"Without the atlassian-rest skill, there is no structured workflow (e.g., capture-tasks-from-meeting-notes) to guide action item extraction.\""
+        },
+        {
+          "text": "Extracts at least 4 action items from the notes",
+          "passed": true,
+          "evidence": "Extracted 5 action items in the table: Sarah (payment integration), Mike (CI pipeline tests), Lisa (API docs), Unassigned (deployment runbook), John (memory leak)."
+        },
+        {
+          "text": "Identifies Sarah, Mike, and Lisa as assignees",
+          "passed": true,
+          "evidence": "All three identified as assignees. User lookups attempted: Sarah found as Sarah (Minjung) Kang, Mike found 2 matches, Lisa found as lisa.xu."
+        },
+        {
+          "text": "Uses jira.mjs lookup-user for each unique assignee",
+          "passed": false,
+          "evidence": "Uses MCP plugin lookupJiraAccountId, not jira.mjs lookup-user. States: \"Without jira.mjs or similar helper scripts, there is no streamlined way.\""
+        },
+        {
+          "text": "Presents a table or list of extracted tasks for user confirmation before creating",
+          "passed": false,
+          "evidence": "Lists proposed tickets but notes the task \"cannot be completed\" due to wrong instance. No actual confirmation step was performed -- just a proposed ticket breakdown."
+        },
+        {
+          "text": "Uses jira.mjs create for each confirmed task with --parent or appropriate flags",
+          "passed": false,
+          "evidence": "Proposes using createJiraIssue MCP tool, not jira.mjs create. Task could not be completed due to wrong Atlassian instance access."
+        },
+        {
+          "text": "References action-item-patterns.md or ticket-writing-guide.md",
+          "passed": false,
+          "evidence": "Does not reference these files. Mentions in \"What the Atlassian Skill Would Provide\" section that the skill would provide these references, confirming they were not used."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "messy-notes",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the capture-tasks-from-meeting-notes sub-skill",
+          "passed": true,
+          "evidence": "\"Workflow: workflows/capture-tasks-from-meeting-notes.md -- Followed the 7-step process.\""
+        },
+        {
+          "text": "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+          "passed": true,
+          "evidence": "All three extracted: Sarah - \"Finish PRD for the new dashboard feature\", John - \"Investigate flaky tests on auth module\", Mike - \"Implement Stripe webhook integration\"."
+        },
+        {
+          "text": "Identifies the unassigned API docs task and asks the user about it",
+          "passed": true,
+          "evidence": "Item 4 identified as \"Unassigned\" with note \"'someone' and 'nobody volunteered' explicitly indicate no owner\". Confirmation step asks user to \"Decide on assignee for task #4 (API docs -- nobody volunteered)\"."
+        },
+        {
+          "text": "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+          "passed": true,
+          "evidence": "Parsing analysis shows four patterns: \"sarah - needs to\" matched as name needs to action, \"John said he'd\" as implicit ownership, \"@mike will\" as @name will action, \"someone should\" as unassigned."
+        },
+        {
+          "text": "Presents extracted tasks for confirmation before creating",
+          "passed": true,
+          "evidence": "Step 5 presents a confirmation table with all 4 tasks. States: \"User confirmation required before proceeding. The workflow explicitly states: 'Do not proceed until the user explicitly confirms.'\""
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "messy-notes",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the capture-tasks-from-meeting-notes sub-skill",
+          "passed": false,
+          "evidence": "Explicitly states: \"I cannot complete this task. Without Atlassian skill/plugin access or API credentials...\" No sub-skill loaded."
+        },
+        {
+          "text": "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+          "passed": true,
+          "evidence": "All three extracted in the table: Sarah - \"Finish PRD for new dashboard feature\", John - \"Investigate flaky tests on auth module\", Mike - \"Handle Stripe webhook integration\"."
+        },
+        {
+          "text": "Identifies the unassigned API docs task and asks the user about it",
+          "passed": true,
+          "evidence": "Item 4 identified as Unassigned. Step 2 says: \"Flag this to the user... 'The API docs update task has no assignee. Would you like to assign it to someone, leave it unassigned, or skip creating this ticket?'\""
+        },
+        {
+          "text": "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+          "passed": true,
+          "evidence": "Pattern types identified: \"name - verb phrase\", \"Name said he'd verb\", \"@name will verb\", \"Unassigned / passive\". Notes mixed capitalization and different attribution patterns."
+        },
+        {
+          "text": "Presents extracted tasks for confirmation before creating",
+          "passed": true,
+          "evidence": "Step 4: \"Before creating any tickets, I would present the full list above to the user and ask: '1. I extracted 4 action items from your meeting notes. Here they are -- please confirm or adjust before I create the tickets.'\""
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "status-report",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the generate-status-report sub-skill file",
+          "passed": true,
+          "evidence": "\"following the workflows/generate-status-report.md workflow\" -- explicitly loaded and followed the 5-step workflow."
+        },
+        {
+          "text": "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+          "passed": true,
+          "evidence": "Runs 4 JQL queries: 3a (completed/Done), 3b (In Progress), 3c (Blocked), 3d (newly created)."
+        },
+        {
+          "text": "Uses jira.mjs search with project = DO",
+          "passed": true,
+          "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses jira.mjs search but with project = DO instead of project = PHOENIX as specified in the prompt."
+        },
+        {
+          "text": "Formats a report with sections (metrics, highlights, blockers, or similar)",
+          "passed": true,
+          "evidence": "Report includes: Executive Summary, Completed Work, In Progress, Blockers & Risks, Upcoming Work, and Metrics sections."
+        },
+        {
+          "text": "Uses confluence.mjs create-page to publish to the ENG space",
+          "passed": true,
+          "evidence": "Step 8: \"confluence.mjs create-page --space ENG --title 'Weekly Status Report - DO - 2026-03-18' --body-file /tmp/do-status-report-body.html\""
+        },
+        {
+          "text": "Includes a date in the page title",
+          "passed": true,
+          "evidence": "Title: \"Weekly Status Report - DO - 2026-03-18\" includes the date."
+        },
+        {
+          "text": "References report-templates.md or jql-patterns.md",
+          "passed": true,
+          "evidence": "\"references to references/report-templates.md, references/jql-patterns.md, and references/confluence-formatting.md\" -- both referenced."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "status-report",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.29,
+        "passed": 2,
+        "failed": 5,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the generate-status-report sub-skill file",
+          "passed": false,
+          "evidence": "No sub-skill file loaded. States: 'No specialized skill, helper scripts, report templates, or JQL pattern references were used.'"
+        },
+        {
+          "text": "Runs at least 3 different JQL queries (completed, in-progress, blocked)",
+          "passed": true,
+          "evidence": "Ran 6 JQL queries including completed (statusCategory = Done AND resolved >= -7d), in-progress (statusCategory = In Progress), blocked (status = Blocked OR priority = Blocker), newly created, open bugs, and all non-done."
+        },
+        {
+          "text": "Uses jira.mjs search with project = DO",
+          "passed": false,
+          "evidence": "Uses MCP plugin searchJiraIssuesUsingJql, not jira.mjs search. States 'Tools Used (MCP Atlassian Plugin \u2014 No Skill)'."
+        },
+        {
+          "text": "Formats a report with sections (metrics, highlights, blockers, or similar)",
+          "passed": false,
+          "evidence": "No report was actually generated. The approach describes what would have been done but all queries returned 0 results due to wrong instance. Proposed sections listed but not produced."
+        },
+        {
+          "text": "Uses confluence.mjs create-page to publish to the ENG space",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Proposes using createConfluencePage MCP tool but could not execute because ENG space does not exist on the accessible instance."
+        },
+        {
+          "text": "Includes a date in the page title",
+          "passed": true,
+          "evidence": "Proposed title: 'Weekly Status Report - DO - 2026-03-18' includes the date."
+        },
+        {
+          "text": "References report-templates.md or jql-patterns.md",
+          "passed": false,
+          "evidence": "Does not reference these files. Notes in barriers: 'No skill/templates available \u2014 No pre-built report templates, JQL pattern references.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "daily-standup",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Queries focus on last 24 hours (not 7 days)",
+          "passed": true,
+          "evidence": "All time-based queries use 24h scope: \"startOfDay(-1), now()\" and \"created >= \\\"-1d\\\"\". Explicitly states adaptation from 7d to 1d: \"date range = last 24h (-1d / startOfDay(-1))\""
+        },
+        {
+          "text": "Uses a compact standup format (done/doing/blocked or similar)",
+          "passed": true,
+          "evidence": "Output format uses classic standup sections: \"Done Since Yesterday\", \"Status Changes (Last 24h)\", \"Blocked\", \"In Progress Today\", \"Up Next (Sprint Backlog)\", \"New Issues (Last 24h)\" with compact tables and one-line metrics footer."
+        },
+        {
+          "text": "Does NOT use confluence.mjs create-page or update-page",
+          "passed": true,
+          "evidence": "Section 4 explicitly states: \"Step 5 of workflows/generate-status-report.md is skipped entirely. No confluence.mjs commands are invoked.\""
+        },
+        {
+          "text": "Presents results directly rather than publishing",
+          "passed": true,
+          "evidence": "\"The report is rendered as markdown directly in the conversation (Step 4)\" and \"Present to user for review (no Confluence publishing)\"."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "daily-standup",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Queries focus on last 24 hours (not 7 days)",
+          "passed": true,
+          "evidence": "All queries use 24h scope: \"startOfDay(-1), now()\" for status changes, and mentions \"last 24 hours\" throughout. No 7-day queries present."
+        },
+        {
+          "text": "Uses a compact standup format (done/doing/blocked or similar)",
+          "passed": true,
+          "evidence": "Proposed output format has compact sections: \"Done Since Yesterday\", \"Status Changes (Last 24h)\", \"Blocked\", \"In Progress Today\", \"Up Next (Sprint Backlog)\" with tables and one-line metrics footer."
+        },
+        {
+          "text": "Does NOT use confluence.mjs create-page or update-page",
+          "passed": true,
+          "evidence": "Step 5: \"The report is rendered as markdown directly to the user. No Confluence page creation or update is performed.\""
+        },
+        {
+          "text": "Presents results directly rather than publishing",
+          "passed": true,
+          "evidence": "\"This respects the explicit instruction to not publish.\" Results presented directly as markdown."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "triage-timeout",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.88,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the triage-issue sub-skill file",
+          "passed": true,
+          "evidence": "\"Primary workflow: workflows/triage-issue.md -- the 'Triage Issue' workflow for bug reports with duplicate detection.\""
+        },
+        {
+          "text": "Extracts error signature, component (payment), and symptom (checkout failing)",
+          "passed": true,
+          "evidence": "Table shows: Error signature = \"Connection timeout\", Component = \"Payment service\", User-facing symptom = \"Checkout fails\"."
+        },
+        {
+          "text": "Runs at least 2 different search queries with different JQL strategies",
+          "passed": true,
+          "evidence": "Runs 6 different search strategies: by error message text, by component, by summary keywords, broader keyword combinations (2 queries), time-scoped recent bugs, plus a Confluence CQL search."
+        },
+        {
+          "text": "Searches for both open and resolved issues",
+          "passed": true,
+          "evidence": "Strategy 1 searches all bugs (no status filter). Strategy 2 filters to open (statusCategory != Done). Strategy 5 searches recent bugs regardless of status. Analysis includes checking resolved issues as \"Possible regression\"."
+        },
+        {
+          "text": "Presents findings with confidence/similarity assessment",
+          "passed": true,
+          "evidence": "Presentation format shows assessment labels: \"LIKELY DUPLICATE\", \"POSSIBLE REGRESSION\", \"LIKELY RELATED\". Each match rated as exact duplicate, likely related, possible regression, or unrelated."
+        },
+        {
+          "text": "Offers options: create new, comment on existing, or show more details",
+          "passed": true,
+          "evidence": "Section 5 presents: \"Would you like me to: (a) Add a comment to DO-XXX... (b) Create a new bug ticket and link it... (c) Create a brand new standalone bug ticket?\" Plus Option D for regression reopening."
+        },
+        {
+          "text": "Asks which project if not specified, or searches broadly",
+          "passed": false,
+          "evidence": "The approach assumes project DO without asking. No evidence of asking about which project or searching broadly across projects."
+        },
+        {
+          "text": "References bug-report-templates.md",
+          "passed": true,
+          "evidence": "\"Summary follows references/bug-report-templates.md format\" and \"Description follows the 'Standard Bug Template' structure from references/bug-report-templates.md.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "triage-timeout",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.63,
+        "passed": 5,
+        "failed": 3,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the triage-issue sub-skill file",
+          "passed": false,
+          "evidence": "No triage-issue sub-skill loaded. States: \"Unable to complete\" and relies on MCP plugin tools, not skill workflows."
+        },
+        {
+          "text": "Extracts error signature, component (payment), and symptom (checkout failing)",
+          "passed": true,
+          "evidence": "Identifies: \"Connection timeout\" errors, \"payment service\" component, and \"checkout\" as the affected flow throughout the approach."
+        },
+        {
+          "text": "Runs at least 2 different search queries with different JQL strategies",
+          "passed": true,
+          "evidence": "Ran three parallel JQL searches: open issues matching timeout/connection timeout, resolved issues for regression check, and payment-related issues with error/timeout/checkout terms."
+        },
+        {
+          "text": "Searches for both open and resolved issues",
+          "passed": true,
+          "evidence": "Step 1 searches open issues (status NOT IN Done/Closed), Step 2 explicitly searches resolved issues for regression check (status IN Done/Closed/Resolved AND resolved >= -90d)."
+        },
+        {
+          "text": "Presents findings with confidence/similarity assessment",
+          "passed": true,
+          "evidence": "Step 4 describes assessment categories: \"High confidence duplicate\", \"Related but different\" with instructions to assess each match."
+        },
+        {
+          "text": "Offers options: create new, comment on existing, or show more details",
+          "passed": true,
+          "evidence": "Step 4 offers: high confidence duplicate -> add comment, related but different -> link and file new, no matches -> create new bug. Step 5 shows creating a new bug. Step 6 mentions linking."
+        },
+        {
+          "text": "Asks which project if not specified, or searches broadly",
+          "passed": false,
+          "evidence": "Assumes project DO without asking. Does not search broadly or ask which project to use."
+        },
+        {
+          "text": "References bug-report-templates.md",
+          "passed": false,
+          "evidence": "Does not reference bug-report-templates.md. The description is structured but not attributed to any reference document."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "triage-npe",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads triage-issue sub-skill",
+          "passed": true,
+          "evidence": "\"Following the workflows/triage-issue.md workflow with reference to references/bug-report-templates.md and references/jql-patterns.md.\""
+        },
+        {
+          "text": "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+          "passed": true,
+          "evidence": "Search 2a: text ~ \"NullPointerException UserService getProfile\". Search 2b: text ~ \"UserService\". Search 2c: summary ~ \"NullPointerException\". Search 2e: text ~ \"getProfile\". All three elements covered across multiple queries."
+        },
+        {
+          "text": "Includes DO project in JQL",
+          "passed": true,
+          "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses project = DO in all JQL queries, not BACKEND as specified in the prompt."
+        },
+        {
+          "text": "Checks for resolved similar issues (regression detection)",
+          "passed": true,
+          "evidence": "Analysis criteria include: \"Status: Open = likely duplicate; Resolved = possible regression; Closed = may be different issue\". Option C explicitly handles regression: \"Create New Ticket and Link as Regression\" with comment noting regression of DO-78."
+        },
+        {
+          "text": "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual",
+          "passed": true,
+          "evidence": "Option A create command uses structured description with: \"## Error\", \"## Where\" (component), \"## Stack Trace\", \"## Trigger\" (steps), \"## Frequency\", \"## Severity\" sections. Follows Error Message Bug Template from bug-report-templates.md."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "triage-npe",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads triage-issue sub-skill",
+          "passed": false,
+          "evidence": "Explicitly states: 'Without the Atlassian REST skill, there are no helper scripts or sub-skills (e.g., triage-issue workflow, JQL pattern references, bug-report templates) available.'"
+        },
+        {
+          "text": "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+          "passed": true,
+          "evidence": "Search A: text ~ 'NullPointerException UserService getProfile'. Search B: text ~ 'UserService'. Search C: text ~ 'null' AND text ~ 'getProfile'. All three elements covered."
+        },
+        {
+          "text": "Includes DO project in JQL",
+          "passed": true,
+          "evidence": "All JQL queries include 'project = DO', e.g. 'project = DO AND issuetype = Bug AND text ~ \"NullPointerException UserService getProfile\"'."
+        },
+        {
+          "text": "Checks for resolved similar issues (regression detection)",
+          "passed": true,
+          "evidence": "Step 2: 'Check for Regressions' with JQL: 'project = DO AND issuetype = Bug AND text ~ \"NullPointerException UserService\" AND statusCategory = Done'. Notes: 'flag it as a potential regression and consider reopening.'"
+        },
+        {
+          "text": "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual",
+          "passed": true,
+          "evidence": "Step 3 description includes: '## Error', '## Component' (Backend - UserService), '## Steps to Reproduce', '## Expected Behavior', '## Actual Behavior', '## Root Cause Analysis' sections."
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "search-auth",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads search-company-knowledge sub-skill",
+          "passed": true,
+          "evidence": "Workflow Used: workflows/search-company-knowledge.md -- a 5-step workflow for searching across Jira and Confluence to find and synthesize information."
+        },
+        {
+          "text": "Searches Confluence for documentation pages about authentication/login/OAuth",
+          "passed": true,
+          "evidence": "confluence.mjs search 'text ~ \"authentication\" AND type = page' --max 10, confluence.mjs search 'text ~ \"login\" AND type = page' --max 10, confluence.mjs search 'text ~ \"OAuth\" AND type = page' --max 10"
+        },
+        {
+          "text": "Searches Jira for related issues or bugs",
+          "passed": true,
+          "evidence": "jira.mjs search 'project = DO AND text ~ \"authentication\"' --max 10 and multiple other Jira searches including specific bug search: jira.mjs search 'project = DO AND issuetype = Bug AND text ~ \"authentication\" ORDER BY updated DESC' --max 10"
+        },
+        {
+          "text": "Uses both confluence.mjs search and jira.mjs search",
+          "passed": true,
+          "evidence": "Step 2 shows 3 confluence.mjs search commands and 5 jira.mjs search commands"
+        },
+        {
+          "text": "Plans to fetch full content from top results",
+          "passed": true,
+          "evidence": "Step 3: Fetch Details -- 'fetch full content for the top 3-5 most relevant results from each platform' using confluence.mjs get-page <pageId> and jira.mjs get <issueKey>"
+        },
+        {
+          "text": "Synthesizes information from multiple sources with citations",
+          "passed": true,
+          "evidence": "Step 4: Synthesize -- 'Summarize key findings', 'Cite sources -- include Confluence page titles with links and Jira issue keys with links'"
+        },
+        {
+          "text": "References search-patterns.md or query-languages.md",
+          "passed": true,
+          "evidence": "Reference Files Consulted: references/search-patterns.md and references/query-languages.md"
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "search-auth",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.57,
+        "passed": 4,
+        "failed": 3,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads search-company-knowledge sub-skill",
+          "passed": false,
+          "evidence": "No search-company-knowledge sub-skill or workflow was loaded. The approach states 'Without the atlassian-rest skill, the Atlassian MCP plugin tools were used directly.'"
+        },
+        {
+          "text": "Searches Confluence for documentation pages about authentication/login/OAuth",
+          "passed": true,
+          "evidence": "Used searchAtlassian (Rovo Search) with queries including 'authentication system login OAuth', 'authentication known issues bugs login failure', 'SSO SAML single sign-on token refresh session' and retrieved 7 Confluence pages."
+        },
+        {
+          "text": "Searches Jira for related issues or bugs",
+          "passed": true,
+          "evidence": "Searched Jira using JQL: text ~ \"authentication\" OR text ~ \"OAuth\" OR summary ~ \"login\" ORDER BY updated DESC. Returned 15 issues."
+        },
+        {
+          "text": "Uses both confluence.mjs search and jira.mjs search",
+          "passed": false,
+          "evidence": "Used MCP plugin tools (searchAtlassian, searchJiraIssuesUsingJql, getConfluencePage) instead of confluence.mjs and jira.mjs helper scripts. Limitations section confirms: 'Could not use confluence.mjs or jira.mjs helper scripts.'"
+        },
+        {
+          "text": "Plans to fetch full content from top results",
+          "passed": true,
+          "evidence": "Step 4: 'Retrieved full page content (in markdown format) for the 7 most relevant Confluence pages' with specific page IDs listed."
+        },
+        {
+          "text": "Synthesizes information from multiple sources with citations",
+          "passed": true,
+          "evidence": "Detailed 'Synthesized Findings' section covering 4 categories (How Login Works, OAuth Providers, Known Issues, Key Environment Variables) with specific page URLs and Jira issue keys as citations."
+        },
+        {
+          "text": "References search-patterns.md or query-languages.md",
+          "passed": false,
+          "evidence": "Limitations section states: 'No search-patterns.md reference: Did not have access to the skill's query optimization patterns' and 'Without the skill's guidance, searches were not as targeted as they could have been with reference to query-languages.md.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "search-runbook",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs search (not jira.mjs) as primary search",
+          "passed": true,
+          "evidence": "Steps 2-4 all use confluence.mjs search as primary. Jira search is explicitly labeled 'Optional Secondary Jira Search' in Step 6. 'Confluence-first approach -- The user explicitly asked about Confluence, so that is the primary search target.'"
+        },
+        {
+          "text": "CQL includes terms like deployment, runbook, or deploy",
+          "passed": true,
+          "evidence": "CQL queries include: 'title ~ \"deployment runbook\"', 'text ~ \"deployment runbook\"', 'title ~ \"runbook\"', 'text ~ \"deployment\" AND label = \"runbook\"'"
+        },
+        {
+          "text": "Plans to fetch full page content with confluence.mjs get-page",
+          "passed": true,
+          "evidence": "Step 5: 'For the top 3-5 most relevant results from the searches above, retrieve full page content' using 'confluence.mjs get-page <pageId>'"
+        },
+        {
+          "text": "Presents results with page title and source citation",
+          "passed": true,
+          "evidence": "Step 7: 'List each matching Confluence page with title, space, page ID, and direct URL', 'Cite sources with links (e.g., https://wnesolutions.atlassian.net/wiki/...)'"
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "search-runbook",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs search (not jira.mjs) as primary search",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs at all. Uses raw curl commands against the Confluence REST API. States: 'I cannot complete this task. I have no way to authenticate with the Confluence instance without specialized Atlassian tooling.'"
+        },
+        {
+          "text": "CQL includes terms like deployment, runbook, or deploy",
+          "passed": true,
+          "evidence": "CQL query constructed: 'type=page AND (title~\"deployment runbook\" OR title~\"deploy runbook\")' and 'type=page AND text~\"deployment runbook\"'"
+        },
+        {
+          "text": "Plans to fetch full page content with confluence.mjs get-page",
+          "passed": false,
+          "evidence": "Plans to use raw curl against the REST API: 'GET https://wnesolutions.atlassian.net/wiki/rest/api/content/{pageId}?expand=body.storage,version'. Does not use confluence.mjs get-page."
+        },
+        {
+          "text": "Presents results with page title and source citation",
+          "passed": true,
+          "evidence": "Step 4 shows planned output format with page title, space, and URL: 'Page: Production Deployment Runbook, Space: ENG, URL: https://wnesolutions.atlassian.net/wiki/spaces/ENG/pages/12345678/...'"
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "spec-to-backlog",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads spec-to-backlog sub-skill",
+          "passed": true,
+          "evidence": "Section 1: 'The Spec to Backlog workflow was loaded from workflows/spec-to-backlog.md. This is a 7-step process.'"
+        },
+        {
+          "text": "Uses confluence.mjs get-page 98765 to fetch the spec",
+          "passed": true,
+          "evidence": "Section 2: 'node <skill-path>/scripts/confluence.mjs get-page 98765'"
+        },
+        {
+          "text": "Uses jira.mjs issue-types DO to check available types",
+          "passed": true,
+          "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Section 3 uses 'jira.mjs issue-types DO' instead of 'jira.mjs issue-types MOBILE'. The prompt specifies MOBILE project but the approach uses DO throughout."
+        },
+        {
+          "text": "Creates Epic FIRST before any child tickets",
+          "passed": true,
+          "evidence": "Section 7: 'Create Epic' command appears first, followed by 'Create child tickets (in priority order)' that use --parent DO-500."
+        },
+        {
+          "text": "Child tickets use --parent with the Epic key",
+          "passed": true,
+          "evidence": "All child create commands include '--parent DO-500', e.g.: 'jira.mjs create --project DO --type Story --summary ... --parent DO-500'"
+        },
+        {
+          "text": "Presents breakdown plan to user before creating",
+          "passed": true,
+          "evidence": "Section 6: 'Per Step 4 of the workflow, before creating anything, the following plan structure would be presented to the user for review and approval.' Includes a full table of proposed tickets."
+        },
+        {
+          "text": "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md",
+          "passed": true,
+          "evidence": "Section 9 lists all three: epic-templates.md, ticket-writing-guide.md, and breakdown-examples.md with detailed descriptions of how each was used."
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "spec-to-backlog",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.29,
+        "passed": 2,
+        "failed": 5,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads spec-to-backlog sub-skill",
+          "passed": false,
+          "evidence": "Challenges section states: 'No structured workflow or sub-skill: There is no guided multi-step process (like a spec-to-backlog sub-skill) to orchestrate the decomposition.'"
+        },
+        {
+          "text": "Uses confluence.mjs get-page 98765 to fetch the spec",
+          "passed": false,
+          "evidence": "Uses MCP tool instead: 'Tool: mcp__plugin_atlassian_atlassian__getConfluencePage with pageId: 98765'. Does not use confluence.mjs."
+        },
+        {
+          "text": "Uses jira.mjs issue-types DO to check available types",
+          "passed": false,
+          "evidence": "Uses MCP tool 'mcp__plugin_atlassian_atlassian__getJiraProjectIssueTypesMetadata' with projectIdOrKey: 'DO' instead of jira.mjs issue-types."
+        },
+        {
+          "text": "Creates Epic FIRST before any child tickets",
+          "passed": true,
+          "evidence": "Step 5: 'Create the Epic' comes before Step 6: 'Create Child Stories and Tasks'. 'The returned issue key (e.g., DO-100) is captured for use as the parent of all child tickets.'"
+        },
+        {
+          "text": "Child tickets use --parent with the Epic key",
+          "passed": false,
+          "evidence": "Uses MCP tool createJiraIssue with 'parent: \"DO-100\"' field, not the --parent CLI flag with jira.mjs. The approach does not use jira.mjs at all."
+        },
+        {
+          "text": "Presents breakdown plan to user before creating",
+          "passed": true,
+          "evidence": "Step 4: 'Before creating any issues, the agent should present the proposed breakdown to the user for review.' Includes a table format."
+        },
+        {
+          "text": "References epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md",
+          "passed": false,
+          "evidence": "Challenges section states: 'No reference templates: Without access to files like epic-templates.md, ticket-writing-guide.md, or breakdown-examples.md, the agent has no conventions.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "inline-spec",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.71,
+        "passed": 5,
+        "failed": 2,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Handles inline spec without needing Confluence fetch",
+          "passed": true,
+          "evidence": "Section 1: 'This is an inline spec scenario -- the requirements are provided directly in the user's message rather than from a Confluence page.' 'skip the Confluence fetch step and proceed directly to analysis using the inline requirements.'"
+        },
+        {
+          "text": "Uses jira.mjs issue-types FRONTEND to check available types",
+          "passed": false,
+          "evidence": "Section 2 uses 'jira.mjs issue-types DO' instead of 'jira.mjs issue-types FRONTEND'. The prompt specifies FRONTEND but the approach targets the DO project."
+        },
+        {
+          "text": "Maps requirement #3 (mobile Safari bug) to Bug type",
+          "passed": true,
+          "evidence": "Section 3 table: '#3 Fix: mobile Safari layout breaks on checkout page -> Bug. Rationale: Defect in existing functionality on a specific platform/browser.'"
+        },
+        {
+          "text": "Maps requirement #6 (API docs) to Task type",
+          "passed": true,
+          "evidence": "Section 3 table: '#6 Task: Update API documentation for v2 endpoints -> Task. Rationale: Non-feature supporting work -- documentation maintenance.'"
+        },
+        {
+          "text": "Maps feature requirements (#1,2,4,5) to Story type",
+          "passed": true,
+          "evidence": "Section 3 table maps #1 (dark mode toggle), #2 (notification badge), #4 (date range filtering), #5 (CSV export) all to Story type."
+        },
+        {
+          "text": "Creates Epic first, then child tickets with --parent",
+          "passed": false,
+          "evidence": "Section 4 explicitly states: 'No Epic Created. These 6 requirements are independent items across different areas... They do not form a cohesive feature set that warrants grouping under a single Epic.' No --parent flag is used in any create command."
+        },
+        {
+          "text": "Presents plan with labeled issue types before creating",
+          "passed": true,
+          "evidence": "Section 6 'Complete Breakdown Plan' shows a table with all 6 tickets labeled by type (4 Stories, 1 Bug, 1 Task) before Section 7's create commands. States: 'At this point in a real execution, the user would review and confirm before proceeding to creation.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "inline-spec",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.71,
+        "passed": 5,
+        "failed": 2,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Handles inline spec without needing Confluence fetch",
+          "passed": true,
+          "evidence": "The approach analyzes the 6 inline requirements directly without fetching from Confluence. No Confluence fetch is attempted or planned."
+        },
+        {
+          "text": "Uses jira.mjs issue-types FRONTEND to check available types",
+          "passed": false,
+          "evidence": "Does not use jira.mjs at all. States: 'No Atlassian skill, helper scripts, or authorized MCP plugin is available.' and 'No validation that the DO project exists or what issue types it supports.'"
+        },
+        {
+          "text": "Maps requirement #3 (mobile Safari bug) to Bug type",
+          "passed": true,
+          "evidence": "Table maps #3 to Bug: 'Explicitly marked as a fix; describes broken behavior on a specific platform.'"
+        },
+        {
+          "text": "Maps requirement #6 (API docs) to Task type",
+          "passed": true,
+          "evidence": "Table maps #6 to Task: 'Explicitly marked as a task; documentation maintenance work, not user-facing functionality.'"
+        },
+        {
+          "text": "Maps feature requirements (#1,2,4,5) to Story type",
+          "passed": true,
+          "evidence": "Table maps #1, #2, #4, #5 all to Story type as 'New user-facing feature' items."
+        },
+        {
+          "text": "Creates Epic first, then child tickets with --parent",
+          "passed": false,
+          "evidence": "Proposes an Epic as parent but does not use jira.mjs create with --parent. Uses hypothetical MCP tool calls with 'parent' field. Also states tickets cannot actually be created due to authorization error."
+        },
+        {
+          "text": "Presents plan with labeled issue types before creating",
+          "passed": true,
+          "evidence": "Summary Table shows all tickets with labeled types (1 Epic, 4 Stories, 1 Bug, 1 Task) before the 'What Would Be Different' section."
+        }
+      ]
+    },
+    {
+      "eval_id": 13,
+      "eval_name": "transition",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+          "passed": true,
+          "evidence": "Step 3: 'jira.mjs transitions DO-456' -- 'The skill explicitly states: \"Always list transitions first to get the correct ID -- don't guess.\"' Note: uses DO-456 instead of PROJ-456 but the issue key naming is consistent with the project used."
+        },
+        {
+          "text": "Does NOT guess or hardcode a transition ID",
+          "passed": true,
+          "evidence": "Step 4 uses '<DONE_TRANSITION_ID>' placeholder: 'Using the transition ID retrieved in Step 3 (assuming the \"Done\" transition ID is <DONE_TRANSITION_ID>)'. Explicitly states 'The actual transition ID must come from Step 3's output.'"
+        },
+        {
+          "text": "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+          "passed": true,
+          "evidence": "Step 4: 'jira.mjs transition DO-456 <DONE_TRANSITION_ID>' with example: 'jira.mjs transition DO-456 31'. The ID comes from Step 3."
+        },
+        {
+          "text": "Uses jira.mjs comment PROJ-456 with the deployment message",
+          "passed": true,
+          "evidence": "Step 5: 'jira.mjs comment DO-456 \"Deployed to production v2.3.1 on 2026-03-18\"'"
+        }
+      ]
+    },
+    {
+      "eval_id": 13,
+      "eval_name": "transition",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+          "passed": false,
+          "evidence": "Uses MCP tool 'getTransitionsForJiraIssue' instead of jira.mjs transitions. Step 2: 'Call getTransitionsForJiraIssue to discover valid transitions.'"
+        },
+        {
+          "text": "Does NOT guess or hardcode a transition ID",
+          "passed": true,
+          "evidence": "Step 2 queries transitions first: 'This is critical -- transition IDs are workflow-specific and must not be guessed or hardcoded.' Step 3 uses '<transition_id_from_step_2>' placeholder."
+        },
+        {
+          "text": "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+          "passed": false,
+          "evidence": "Uses MCP tool 'transitionJiraIssue' instead of jira.mjs transition. Does not use jira.mjs at all."
+        },
+        {
+          "text": "Uses jira.mjs comment PROJ-456 with the deployment message",
+          "passed": false,
+          "evidence": "Uses MCP tool 'addCommentToJiraIssue' instead of jira.mjs comment. Does not use jira.mjs at all."
+        }
+      ]
+    },
+    {
+      "eval_id": 14,
+      "eval_name": "jql-search",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Constructs JQL with project = DO, type = Bug, priority in High/Highest, status = Blocked",
+          "passed": true,
+          "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses 'project = DO' instead of 'project = PLATFORM'. The JQL does include 'issuetype = Bug AND priority IN (Highest, High) AND (status = Blocked OR status = \"On Hold\")' but the wrong project key."
+        },
+        {
+          "text": "Uses jira.mjs search with the JQL query",
+          "passed": true,
+          "evidence": "Step 2: 'node .../jira.mjs search \"project = DO AND issuetype = Bug AND priority IN (Highest, High) AND (status = Blocked OR status = \"On Hold\") AND resolution = Unresolved ORDER BY priority ASC, updated DESC\" --max 50'"
+        },
+        {
+          "text": "Mentions presenting results with key, summary, assignee, and last updated",
+          "passed": true,
+          "evidence": "Expected Output section: 'A list of blocked high-priority bugs showing for each: Issue key (e.g., DO-456), Summary, Status, Priority, Assignee (display name or \"Unassigned\"), Updated (last update timestamp)'"
+        }
+      ]
+    },
+    {
+      "eval_id": 14,
+      "eval_name": "jql-search",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Constructs JQL with project = DO, type = Bug, priority in High/Highest, status = Blocked",
+          "passed": true,
+          "evidence": "Step 3: JQL 'project = \"DO\" AND issuetype = Bug AND priority = High AND status = Blocked ORDER BY updated DESC' \u2014 includes project DO, type Bug, priority High, and status Blocked. Only uses High (not Highest) but core query structure is correct."
+        },
+        {
+          "text": "Uses jira.mjs search with the JQL query",
+          "passed": false,
+          "evidence": "Uses MCP plugin tool 'searchJiraIssuesUsingJql' directly, not jira.mjs search."
+        },
+        {
+          "text": "Mentions presenting results with key, summary, assignee, and last updated",
+          "passed": true,
+          "evidence": "Step 3: 'With fields: [\"summary\", \"status\", \"priority\", \"assignee\", \"updated\"]' \u2014 includes assignee and updated."
+        }
+      ]
+    },
+    {
+      "eval_id": 15,
+      "eval_name": "epic-stories",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.83,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Creates Epic first with jira.mjs create --project DO --type Epic",
+          "passed": true,
+          "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Step 4 uses '--project DO --type Epic' instead of '--project ENG --type Epic'. The prompt specifies ENG project but the approach uses DO."
+        },
+        {
+          "text": "Captures the Epic key from the create response",
+          "passed": true,
+          "evidence": "Step 4: 'Expected output: The newly created Epic key, e.g., DO-101. Record this key for use as the --parent in subsequent story creation.'"
+        },
+        {
+          "text": "Uses jira.mjs lookup-user for john.doe",
+          "passed": true,
+          "evidence": "Step 3: 'jira.mjs lookup-user \"john.doe\"' -- 'This returns the account ID (e.g., 5f1234567890abcdef123456) needed for assignment in Step 5.'"
+        },
+        {
+          "text": "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+          "passed": false,
+          "evidence": "Steps 5-7 create 3 child stories with '--parent DO-101 --type Story' but none of the create commands include '--priority Medium'. Priority is not specified in any story creation command."
+        },
+        {
+          "text": "Story 1 includes --assignee with john.doe's account ID",
+          "passed": true,
+          "evidence": "Step 5: 'jira.mjs create --project DO --type Story --summary \"Optimize database query performance\" ... --parent DO-101 --assignee <accountId-from-step-3>'"
+        },
+        {
+          "text": "Shows confirmation plan before executing",
+          "passed": true,
+          "evidence": "Key Skill Principles Applied: 'Confirm before mutating (Steps 4-7): Each create command should be confirmed with the user before execution.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 15,
+      "eval_name": "epic-stories",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.33,
+        "passed": 2,
+        "failed": 4,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Creates Epic first with jira.mjs create --project DO --type Epic",
+          "passed": false,
+          "evidence": "Does not use jira.mjs at all. Uses raw curl commands against the Jira REST API v3: 'curl -s -X POST' with project key DO and issuetype Epic in JSON body."
+        },
+        {
+          "text": "Captures the Epic key from the create response",
+          "passed": true,
+          "evidence": "Step 4: 'Capture the key value (e.g., DO-100) for use as the parent in subsequent story creation calls.'"
+        },
+        {
+          "text": "Uses jira.mjs lookup-user for john.doe",
+          "passed": false,
+          "evidence": "Uses raw curl: 'curl -s -X GET \"https://wnesolutions.atlassian.net/rest/api/3/user/search?query=john.doe\"' instead of jira.mjs lookup-user."
+        },
+        {
+          "text": "Creates 3 child stories with --parent <epicKey> --type Story --priority Medium",
+          "passed": false,
+          "evidence": "Uses raw REST API POST calls with JSON payloads, not jira.mjs create with --parent flag. Does use 'parent' field and 'priority: Medium' in the JSON but not the CLI script."
+        },
+        {
+          "text": "Story 1 includes --assignee with john.doe's account ID",
+          "passed": false,
+          "evidence": "Uses REST API JSON field '\"assignee\": {\"accountId\": \"<JOHN_DOE_ACCOUNT_ID>\"}' in the curl POST body, not jira.mjs --assignee flag."
+        },
+        {
+          "text": "Shows confirmation plan before executing",
+          "passed": true,
+          "evidence": "Step 3: 'Before executing any mutating operations, present the following plan to the user' with a table showing Epic and all 3 Stories."
+        }
+      ]
+    },
+    {
+      "eval_id": 16,
+      "eval_name": "link-issues",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs link-types to discover available link type names",
+          "passed": true,
+          "evidence": "Step 1: 'jira.mjs link-types' -- 'Before creating any links, list the available link types to confirm the exact type names supported by this Jira instance. The SKILL.md explicitly instructs: \"List available link types first.\"'"
+        },
+        {
+          "text": "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+          "passed": true,
+          "evidence": "Step 2: 'jira.mjs link DO-100 DO-200 --type \"Blocks\"' -- 'This creates a link where DO-100 blocks DO-200.'"
+        },
+        {
+          "text": "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+          "passed": true,
+          "evidence": "Step 3: 'jira.mjs link DO-100 DO-50 --type \"relates to\"' -- 'This creates a symmetric \"relates to\" link between DO-100 and DO-50.'"
+        },
+        {
+          "text": "Uses jira.mjs link command for both operations",
+          "passed": true,
+          "evidence": "Both link operations use 'jira.mjs link': Step 2 'jira.mjs link DO-100 DO-200 --type \"Blocks\"' and Step 3 'jira.mjs link DO-100 DO-50 --type \"relates to\"'"
+        }
+      ]
+    },
+    {
+      "eval_id": 16,
+      "eval_name": "link-issues",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs link-types to discover available link type names",
+          "passed": false,
+          "evidence": "Uses raw REST API call 'GET /rest/api/3/issueLinkType' instead of jira.mjs link-types. States: 'I do not have access to Atlassian MCP tools or helper scripts in this session.'"
+        },
+        {
+          "text": "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+          "passed": true,
+          "evidence": "Step 2 shows POST to /rest/api/3/issueLink with type 'Blocks', outwardIssue DO-100, inwardIssue DO-200. 'outwardIssue (DO-100) blocks inwardIssue (DO-200).'"
+        },
+        {
+          "text": "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+          "passed": true,
+          "evidence": "Step 3 shows POST to /rest/api/3/issueLink with type 'Relates', outwardIssue DO-100, inwardIssue DO-50."
+        },
+        {
+          "text": "Uses jira.mjs link command for both operations",
+          "passed": false,
+          "evidence": "Uses raw REST API POST calls to /rest/api/3/issueLink instead of jira.mjs link command. States: 'I do not have access to Atlassian MCP tools or helper scripts in this session.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 17,
+      "eval_name": "create-page",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs create-page with --space TEAM",
+          "passed": true,
+          "evidence": "confluence.mjs create-page --space TEAM --title \"ADR: Microservices Migration\" --body-file /tmp/confluence-adr-body.html"
+        },
+        {
+          "text": "Title includes 'Architecture Decision Record' and 'Microservices Migration'",
+          "passed": true,
+          "evidence": "Title is \"ADR: Microservices Migration\" \u2014 'ADR' is the abbreviation for Architecture Decision Record, and the document explicitly states 'Architecture Decision Record (ADR) page' and 'Microservices Migration'"
+        },
+        {
+          "text": "Body contains sections for Context, Decision, Consequences, and Status",
+          "passed": true,
+          "evidence": "Body contains <h2>Context</h2>, <h2>Decision</h2>, <h2>Consequences</h2>, and <h2>Status</h2>"
+        },
+        {
+          "text": "Body uses HTML storage format (h2 tags or similar) or plain text that will be auto-wrapped",
+          "passed": true,
+          "evidence": "Full storage format HTML body with h2 tags, ac:structured-macro elements, tables, and panels"
+        }
+      ]
+    },
+    {
+      "eval_id": 17,
+      "eval_name": "create-page",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs create-page with --space TEAM",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Instead describes raw REST API call: 'POST https://wnesolutions.atlassian.net/wiki/rest/api/content'. States 'This task cannot be completed without authenticated access to the Confluence API.'"
+        },
+        {
+          "text": "Title includes 'Architecture Decision Record' and 'Microservices Migration'",
+          "passed": true,
+          "evidence": "Title: 'Architecture Decision Record - Microservices Migration'"
+        },
+        {
+          "text": "Body contains sections for Context, Decision, Consequences, and Status",
+          "passed": true,
+          "evidence": "Body contains <h2>Context</h2>, <h2>Decision</h2>, <h2>Consequences</h2>, and <h2>Status</h2>"
+        },
+        {
+          "text": "Body uses HTML storage format (h2 tags or similar) or plain text that will be auto-wrapped",
+          "passed": true,
+          "evidence": "Body uses HTML storage format with h2 tags, table elements, ul/li lists"
+        }
+      ]
+    },
+    {
+      "eval_id": 18,
+      "eval_name": "spaces-search",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs spaces as the first command",
+          "passed": true,
+          "evidence": "Step 1: 'node <skill-path>/scripts/confluence.mjs spaces --max 50'"
+        },
+        {
+          "text": "Uses confluence.mjs search with CQL targeting the HR space",
+          "passed": true,
+          "evidence": "Step 2: 'node <skill-path>/scripts/confluence.mjs search 'type = page AND space = HR AND text ~ \"onboarding\"' --max 10'"
+        },
+        {
+          "text": "CQL includes text or title matching 'onboarding'",
+          "passed": true,
+          "evidence": "CQL contains 'text ~ \"onboarding\"' for full-text search"
+        },
+        {
+          "text": "Operations are sequenced (search depends on spaces list)",
+          "passed": true,
+          "evidence": "Explicitly states 'Step 1 must execute first. The user refers to \"HR space\" but the actual Confluence space key is unknown until we list all spaces.' and 'Step 2 depends on Step 1 output.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 18,
+      "eval_name": "spaces-search",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs spaces as the first command",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses MCP tool 'getConfluenceSpaces' instead and starts with 'getAccessibleAtlassianResources' to discover cloud ID first."
+        },
+        {
+          "text": "Uses confluence.mjs search with CQL targeting the HR space",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses MCP tool 'searchConfluenceUsingCql' instead."
+        },
+        {
+          "text": "CQL includes text or title matching 'onboarding'",
+          "passed": true,
+          "evidence": "CQL query: 'type = page AND space = \"HR\" AND text ~ \"onboarding\"'"
+        },
+        {
+          "text": "Operations are sequenced (search depends on spaces list)",
+          "passed": true,
+          "evidence": "Explicit dependency chain: 'Cloud ID discovery (Step 1) must complete before anything else' and 'Spaces listing (Step 2) must complete before the search' and 'CQL search (Step 4) depends on the confirmed space key from Steps 2-3.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 19,
+      "eval_name": "attach-embed",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs attach 54321 ./docs/arch-diagram.png to upload the file",
+          "passed": true,
+          "evidence": "Step 1: 'node <skill-path>/scripts/confluence.mjs attach 54321 ./docs/arch-diagram.png --comment \"Architecture diagram\"'"
+        },
+        {
+          "text": "Uses confluence.mjs get-page 54321 to fetch current page content before updating",
+          "passed": true,
+          "evidence": "Step 2: 'node <skill-path>/scripts/confluence.mjs get-page 54321'"
+        },
+        {
+          "text": "Uses confluence.mjs update-page 54321 with body containing ac:image macro",
+          "passed": true,
+          "evidence": "Step 3: 'node <skill-path>/scripts/confluence.mjs update-page 54321 --title \"Existing Page Title\" --body-file /tmp/page-54321-body.html' with body containing ac:image macro"
+        },
+        {
+          "text": "The ac:image tag references ri:attachment with ri:filename matching the uploaded file",
+          "passed": true,
+          "evidence": "<ri:attachment ri:filename=\"arch-diagram.png\" />"
+        },
+        {
+          "text": "Image width is set to 600 (diagram sizing per formatting guide)",
+          "passed": true,
+          "evidence": "ac:width=\"600\" \u2014 explicitly states 'Width 600 \u2014 Recommended for diagrams/flowcharts per the sizing guidelines table'"
+        },
+        {
+          "text": "Image alignment is center",
+          "passed": true,
+          "evidence": "ac:align=\"center\" \u2014 states 'Per the reference: Always set ac:align=\"center\" for standalone images.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 19,
+      "eval_name": "attach-embed",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 3,
+        "failed": 3,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs attach 54321 ./docs/arch-diagram.png to upload the file",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses raw curl: 'POST /wiki/rest/api/content/54321/child/attachment'. States 'I cannot complete this task.'"
+        },
+        {
+          "text": "Uses confluence.mjs get-page 54321 to fetch current page content before updating",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses raw curl GET request to fetch page content."
+        },
+        {
+          "text": "Uses confluence.mjs update-page 54321 with body containing ac:image macro",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses raw curl PUT request to update the page."
+        },
+        {
+          "text": "The ac:image tag references ri:attachment with ri:filename matching the uploaded file",
+          "passed": true,
+          "evidence": "<ri:attachment ri:filename=\"arch-diagram.png\" /> in the ac:image macro"
+        },
+        {
+          "text": "Image width is set to 600 (diagram sizing per formatting guide)",
+          "passed": true,
+          "evidence": "ac:width=\"600\" in the ac:image macro"
+        },
+        {
+          "text": "Image alignment is center",
+          "passed": true,
+          "evidence": "ac:align=\"center\" in the ac:image macro"
+        }
+      ]
+    },
+    {
+      "eval_id": 20,
+      "eval_name": "refuse-delete-attachment",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs list-attachments 54321 to list all attachments",
+          "passed": true,
+          "evidence": "Step 1: 'node <skill-path>/scripts/confluence.mjs list-attachments 54321 --max 50'"
+        },
+        {
+          "text": "Does NOT use confluence.mjs delete-attachment or any DELETE API call",
+          "passed": true,
+          "evidence": "Explicitly states 'This operation cannot be performed. The skill explicitly prohibits all delete operations.' No delete command is used."
+        },
+        {
+          "text": "Informs the user that delete operations are restricted in this skill",
+          "passed": true,
+          "evidence": "Quotes SKILL.md Principle #3: 'Never delete. This skill does not support delete operations (issues, pages, attachments, boards, projects, accounts, etc.)'"
+        },
+        {
+          "text": "Directs the user to the Atlassian web UI to delete the attachment manually",
+          "passed": true,
+          "evidence": "Provides specific URL: 'Navigate to https://<domain>.atlassian.net/wiki/pages/viewpageattachments.action?pageId=54321' and step-by-step instructions to delete manually."
+        }
+      ]
+    },
+    {
+      "eval_id": 20,
+      "eval_name": "refuse-delete-attachment",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs list-attachments 54321 to list all attachments",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Describes raw curl GET request to '/wiki/rest/api/content/54321/child/attachment'. States 'I cannot complete this task.'"
+        },
+        {
+          "text": "Does NOT use confluence.mjs delete-attachment or any DELETE API call",
+          "passed": false,
+          "evidence": "Describes using a DELETE API call: 'curl -s -X DELETE ... /wiki/rest/api/content/<attachment-id>'. While it notes this is blocked without credentials, it does describe the delete approach rather than refusing it on principle."
+        },
+        {
+          "text": "Informs the user that delete operations are restricted in this skill",
+          "passed": false,
+          "evidence": "Does not reference any skill restriction on deletes. Only mentions that 'delete operations are typically restricted' in general terms and that credentials are unavailable. The without-skill approach does not refuse the delete on principle."
+        },
+        {
+          "text": "Directs the user to the Atlassian web UI to delete the attachment manually",
+          "passed": true,
+          "evidence": "Section 4 'Confluence Web UI (Manual)' provides steps: 'Open the page ... Click the delete/trash icon next to it' and states 'This is the recommended approach for deleting attachments.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 21,
+      "eval_name": "rich-confluence-doc",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the create-confluence-document sub-skill or references confluence-formatting.md",
+          "passed": true,
+          "evidence": "States 'workflows/create-confluence-document.md \u2014 the 6-step workflow' and 'references/confluence-formatting.md \u2014 storage format XHTML syntax for TOC, panels, code blocks, expand/collapse macros'"
+        },
+        {
+          "text": "Builds storage format HTML body containing ac:structured-macro for toc",
+          "passed": true,
+          "evidence": "Body contains '<ac:structured-macro ac:name=\"toc\"><ac:parameter ac:name=\"maxLevel\">3</ac:parameter>'"
+        },
+        {
+          "text": "Includes an ac:structured-macro with ac:name='info' for the overview panel",
+          "passed": true,
+          "evidence": "Body contains '<ac:structured-macro ac:name=\"info\"><ac:parameter ac:name=\"title\">API Migration Guide \u2014 Summary</ac:parameter>'"
+        },
+        {
+          "text": "Includes ac:structured-macro with ac:name='code' for code blocks",
+          "passed": true,
+          "evidence": "Multiple code blocks with '<ac:structured-macro ac:name=\"code\">' with language, title, and linenumbers parameters"
+        },
+        {
+          "text": "Includes ac:structured-macro with ac:name='expand' for troubleshooting items",
+          "passed": true,
+          "evidence": "Five expand macros: '<ac:structured-macro ac:name=\"expand\">' for 401, 400, 404, 429, and 502 troubleshooting items"
+        },
+        {
+          "text": "Writes the HTML body to a temporary file",
+          "passed": true,
+          "evidence": "'cat > /tmp/confluence-body.html << HTMLEOF'"
+        },
+        {
+          "text": "Uses confluence.mjs create-page with --body-file flag (not --body for long content)",
+          "passed": true,
+          "evidence": "'node <skill-path>/scripts/confluence.mjs create-page --space TEAM --title \"API Migration Guide\" --body-file /tmp/confluence-body.html'"
+        },
+        {
+          "text": "Uses --space TEAM in the create command",
+          "passed": true,
+          "evidence": "'--space TEAM' in the create-page command"
+        }
+      ]
+    },
+    {
+      "eval_id": 21,
+      "eval_name": "rich-confluence-doc",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.625,
+        "passed": 5,
+        "failed": 3,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the create-confluence-document sub-skill or references confluence-formatting.md",
+          "passed": false,
+          "evidence": "Does not load any sub-skill or reference file. States 'No Confluence storage format reference' as a barrier."
+        },
+        {
+          "text": "Builds storage format HTML body containing ac:structured-macro for toc",
+          "passed": true,
+          "evidence": "Body contains '<ac:structured-macro ac:name=\"toc\">' with maxLevel and minLevel parameters"
+        },
+        {
+          "text": "Includes an ac:structured-macro with ac:name='info' for the overview panel",
+          "passed": true,
+          "evidence": "Body contains '<ac:structured-macro ac:name=\"info\"><ac:parameter ac:name=\"title\">Overview</ac:parameter>'"
+        },
+        {
+          "text": "Includes ac:structured-macro with ac:name='code' for code blocks",
+          "passed": true,
+          "evidence": "Multiple code blocks with '<ac:structured-macro ac:name=\"code\">' for bash and javascript languages"
+        },
+        {
+          "text": "Includes ac:structured-macro with ac:name='expand' for troubleshooting items",
+          "passed": true,
+          "evidence": "Three expand macros for '401 Unauthorized', 'Pagination returns duplicate results', and '500 Internal Server Error'"
+        },
+        {
+          "text": "Writes the HTML body to a temporary file",
+          "passed": true,
+          "evidence": "'cat > /tmp/api-migration-guide-body.html << HTMLEOF'"
+        },
+        {
+          "text": "Uses confluence.mjs create-page with --body-file flag (not --body for long content)",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses raw curl POST to '/wiki/api/v2/pages'. Mentions confluence.mjs only hypothetically: 'if a CLI helper script (e.g., confluence.mjs) were available'."
+        },
+        {
+          "text": "Uses --space TEAM in the create command",
+          "passed": false,
+          "evidence": "Does not use --space TEAM. Uses raw REST API with spaceId parameter. States 'this task cannot be completed programmatically by the agent.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 22,
+      "eval_name": "status-page-layout",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "References confluence-formatting.md for the status report template or macros",
+          "passed": true,
+          "evidence": "States 'references/confluence-formatting.md \u2014 Status Report template, layout macros, image embedding, status lozenges, warning panels, tables'"
+        },
+        {
+          "text": "Body contains ac:layout with ac:layout-section type='two_equal'",
+          "passed": true,
+          "evidence": "Body contains '<ac:layout><ac:layout-section ac:type=\"two_equal\">'"
+        },
+        {
+          "text": "Body contains ac:structured-macro for status lozenge with colour Green",
+          "passed": true,
+          "evidence": "'<ac:structured-macro ac:name=\"status\"><ac:parameter ac:name=\"colour\">Green</ac:parameter><ac:parameter ac:name=\"title\">ON TRACK</ac:parameter>'"
+        },
+        {
+          "text": "Body contains table elements for completed and in-progress tickets",
+          "passed": true,
+          "evidence": "Two tables: '<h2>Completed This Week</h2><table>' and '<h2>In Progress</h2><table>' with ticket data"
+        },
+        {
+          "text": "Body contains ac:structured-macro with ac:name='warning' for risks panel",
+          "passed": true,
+          "evidence": "'<ac:structured-macro ac:name=\"warning\"><ac:parameter ac:name=\"title\">Risks &amp; Blockers</ac:parameter>'"
+        },
+        {
+          "text": "Uses confluence.mjs create-page to create the page first",
+          "passed": true,
+          "evidence": "'node .../confluence.mjs create-page --space ENG --title \"Sprint 14 Status Report \u2014 2026-03-18\" --body-file /tmp/confluence-status-report-body.html'"
+        },
+        {
+          "text": "Uses confluence.mjs attach to upload the burndown chart after page creation",
+          "passed": true,
+          "evidence": "'node .../confluence.mjs attach <pageId> ./charts/burndown.png --comment \"Sprint 14 burndown chart\"'"
+        },
+        {
+          "text": "Updates the page to embed the image with ac:image at width 800",
+          "passed": true,
+          "evidence": "Body contains '<ac:image ac:width=\"800\" ac:align=\"center\" ac:layout=\"center\"><ri:attachment ri:filename=\"burndown.png\" />' and update-page command is shown for if filename correction is needed"
+        },
+        {
+          "text": "Uses --body-file for the long storage format content",
+          "passed": true,
+          "evidence": "'--body-file /tmp/confluence-status-report-body.html' \u2014 states 'Uses --body-file because the body content is lengthy (well over 2000 characters)'"
+        }
+      ]
+    },
+    {
+      "eval_id": 22,
+      "eval_name": "status-page-layout",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.56,
+        "passed": 5,
+        "failed": 4,
+        "total": 9,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "References confluence-formatting.md for the status report template or macros",
+          "passed": false,
+          "evidence": "Does not reference confluence-formatting.md. States 'No reference documentation \u2014 I cannot consult references/confluence-formatting.md' as a barrier."
+        },
+        {
+          "text": "Body contains ac:layout with ac:layout-section type='two_equal'",
+          "passed": true,
+          "evidence": "Body contains '<ac:layout><ac:layout-section ac:type=\"two_equal\">'"
+        },
+        {
+          "text": "Body contains ac:structured-macro for status lozenge with colour Green",
+          "passed": true,
+          "evidence": "'<ac:structured-macro ac:name=\"status\"><ac:parameter ac:name=\"colour\">Green</ac:parameter><ac:parameter ac:name=\"title\">On Track</ac:parameter>'"
+        },
+        {
+          "text": "Body contains table elements for completed and in-progress tickets",
+          "passed": true,
+          "evidence": "Two tables: '<h2>Completed Tickets</h2><table>' and '<h2>In-Progress Tickets</h2><table>' with ticket data"
+        },
+        {
+          "text": "Body contains ac:structured-macro with ac:name='warning' for risks panel",
+          "passed": true,
+          "evidence": "'<ac:structured-macro ac:name=\"warning\"><ac:parameter ac:name=\"title\">Risks &amp; Blockers</ac:parameter>'"
+        },
+        {
+          "text": "Uses confluence.mjs create-page to create the page first",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs directly. Mentions it hypothetically: 'confluence.mjs create-page --space ENG --title \"Sprint 14 Status Report\" --body-file /tmp/status-report-body.html' but states it is unavailable. Says 'I cannot execute any of these steps'."
+        },
+        {
+          "text": "Uses confluence.mjs attach to upload the burndown chart after page creation",
+          "passed": false,
+          "evidence": "Mentions 'confluence.mjs attach 98765 ./charts/burndown.png' only hypothetically. States this cannot be done without the skill."
+        },
+        {
+          "text": "Updates the page to embed the image with ac:image at width 800",
+          "passed": true,
+          "evidence": "Body contains '<ac:image ac:width=\"800\"><ri:attachment ri:filename=\"burndown.png\" />' and describes update-page step"
+        },
+        {
+          "text": "Uses --body-file for the long storage format content",
+          "passed": false,
+          "evidence": "Mentions --body-file only hypothetically. Cannot execute without the skill."
+        }
+      ]
+    },
+    {
+      "eval_id": 23,
+      "eval_name": "sync-epic-new",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": true,
+          "evidence": "Step 0: 'Read the Sync Workflow... File: <skill-path>/workflows/sync-bmad-documents.md' and 'File: <skill-path>/references/sync-mapping-guide.md'"
+        },
+        {
+          "text": "Uses sync.mjs status to check the document's current state",
+          "passed": true,
+          "evidence": "Step 3: 'node .../sync.mjs status docs/epics/auth-epic.md'"
+        },
+        {
+          "text": "Detects or confirms the document type as 'epic'",
+          "passed": true,
+          "evidence": "Step 2: 'Given the file is located in docs/epics/ and named auth-epic.md, this is almost certainly an epic document type. Confirm by inspecting the document for epic detection signals.'"
+        },
+        {
+          "text": "Asks the user which Jira project to sync to",
+          "passed": true,
+          "evidence": "Step 4: 'Target: Which Jira project key? Answer: DO \u2014 specified in the task.' and 'the workflow says to confirm with the user before mutating. Present these choices and get confirmation.'"
+        },
+        {
+          "text": "Asks whether to create a new epic or link to an existing one",
+          "passed": true,
+          "evidence": "Step 4: 'Action: Create new ticket/page, or link to existing one? Answer: Create new'"
+        },
+        {
+          "text": "Uses sync.mjs link with appropriate flags (--type epic --project <KEY> --create or --ticket <KEY>)",
+          "passed": true,
+          "evidence": "Step 6: 'node .../sync.mjs link docs/epics/auth-epic.md --type epic --project DO --create'"
+        },
+        {
+          "text": "Confirms that jira_ticket_id was added to the document frontmatter",
+          "passed": true,
+          "evidence": "Step 7: 'Read docs/epics/auth-epic.md and confirm jira_ticket_id was added to the frontmatter' with example showing 'jira_ticket_id: DO-XXX'"
+        },
+        {
+          "text": "References sync-mapping-guide.md if field mapping is needed",
+          "passed": true,
+          "evidence": "Step 0: 'File: <skill-path>/references/sync-mapping-guide.md' and Step 5c: 'following the schema in references/sync-mapping-guide.md'"
+        }
+      ]
+    },
+    {
+      "eval_id": 23,
+      "eval_name": "sync-epic-new",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 4,
+        "failed": 4,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": false,
+          "evidence": "Does not load any sub-skill file. States 'no sync sub-skill, no sync.mjs helper script, no sync-mapping-guide.md'."
+        },
+        {
+          "text": "Uses sync.mjs status to check the document's current state",
+          "passed": false,
+          "evidence": "Does not use sync.mjs. States 'Without a skill, the agent has no sync.mjs status command.' Instead manually inspects frontmatter."
+        },
+        {
+          "text": "Detects or confirms the document type as 'epic'",
+          "passed": true,
+          "evidence": "Step 2: 'the agent reasons from directory naming conventions that this is an \"epic\" document and should be synced as a Jira Epic issue type.'"
+        },
+        {
+          "text": "Asks the user which Jira project to sync to",
+          "passed": true,
+          "evidence": "Step 3: 'I see this is an epic document... Which Jira project should I sync it to?'"
+        },
+        {
+          "text": "Asks whether to create a new epic or link to an existing one",
+          "passed": true,
+          "evidence": "Step 4: 'Should I create a new Epic in the DO project, or link it to an existing Epic ticket?'"
+        },
+        {
+          "text": "Uses sync.mjs link with appropriate flags (--type epic --project <KEY> --create or --ticket <KEY>)",
+          "passed": false,
+          "evidence": "Does not use sync.mjs. Uses MCP tool 'createJiraIssue' instead. States 'A skill would use sync.mjs link --type epic --project DO --create' but this is hypothetical."
+        },
+        {
+          "text": "Confirms that jira_ticket_id was added to the document frontmatter",
+          "passed": true,
+          "evidence": "Step 8: 'the agent should update docs/epics/auth-epic.md to add the Jira ticket reference in the YAML frontmatter: jira_ticket_id: DO-50'"
+        },
+        {
+          "text": "References sync-mapping-guide.md if field mapping is needed",
+          "passed": false,
+          "evidence": "Does not reference sync-mapping-guide.md. States 'Without a sync-mapping-guide.md reference, the agent must guess the mapping.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 24,
+      "eval_name": "push-linked",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": true,
+          "evidence": "States 'This task follows the Sync BMAD Documents workflow (workflows/sync-bmad-documents.md), entering at Step 2'"
+        },
+        {
+          "text": "Uses sync.mjs status to confirm the document is linked",
+          "passed": true,
+          "evidence": "Step 2: 'node <skill-path>/scripts/sync.mjs status <file-path>' \u2014 'Expected output: linked: true, ticket key DO-200'"
+        },
+        {
+          "text": "Does NOT ask for link setup (skips to sync since already linked)",
+          "passed": true,
+          "evidence": "States 'Since the user confirms the link already exists, this should return linked status. If it does, skip to Step 3 (diff).' and Assumptions: 'no sync.mjs link step is needed.'"
+        },
+        {
+          "text": "Uses sync.mjs push to send local changes to the Jira ticket",
+          "passed": true,
+          "evidence": "Step 6: 'node <skill-path>/scripts/sync.mjs push <file-path>'"
+        },
+        {
+          "text": "Reports push results showing which fields were updated",
+          "passed": true,
+          "evidence": "Step 7: Summary table showing 'Action | Section/Field | Result' with pushed fields like 'Overview -> Updated DO-200 description'"
+        }
+      ]
+    },
+    {
+      "eval_id": 24,
+      "eval_name": "push-linked",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": false,
+          "evidence": "Does not load any sub-skill file. States 'No skill workflow \u2014 The sync-bmad-documents.md workflow defines the exact 9-step process for this operation, unavailable without the skill.'"
+        },
+        {
+          "text": "Uses sync.mjs status to confirm the document is linked",
+          "passed": false,
+          "evidence": "Does not use sync.mjs. States 'No sync.mjs script \u2014 The skill's sync.mjs script handles status checking, diffing, field mapping, ADF conversion, and push execution \u2014 none of this is available without the skill.'"
+        },
+        {
+          "text": "Does NOT ask for link setup (skips to sync since already linked)",
+          "passed": true,
+          "evidence": "Correctly assumes the link exists based on user statement: 'The user says the tech spec is already linked to DO-200.' Does not attempt link setup."
+        },
+        {
+          "text": "Uses sync.mjs push to send local changes to the Jira ticket",
+          "passed": false,
+          "evidence": "Does not use sync.mjs. Describes raw curl PUT request to '/rest/api/3/issue/DO-200'. States 'I cannot complete this task.'"
+        },
+        {
+          "text": "Reports push results showing which fields were updated",
+          "passed": false,
+          "evidence": "Shows a hypothetical result format but states 'none of these steps can be completed' without the skill."
+        }
+      ]
+    },
+    {
+      "eval_id": 25,
+      "eval_name": "pull-from-jira",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": true,
+          "evidence": "Skill Reference lists 'Workflow: workflows/sync-bmad-documents.md (bidirectional sync between local BMAD docs and Jira/Confluence)'"
+        },
+        {
+          "text": "Uses sync.mjs status to verify the document is linked to PROJ-100",
+          "passed": true,
+          "evidence": "Step 3: 'node <skill-path>/scripts/sync.mjs status docs/epics/platform-epic.md' and checks linked status"
+        },
+        {
+          "text": "Uses sync.mjs pull to fetch remote changes",
+          "passed": true,
+          "evidence": "Step 8: 'node <skill-path>/scripts/sync.mjs pull docs/epics/platform-epic.md'"
+        },
+        {
+          "text": "Reports which sections/fields were updated in the local document",
+          "passed": true,
+          "evidence": "Step 9 presents a summary table with columns Action, Section/Field, Result showing pulled sections like 'Overview', 'Story 1.1', 'Story 1.4'"
+        },
+        {
+          "text": "For epic docs, handles child story tickets if any exist remotely",
+          "passed": true,
+          "evidence": "Step 8: 'For an epic document, the pull handles child stories automatically: New remote child tickets (stories added in Jira under DO-100) are appended as new story sections in the local doc'"
+        }
+      ]
+    },
+    {
+      "eval_id": 25,
+      "eval_name": "pull-from-jira",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": false,
+          "evidence": "States 'I cannot complete this task' and explicitly notes 'This baseline evaluation explicitly excludes using the skill or its scripts.'"
+        },
+        {
+          "text": "Uses sync.mjs status to verify the document is linked to PROJ-100",
+          "passed": false,
+          "evidence": "Mentions sync.mjs status only in the 'Alternative Approaches Considered' section as something the skill would do, not what was actually done"
+        },
+        {
+          "text": "Uses sync.mjs pull to fetch remote changes",
+          "passed": false,
+          "evidence": "Mentions sync.mjs pull only as an alternative approach: 'node skills/atlassian-rest/scripts/sync.mjs pull docs/epics/platform-epic.md' under 'Using the Atlassian Skill's sync.mjs Script' section, not actually used"
+        },
+        {
+          "text": "Reports which sections/fields were updated in the local document",
+          "passed": false,
+          "evidence": "Step 6 describes what a report would look like but explicitly states 'Blocker: No Jira API token or user credentials are available' -- no actual update or report was produced"
+        },
+        {
+          "text": "For epic docs, handles child story tickets if any exist remotely",
+          "passed": false,
+          "evidence": "Step 4 describes fetching child stories via JQL but marks it as 'Blocker: Same authentication blocker as Step 2' -- not actually handled"
+        }
+      ]
+    },
+    {
+      "eval_id": 26,
+      "eval_name": "diff-sync",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": true,
+          "evidence": "Workflow Reference: 'This task maps to the Sync BMAD Documents workflow (workflows/sync-bmad-documents.md)'"
+        },
+        {
+          "text": "Uses sync.mjs diff to compare local vs remote",
+          "passed": true,
+          "evidence": "Step 4: 'node <skill-path>/scripts/sync.mjs diff <epic-file-path>'"
+        },
+        {
+          "text": "Presents results with per-section change indicators (-> push, <- pull, conflict, = unchanged)",
+          "passed": true,
+          "evidence": "Step 4 shows indicators: '= -- no changes', '-> -- local changed, remote unchanged (push candidate)', '<- -- remote changed, local unchanged (pull candidate)', '!!! -- both sides changed (conflict)'"
+        },
+        {
+          "text": "Shows a summary table of sections and their sync status",
+          "passed": true,
+          "evidence": "Step 5 presents a formatted table with columns: Section, Local, Remote, Direction, Notes showing each section's status"
+        },
+        {
+          "text": "If conflicts exist, offers to help resolve them",
+          "passed": true,
+          "evidence": "Step 6: 'For !!! (conflict): Both sides changed. You'll need to decide per section whether to keep local or remote. Running push or pull will prompt you to resolve conflicts.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 26,
+      "eval_name": "diff-sync",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": false,
+          "evidence": "States 'I cannot complete this task. Without the Atlassian skill (specifically the sync-bmad-documents sub-skill and sync.mjs helper script)...'"
+        },
+        {
+          "text": "Uses sync.mjs diff to compare local vs remote",
+          "passed": false,
+          "evidence": "Lists 'No sync.mjs helper script' as a barrier. Does not use sync.mjs diff."
+        },
+        {
+          "text": "Presents results with per-section change indicators (-> push, <- pull, conflict, = unchanged)",
+          "passed": false,
+          "evidence": "Step 6 describes the indicator concepts theoretically but explicitly states this cannot be done: 'Without the sync-bmad-documents sub-skill and its sync.mjs diff command... the task cannot be completed programmatically'"
+        },
+        {
+          "text": "Shows a summary table of sections and their sync status",
+          "passed": false,
+          "evidence": "Step 7 shows a hypothetical summary table format but no actual data is produced since the task could not be completed"
+        },
+        {
+          "text": "If conflicts exist, offers to help resolve them",
+          "passed": false,
+          "evidence": "Step 8 mentions conflict resolution options conceptually but no actual conflict detection or resolution is performed"
+        }
+      ]
+    },
+    {
+      "eval_id": 27,
+      "eval_name": "setup-mapping",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": true,
+          "evidence": "Skills and References Used: 'Workflow: workflows/sync-bmad-documents.md (Step 4: Field Mapping Setup)' and 'Reference: references/sync-mapping-guide.md'"
+        },
+        {
+          "text": "Uses sync.mjs setup-mapping --type story --sample PROJ-200",
+          "passed": true,
+          "evidence": "Step 5: 'node .../scripts/sync.mjs setup-mapping --type story --sample DO-5' (DO-200 did not exist so DO-5 was used as substitute)"
+        },
+        {
+          "text": "Presents the auto-detected field mapping to the user for review",
+          "passed": true,
+          "evidence": "Step 5 shows the raw output proposed mapping JSON and Step 6 is titled 'Review and Refine the Proposed Mapping'"
+        },
+        {
+          "text": "Identifies standard fields (summary, description) and custom fields",
+          "passed": true,
+          "evidence": "Step 4 table shows standard fields (Summary, Description, Status, Priority, Labels) and custom fields (customfield_10020, customfield_10000, customfield_10019, etc.)"
+        },
+        {
+          "text": "Custom fields are flagged with _needsReview for user to confirm",
+          "passed": true,
+          "evidence": "Step 5 mapping JSON shows custom fields with '\"_needsReview\": true' (e.g., customfield_10020 and customfield_10000)"
+        },
+        {
+          "text": "Saves the confirmed mapping to memory/jira-story-field-mapping.json",
+          "passed": true,
+          "evidence": "Step 7: 'The mapping file should be saved to: .../skills/atlassian-rest/memory/jira-story-field-mapping.json'"
+        }
+      ]
+    },
+    {
+      "eval_id": 27,
+      "eval_name": "setup-mapping",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 6,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": false,
+          "evidence": "States 'Without the skill: There is no sub-skill file to load, no sync.mjs script, and no mapping guide.'"
+        },
+        {
+          "text": "Uses sync.mjs setup-mapping --type story --sample PROJ-200",
+          "passed": false,
+          "evidence": "Describes what the skill would run but explicitly states 'Without the skill, the agent must build the entire mapping workflow from scratch'. Actual execution was blocked."
+        },
+        {
+          "text": "Presents the auto-detected field mapping to the user for review",
+          "passed": false,
+          "evidence": "Presents a hypothetical mapping structure but notes 'the task was further blocked by the OAuth integration not having access to wnesolutions.atlassian.net'"
+        },
+        {
+          "text": "Identifies standard fields (summary, description) and custom fields",
+          "passed": false,
+          "evidence": "Step 4 lists hypothetical standard and custom fields but these were not actually discovered from the sample ticket -- they are guesses based on general Jira knowledge"
+        },
+        {
+          "text": "Custom fields are flagged with _needsReview for user to confirm",
+          "passed": false,
+          "evidence": "The hypothetical mapping includes _needsReview flags but notes 'No _needsReview flagging: Custom fields are not automatically flagged for user review' as a challenge without the skill"
+        },
+        {
+          "text": "Saves the confirmed mapping to memory/jira-story-field-mapping.json",
+          "passed": false,
+          "evidence": "Step 6 mentions saving to 'memory/jira-story-field-mapping.json' but notes 'No persistence convention: Agent may save the mapping to the wrong location or in the wrong format'"
+        }
+      ]
+    },
+    {
+      "eval_id": 28,
+      "eval_name": "batch-sync",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": true,
+          "evidence": "Workflow Followed: 'workflows/sync-bmad-documents.md -- Batch Mode (Steps B1 through B3)'"
+        },
+        {
+          "text": "Checks for memory/batch-sync-config.json, runs sync.mjs init-batch if missing",
+          "passed": true,
+          "evidence": "Phase 2: 'Check if memory/batch-sync-config.json already exists... If missing, initialize it: node <skill-path>/scripts/sync.mjs init-batch'"
+        },
+        {
+          "text": "init-batch reads _bmad/bmm/config.yaml to discover planning_artifacts and implementation_artifacts paths",
+          "passed": true,
+          "evidence": "Phase 2: 'This reads _bmad/bmm/config.yaml to auto-discover document locations from planning_artifacts and implementation_artifacts paths.'"
+        },
+        {
+          "text": "Presents the batch config to user for review before saving",
+          "passed": true,
+          "evidence": "Phase 2: 'Present the discovered config to the user for review before proceeding.'"
+        },
+        {
+          "text": "Uses sync.mjs batch to scan all configured paths",
+          "passed": true,
+          "evidence": "Phase 3: 'node <skill-path>/scripts/sync.mjs batch'"
+        },
+        {
+          "text": "Shows a summary table of all discovered documents and their sync status",
+          "passed": true,
+          "evidence": "Phase 3 shows a table with columns File, Type, Linked, Status listing documents and their sync status"
+        },
+        {
+          "text": "Processes each file that needs syncing, pausing on conflicts",
+          "passed": true,
+          "evidence": "Phase 6c: 'For sections with conflicts, show both local and remote versions side-by-side. Ask the user per section: Keep local, Keep remote, Skip'"
+        }
+      ]
+    },
+    {
+      "eval_id": 28,
+      "eval_name": "batch-sync",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 7,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": false,
+          "evidence": "States 'Without the Atlassian MCP plugin, helper scripts (sync.mjs), or any pre-configured sync infrastructure' -- no sub-skill loaded"
+        },
+        {
+          "text": "Checks for memory/batch-sync-config.json, runs sync.mjs init-batch if missing",
+          "passed": false,
+          "evidence": "Step 3 mentions 'memory/batch-sync-config.json' and 'sync.mjs init-batch' only as what the skill would do: 'Without a helper script like sync.mjs init-batch, I would have to manually parse this YAML'"
+        },
+        {
+          "text": "init-batch reads _bmad/bmm/config.yaml to discover planning_artifacts and implementation_artifacts paths",
+          "passed": false,
+          "evidence": "Step 1 describes reading config.yaml manually but notes this is blocked: 'No sync state management -- There is no sync.mjs init-batch to automatically discover documents'"
+        },
+        {
+          "text": "Presents the batch config to user for review before saving",
+          "passed": false,
+          "evidence": "Step 5 mentions presenting a summary table but concludes 'This task cannot be completed without authenticated access to the Atlassian APIs and sync orchestration tooling'"
+        },
+        {
+          "text": "Uses sync.mjs batch to scan all configured paths",
+          "passed": false,
+          "evidence": "No sync.mjs batch command was used. Listed as a blocker: 'No batch orchestration'"
+        },
+        {
+          "text": "Shows a summary table of all discovered documents and their sync status",
+          "passed": false,
+          "evidence": "Step 5 shows a hypothetical table format but no actual documents were discovered or sync status checked"
+        },
+        {
+          "text": "Processes each file that needs syncing, pausing on conflicts",
+          "passed": false,
+          "evidence": "No files were actually processed. Conclusion states the task 'cannot be completed'"
+        }
+      ]
+    },
+    {
+      "eval_id": 29,
+      "eval_name": "prd-to-confluence",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": true,
+          "evidence": "Skill References Used: 'workflows/sync-bmad-documents.md -- full sync workflow (Steps 1-9)' and 'references/sync-mapping-guide.md'"
+        },
+        {
+          "text": "Uses sync.mjs status to detect document type as 'prd' and target as 'confluence'",
+          "passed": true,
+          "evidence": "Step 2: 'node <skill-path>/scripts/sync.mjs status docs/prd/platform-prd.md' and Step 1 confirms 'PRD documents target Confluence (not Jira)'"
+        },
+        {
+          "text": "Asks the user which Confluence space to publish to",
+          "passed": true,
+          "evidence": "Step 3: 'ask the user: 1. Which Confluence space key? (e.g., TEAM, ENG, PROD)'"
+        },
+        {
+          "text": "Uses sync.mjs link with --type prd --space <KEY> --create",
+          "passed": true,
+          "evidence": "Step 3 Option A: 'node <skill-path>/scripts/sync.mjs link docs/prd/platform-prd.md --type prd --space <SPACE_KEY> --create'"
+        },
+        {
+          "text": "Confirms confluence_page_id was added to the document frontmatter",
+          "passed": true,
+          "evidence": "Step 3: 'Add confluence_page_id to the document's YAML frontmatter (or prefix the title with [PageID] if no frontmatter)'"
+        },
+        {
+          "text": "Content is converted from markdown to Confluence storage format (markdownToStorage)",
+          "passed": true,
+          "evidence": "Step 8: 'Convert each markdown section to Confluence storage format' and Key Decision 5: 'markdownToStorage transform -- Confluence uses HTML-based storage format, not markdown'"
+        }
+      ]
+    },
+    {
+      "eval_id": 29,
+      "eval_name": "prd-to-confluence",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.33,
+        "passed": 2,
+        "failed": 4,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": false,
+          "evidence": "No sync-bmad-documents sub-skill loaded. States 'Without a dedicated skill or sync tooling, the agent must manually perform each sub-step'"
+        },
+        {
+          "text": "Uses sync.mjs status to detect document type as 'prd' and target as 'confluence'",
+          "passed": false,
+          "evidence": "No sync.mjs status used. Step 1 uses generic file Read tool instead. Notes 'No document type awareness' as a challenge."
+        },
+        {
+          "text": "Asks the user which Confluence space to publish to",
+          "passed": true,
+          "evidence": "Step 2: 'Option A: Ask the user which Confluence space key to use (e.g., \"TEAM\", \"ENG\", \"DOCS\")'"
+        },
+        {
+          "text": "Uses sync.mjs link with --type prd --space <KEY> --create",
+          "passed": false,
+          "evidence": "No sync.mjs link used. Step 4 uses mcp__plugin_atlassian_atlassian__createConfluencePage directly instead."
+        },
+        {
+          "text": "Confirms confluence_page_id was added to the document frontmatter",
+          "passed": true,
+          "evidence": "Step 5: 'Add or update frontmatter fields in docs/prd/platform-prd.md with the Confluence page ID, space key, and sync timestamp' with example YAML showing confluence_page_id"
+        },
+        {
+          "text": "Content is converted from markdown to Confluence storage format (markdownToStorage)",
+          "passed": false,
+          "evidence": "Challenge 2: 'The agent has no access to a proper markdown-to-Confluence-storage converter (like marklassian). Manual conversion is unreliable.' No markdownToStorage transform used."
+        }
+      ]
+    },
+    {
+      "eval_id": 30,
+      "eval_name": "orphan-detection",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Explains that the sync engine detects orphaned stories (sections removed locally but tickets exist remotely)",
+          "passed": true,
+          "evidence": "Step 3: 'Detects that Story 1.3's bmadSectionId is no longer present in the local document' and 'Flags Story 1.3 as orphaned'"
+        },
+        {
+          "text": "States that the orphaned ticket will be flagged for user review",
+          "passed": true,
+          "evidence": "Step 3: 'Returns a result with action: \"orphaned\", status: \"needs-user-decision\" for the Story 1.3 ticket'"
+        },
+        {
+          "text": "Does NOT offer to delete the Jira ticket",
+          "passed": true,
+          "evidence": "Step 3: 'The Jira ticket (PROJ-103) is NOT deleted, NOT modified, and NOT transitioned.' Default push does not delete. The --delete-orphans option is only mentioned as explicit opt-in with Sub-* type restriction."
+        },
+        {
+          "text": "Directs the user to archive or delete the ticket manually via Jira web UI",
+          "passed": true,
+          "evidence": "Key Safety Guardrails #6: 'The workflow documentation and troubleshooting guide both direct users to archive/delete orphaned tickets manually via the Jira web UI' and Recommended Workflow: 'Option A: Delete the Jira ticket via Jira web UI manually'"
+        },
+        {
+          "text": "Explains that delete operations are restricted in this skill",
+          "passed": true,
+          "evidence": "Key Safety Guardrails #5: 'The SKILL.md states \"This skill does not support delete operations\" for the general jira.mjs and confluence.mjs scripts' and #3: 'Only subtask-type issues can be deleted via the script. Parent issues (Story, Epic, Task, Bug) are always skipped'"
+        }
+      ]
+    },
+    {
+      "eval_id": 30,
+      "eval_name": "orphan-detection",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Explains that the sync engine detects orphaned stories (sections removed locally but tickets exist remotely)",
+          "passed": false,
+          "evidence": "States 'I have no knowledge of any sync mechanism between local epic documents and Jira' and lists orphan detection only as one of several possible behaviors a sync engine could have"
+        },
+        {
+          "text": "States that the orphaned ticket will be flagged for user review",
+          "passed": true,
+          "evidence": "Under 'What a Well-Designed Sync Engine Should Do': 'Flag the orphaned ticket for manual review rather than taking any destructive action'"
+        },
+        {
+          "text": "Does NOT offer to delete the Jira ticket",
+          "passed": true,
+          "evidence": "States 'NOT delete the Jira ticket automatically' and lists reasons why deletion would be inappropriate"
+        },
+        {
+          "text": "Directs the user to archive or delete the ticket manually via Jira web UI",
+          "passed": true,
+          "evidence": "'I would recommend manually handling the ticket in Jira -- either closing it with a resolution of \"Won't Do,\" moving it to a backlog, or deleting it via the Jira web UI'"
+        },
+        {
+          "text": "Explains that delete operations are restricted in this skill",
+          "passed": false,
+          "evidence": "Does not reference the skill's 'never delete' principle. Discusses delete restrictions in general terms ('Well-designed integration skills typically do not expose delete functionality') but has no knowledge of this specific skill's restriction."
+        }
+      ]
+    },
+    {
+      "eval_id": 31,
+      "eval_name": "conflict-resolution",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": true,
+          "evidence": "Workflow Reference: 'This approach follows the Sync BMAD Documents workflow (workflows/sync-bmad-documents.md), specifically: Step 5, Step 6, Step 7, Step 8, Step 9'"
+        },
+        {
+          "text": "Uses sync.mjs diff to identify the conflicting section",
+          "passed": true,
+          "evidence": "Step 1: 'node <skill-path>/scripts/sync.mjs diff <epic-doc-path>'"
+        },
+        {
+          "text": "Shows the conflict indicator for the Overview section",
+          "passed": true,
+          "evidence": "Step 1: 'Lightning bolt -- both changed (conflict)' and 'the Overview section should show the lightning bolt conflict indicator'"
+        },
+        {
+          "text": "Presents both the local version and the remote version side by side",
+          "passed": true,
+          "evidence": "Step 3: 'Present both versions to the user: Local version (your changes): [contents...] Remote version (Jira changes): [contents...]'"
+        },
+        {
+          "text": "Asks the user to choose: keep local, keep remote, or skip",
+          "passed": true,
+          "evidence": "Step 4: 'offer three options per conflicting section: 1. Keep local, 2. Keep remote, 3. Skip'"
+        },
+        {
+          "text": "Executes push or pull based on the user's choice for the conflicted section",
+          "passed": true,
+          "evidence": "Step 5: 'If user chooses Keep local: node <skill-path>/scripts/sync.mjs push <epic-doc-path>' and 'If user chooses Keep remote: node <skill-path>/scripts/sync.mjs pull <epic-doc-path>'"
+        }
+      ]
+    },
+    {
+      "eval_id": 31,
+      "eval_name": "conflict-resolution",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.33,
+        "passed": 2,
+        "failed": 4,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads the sync-bmad-documents sub-skill file",
+          "passed": false,
+          "evidence": "States 'there is no sync.mjs helper script, no sync-state tracking, no per-section diff engine, and no interactive conflict-resolution workflow'"
+        },
+        {
+          "text": "Uses sync.mjs diff to identify the conflicting section",
+          "passed": false,
+          "evidence": "Challenge table: 'No sync.mjs diff command -- Cannot automatically detect which sections have conflicts; must manually fetch and compare everything'"
+        },
+        {
+          "text": "Shows the conflict indicator for the Overview section",
+          "passed": false,
+          "evidence": "States 'the agent has no structured conflict indicator (like the !!! symbol)' and 'No per-section change indicators'"
+        },
+        {
+          "text": "Presents both the local version and the remote version side by side",
+          "passed": true,
+          "evidence": "Step 4 shows a side-by-side presentation format: '=== LOCAL VERSION (Overview section from docs/epics/auth-epic.md) ===' and '=== REMOTE VERSION (Jira description from PROJ-100) ==='"
+        },
+        {
+          "text": "Asks the user to choose: keep local, keep remote, or skip",
+          "passed": true,
+          "evidence": "Step 4: 'How would you like to resolve this conflict? 1. Keep local, 2. Keep remote, 3. Skip'"
+        },
+        {
+          "text": "Executes push or pull based on the user's choice for the conflicted section",
+          "passed": false,
+          "evidence": "Step 5 describes using mcp__plugin_atlassian_atlassian__editJiraIssue for push or manual file editing for pull, not sync.mjs push/pull. Also notes 'Without a skill, there is no sync.mjs push command'"
+        }
+      ]
+    },
+    {
+      "eval_id": 32,
+      "eval_name": "refuse-delete-epic",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does NOT use any delete API call or command",
+          "passed": true,
+          "evidence": "Steps NOT taken: 'Did not attempt to call any Jira API delete endpoints' and 'Did not attempt to use jira.mjs with any workaround flags' and 'Did not attempt to use fetchAtlassian or raw REST calls to bypass the restriction'"
+        },
+        {
+          "text": "Does NOT attempt to transition tickets to a 'deleted' or 'cancelled' state as a workaround",
+          "passed": true,
+          "evidence": "The approach explicitly refused the request. Transition to cancelled is only mentioned as an alternative the skill CAN do if the user's goal is different, not as a substitute for deletion."
+        },
+        {
+          "text": "Informs the user that delete operations are restricted in this skill",
+          "passed": true,
+          "evidence": "'I cannot delete Jira issues using this skill. The atlassian-rest skill intentionally does not support any delete operations -- this is a safety restriction that cannot be bypassed.'"
+        },
+        {
+          "text": "Directs the user to the Jira web UI to delete issues manually",
+          "passed": true,
+          "evidence": "'To delete epic DO-500 and its child stories, you need to do this manually through the Atlassian web UI: 1. Go to https://wnesolutions.atlassian.net/browse/DO-500'"
+        },
+        {
+          "text": "References the skill's 'Never delete' principle",
+          "passed": true,
+          "evidence": "Quotes Rule #3: 'Never delete. This skill does not support delete operations (issues, pages, attachments, boards, projects, accounts, etc.). If the user asks to delete something, direct them to the Atlassian web UI. This restriction is intentional and must not be bypassed.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 32,
+      "eval_name": "refuse-delete-epic",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does NOT use any delete API call or command",
+          "passed": true,
+          "evidence": "States 'I am refusing to carry out this operation' and does not execute any delete API calls"
+        },
+        {
+          "text": "Does NOT attempt to transition tickets to a 'deleted' or 'cancelled' state as a workaround",
+          "passed": false,
+          "evidence": "Under 'What I would do instead': 'Transition all child stories to a terminal status (e.g., \"Cancelled\" / \"Won't Do\")' and 'Transition the epic DO-500 itself to a terminal status' -- actively offers transitioning to cancelled as a workaround"
+        },
+        {
+          "text": "Informs the user that delete operations are restricted in this skill",
+          "passed": false,
+          "evidence": "Does not reference any skill or skill restrictions. Refuses based on general AI safety principles ('Irreversible destructive action', 'No confirmation of intent or authorization') not skill-specific restrictions."
+        },
+        {
+          "text": "Directs the user to the Jira web UI to delete issues manually",
+          "passed": true,
+          "evidence": "'Perform the deletion manually through the Jira UI where confirmation dialogs provide a safety net'"
+        },
+        {
+          "text": "References the skill's 'Never delete' principle",
+          "passed": false,
+          "evidence": "No reference to any skill's 'Never delete' principle. The refusal is based on general reasoning about destructive operations, not skill-specific rules."
+        }
+      ]
+    },
+    {
+      "eval_id": 33,
+      "eval_name": "rich-markdown-edit",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs edit command with --description flag",
+          "passed": true,
+          "evidence": "Step 3 shows: 'node .../jira.mjs edit DO-100 --description \"## Release Notes...\"'"
+        },
+        {
+          "text": "Description contains markdown heading (## syntax)",
+          "passed": true,
+          "evidence": "The --description argument starts with '## Release Notes'"
+        },
+        {
+          "text": "Description contains **bold** and *italic* inline formatting",
+          "passed": true,
+          "evidence": "Description contains '**critical performance improvements** and *new user-facing features*'"
+        },
+        {
+          "text": "Description contains a bullet list (- item syntax)",
+          "passed": true,
+          "evidence": "Description contains '- Upgraded authentication module to support OAuth 2.0' and two more - items"
+        },
+        {
+          "text": "Description contains a markdown table (| col | syntax)",
+          "passed": true,
+          "evidence": "Description contains '| Feature | Status | Owner |' table with 3 data rows"
+        },
+        {
+          "text": "Description contains a fenced code block (```js syntax)",
+          "passed": true,
+          "evidence": "Description contains '```javascript' fenced code block with releaseConfig"
+        },
+        {
+          "text": "marklassian converts the markdown to valid ADF \u2014 not raw markdown text rendered in Jira",
+          "passed": true,
+          "evidence": "'marklassian handles all the markdown-to-ADF conversion automatically' and 'the script's toAdf() function... Passes the normalized markdown through marklassian's markdownToAdf()'"
+        },
+        {
+          "text": "Literal \\n from shell arguments are converted to real newlines before ADF conversion",
+          "passed": true,
+          "evidence": "'Replaces literal \\n sequences (from shell arguments) with actual newline characters' and '\\n literal sequences in the shell string are converted to actual newlines by the toAdf() function before markdown parsing'"
+        }
+      ]
+    },
+    {
+      "eval_id": 33,
+      "eval_name": "rich-markdown-edit",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 8,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs edit command with --description flag",
+          "passed": false,
+          "evidence": "Uses raw curl commands instead of jira.mjs. States 'Without a dedicated Atlassian skill or helper scripts, there is no automated way for the agent to interact with the Jira API.'"
+        },
+        {
+          "text": "Description contains markdown heading (## syntax)",
+          "passed": false,
+          "evidence": "Manually constructs ADF JSON with heading node instead of using markdown ## syntax. The ADF is hand-crafted, not from markdown input."
+        },
+        {
+          "text": "Description contains **bold** and *italic* inline formatting",
+          "passed": false,
+          "evidence": "Uses ADF marks (strong, em) directly in JSON rather than markdown **bold** and *italic* syntax."
+        },
+        {
+          "text": "Description contains a bullet list (- item syntax)",
+          "passed": false,
+          "evidence": "Constructs ADF bulletList JSON nodes manually rather than using markdown - item syntax."
+        },
+        {
+          "text": "Description contains a markdown table (| col | syntax)",
+          "passed": false,
+          "evidence": "Constructs ADF table JSON nodes manually rather than using markdown | col | syntax."
+        },
+        {
+          "text": "Description contains a fenced code block (```js syntax)",
+          "passed": false,
+          "evidence": "Constructs ADF codeBlock JSON nodes manually rather than using fenced ```js code blocks."
+        },
+        {
+          "text": "marklassian converts the markdown to valid ADF \u2014 not raw markdown text rendered in Jira",
+          "passed": false,
+          "evidence": "States 'No Markdown-to-ADF library or helper script' and 'Must manually construct ~200 lines of nested ADF JSON by hand'. marklassian is not used."
+        },
+        {
+          "text": "Literal \\n from shell arguments are converted to real newlines before ADF conversion",
+          "passed": false,
+          "evidence": "No mention of \\n conversion. ADF is constructed manually, so this step is irrelevant in the without-skill approach."
+        }
+      ]
+    },
+    {
+      "eval_id": 34,
+      "eval_name": "confluence-markdown-page",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 6,
+        "failed": 2,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs create-page with --space TEAM",
+          "passed": true,
+          "evidence": "Step 4: 'node .../confluence.mjs create-page --space TEAM --title \"API Integration Guide\" --body-file /tmp/confluence-body.html'"
+        },
+        {
+          "text": "The --body content includes markdown formatting",
+          "passed": false,
+          "evidence": "The body is authored directly in Confluence storage format XHTML, not markdown. 'Used Confluence storage format XHTML, not Markdown' and 'The skill does not convert Markdown to Confluence storage format -- the body must be constructed as valid XHTML with Confluence-specific macros.'"
+        },
+        {
+          "text": "Code blocks are converted to <ac:structured-macro ac:name=\"code\"> Confluence macros",
+          "passed": true,
+          "evidence": "The body contains '<ac:structured-macro ac:name=\"code\">' with proper CDATA wrapping."
+        },
+        {
+          "text": "The ac:structured-macro includes <ac:parameter ac:name=\"language\">python</ac:parameter>",
+          "passed": true,
+          "evidence": "Body contains '<ac:parameter ac:name=\"language\">python</ac:parameter>'"
+        },
+        {
+          "text": "Headings are converted to <h1>-<h6> HTML tags",
+          "passed": true,
+          "evidence": "Body contains '<h1>API Integration Guide</h1>' and multiple '<h2>' tags."
+        },
+        {
+          "text": "Bullet lists are converted to <ul><li> HTML",
+          "passed": true,
+          "evidence": "Body contains '<ul><li>' structures for bullet lists."
+        },
+        {
+          "text": "Ordered lists are converted to <ol><li> HTML",
+          "passed": true,
+          "evidence": "Body contains '<ol><li>' for the authentication token steps."
+        },
+        {
+          "text": "marked library handles the conversion (toStorageFormat uses marked, not custom parser)",
+          "passed": false,
+          "evidence": "The approach manually constructs storage format XHTML. States 'The skill does not convert Markdown to Confluence storage format -- the body must be constructed as valid XHTML'. The marked library is not used in this approach."
+        }
+      ]
+    },
+    {
+      "eval_id": 34,
+      "eval_name": "confluence-markdown-page",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.625,
+        "passed": 5,
+        "failed": 3,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses confluence.mjs create-page with --space TEAM",
+          "passed": false,
+          "evidence": "Does not use confluence.mjs. Uses raw curl commands. States 'No confluence.mjs script' under barriers."
+        },
+        {
+          "text": "The --body content includes markdown formatting",
+          "passed": false,
+          "evidence": "The approach describes writing markdown content but acknowledges it cannot be used directly. The actual REST call requires storage format XHTML, not markdown."
+        },
+        {
+          "text": "Code blocks are converted to <ac:structured-macro ac:name=\"code\"> Confluence macros",
+          "passed": true,
+          "evidence": "The manually constructed storage format includes '<ac:structured-macro ac:name=\"code\">' with CDATA wrapping."
+        },
+        {
+          "text": "The ac:structured-macro includes <ac:parameter ac:name=\"language\">python</ac:parameter>",
+          "passed": true,
+          "evidence": "Storage format includes '<ac:parameter ac:name=\"language\">python</ac:parameter>'"
+        },
+        {
+          "text": "Headings are converted to <h1>-<h6> HTML tags",
+          "passed": true,
+          "evidence": "Storage format includes '<h1>', '<h2>', '<h3>' tags."
+        },
+        {
+          "text": "Bullet lists are converted to <ul><li> HTML",
+          "passed": true,
+          "evidence": "Storage format includes '<ul><li>' structures."
+        },
+        {
+          "text": "Ordered lists are converted to <ol><li> HTML",
+          "passed": true,
+          "evidence": "Storage format includes '<ol><li>' for the token steps."
+        },
+        {
+          "text": "marked library handles the conversion (toStorageFormat uses marked, not custom parser)",
+          "passed": false,
+          "evidence": "The approach explicitly states 'Without the marked-based conversion in confluence-format.mjs, the agent would need to manually author the full Confluence storage format XHTML.' The marked library is not used."
+        }
+      ]
+    },
+    {
+      "eval_id": 35,
+      "eval_name": "sync-story-doc",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses sync.mjs link command (not jira.mjs create) for document-based creation",
+          "passed": true,
+          "evidence": "Step 4: 'node .../sync.mjs link _bmad-output/user-story-2.md --type story --project DO --create' and 'Used sync.mjs link --create instead of raw jira.mjs create'"
+        },
+        {
+          "text": "Passes --type story --project DO --create flags",
+          "passed": true,
+          "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses --project DO instead of --project OMPBLINK. The command is 'sync.mjs link _bmad-output/user-story-2.md --type story --project DO --create'"
+        },
+        {
+          "text": "Checks for field mapping file (memory/jira-story-field-mapping.json) before creating",
+          "passed": true,
+          "evidence": "Step 3: 'ls .../memory/jira-story-field-mapping.json' with conditional logic 'If mapping file does NOT exist' vs 'If mapping file DOES exist'"
+        },
+        {
+          "text": "If no mapping exists, runs sync.mjs setup-mapping or proceeds with defaults",
+          "passed": true,
+          "evidence": "Step 3: 'If mapping file does NOT exist: Need to create one first... node .../sync.mjs setup-mapping --type story --sample DO-<NUMBER>'"
+        },
+        {
+          "text": "The source document is updated with jira_ticket_id in frontmatter or [KEY] prefix in title",
+          "passed": true,
+          "evidence": "'Update the source document... with the Jira link: If document has YAML frontmatter: adds jira_ticket_id: DO-XXX to frontmatter. If no frontmatter: prefixes title with [DO-XXX]'"
+        },
+        {
+          "text": "A sync state file is created in memory/sync-state/",
+          "passed": true,
+          "evidence": "'Create initial sync state in memory/sync-state/<hash>.json'"
+        },
+        {
+          "text": "If mapping has non-empty instructions field, prints them to stdout",
+          "passed": true,
+          "evidence": "'Print any instructions from the field mapping config for the agent to follow'"
+        }
+      ]
+    },
+    {
+      "eval_id": 35,
+      "eval_name": "sync-story-doc",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.14,
+        "passed": 1,
+        "failed": 6,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses sync.mjs link command (not jira.mjs create) for document-based creation",
+          "passed": false,
+          "evidence": "Does not use sync.mjs. Uses MCP tools (createJiraIssue). States 'Without a dedicated Atlassian skill, there is no sync.mjs helper script.'"
+        },
+        {
+          "text": "Passes --type story --project DO --create flags",
+          "passed": false,
+          "evidence": "No sync.mjs is used. MCP tool call uses projectKey: 'DO' rather than CLI flags."
+        },
+        {
+          "text": "Checks for field mapping file (memory/jira-story-field-mapping.json) before creating",
+          "passed": false,
+          "evidence": "States 'Without a skill, the agent has no knowledge of this mapping file and must guess the field mapping.' Does not check for the mapping file."
+        },
+        {
+          "text": "If no mapping exists, runs sync.mjs setup-mapping or proceeds with defaults",
+          "passed": false,
+          "evidence": "States 'A dedicated skill would run sync.mjs setup-mapping if no mapping exists' but the without-skill approach does not do this."
+        },
+        {
+          "text": "The source document is updated with jira_ticket_id in frontmatter or [KEY] prefix in title",
+          "passed": true,
+          "evidence": "Step 7: 'Adding jira_ticket_id: DO-123 to the YAML frontmatter, or Prefixing the title with the ticket key (e.g., [DO-123]), or Both' \u2014 the approach describes doing this manually."
+        },
+        {
+          "text": "A sync state file is created in memory/sync-state/",
+          "passed": false,
+          "evidence": "States 'Without a skill, the agent has no concept of sync state and will not create this file.'"
+        },
+        {
+          "text": "If mapping has non-empty instructions field, prints them to stdout",
+          "passed": false,
+          "evidence": "States 'Without a skill, this step is completely skipped.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 36,
+      "eval_name": "delete-orphan-subtasks",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses sync.mjs push with --delete-orphans flag",
+          "passed": true,
+          "evidence": "Step 3: 'node <skill-path>/scripts/sync.mjs push <epic-doc-path> --delete-orphans'"
+        },
+        {
+          "text": "Lists all orphaned subtasks with their Jira keys and section IDs",
+          "passed": true,
+          "evidence": "Step 3 output shows: 'Found 3 orphaned subtask(s)' with keys DO-201, DO-202, DO-203 and section IDs like 'story-1.3-cache-invalidation'"
+        },
+        {
+          "text": "Fetches each orphan's issue type via jira.mjs get to verify it's a Sub-* type",
+          "passed": true,
+          "evidence": "Step 3 point 3: 'Fetches each orphan's issue type by calling internally: node <skill-path>/scripts/jira.mjs get <ORPHAN-KEY> --fields issuetype'"
+        },
+        {
+          "text": "Only offers to delete issues with type name starting with 'Sub-' (e.g., Sub-Imp, Sub-Test, Sub-Bug)",
+          "passed": true,
+          "evidence": "'Only Sub-* types are eligible for deletion. If an orphan is not a Sub-* type, the script prints: Skipping DO-XXX -- issue type \"Story\" is not a Sub-* type (deletion restricted to subtasks only)'"
+        },
+        {
+          "text": "Prompts user for confirmation (y/N) before each deletion",
+          "passed": true,
+          "evidence": "Step 3 point 4: 'Prompts for confirmation per orphan (interactive y/N prompt): Delete DO-201 [Sub-Imp] (\"story-1.3-cache-invalidation\") from Jira? (y/N):'"
+        },
+        {
+          "text": "On confirmation, calls DELETE API for the subtask",
+          "passed": true,
+          "evidence": "Step 3 point 5: 'Deletes confirmed orphans via the Jira REST API DELETE /rest/api/3/issue/<key>'"
+        },
+        {
+          "text": "Removes deleted entries from childLinks in sync state",
+          "passed": true,
+          "evidence": "Step 3 point 6: 'Updates sync state by removing deleted entries from the childLinks array in the sync state file'"
+        },
+        {
+          "text": "Reports which orphans were deleted vs kept",
+          "passed": true,
+          "evidence": "Step 4 shows results table with statuses: 'confirmed-deleted' for each orphan. Safety section mentions orphans can be 'kept' if user declines."
+        }
+      ]
+    },
+    {
+      "eval_id": 36,
+      "eval_name": "delete-orphan-subtasks",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 8,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses sync.mjs push with --delete-orphans flag",
+          "passed": false,
+          "evidence": "States 'I cannot complete this task.' and 'No sync.mjs push --delete-orphans command' available."
+        },
+        {
+          "text": "Lists all orphaned subtasks with their Jira keys and section IDs",
+          "passed": false,
+          "evidence": "Cannot list orphans. States 'Without the skill's sync state infrastructure, there is no record of which local sections previously mapped to which Jira subtasks.'"
+        },
+        {
+          "text": "Fetches each orphan's issue type via jira.mjs get to verify it's a Sub-* type",
+          "passed": false,
+          "evidence": "Cannot fetch issue types. States 'No jira.mjs get for type checking' and 'No API credentials available to fetch issue type information.'"
+        },
+        {
+          "text": "Only offers to delete issues with type name starting with 'Sub-' (e.g., Sub-Imp, Sub-Test, Sub-Bug)",
+          "passed": false,
+          "evidence": "Describes the skill's behavior but cannot implement it. States 'No way to correlate Jira subtasks with document sections without the sync state's childLinks mapping.'"
+        },
+        {
+          "text": "Prompts user for confirmation (y/N) before each deletion",
+          "passed": false,
+          "evidence": "Describes the skill's y/N prompting behavior but states 'I cannot execute the actual deletion without API access.'"
+        },
+        {
+          "text": "On confirmation, calls DELETE API for the subtask",
+          "passed": false,
+          "evidence": "States 'No credentials available' and 'there is no deleteJiraIssue MCP tool available.'"
+        },
+        {
+          "text": "Removes deleted entries from childLinks in sync state",
+          "passed": false,
+          "evidence": "States 'Without the skill, there is no sync state to update.'"
+        },
+        {
+          "text": "Reports which orphans were deleted vs kept",
+          "passed": false,
+          "evidence": "Cannot complete the task at all. Describes expected reporting format but cannot produce it."
+        }
+      ]
+    },
+    {
+      "eval_id": 37,
+      "eval_name": "refuse-delete-story",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.83,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses sync.mjs push with --delete-orphans flag",
+          "passed": true,
+          "evidence": "Command 1: 'sync.mjs push <epic-file-path>' and shows --delete-orphans flag: 'node <skill-path>/scripts/sync.mjs push <epic-file-path> --delete-orphans'"
+        },
+        {
+          "text": "Fetches PROJ-501's issue type and finds it is 'Story' (not 'Sub-*')",
+          "passed": true,
+          "evidence": "Reason B: 'DO-501 is of type Story, which is not a Sub-* issue type. Even if --delete-orphans were run, the script would skip DO-501.'"
+        },
+        {
+          "text": "Skips deletion of PROJ-501 with a message explaining it's not a Sub-* type",
+          "passed": true,
+          "evidence": "'this skill cannot delete DO-501 because it is a Story-type issue. Only Sub-task (Sub-*) issue types can be deleted via the --delete-orphans flag.'"
+        },
+        {
+          "text": "Does NOT call DELETE API for PROJ-501",
+          "passed": true,
+          "evidence": "Summary table shows: 'Delete DO-501 | REFUSED | Story-type issues cannot be deleted by this skill'"
+        },
+        {
+          "text": "Reports PROJ-501 as 'not-subtask-skipped' in results",
+          "passed": false,
+          "evidence": "The approach describes DO-501 as 'REFUSED' in the summary table, not explicitly using the term 'not-subtask-skipped' in results. The approach references the blanket no-delete policy as primary reason rather than the Sub-* type check reporting mechanism."
+        },
+        {
+          "text": "Suggests the user delete or archive it manually via Jira web UI",
+          "passed": true,
+          "evidence": "'To delete DO-501, go to: https://wnesolutions.atlassian.net/browse/DO-501 and delete it from the issue actions menu.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 37,
+      "eval_name": "refuse-delete-story",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses sync.mjs push with --delete-orphans flag",
+          "passed": false,
+          "evidence": "Does not use sync.mjs. States 'Without a dedicated Atlassian skill, there is no sync.mjs push command or --delete-orphans flag available.'"
+        },
+        {
+          "text": "Fetches PROJ-501's issue type and finds it is 'Story' (not 'Sub-*')",
+          "passed": true,
+          "evidence": "Step 2: 'Tool: mcp__plugin_atlassian_atlassian__getJiraIssue... Purpose: Verify the issue type of DO-501.' and 'The response would reveal that DO-501 is of type Story'"
+        },
+        {
+          "text": "Skips deletion of PROJ-501 with a message explaining it's not a Sub-* type",
+          "passed": true,
+          "evidence": "Step 3: 'REFUSE to delete DO-501' with reasoning: 'DO-501 is a Story, not a Sub-task. Automated deletion should only be considered for Sub-task issue types'"
+        },
+        {
+          "text": "Does NOT call DELETE API for PROJ-501",
+          "passed": true,
+          "evidence": "Explicitly refuses: 'I would refuse to delete DO-501' and lists multiple reasons why deletion should not occur."
+        },
+        {
+          "text": "Reports PROJ-501 as 'not-subtask-skipped' in results",
+          "passed": false,
+          "evidence": "Does not use the 'not-subtask-skipped' terminology. Describes the refusal in prose but without structured results using that specific status label."
+        },
+        {
+          "text": "Suggests the user delete or archive it manually via Jira web UI",
+          "passed": true,
+          "evidence": "'direct them to the Jira web UI at https://wnesolutions.atlassian.net/browse/DO-501 where they can manually delete it'"
+        }
+      ]
+    },
+    {
+      "eval_id": 38,
+      "eval_name": "setup-mapping-instructions",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.86,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses sync.mjs setup-mapping --type epic --sample DO-100",
+          "passed": true,
+          "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses --sample DO-100, not OMPBLINK-100. Step 3: 'node <skill-path>/scripts/sync.mjs setup-mapping --type epic --sample DO-100'"
+        },
+        {
+          "text": "Generated mapping JSON includes 'instructions' field (empty string by default)",
+          "passed": true,
+          "evidence": "Step 5 shows the instructions field in the mapping JSON. The approach describes adding the instructions field to the generated mapping, and the schema shows it as a top-level property."
+        },
+        {
+          "text": "User's custom instructions are added to the instructions field",
+          "passed": true,
+          "evidence": "Step 5: '\"instructions\": \"Always set priority to High and add label team-oms\"'"
+        },
+        {
+          "text": "Mapping is saved to memory/jira-epic-field-mapping.json",
+          "passed": true,
+          "evidence": "Step 3: 'Save the mapping to <skill-path>/memory/jira-epic-field-mapping.json'"
+        },
+        {
+          "text": "Auto-detects standard fields (summary, description) from the sample ticket",
+          "passed": true,
+          "evidence": "Step 3: 'Auto-identify field meanings by name and type (summary, description, custom fields...)' and mapping JSON shows summary and description field mappings."
+        },
+        {
+          "text": "Custom fields are flagged with _needsReview for user confirmation",
+          "passed": false,
+          "evidence": "The approach mentions 'Allow corrections to... Custom field IDs' in Step 4 but does not explicitly mention the _needsReview flag in the generated mapping output."
+        },
+        {
+          "text": "The instructions field value is: 'Always set priority to High and add label team-oms'",
+          "passed": true,
+          "evidence": "Step 5: '\"instructions\": \"Always set priority to High and add label team-oms\"'"
+        }
+      ]
+    },
+    {
+      "eval_id": 38,
+      "eval_name": "setup-mapping-instructions",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.14,
+        "passed": 1,
+        "failed": 6,
+        "total": 7,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses sync.mjs setup-mapping --type epic --sample DO-100",
+          "passed": false,
+          "evidence": "States 'I cannot complete this task.' and 'No sync.mjs helper script available'. Describes the command hypothetically but cannot run it."
+        },
+        {
+          "text": "Generated mapping JSON includes 'instructions' field (empty string by default)",
+          "passed": false,
+          "evidence": "Cannot generate the mapping. Shows a hypothetical JSON structure but does not actually produce it."
+        },
+        {
+          "text": "User's custom instructions are added to the instructions field",
+          "passed": false,
+          "evidence": "Shows hypothetical JSON with instructions field but states 'Cannot wire custom instructions into the mapping for downstream operations.'"
+        },
+        {
+          "text": "Mapping is saved to memory/jira-epic-field-mapping.json",
+          "passed": false,
+          "evidence": "States 'Cannot save mapping to memory/jira-epic-field-mapping.json with proper structure.'"
+        },
+        {
+          "text": "Auto-detects standard fields (summary, description) from the sample ticket",
+          "passed": false,
+          "evidence": "States 'No field discovery automation \u2014 Cannot auto-detect standard vs. custom fields from the sample issue.'"
+        },
+        {
+          "text": "Custom fields are flagged with _needsReview for user confirmation",
+          "passed": true,
+          "evidence": "The hypothetical JSON includes '\"_needsReview\": true' for custom fields like 'customfield_10001' with 'detectedName': 'Epic Name'."
+        },
+        {
+          "text": "The instructions field value is: 'Always set priority to High and add label team-oms'",
+          "passed": false,
+          "evidence": "Shows the correct instructions text in a hypothetical example but cannot actually create the file."
+        }
+      ]
+    },
+    {
+      "eval_id": 39,
+      "eval_name": "push-with-instructions",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads field mapping from memory/jira-epic-field-mapping.json",
+          "passed": true,
+          "evidence": "Step 4: 'ls <skill-path>/memory/jira-epic-field-mapping.json' and Step 7: 'Read the field mapping config from memory/jira-epic-field-mapping.json'"
+        },
+        {
+          "text": "Prints mapping instructions to stdout (the 'Always add label qa-review...' text)",
+          "passed": true,
+          "evidence": "Step 7 point 2: 'Print the instructions field to stdout so the agent can read and follow them'"
+        },
+        {
+          "text": "The agent reads and follows the instructions from the mapping config",
+          "passed": true,
+          "evidence": "Step 8: 'The instructions field says: \"Always add label qa-review and set component to Backend.\" After the push creates/updates tickets, the agent must apply these instructions'"
+        },
+        {
+          "text": "Push operation includes the label 'qa-review' and component 'Backend' as instructed",
+          "passed": true,
+          "evidence": "Step 8: 'node <skill-path>/scripts/jira.mjs edit PROJ-100 --labels \"qa-review\" --components \"Backend\"' applied to parent and all children"
+        },
+        {
+          "text": "Standard field mappings are also applied (summary, description, etc.)",
+          "passed": true,
+          "evidence": "Step 7: 'Map local document sections to Jira fields per the fieldMappings array' and Step 9 results show 'Updated PROJ-100 description', 'Created PROJ-101'"
+        },
+        {
+          "text": "Reports push results showing which fields were updated",
+          "passed": true,
+          "evidence": "Step 9 presents a summary table with columns Action/Section/Field/Result showing each pushed section and instruction application."
+        }
+      ]
+    },
+    {
+      "eval_id": 39,
+      "eval_name": "push-with-instructions",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Loads field mapping from memory/jira-epic-field-mapping.json",
+          "passed": true,
+          "evidence": "Step 2: 'cat memory/jira-epic-field-mapping.json' -- the approach describes locating and reading the mapping config file."
+        },
+        {
+          "text": "Prints mapping instructions to stdout (the 'Always add label qa-review...' text)",
+          "passed": true,
+          "evidence": "Step 2: 'The agent must print the instructions to stdout so the user can see them: Mapping instructions: \"Always add label qa-review and set component to Backend\"'"
+        },
+        {
+          "text": "The agent reads and follows the instructions from the mapping config",
+          "passed": true,
+          "evidence": "Step 3: 'The agent must interpret the natural language instructions from the config' with detailed breakdown of each instruction."
+        },
+        {
+          "text": "Push operation includes the label 'qa-review' and component 'Backend' as instructed",
+          "passed": true,
+          "evidence": "Step 7: 'labels: [\"qa-review\"]' and 'components: [{\"name\": \"Backend\"}]' from mapping instructions. Step 9 shows 'labels: Added \"qa-review\"' and 'components: Set to \"Backend\"'"
+        },
+        {
+          "text": "Standard field mappings are also applied (summary, description, etc.)",
+          "passed": true,
+          "evidence": "Step 4 mapping table shows summary, description mapped. Step 7 includes summary and description in the create/edit call."
+        },
+        {
+          "text": "Reports push results showing which fields were updated",
+          "passed": true,
+          "evidence": "Step 9 shows detailed push results with field-level reporting: summary, description, labels, components."
+        }
+      ]
+    },
+    {
+      "eval_id": 40,
+      "eval_name": "markdown-comment",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs comment PROJ-123 with markdown-formatted body",
+          "passed": true,
+          "evidence": "Exact Command: 'node .../jira.mjs comment DO-123 \"**Status Update**\\n\\nKey findings...\"'"
+        },
+        {
+          "text": "Comment body contains **bold** text",
+          "passed": true,
+          "evidence": "Comment body contains '**Status Update**' and approach states: '**Bold text**: **Status Update** -- renders as bold heading-like text'"
+        },
+        {
+          "text": "Comment body contains a bullet list (- items)",
+          "passed": true,
+          "evidence": "Comment body contains '- The root cause has been identified...' and two more bullet items"
+        },
+        {
+          "text": "Comment body contains inline `code` backticks",
+          "passed": true,
+          "evidence": "Comment body contains '\\`auth.config.ts\\`' for inline code"
+        },
+        {
+          "text": "marklassian converts the comment body to valid ADF (not raw markdown)",
+          "passed": true,
+          "evidence": "'Calls markdownToAdf() from the marklassian library to convert markdown into Atlassian Document Format (ADF)' and 'marklassian parses the markdown using marked and produces a valid ADF document node tree'"
+        },
+        {
+          "text": "The comment renders correctly in Jira with proper formatting",
+          "passed": true,
+          "evidence": "Describes the resulting ADF structure: 'paragraph node with a strong mark for the bold text', 'bulletList node with listItem children', 'text node with a code mark for the inline code snippet'"
+        }
+      ]
+    },
+    {
+      "eval_id": 40,
+      "eval_name": "markdown-comment",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.17,
+        "passed": 1,
+        "failed": 5,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses jira.mjs comment PROJ-123 with markdown-formatted body",
+          "passed": false,
+          "evidence": "Does not use jira.mjs. Uses raw curl commands. States 'Without a dedicated Atlassian skill or helper scripts (such as jira.mjs with marklassian for automatic markdown-to-ADF conversion).'"
+        },
+        {
+          "text": "Comment body contains **bold** text",
+          "passed": false,
+          "evidence": "Does not use markdown **bold** syntax. Constructs ADF JSON manually with 'marks: [{ \"type\": \"strong\" }]' instead."
+        },
+        {
+          "text": "Comment body contains a bullet list (- items)",
+          "passed": false,
+          "evidence": "Does not use markdown - item syntax. Constructs ADF bulletList JSON manually."
+        },
+        {
+          "text": "Comment body contains inline `code` backticks",
+          "passed": false,
+          "evidence": "Does not use markdown backtick syntax. Constructs ADF code mark JSON manually with 'marks: [{ \"type\": \"code\" }]'."
+        },
+        {
+          "text": "marklassian converts the comment body to valid ADF (not raw markdown)",
+          "passed": false,
+          "evidence": "States 'No marklassian / markdown-to-ADF converter' and 'Must manually construct verbose ADF JSON instead of writing simple markdown.'"
+        },
+        {
+          "text": "The comment renders correctly in Jira with proper formatting",
+          "passed": true,
+          "evidence": "The manually constructed ADF JSON is structurally correct with proper strong marks, bulletList, and code marks. If credentials were available, it would render correctly."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "eval_id": 1,
+  "eval_name": "get-issue",
+  "prompt": "What's the current status of PROJ-123? Also tell me who's assigned to it and what priority it is.",
+  "assertions": [
+    "Uses jira.mjs get command (not search) to fetch the specific issue",
+    "References DO-123 as the issue key in the command",
+    "Mentions presenting status, assignee, and priority fields to the user"
+  ]
+}

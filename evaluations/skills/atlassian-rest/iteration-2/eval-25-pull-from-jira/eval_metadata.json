@@ -1,0 +1,12 @@
+{
+  "eval_id": 25,
+  "eval_name": "pull-from-jira",
+  "prompt": "Pull the latest changes from Jira ticket PROJ-100 into my local epic doc at docs/epics/platform-epic.md.",
+  "assertions": [
+    "Loads the sync-bmad-documents sub-skill file",
+    "Uses sync.mjs status to verify the document is linked to PROJ-100",
+    "Uses sync.mjs pull to fetch remote changes",
+    "Reports which sections/fields were updated in the local document",
+    "For epic docs, handles child story tickets if any exist remotely"
+  ]
+}

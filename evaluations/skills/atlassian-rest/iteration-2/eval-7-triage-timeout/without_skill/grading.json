@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the triage-issue sub-skill file",
+      "passed": false,
+      "evidence": "No triage-issue sub-skill loaded. States: \"Unable to complete\" and relies on MCP plugin tools, not skill workflows."
+    },
+    {
+      "text": "Extracts error signature, component (payment), and symptom (checkout failing)",
+      "passed": true,
+      "evidence": "Identifies: \"Connection timeout\" errors, \"payment service\" component, and \"checkout\" as the affected flow throughout the approach."
+    },
+    {
+      "text": "Runs at least 2 different search queries with different JQL strategies",
+      "passed": true,
+      "evidence": "Ran three parallel JQL searches: open issues matching timeout/connection timeout, resolved issues for regression check, and payment-related issues with error/timeout/checkout terms."
+    },
+    {
+      "text": "Searches for both open and resolved issues",
+      "passed": true,
+      "evidence": "Step 1 searches open issues (status NOT IN Done/Closed), Step 2 explicitly searches resolved issues for regression check (status IN Done/Closed/Resolved AND resolved >= -90d)."
+    },
+    {
+      "text": "Presents findings with confidence/similarity assessment",
+      "passed": true,
+      "evidence": "Step 4 describes assessment categories: \"High confidence duplicate\", \"Related but different\" with instructions to assess each match."
+    },
+    {
+      "text": "Offers options: create new, comment on existing, or show more details",
+      "passed": true,
+      "evidence": "Step 4 offers: high confidence duplicate -> add comment, related but different -> link and file new, no matches -> create new bug. Step 5 shows creating a new bug. Step 6 mentions linking."
+    },
+    {
+      "text": "Asks which project if not specified, or searches broadly",
+      "passed": false,
+      "evidence": "Assumes project DO without asking. Does not search broadly or ask which project to use."
+    },
+    {
+      "text": "References bug-report-templates.md",
+      "passed": false,
+      "evidence": "Does not reference bug-report-templates.md. The description is structured but not attributed to any reference document."
+    }
+  ],
+  "summary": { "passed": 5, "failed": 3, "total": 8, "pass_rate": 0.63 }
+}

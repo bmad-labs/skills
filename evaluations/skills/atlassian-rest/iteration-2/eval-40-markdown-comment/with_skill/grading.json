@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs comment PROJ-123 with markdown-formatted body",
+      "passed": true,
+      "evidence": "Exact Command: 'node .../jira.mjs comment DO-123 \"**Status Update**\\n\\nKey findings...\"'"
+    },
+    {
+      "text": "Comment body contains **bold** text",
+      "passed": true,
+      "evidence": "Comment body contains '**Status Update**' and approach states: '**Bold text**: **Status Update** -- renders as bold heading-like text'"
+    },
+    {
+      "text": "Comment body contains a bullet list (- items)",
+      "passed": true,
+      "evidence": "Comment body contains '- The root cause has been identified...' and two more bullet items"
+    },
+    {
+      "text": "Comment body contains inline `code` backticks",
+      "passed": true,
+      "evidence": "Comment body contains '\\`auth.config.ts\\`' for inline code"
+    },
+    {
+      "text": "marklassian converts the comment body to valid ADF (not raw markdown)",
+      "passed": true,
+      "evidence": "'Calls markdownToAdf() from the marklassian library to convert markdown into Atlassian Document Format (ADF)' and 'marklassian parses the markdown using marked and produces a valid ADF document node tree'"
+    },
+    {
+      "text": "The comment renders correctly in Jira with proper formatting",
+      "passed": true,
+      "evidence": "Describes the resulting ADF structure: 'paragraph node with a strong mark for the bold text', 'bulletList node with listItem children', 'text node with a code mark for the inline code snippet'"
+    }
+  ],
+  "summary": { "passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0 }
+}

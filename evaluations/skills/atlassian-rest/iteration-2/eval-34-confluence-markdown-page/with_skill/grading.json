@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs create-page with --space TEAM",
+      "passed": true,
+      "evidence": "Step 4: 'node .../confluence.mjs create-page --space TEAM --title \"API Integration Guide\" --body-file /tmp/confluence-body.html'"
+    },
+    {
+      "text": "The --body content includes markdown formatting",
+      "passed": false,
+      "evidence": "The body is authored directly in Confluence storage format XHTML, not markdown. 'Used Confluence storage format XHTML, not Markdown' and 'The skill does not convert Markdown to Confluence storage format -- the body must be constructed as valid XHTML with Confluence-specific macros.'"
+    },
+    {
+      "text": "Code blocks are converted to <ac:structured-macro ac:name=\"code\"> Confluence macros",
+      "passed": true,
+      "evidence": "The body contains '<ac:structured-macro ac:name=\"code\">' with proper CDATA wrapping."
+    },
+    {
+      "text": "The ac:structured-macro includes <ac:parameter ac:name=\"language\">python</ac:parameter>",
+      "passed": true,
+      "evidence": "Body contains '<ac:parameter ac:name=\"language\">python</ac:parameter>'"
+    },
+    {
+      "text": "Headings are converted to <h1>-<h6> HTML tags",
+      "passed": true,
+      "evidence": "Body contains '<h1>API Integration Guide</h1>' and multiple '<h2>' tags."
+    },
+    {
+      "text": "Bullet lists are converted to <ul><li> HTML",
+      "passed": true,
+      "evidence": "Body contains '<ul><li>' structures for bullet lists."
+    },
+    {
+      "text": "Ordered lists are converted to <ol><li> HTML",
+      "passed": true,
+      "evidence": "Body contains '<ol><li>' for the authentication token steps."
+    },
+    {
+      "text": "marked library handles the conversion (toStorageFormat uses marked, not custom parser)",
+      "passed": false,
+      "evidence": "The approach manually constructs storage format XHTML. States 'The skill does not convert Markdown to Confluence storage format -- the body must be constructed as valid XHTML'. The marked library is not used in this approach."
+    }
+  ],
+  "summary": { "passed": 6, "failed": 2, "total": 8, "pass_rate": 0.75 }
+}

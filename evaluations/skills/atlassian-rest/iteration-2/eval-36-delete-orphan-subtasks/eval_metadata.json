@@ -1,0 +1,15 @@
+{
+  "eval_id": 36,
+  "eval_name": "delete-orphan-subtasks",
+  "prompt": "I removed 3 story sections from my epic doc. Push changes and clean up the orphaned Sub-Imp subtasks in Jira.",
+  "assertions": [
+    "Uses sync.mjs push with --delete-orphans flag",
+    "Lists all orphaned subtasks with their Jira keys and section IDs",
+    "Fetches each orphan's issue type via jira.mjs get to verify it's a Sub-* type",
+    "Only offers to delete issues with type name starting with 'Sub-' (e.g., Sub-Imp, Sub-Test, Sub-Bug)",
+    "Prompts user for confirmation (y/N) before each deletion",
+    "On confirmation, calls DELETE API for the subtask",
+    "Removes deleted entries from childLinks in sync state",
+    "Reports which orphans were deleted vs kept"
+  ]
+}

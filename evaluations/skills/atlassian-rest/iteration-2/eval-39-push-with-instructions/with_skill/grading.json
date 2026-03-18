@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Loads field mapping from memory/jira-epic-field-mapping.json",
+      "passed": true,
+      "evidence": "Step 4: 'ls <skill-path>/memory/jira-epic-field-mapping.json' and Step 7: 'Read the field mapping config from memory/jira-epic-field-mapping.json'"
+    },
+    {
+      "text": "Prints mapping instructions to stdout (the 'Always add label qa-review...' text)",
+      "passed": true,
+      "evidence": "Step 7 point 2: 'Print the instructions field to stdout so the agent can read and follow them'"
+    },
+    {
+      "text": "The agent reads and follows the instructions from the mapping config",
+      "passed": true,
+      "evidence": "Step 8: 'The instructions field says: \"Always add label qa-review and set component to Backend.\" After the push creates/updates tickets, the agent must apply these instructions'"
+    },
+    {
+      "text": "Push operation includes the label 'qa-review' and component 'Backend' as instructed",
+      "passed": true,
+      "evidence": "Step 8: 'node <skill-path>/scripts/jira.mjs edit PROJ-100 --labels \"qa-review\" --components \"Backend\"' applied to parent and all children"
+    },
+    {
+      "text": "Standard field mappings are also applied (summary, description, etc.)",
+      "passed": true,
+      "evidence": "Step 7: 'Map local document sections to Jira fields per the fieldMappings array' and Step 9 results show 'Updated PROJ-100 description', 'Created PROJ-101'"
+    },
+    {
+      "text": "Reports push results showing which fields were updated",
+      "passed": true,
+      "evidence": "Step 9 presents a summary table with columns Action/Section/Field/Result showing each pushed section and instruction application."
+    }
+  ],
+  "summary": { "passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0 }
+}

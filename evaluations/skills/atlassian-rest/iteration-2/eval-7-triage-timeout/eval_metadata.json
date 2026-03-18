@@ -1,0 +1,15 @@
+{
+  "eval_id": 7,
+  "eval_name": "triage-timeout",
+  "prompt": "Triage 'Connection timeout' errors in payment service during checkout.",
+  "assertions": [
+    "Loads the triage-issue sub-skill file",
+    "Extracts error signature, component (payment), and symptom (checkout failing)",
+    "Runs at least 2 different search queries with different JQL strategies",
+    "Searches for both open and resolved issues",
+    "Presents findings with confidence/similarity assessment",
+    "Offers options: create new, comment on existing, or show more details",
+    "Asks which project if not specified, or searches broadly",
+    "References bug-report-templates.md"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": true,
+      "evidence": "Workflow Reference: 'This task maps to the Sync BMAD Documents workflow (workflows/sync-bmad-documents.md)'"
+    },
+    {
+      "text": "Uses sync.mjs diff to compare local vs remote",
+      "passed": true,
+      "evidence": "Step 4: 'node <skill-path>/scripts/sync.mjs diff <epic-file-path>'"
+    },
+    {
+      "text": "Presents results with per-section change indicators (-> push, <- pull, conflict, = unchanged)",
+      "passed": true,
+      "evidence": "Step 4 shows indicators: '= -- no changes', '-> -- local changed, remote unchanged (push candidate)', '<- -- remote changed, local unchanged (pull candidate)', '!!! -- both sides changed (conflict)'"
+    },
+    {
+      "text": "Shows a summary table of sections and their sync status",
+      "passed": true,
+      "evidence": "Step 5 presents a formatted table with columns: Section, Local, Remote, Direction, Notes showing each section's status"
+    },
+    {
+      "text": "If conflicts exist, offers to help resolve them",
+      "passed": true,
+      "evidence": "Step 6: 'For !!! (conflict): Both sides changed. You'll need to decide per section whether to keep local or remote. Running push or pull will prompt you to resolve conflicts.'"
+    }
+  ],
+  "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0 }
+}

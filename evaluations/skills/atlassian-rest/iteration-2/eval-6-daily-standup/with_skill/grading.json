@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Queries focus on last 24 hours (not 7 days)",
+      "passed": true,
+      "evidence": "All time-based queries use 24h scope: \"startOfDay(-1), now()\" and \"created >= \\\"-1d\\\"\". Explicitly states adaptation from 7d to 1d: \"date range = last 24h (-1d / startOfDay(-1))\""
+    },
+    {
+      "text": "Uses a compact standup format (done/doing/blocked or similar)",
+      "passed": true,
+      "evidence": "Output format uses classic standup sections: \"Done Since Yesterday\", \"Status Changes (Last 24h)\", \"Blocked\", \"In Progress Today\", \"Up Next (Sprint Backlog)\", \"New Issues (Last 24h)\" with compact tables and one-line metrics footer."
+    },
+    {
+      "text": "Does NOT use confluence.mjs create-page or update-page",
+      "passed": true,
+      "evidence": "Section 4 explicitly states: \"Step 5 of workflows/generate-status-report.md is skipped entirely. No confluence.mjs commands are invoked.\""
+    },
+    {
+      "text": "Presents results directly rather than publishing",
+      "passed": true,
+      "evidence": "\"The report is rendered as markdown directly in the conversation (Step 4)\" and \"Present to user for review (no Confluence publishing)\"."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 }
+}

@@ -1,0 +1,13 @@
+{
+  "eval_id": 40,
+  "eval_name": "markdown-comment",
+  "prompt": "Create a Jira comment on PROJ-123 with markdown formatting: bold text, a bullet list, and an inline code snippet.",
+  "assertions": [
+    "Uses jira.mjs comment PROJ-123 with markdown-formatted body",
+    "Comment body contains **bold** text",
+    "Comment body contains a bullet list (- items)",
+    "Comment body contains inline `code` backticks",
+    "marklassian converts the comment body to valid ADF (not raw markdown)",
+    "The comment renders correctly in Jira with proper formatting"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "eval_id": 26,
+  "eval_name": "diff-sync",
+  "prompt": "Check what's changed between my local epic doc and the Jira ticket since the last sync.",
+  "assertions": [
+    "Loads the sync-bmad-documents sub-skill file",
+    "Uses sync.mjs diff to compare local vs remote",
+    "Presents results with per-section change indicators (\u2192 push, \u2190 pull, \u26a1 conflict, = unchanged)",
+    "Shows a summary table of sections and their sync status",
+    "If conflicts exist, offers to help resolve them"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "eval_id": 22,
+  "eval_name": "status-page-layout",
+  "prompt": "Create a status report page in Confluence ENG space with two-column layout showing overall status (green lozenge) on the left and sprint progress on the right. Include tables for completed and in-progress tickets, and a warning panel for risks. Upload the burndown chart from ./charts/burndown.png and embed it at 800px.",
+  "assertions": [
+    "References confluence-formatting.md for the status report template or macros",
+    "Body contains ac:layout with ac:layout-section type='two_equal'",
+    "Body contains ac:structured-macro for status lozenge with colour Green",
+    "Body contains table elements for completed and in-progress tickets",
+    "Body contains ac:structured-macro with ac:name='warning' for risks panel",
+    "Uses confluence.mjs create-page to create the page first",
+    "Uses confluence.mjs attach to upload the burndown chart after page creation",
+    "Updates the page to embed the image with ac:image at width 800",
+    "Uses --body-file for the long storage format content"
+  ]
+}

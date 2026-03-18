@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Loads search-company-knowledge sub-skill",
+      "passed": false,
+      "evidence": "No search-company-knowledge sub-skill or workflow was loaded. The approach states 'Without the atlassian-rest skill, the Atlassian MCP plugin tools were used directly.'"
+    },
+    {
+      "text": "Searches Confluence for documentation pages about authentication/login/OAuth",
+      "passed": true,
+      "evidence": "Used searchAtlassian (Rovo Search) with queries including 'authentication system login OAuth', 'authentication known issues bugs login failure', 'SSO SAML single sign-on token refresh session' and retrieved 7 Confluence pages."
+    },
+    {
+      "text": "Searches Jira for related issues or bugs",
+      "passed": true,
+      "evidence": "Searched Jira using JQL: text ~ \"authentication\" OR text ~ \"OAuth\" OR summary ~ \"login\" ORDER BY updated DESC. Returned 15 issues."
+    },
+    {
+      "text": "Uses both confluence.mjs search and jira.mjs search",
+      "passed": false,
+      "evidence": "Used MCP plugin tools (searchAtlassian, searchJiraIssuesUsingJql, getConfluencePage) instead of confluence.mjs and jira.mjs helper scripts. Limitations section confirms: 'Could not use confluence.mjs or jira.mjs helper scripts.'"
+    },
+    {
+      "text": "Plans to fetch full content from top results",
+      "passed": true,
+      "evidence": "Step 4: 'Retrieved full page content (in markdown format) for the 7 most relevant Confluence pages' with specific page IDs listed."
+    },
+    {
+      "text": "Synthesizes information from multiple sources with citations",
+      "passed": true,
+      "evidence": "Detailed 'Synthesized Findings' section covering 4 categories (How Login Works, OAuth Providers, Known Issues, Key Environment Variables) with specific page URLs and Jira issue keys as citations."
+    },
+    {
+      "text": "References search-patterns.md or query-languages.md",
+      "passed": false,
+      "evidence": "Limitations section states: 'No search-patterns.md reference: Did not have access to the skill's query optimization patterns' and 'Without the skill's guidance, searches were not as targeted as they could have been with reference to query-languages.md.'"
+    }
+  ],
+  "summary": { "passed": 4, "failed": 3, "total": 7, "pass_rate": 0.57 }
+}

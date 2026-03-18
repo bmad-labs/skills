@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the sync-bmad-documents sub-skill file",
+      "passed": false,
+      "evidence": "States 'Without the Atlassian MCP plugin, helper scripts (sync.mjs), or any pre-configured sync infrastructure' -- no sub-skill loaded"
+    },
+    {
+      "text": "Checks for memory/batch-sync-config.json, runs sync.mjs init-batch if missing",
+      "passed": false,
+      "evidence": "Step 3 mentions 'memory/batch-sync-config.json' and 'sync.mjs init-batch' only as what the skill would do: 'Without a helper script like sync.mjs init-batch, I would have to manually parse this YAML'"
+    },
+    {
+      "text": "init-batch reads _bmad/bmm/config.yaml to discover planning_artifacts and implementation_artifacts paths",
+      "passed": false,
+      "evidence": "Step 1 describes reading config.yaml manually but notes this is blocked: 'No sync state management -- There is no sync.mjs init-batch to automatically discover documents'"
+    },
+    {
+      "text": "Presents the batch config to user for review before saving",
+      "passed": false,
+      "evidence": "Step 5 mentions presenting a summary table but concludes 'This task cannot be completed without authenticated access to the Atlassian APIs and sync orchestration tooling'"
+    },
+    {
+      "text": "Uses sync.mjs batch to scan all configured paths",
+      "passed": false,
+      "evidence": "No sync.mjs batch command was used. Listed as a blocker: 'No batch orchestration'"
+    },
+    {
+      "text": "Shows a summary table of all discovered documents and their sync status",
+      "passed": false,
+      "evidence": "Step 5 shows a hypothetical table format but no actual documents were discovered or sync status checked"
+    },
+    {
+      "text": "Processes each file that needs syncing, pausing on conflicts",
+      "passed": false,
+      "evidence": "No files were actually processed. Conclusion states the task 'cannot be completed'"
+    }
+  ],
+  "summary": { "passed": 0, "failed": 7, "total": 7, "pass_rate": 0.0 }
+}

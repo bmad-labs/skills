@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads triage-issue sub-skill",
+      "passed": false,
+      "evidence": "Explicitly states: 'Without the Atlassian REST skill, there are no helper scripts or sub-skills (e.g., triage-issue workflow, JQL pattern references, bug-report templates) available.'"
+    },
+    {
+      "text": "Searches by error type (NullPointerException), class (UserService), and method (getProfile)",
+      "passed": true,
+      "evidence": "Search A: text ~ 'NullPointerException UserService getProfile'. Search B: text ~ 'UserService'. Search C: text ~ 'null' AND text ~ 'getProfile'. All three elements covered."
+    },
+    {
+      "text": "Includes DO project in JQL",
+      "passed": true,
+      "evidence": "All JQL queries include 'project = DO', e.g. 'project = DO AND issuetype = Bug AND text ~ \"NullPointerException UserService getProfile\"'."
+    },
+    {
+      "text": "Checks for resolved similar issues (regression detection)",
+      "passed": true,
+      "evidence": "Step 2: 'Check for Regressions' with JQL: 'project = DO AND issuetype = Bug AND text ~ \"NullPointerException UserService\" AND statusCategory = Done'. Notes: 'flag it as a potential regression and consider reopening.'"
+    },
+    {
+      "text": "If creating new, uses structured bug format with Component, Error, Steps, Expected/Actual",
+      "passed": true,
+      "evidence": "Step 3 description includes: '## Error', '## Component' (Backend - UserService), '## Steps to Reproduce', '## Expected Behavior', '## Actual Behavior', '## Root Cause Analysis' sections."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 1, "total": 5, "pass_rate": 0.8 }
+}

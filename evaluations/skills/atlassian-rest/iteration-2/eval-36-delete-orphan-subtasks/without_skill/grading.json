@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Uses sync.mjs push with --delete-orphans flag",
+      "passed": false,
+      "evidence": "States 'I cannot complete this task.' and 'No sync.mjs push --delete-orphans command' available."
+    },
+    {
+      "text": "Lists all orphaned subtasks with their Jira keys and section IDs",
+      "passed": false,
+      "evidence": "Cannot list orphans. States 'Without the skill's sync state infrastructure, there is no record of which local sections previously mapped to which Jira subtasks.'"
+    },
+    {
+      "text": "Fetches each orphan's issue type via jira.mjs get to verify it's a Sub-* type",
+      "passed": false,
+      "evidence": "Cannot fetch issue types. States 'No jira.mjs get for type checking' and 'No API credentials available to fetch issue type information.'"
+    },
+    {
+      "text": "Only offers to delete issues with type name starting with 'Sub-' (e.g., Sub-Imp, Sub-Test, Sub-Bug)",
+      "passed": false,
+      "evidence": "Describes the skill's behavior but cannot implement it. States 'No way to correlate Jira subtasks with document sections without the sync state's childLinks mapping.'"
+    },
+    {
+      "text": "Prompts user for confirmation (y/N) before each deletion",
+      "passed": false,
+      "evidence": "Describes the skill's y/N prompting behavior but states 'I cannot execute the actual deletion without API access.'"
+    },
+    {
+      "text": "On confirmation, calls DELETE API for the subtask",
+      "passed": false,
+      "evidence": "States 'No credentials available' and 'there is no deleteJiraIssue MCP tool available.'"
+    },
+    {
+      "text": "Removes deleted entries from childLinks in sync state",
+      "passed": false,
+      "evidence": "States 'Without the skill, there is no sync state to update.'"
+    },
+    {
+      "text": "Reports which orphans were deleted vs kept",
+      "passed": false,
+      "evidence": "Cannot complete the task at all. Describes expected reporting format but cannot produce it."
+    }
+  ],
+  "summary": { "passed": 0, "failed": 8, "total": 8, "pass_rate": 0.0 }
+}

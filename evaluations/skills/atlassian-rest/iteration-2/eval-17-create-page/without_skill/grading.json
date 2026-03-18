@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses confluence.mjs create-page with --space TEAM",
+      "passed": false,
+      "evidence": "Does not use confluence.mjs. Instead describes raw REST API call: 'POST https://wnesolutions.atlassian.net/wiki/rest/api/content'. States 'This task cannot be completed without authenticated access to the Confluence API.'"
+    },
+    {
+      "text": "Title includes 'Architecture Decision Record' and 'Microservices Migration'",
+      "passed": true,
+      "evidence": "Title: 'Architecture Decision Record - Microservices Migration'"
+    },
+    {
+      "text": "Body contains sections for Context, Decision, Consequences, and Status",
+      "passed": true,
+      "evidence": "Body contains <h2>Context</h2>, <h2>Decision</h2>, <h2>Consequences</h2>, and <h2>Status</h2>"
+    },
+    {
+      "text": "Body uses HTML storage format (h2 tags or similar) or plain text that will be auto-wrapped",
+      "passed": true,
+      "evidence": "Body uses HTML storage format with h2 tags, table elements, ul/li lists"
+    }
+  ],
+  "summary": { "passed": 3, "failed": 1, "total": 4, "pass_rate": 0.75 }
+}

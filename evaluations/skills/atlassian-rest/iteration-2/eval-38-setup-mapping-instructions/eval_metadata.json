@@ -1,0 +1,14 @@
+{
+  "eval_id": 38,
+  "eval_name": "setup-mapping-instructions",
+  "prompt": "Set up field mapping for my epic docs syncing to OMPBLINK. Use OMPBLINK-100 as a sample. I want to add custom instructions: 'Always set priority to High and add label team-oms'.",
+  "assertions": [
+    "Uses sync.mjs setup-mapping --type epic --sample DO-100",
+    "Generated mapping JSON includes 'instructions' field (empty string by default)",
+    "User's custom instructions are added to the instructions field",
+    "Mapping is saved to memory/jira-epic-field-mapping.json",
+    "Auto-detects standard fields (summary, description) from the sample ticket",
+    "Custom fields are flagged with _needsReview for user confirmation",
+    "The instructions field value is: 'Always set priority to High and add label team-oms'"
+  ]
+}

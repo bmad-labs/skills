@@ -83,6 +83,8 @@ This will:
 3. Auto-identify field meanings by name and type
 4. Output a proposed mapping as JSON
 
+Fields marked with `_needsReview: true` are auto-detected custom fields — highlight these to the user and ask them to verify the mapping is correct.
+
 Present the mapping table to the user for review. Allow them to:
 
 - Correct auto-detected mappings

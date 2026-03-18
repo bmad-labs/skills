@@ -1,0 +1,13 @@
+{
+  "eval_id": 19,
+  "eval_name": "attach-embed",
+  "prompt": "Upload the architecture diagram at ./docs/arch-diagram.png to Confluence page 54321, then update the page body to embed it at 600px width centered.",
+  "assertions": [
+    "Uses confluence.mjs attach 54321 ./docs/arch-diagram.png to upload the file",
+    "Uses confluence.mjs get-page 54321 to fetch current page content before updating",
+    "Uses confluence.mjs update-page 54321 with body containing ac:image macro",
+    "The ac:image tag references ri:attachment with ri:filename matching the uploaded file",
+    "Image width is set to 600 (diagram sizing per formatting guide)",
+    "Image alignment is center"
+  ]
+}

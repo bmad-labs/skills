@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Handles inline spec without needing Confluence fetch",
+      "passed": true,
+      "evidence": "The approach analyzes the 6 inline requirements directly without fetching from Confluence. No Confluence fetch is attempted or planned."
+    },
+    {
+      "text": "Uses jira.mjs issue-types FRONTEND to check available types",
+      "passed": false,
+      "evidence": "Does not use jira.mjs at all. States: 'No Atlassian skill, helper scripts, or authorized MCP plugin is available.' and 'No validation that the DO project exists or what issue types it supports.'"
+    },
+    {
+      "text": "Maps requirement #3 (mobile Safari bug) to Bug type",
+      "passed": true,
+      "evidence": "Table maps #3 to Bug: 'Explicitly marked as a fix; describes broken behavior on a specific platform.'"
+    },
+    {
+      "text": "Maps requirement #6 (API docs) to Task type",
+      "passed": true,
+      "evidence": "Table maps #6 to Task: 'Explicitly marked as a task; documentation maintenance work, not user-facing functionality.'"
+    },
+    {
+      "text": "Maps feature requirements (#1,2,4,5) to Story type",
+      "passed": true,
+      "evidence": "Table maps #1, #2, #4, #5 all to Story type as 'New user-facing feature' items."
+    },
+    {
+      "text": "Creates Epic first, then child tickets with --parent",
+      "passed": false,
+      "evidence": "Proposes an Epic as parent but does not use jira.mjs create with --parent. Uses hypothetical MCP tool calls with 'parent' field. Also states tickets cannot actually be created due to authorization error."
+    },
+    {
+      "text": "Presents plan with labeled issue types before creating",
+      "passed": true,
+      "evidence": "Summary Table shows all tickets with labeled types (1 Epic, 4 Stories, 1 Bug, 1 Task) before the 'What Would Be Different' section."
+    }
+  ],
+  "summary": { "passed": 5, "failed": 2, "total": 7, "pass_rate": 0.71 }
+}

@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs transitions PROJ-456 to list available transitions FIRST",
+      "passed": false,
+      "evidence": "Uses MCP tool 'getTransitionsForJiraIssue' instead of jira.mjs transitions. Step 2: 'Call getTransitionsForJiraIssue to discover valid transitions.'"
+    },
+    {
+      "text": "Does NOT guess or hardcode a transition ID",
+      "passed": true,
+      "evidence": "Step 2 queries transitions first: 'This is critical -- transition IDs are workflow-specific and must not be guessed or hardcoded.' Step 3 uses '<transition_id_from_step_2>' placeholder."
+    },
+    {
+      "text": "Uses jira.mjs transition PROJ-456 <id> with the ID from transitions list",
+      "passed": false,
+      "evidence": "Uses MCP tool 'transitionJiraIssue' instead of jira.mjs transition. Does not use jira.mjs at all."
+    },
+    {
+      "text": "Uses jira.mjs comment PROJ-456 with the deployment message",
+      "passed": false,
+      "evidence": "Uses MCP tool 'addCommentToJiraIssue' instead of jira.mjs comment. Does not use jira.mjs at all."
+    }
+  ],
+  "summary": { "passed": 1, "failed": 3, "total": 4, "pass_rate": 0.25 }
+}

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Loads the capture-tasks-from-meeting-notes sub-skill",
+      "passed": false,
+      "evidence": "Explicitly states: \"I cannot complete this task. Without Atlassian skill/plugin access or API credentials...\" No sub-skill loaded."
+    },
+    {
+      "text": "Extracts Sarah's PRD task, John's flaky test task, Mike's Stripe task",
+      "passed": true,
+      "evidence": "All three extracted in the table: Sarah - \"Finish PRD for new dashboard feature\", John - \"Investigate flaky tests on auth module\", Mike - \"Handle Stripe webhook integration\"."
+    },
+    {
+      "text": "Identifies the unassigned API docs task and asks the user about it",
+      "passed": true,
+      "evidence": "Item 4 identified as Unassigned. Step 2 says: \"Flag this to the user... 'The API docs update task has no assignee. Would you like to assign it to someone, leave it unassigned, or skip creating this ticket?'\""
+    },
+    {
+      "text": "Handles different action item patterns (name + verb, name: task, implicit volunteering)",
+      "passed": true,
+      "evidence": "Pattern types identified: \"name - verb phrase\", \"Name said he'd verb\", \"@name will verb\", \"Unassigned / passive\". Notes mixed capitalization and different attribution patterns."
+    },
+    {
+      "text": "Presents extracted tasks for confirmation before creating",
+      "passed": true,
+      "evidence": "Step 4: \"Before creating any tickets, I would present the full list above to the user and ask: '1. I extracted 4 action items from your meeting notes. Here they are -- please confirm or adjust before I create the tickets.'\""
+    }
+  ],
+  "summary": { "passed": 4, "failed": 1, "total": 5, "pass_rate": 0.80 }
+}

@@ -1,0 +1,14 @@
+{
+  "eval_id": 12,
+  "eval_name": "inline-spec",
+  "prompt": "Break inline requirements into tickets in FRONTEND with correct issue types.",
+  "assertions": [
+    "Handles inline spec without needing Confluence fetch",
+    "Uses jira.mjs issue-types to check available types for the target project",
+    "Maps requirement #3 (mobile Safari bug) to Bug type",
+    "Maps requirement #6 (API docs) to Task type",
+    "Maps feature requirements (#1,2,4,5) to Story type",
+    "Either creates an Epic with child tickets using --parent, or explains why standalone tickets are more appropriate",
+    "Presents plan with labeled issue types before creating"
+  ]
+}

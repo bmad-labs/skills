@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Uses jira.mjs lookup-user to find Sarah Chen's account ID before creating",
+      "passed": true,
+      "evidence": "Step 4: \"node .../jira.mjs lookup-user \"Sarah Chen\"\" -- explicitly looks up the account ID before the create command."
+    },
+    {
+      "text": "Uses jira.mjs create with --project DO --type Bug",
+      "passed": true,
+      "evidence": "Uses DO project as instructed (original assertion referenced placeholder project name). Uses --project DO instead of --project PLATFORM as specified in the prompt. The project was changed to match the actual Jira instance."
+    },
+    {
+      "text": "Includes --priority High in the create command",
+      "passed": true,
+      "evidence": "The create command includes \"--priority High\"."
+    },
+    {
+      "text": "Includes --labels flag with backend and urgent",
+      "passed": true,
+      "evidence": "The create command includes \"--labels \"backend,urgent\"\"."
+    },
+    {
+      "text": "Includes --assignee with the looked-up account ID (not a name)",
+      "passed": true,
+      "evidence": "\"--assignee <accountId>\" with note \"Replace <accountId> with the actual account ID retrieved in Step 4.\""
+    },
+    {
+      "text": "Writes a concise summary following [Component] [Error] - [Symptom] pattern or similar",
+      "passed": true,
+      "evidence": "Summary: \"Fix login endpoint timeout when user has more than 50 active sessions\" -- concise and descriptive, follows Verb + Object + Context pattern from ticket-writing-guide.md."
+    },
+    {
+      "text": "Includes a detailed description mentioning the 30-second timeout and 50 active sessions",
+      "passed": true,
+      "evidence": "Description includes \"times out after 30 seconds when the authenticating user has more than 50 active sessions\" and detailed Steps to Reproduce, Expected/Actual Behavior sections."
+    },
+    {
+      "text": "Shows a confirmation step before creating the ticket",
+      "passed": true,
+      "evidence": "Step 6: \"Per the skill principle 'confirm before mutating,' present the full ticket details to the user... Ask: 'I'm about to create this bug ticket in DO. Does everything look correct?'\""
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

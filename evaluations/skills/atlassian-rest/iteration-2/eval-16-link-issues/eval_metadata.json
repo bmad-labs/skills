@@ -1,0 +1,11 @@
+{
+  "eval_id": 16,
+  "eval_name": "link-issues",
+  "prompt": "Link PROJ-100 blocks PROJ-200, and PROJ-100 relates to PROJ-50.",
+  "assertions": [
+    "Uses jira.mjs link-types to discover available link type names",
+    "Creates a 'blocks' link between PROJ-100 and PROJ-200",
+    "Creates a 'relates to' link between PROJ-100 and PROJ-50",
+    "Uses jira.mjs link command for both operations"
+  ]
+}
