@@ -38,6 +38,10 @@ description: >            # Complete description of what the skill does
 
 Content guidelines: specific and actionable instructions, real examples, under 500 lines, link to scripts/docs instead of inlining large content.
 
+## Evaluations and Benchmarks
+
+!IMPORTANT: Evaluation and benchmark results for each skill are stored in `evaluations/skills/<skill-name>/`:
+
 ## Testing a Skill Locally
 
 Install a skill by adding it to `.claude/settings.json`:
@@ -75,10 +79,6 @@ npx skills add bmad-labs/skills --skill typescript-clean-code --skill typescript
 # Install globally
 npx skills add bmad-labs/skills -g
 ```
-
-## Evaluations and Benchmarks
-
-!IMPORTANT: Evaluation and benchmark results for each skill are stored in `evalutions/skills/<skill-name>/`:
 
 ## Troubleshooting
 
