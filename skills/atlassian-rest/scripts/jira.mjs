@@ -127,7 +127,7 @@ async function cmdSearch(positional, flags) {
   const jql = requirePositional(positional, 0, 'JQL');
   const maxResults = parseInt(flags.max, 10) || 50;
 
-  const data = await request('/search', {
+  const data = await request('/search/jql', {
     method: 'POST',
     body: { jql, maxResults, fields: ['summary', 'status', 'assignee', 'priority'] },
   });
