@@ -7,13 +7,16 @@ description: >
   creating/editing/searching/transitioning Jira issues, writing or reading Confluence pages,
   generating status reports, triaging bugs, converting specs to backlogs, capturing tasks
   from meeting notes, searching company knowledge, syncing local BMAD documents with Jira
-  or Confluence, pushing docs to Jira, pulling from Jira, or linking documents to tickets.
-  Also trigger when the user says things like "move that ticket to done",
+  or Confluence, pushing docs to Jira, pulling from Jira, linking documents to tickets,
+  downloading Confluence spaces to local markdown, or converting between Confluence storage
+  format and markdown. Also trigger when the user says things like "move that ticket to done",
   "what's the status of PROJ-123", "create a bug for X", "search our wiki for Y",
   "file a ticket", "check for duplicates", "write a status update",
   "break this spec into stories", "sync this doc", "push to jira", "pull from jira",
-  "sync to confluence", "link this to jira", or "sync my epics". If there is even a chance
-  the user wants to interact with Jira or Confluence, use this skill.
+  "sync to confluence", "link this to jira", "sync my epics",
+  "download confluence pages", "sync confluence space", "convert confluence to markdown",
+  or "pull docs from confluence". If there is even a chance the user wants to interact
+  with Jira or Confluence, use this skill.
 ---
 
 # Atlassian REST API Skill
@@ -241,11 +244,102 @@ confluence.mjs list-attachments 12345 --max 10
 ```
 Use `attach` to upload local files (images, PDFs, etc.) to a page. After uploading, embed images in the page body using `<ac:image><ri:attachment ri:filename="screenshot.png" /></ac:image>` — see `references/confluence-formatting.md` for sizing guidelines.
 
+### Sync Confluence Space to Local Markdown
+```bash
+# Download an entire page tree to local markdown with attachments
+node <skill-path>/scripts/sync-confluence-space.mjs --root <pageId> --output ./docs
+
+# Preview without writing files
+node <skill-path>/scripts/sync-confluence-space.mjs --root <pageId> --output ./docs --dry-run
+
+# Skip attachment downloads (faster, markdown only)
+node <skill-path>/scripts/sync-confluence-space.mjs --root <pageId> --output ./docs --skip-attachments
+```
+Downloads an entire Confluence page tree to local markdown files with hierarchy, images, and linked titles. Rewrites both image references and file attachment links to point to local assets. See `workflows/sync-confluence-space.md` for full details and customization options.
+
 ### Spaces & Navigation
 ```bash
 confluence.mjs spaces --max 20
 confluence.mjs descendants 12345       # Get child pages
 ```
+
+---
+
+## Format Conversion Utilities
+
+Script: `<skill-path>/scripts/confluence-format.mjs`
+
+This module provides bidirectional markdown ↔ Confluence storage format conversion. It's used internally by `confluence.mjs` but can also be imported directly for custom sync scripts.
+
+### Exported Functions
+
+```js
+import { markdownToStorage, storageToMarkdown, htmlInlineToMarkdown } from '<skill-path>/scripts/confluence-format.mjs';
+```
+
+| Function | Direction | Use case |
+|----------|-----------|----------|
+| `markdownToStorage(md)` | Markdown → XHTML | Publishing to Confluence (auto-used by `confluence.mjs --body-file`) |
+| `storageToMarkdown(html)` | XHTML → Markdown | Downloading/syncing Confluence pages to local markdown files |
+| `htmlInlineToMarkdown(html)` | Inline HTML → Markdown | Converting snippets (table cells, list items) that may contain `<strong>`, `<em>`, `<a>`, `<code>` |
+
+### What `storageToMarkdown` Handles
+
+The converter handles real-world Confluence storage format patterns including:
+
+- **Structured macros**: code blocks (with/without language), panels (info/tip/warning/note → GitHub alerts), expand → `<details><summary>` collapsible sections, jira references, view-file → attachment links, toc/children (stripped)
+- **Unknown macros**: Any unrecognized `ac:structured-macro` types have their body content preserved (not silently dropped)
+- **Tables**: `<colgroup>`, `<tbody>`, `<thead>` wrappers stripped; attributes on `<table>`, `<tr>`, `<th>`, `<td>` handled
+- **Task lists**: `<ac:task-list>` with `<ac:task-id>` → markdown checkboxes
+- **Images**: URL and attachment images → `![alt](url)` with filename as fallback alt text; parentheses and spaces in filenames URL-encoded
+- **Code blocks**: Protected from HTML tag stripping via placeholder system — generic types like `Array<string>` preserved inside fenced blocks
+- **Expand/collapsible bodies**: Full content support inside expand macros — code blocks, images, tables, panels, task lists, and nested macros all convert correctly
+- **Entities**: Full HTML entity decoding (`&rsquo;`, `&ldquo;`, `&rarr;`, `&nbsp;`, numeric `&#123;`)
+- **Block separation**: `\n\n` around headings, images, lists, `<hr>`, tables, code blocks
+- **Attribute tolerance**: All HTML tag regexes accept optional attributes (handles Confluence's `local-id`, `data-layout`, `breakoutWidth`, etc.)
+- **Bold/italic cleanup**: Trailing spaces inside markers fixed (`**text **` → `**text**`)
+- **Stray angle brackets**: Escaped outside code blocks to prevent markdown renderer confusion
+
+### Syncing a Confluence Space
+
+For most use cases, use the built-in sync script directly:
+```bash
+node <skill-path>/scripts/sync-confluence-space.mjs --root <pageId> --output ./docs
+```
+
+For custom sync scripts, import `storageToMarkdown` and follow this pattern:
+
+```js
+import { storageToMarkdown } from '<skill-path>/scripts/confluence-format.mjs';
+
+// Fetch page via Confluence v2 API
+const page = await apiGet(`/wiki/api/v2/pages/${pageId}`, { 'body-format': 'storage' });
+const html = page.body.storage.value;
+
+// Convert to markdown
+let markdown = storageToMarkdown(html);
+
+// Add linked title using page._links.base + page._links.webui
+const pageUrl = `${page._links.base}${page._links.webui}`;
+markdown = `# [${page.title}](${pageUrl})\n\n${markdown}`;
+```
+
+**Key gotchas discovered in production use:**
+- The v2 API `_links.webui` is a relative path (e.g., `/spaces/BTH/pages/123/Title`). Combine with `_links.base` (e.g., `https://company.atlassian.net/wiki`) for the full URL — do NOT use `env.domain` + `_links.webui` directly (missing `/wiki` prefix).
+- Attachment filenames with spaces and parentheses must be URL-encoded in markdown links: `![alt](Screenshot%202025-11-05%20at%2016.50.02.png)`.
+- When writing a hierarchical sync, use `getChildrenTree()` (recursive children API) to build the tree, then decide per-node: pages with children → `directory/index.md`, leaf pages → flat `PageName.md`.
+- Keep attachments in a shared `assets/imgs/` and `assets/pdfs/` directory. Use depth-aware relative paths (`../assets/imgs/` at depth 1, `../../assets/imgs/` at depth 2, etc.).
+- The sync script must rewrite **both** image references (`![alt](filename)`) and file attachment links (`[filename](filename)`) to local paths — Confluence `view-file` macros produce regular links, not image references.
+- Confluence adds attributes (`local-id`, `breakoutWidth`, `data-layout`) to most HTML tags. Any regex matching tags must use `[^>]*` for optional attributes.
+- Expand macro bodies can contain any content (code blocks, images, tables). The inner HTML converter must handle the same set of elements as the main converter.
+
+### Running Tests
+
+```bash
+node <skill-path>/scripts/test-format.mjs
+```
+
+100+ tests covering forward conversion, reverse conversion, round-trip preservation, block element spacing, code block protection, image URL encoding, entity decoding, expand macros with nested content, view-file macros, unknown macro catch-all, and attribute tolerance on HTML tags.
 
 ---
 
@@ -262,6 +356,7 @@ For complex multi-step operations that require user interaction across several t
 | **Triage Issue** | User reports a bug and wants duplicate checking before filing | `workflows/triage-issue.md` |
 | **Create Confluence Document** | User wants a professional Confluence page with macros, images, and structured formatting | `workflows/create-confluence-document.md` |
 | **Sync BMAD Documents** | User wants to sync local BMAD docs (epics, tech specs, PRDs, architecture) with Jira or Confluence, or link a document to a ticket/page | `workflows/sync-bmad-documents.md` |
+| **Sync Confluence Space** | User wants to download an entire Confluence space to local markdown files with hierarchy, images, and linked titles | `workflows/sync-confluence-space.md` |
 
 ---
 

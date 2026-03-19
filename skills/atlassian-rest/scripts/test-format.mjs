@@ -4,7 +4,7 @@
  * Tests for confluence-format.mjs — markdown ↔ Confluence storage format conversion.
  */
 
-import { markdownToStorage, storageToMarkdown } from './confluence-format.mjs';
+import { markdownToStorage, storageToMarkdown, htmlInlineToMarkdown } from './confluence-format.mjs';
 
 let passed = 0;
 let failed = 0;
@@ -45,6 +45,18 @@ function assertNotContains(name, actual, substring) {
     console.log(`  ✗ ${name}`);
     console.log(`    Expected NOT to contain: ${substring}`);
     console.log(`    Actual: ${actual}`);
+  }
+}
+
+function assertExact(name, actual, expected) {
+  if (actual === expected) {
+    passed++;
+    console.log(`  ✓ ${name}`);
+  } else {
+    failed++;
+    console.log(`  ✗ ${name}`);
+    console.log(`    Expected: ${JSON.stringify(expected)}`);
+    console.log(`    Actual:   ${JSON.stringify(actual)}`);
   }
 }
 
@@ -223,6 +235,365 @@ console.log('\nBasic HTML elements:');
   assertContains('table has header row', table, '| Name | Value |');
   assertContains('table has separator', table, '| --- | --- |');
   assertContains('table has data row', table, '| x | 1 |');
+}
+
+// New storageToMarkdown tests for formatting fixes
+// -------------------------------------------------------------------------
+
+// Fix 1-4: Table with <tbody>, attributes, <colgroup>
+console.log('\nTables with <tbody> and attributes:');
+{
+  const table = storageToMarkdown(
+    '<table data-table-width="760"><colgroup><col style="width: 50%;" /><col style="width: 50%;" /></colgroup><tbody><tr><td><p>A</p></td><td><p>B</p></td></tr></tbody></table>'
+  );
+  assertContains('table with tbody and attrs has cells', table, '| A | B |');
+}
+
+// Fix 6: Code block without language param
+console.log('\nCode block without language:');
+{
+  const code = storageToMarkdown(
+    '<ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[hello]]></ac:plain-text-body></ac:structured-macro>'
+  );
+  assertContains('code block without lang has fences', code, '```');
+  assertContains('code block without lang has body', code, 'hello');
+}
+
+// Fix 6: Code block with width + language params
+console.log('\nCode block with width + language:');
+{
+  const code = storageToMarkdown(
+    '<ac:structured-macro ac:name="code"><ac:parameter ac:name="language">java</ac:parameter><ac:parameter ac:name="width">wide1800</ac:parameter><ac:plain-text-body><![CDATA[System.out.println("hi");]]></ac:plain-text-body></ac:structured-macro>'
+  );
+  assertContains('code block with width uses language', code, '```java');
+  assertNotContains('code block with width ignores width param', code, 'wide1800');
+}
+
+// Fix 7: Task list with <ac:task-id>
+console.log('\nTask list with task-id:');
+{
+  const tasks = storageToMarkdown(
+    '<ac:task-list><ac:task><ac:task-id>abc-123</ac:task-id><ac:task-status>complete</ac:task-status><ac:task-body>Done item</ac:task-body></ac:task></ac:task-list>'
+  );
+  assertContains('task with task-id → [x]', tasks, '- [x] Done item');
+}
+
+// Fix 8: Links with extra attributes
+console.log('\nLinks with extra attributes:');
+{
+  const link = storageToMarkdown(
+    '<a href="https://example.com" data-card-appearance="inline">Click me</a>'
+  );
+  assertContains('link with attrs → markdown link', link, '[Click me](https://example.com)');
+}
+
+// Fix 9: Headings with attributes
+console.log('\nHeadings with attributes:');
+{
+  const heading = storageToMarkdown('<h2 local-id="abc123">Title Here</h2>');
+  assertContains('heading with attrs → ##', heading, '## Title Here');
+}
+
+// Fix 10: Paragraph separation
+console.log('\nParagraph separation:');
+{
+  const paras = storageToMarkdown('<p>First paragraph</p><p>Second paragraph</p>');
+  assertContains('paragraphs have first', paras, 'First paragraph');
+  assertContains('paragraphs have second', paras, 'Second paragraph');
+  // They should be separated by a blank line
+  assert('paragraphs separated by blank line', paras, 'First paragraph\n\nSecond paragraph');
+}
+
+// Fix 11: HTML entity decoding
+console.log('\nHTML entity decoding:');
+{
+  const decoded = storageToMarkdown('<p>&rsquo; &ldquo; &rarr; &nbsp; &#123;</p>');
+  assertContains('rsquo decoded', decoded, '\u2019');
+  assertContains('ldquo decoded', decoded, '\u201C');
+  assertContains('rarr decoded', decoded, '\u2192');
+  assertContains('numeric entity decoded', decoded, '{');
+}
+
+// Fix 12: Jira macro
+console.log('\nJira macro:');
+{
+  const jira = storageToMarkdown(
+    '<ac:structured-macro ac:name="jira"><ac:parameter ac:name="key">NCOP-123</ac:parameter><ac:parameter ac:name="server">Jira</ac:parameter></ac:structured-macro>'
+  );
+  assertContains('jira macro → key text', jira, 'NCOP-123');
+}
+
+// Fix 13: Expand macro
+console.log('\nExpand macro:');
+{
+  const expand = storageToMarkdown(
+    '<ac:structured-macro ac:name="expand"><ac:parameter ac:name="title">Details</ac:parameter><ac:rich-text-body><p>Hidden content</p></ac:rich-text-body></ac:structured-macro>'
+  );
+  assertContains('expand macro has details tag', expand, '<details>');
+  assertContains('expand macro has summary', expand, '<summary>Details</summary>');
+  assertContains('expand macro has body', expand, 'Hidden content');
+}
+
+// Fix 14: TOC macro stripped
+console.log('\nTOC macro stripped:');
+{
+  const toc = storageToMarkdown(
+    '<ac:structured-macro ac:name="toc"><ac:parameter ac:name="maxLevel">3</ac:parameter></ac:structured-macro>'
+  );
+  assert('toc macro stripped to empty', toc, '');
+}
+
+// Fix 15: Span with style
+console.log('\nSpan with style:');
+{
+  const span = storageToMarkdown('<p><span style="color:red">important text</span></p>');
+  assertContains('span with style → text only', span, 'important text');
+  assertNotContains('span tag removed', span, '<span');
+}
+
+// -------------------------------------------------------------------------
+// Bug regression tests
+// -------------------------------------------------------------------------
+
+console.log('\n=== Bug regression tests ===\n');
+
+// Bug 1: Expand macro with breakoutWidth parameter leaking "1800"
+console.log('Expand with extra params:');
+{
+  const expand = storageToMarkdown(
+    '<ac:structured-macro ac:name="expand" ac:schema-version="1"><ac:parameter ac:name="title">Details</ac:parameter><ac:parameter ac:name="breakoutWidth">1800</ac:parameter><ac:rich-text-body><p>Content here</p></ac:rich-text-body></ac:structured-macro>'
+  );
+  assertContains('expand with breakoutWidth has details', expand, '<details>');
+  assertNotContains('no leaked breakoutWidth value', expand, '1800');
+  assertContains('expand body preserved', expand, 'Content here');
+}
+
+// Bug 2: Lists with local-id attributes not converting to bullets
+console.log('\nLists with local-id:');
+{
+  const result = storageToMarkdown(
+    '<ul local-id="abc"><li local-id="def"><p>Item A</p></li><li local-id="ghi"><p>Item B</p></li></ul>'
+  );
+  assertContains('ul with local-id → bullet A', result, '- Item A');
+  assertContains('ul with local-id → bullet B', result, '- Item B');
+}
+
+// Bug 3: view-file macro producing empty list items
+console.log('\nView-file macro:');
+{
+  const result = storageToMarkdown(
+    '<ac:structured-macro ac:name="view-file" ac:schema-version="1"><ac:parameter ac:name="name"><ri:attachment ri:filename="diagrams.drawio" ri:version-at-save="1" /></ac:parameter></ac:structured-macro>'
+  );
+  assertContains('view-file → link', result, '[diagrams.drawio]');
+}
+
+// Expand body with nested code blocks
+console.log('\nExpand with code blocks:');
+{
+  const expand = storageToMarkdown(
+    '<ac:structured-macro ac:name="expand"><ac:parameter ac:name="title">Code</ac:parameter><ac:rich-text-body>' +
+    '<ac:structured-macro ac:name="code"><ac:parameter ac:name="language">js</ac:parameter><ac:plain-text-body><![CDATA[const x = 1;]]></ac:plain-text-body></ac:structured-macro>' +
+    '</ac:rich-text-body></ac:structured-macro>'
+  );
+  assertContains('expand+code has details', expand, '<details>');
+  assertContains('expand+code has fenced block', expand, '```js');
+  assertContains('expand+code preserves body', expand, 'const x = 1;');
+  assertNotContains('no null bytes', expand, '\x00');
+}
+
+// Expand body with images
+console.log('\nExpand with images:');
+{
+  const expand = storageToMarkdown(
+    '<ac:structured-macro ac:name="expand"><ac:parameter ac:name="title">Screenshots</ac:parameter><ac:rich-text-body>' +
+    '<ac:image ac:alt="screenshot"><ri:attachment ri:filename="screen.png" /></ac:image>' +
+    '</ac:rich-text-body></ac:structured-macro>'
+  );
+  assertContains('expand+image has details', expand, '<details>');
+  assertContains('expand+image has md image', expand, '![screenshot](screen.png)');
+}
+
+// Expand body with table
+console.log('\nExpand with tables:');
+{
+  const expand = storageToMarkdown(
+    '<ac:structured-macro ac:name="expand"><ac:parameter ac:name="title">Data</ac:parameter><ac:rich-text-body>' +
+    '<table><tr><th>Col A</th></tr><tr><td>Val 1</td></tr></table>' +
+    '</ac:rich-text-body></ac:structured-macro>'
+  );
+  assertContains('expand+table has details', expand, '<details>');
+  assertContains('expand+table has md table', expand, '| Col A |');
+}
+
+// Unknown macro with rich-text-body preserved
+console.log('\nUnknown macro catch-all:');
+{
+  const result = storageToMarkdown(
+    '<ac:structured-macro ac:name="some-unknown-macro"><ac:rich-text-body><p>Preserved content</p></ac:rich-text-body></ac:structured-macro>'
+  );
+  assertContains('unknown macro body preserved', result, 'Preserved content');
+}
+{
+  const result = storageToMarkdown(
+    '<ac:structured-macro ac:name="noformat"><ac:plain-text-body><![CDATA[raw text here]]></ac:plain-text-body></ac:structured-macro>'
+  );
+  assertContains('noformat macro → code block', result, 'raw text here');
+}
+
+// htmlInlineToMarkdown with attributes on inline tags
+console.log('\nInline tags with attributes:');
+{
+  assertContains('strong with class', htmlInlineToMarkdown('<strong class="bold">text</strong>'), '**text**');
+  assertContains('em with style', htmlInlineToMarkdown('<em style="color:red">text</em>'), '*text*');
+  assertContains('code with data attr', htmlInlineToMarkdown('<code data-x="1">text</code>'), '`text`');
+}
+
+// -------------------------------------------------------------------------
+// Formatting: newline separation around block elements
+// -------------------------------------------------------------------------
+
+console.log('\n=== Formatting: newline separation ===\n');
+
+// Fix C: Headings get newlines
+console.log('Heading separation:');
+{
+  const result = storageToMarkdown('<p>Some text</p><h2>Title</h2><p>More text</p>');
+  assertExact('heading separated from surrounding content', result,
+    'Some text\n\n## Title\n\nMore text');
+}
+{
+  const result = storageToMarkdown('<h1>First</h1><h2>Second</h2>');
+  assertExact('adjacent headings separated', result, '# First\n\n## Second');
+}
+
+// Fix D: Images get newlines
+console.log('\nImage separation:');
+{
+  const result = storageToMarkdown(
+    '<ac:image ac:alt="pic"><ri:url ri:value="https://example.com/img.png" /></ac:image><p><strong>Caption</strong></p>'
+  );
+  assertContains('image separated from following bold', result, '![pic](https://example.com/img.png)\n\n**Caption**');
+}
+{
+  const result = storageToMarkdown(
+    '<ac:image ac:alt="pic"><ri:attachment ri:filename="img.png" /></ac:image><h2>Next</h2>'
+  );
+  assertContains('attachment image separated from heading', result, '![pic](img.png)\n\n## Next');
+}
+
+// Fix E: HR gets newlines
+console.log('\nHR separation:');
+{
+  const result = storageToMarkdown('<p>Above</p><hr/><p>Below</p>');
+  assertExact('hr separated from content', result, 'Above\n\n---\n\nBelow');
+}
+
+// Fix F: Lists get newlines
+console.log('\nList separation:');
+{
+  const result = storageToMarkdown('<p>Intro</p><ul><li>A</li><li>B</li></ul><p>After</p>');
+  assertExact('ul separated from surrounding', result, 'Intro\n\n- A\n- B\n\nAfter');
+}
+{
+  const result = storageToMarkdown('<p>Intro</p><ol><li>A</li><li>B</li></ol><p>After</p>');
+  assertExact('ol separated from surrounding', result, 'Intro\n\n1. A\n2. B\n\nAfter');
+}
+
+// Fix A: <br> inside inline context preserved
+console.log('\nBR preservation:');
+{
+  const result = storageToMarkdown('<p>Line one<br/>Line two</p>');
+  assertExact('br inside paragraph preserved', result, 'Line one\nLine two');
+}
+
+// Fix G: Code block separated and content protected
+console.log('\nCode block separation and protection:');
+{
+  const result = storageToMarkdown(
+    '<h1>Sample</h1><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">typescript</ac:parameter><ac:plain-text-body><![CDATA[let x: Array<string> = [];]]></ac:plain-text-body></ac:structured-macro>'
+  );
+  assertContains('code block separated from heading', result, '# Sample\n\n```typescript');
+  assertContains('angle brackets preserved in code block', result, 'Array<string>');
+}
+{
+  const result = storageToMarkdown(
+    '<ac:structured-macro ac:name="code"><ac:parameter ac:name="language">typescript</ac:parameter><ac:plain-text-body><![CDATA[let m: DeepMocked<Repository<FilterConfig>>;]]></ac:plain-text-body></ac:structured-macro>'
+  );
+  assertContains('generic types preserved in code block', result, 'DeepMocked<Repository<FilterConfig>>');
+}
+
+// Compound: image + heading (bug-template pattern)
+console.log('\nCompound patterns:');
+{
+  const result = storageToMarkdown(
+    '<ac:image ac:alt=""><ri:attachment ri:filename="screenshot.png" /></ac:image><h2>Section</h2>'
+  );
+  assertContains('image does not merge with heading', result, '![screenshot.png](screenshot.png)\n\n## Section');
+}
+{
+  const result = storageToMarkdown(
+    '<h1>Overall flow</h1><h5><strong>UAT bug</strong></h5><p>Log bug here</p>'
+  );
+  const lines = result.split('\n').filter(l => l.trim());
+  assertExact('h1 on own line', lines[0], '# Overall flow');
+  assertExact('h5 on own line', lines[1], '##### **UAT bug**');
+  assertExact('paragraph on own line', lines[2], 'Log bug here');
+}
+
+// -------------------------------------------------------------------------
+// Additional fixes: bold spacing, image encoding, angle bracket escaping
+// -------------------------------------------------------------------------
+
+console.log('\n=== Additional formatting fixes ===\n');
+
+// Fix 1: Bold/italic with trailing space
+console.log('Bold/italic trailing space:');
+{
+  const result = storageToMarkdown('<p><strong>Expected result: </strong></p>');
+  assertContains('bold trailing space trimmed', result, '**Expected result:**');
+  assertNotContains('no broken bold marker', result, '** ');
+}
+{
+  const result = storageToMarkdown('<p><em>italic text </em></p>');
+  assertContains('italic trailing space trimmed', result, '*italic text*');
+}
+
+// Fix 3: Parentheses and spaces in image filenames
+console.log('\nImage filename encoding:');
+{
+  const result = storageToMarkdown(
+    '<ac:image ac:alt="pic"><ri:attachment ri:filename="unnamed (1).png" /></ac:image>'
+  );
+  assertContains('parentheses encoded in image URL', result, 'unnamed%20%281%29.png');
+}
+{
+  const result = storageToMarkdown(
+    '<ac:image><ri:attachment ri:filename="Screenshot 2025-11-05 at 16.50.02.png" /></ac:image>'
+  );
+  assertContains('spaces encoded in image URL', result, 'Screenshot%202025-11-05%20at%2016.50.02.png');
+  assertNotContains('no raw spaces in image URL', result, 'Screenshot 2025-11-05 at 16.50.02.png)');
+}
+{
+  // Empty alt text should use filename as fallback
+  const result = storageToMarkdown(
+    '<ac:image><ri:attachment ri:filename="diagram.png" /></ac:image>'
+  );
+  assertContains('empty alt uses filename', result, '![diagram.png]');
+}
+
+// Fix 5: Stray angle brackets escaped
+console.log('\nAngle bracket escaping:');
+{
+  const result = storageToMarkdown('<p>&lt;Re-consuming Kafka Message&gt;</p>');
+  assertContains('angle brackets escaped', result, '\\<Re-consuming Kafka Message\\>');
+}
+{
+  // Code blocks should NOT have their <> escaped
+  const result = storageToMarkdown(
+    '<ac:structured-macro ac:name="code"><ac:parameter ac:name="language">ts</ac:parameter><ac:plain-text-body><![CDATA[let x: Array<string>;]]></ac:plain-text-body></ac:structured-macro>'
+  );
+  assertContains('code block angle brackets NOT escaped', result, 'Array<string>');
+  assertNotContains('no escaped brackets in code', result, 'Array\\<string\\>');
 }
 
 // -------------------------------------------------------------------------

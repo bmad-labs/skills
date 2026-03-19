@@ -1,6 +1,6 @@
 # Confluence Storage Format — Macros, Layouts & Document Templates
 
-Complete reference for building professional Confluence pages using storage format XHTML.
+Complete reference for building professional Confluence pages using storage format XHTML. Also includes guidance on converting storage format back to markdown (reverse conversion).
 
 ---
 
@@ -370,3 +370,61 @@ For coloured header rows, add inline styles:
   </ac:rich-text-body>
 </ac:structured-macro>
 ```
+
+---
+
+## Reverse Conversion: Storage Format → Markdown
+
+The `storageToMarkdown()` function in `scripts/confluence-format.mjs` converts Confluence storage format XHTML back to clean markdown. This section documents the real-world patterns it handles — useful when building custom sync scripts or debugging conversion issues.
+
+### Processing Pipeline Order
+
+The order of operations matters because earlier steps can interfere with later ones:
+
+1. Strip structural wrappers (`<colgroup>`, `<tbody>`, `<thead>`)
+2. Extract code blocks to placeholders (protects `<>` inside code from step 14)
+3. Strip navigation macros (toc, children, recently-updated)
+4. Convert Jira macros → plain text key
+5. Convert expand macros → bold title + body
+6. Convert panel macros → GitHub-style `> [!NOTE]` alerts
+7. Convert task lists → `- [x]` / `- [ ]` checkboxes
+8. Convert images → `![alt](url)` with URL encoding
+9. Convert headings → `#` with `\n\n` separation
+10. Convert lists → `- item` / `1. item` with `\n\n` separation
+11. Convert tables → pipe-delimited `| cell |` format
+12. Convert paragraphs → text + `\n\n`
+13. Convert remaining links and spans
+14. Strip remaining HTML tags
+15. Decode HTML entities
+16. Escape stray `<>` angle brackets
+17. Restore code blocks from placeholders
+18. Collapse excess blank lines
+
+### Common Pitfalls
+
+These issues were discovered during production sync of 160+ Confluence pages:
+
+| Pattern | Problem | Solution |
+|---------|---------|----------|
+| `<strong>text </strong>` | Trailing space inside tag → `**text **` (broken bold) | Regex to trim: `/\*\*(\S.*?) \*\*/g` |
+| `<td><p>A</p><p>B</p></td>` | Multiple paragraphs in table cell | `htmlInlineToMarkdown()` converts `</p>` to `\n` |
+| `DeepMocked<Repository<T>>` in code | `stripHtmlTags()` removes angle brackets | Placeholder system protects code blocks |
+| `<h1>Title</h1><h2>Sub</h2>` | Headings merge without separation | `\n\n` added before and after each heading |
+| `![](img.png)<strong>Caption</strong>` | Image merges with following content | `\n\n` added before and after each image |
+| `unnamed (1).png` in image URL | Parentheses close markdown link prematurely | URL-encode: `%28`, `%29` |
+| `Screenshot 2025-11-05.png` | Spaces break markdown image link | URL-encode: `%20` |
+| `&lt;Re-consuming Message&gt;` | Decoded to `<...>` which looks like HTML | Escape as `\<...\>` after entity decode |
+| Panel macro inside table cell | `> [!NOTE]` inside `\| ... \|` breaks table | Strip alert syntax from table rows |
+
+### Macro Conversion Reference
+
+| Confluence Macro | Markdown Output |
+|-----------------|-----------------|
+| `ac:name="code"` with CDATA | ` ```lang\ncode\n``` ` |
+| `ac:name="info"` / `note` / `tip` / `warning` | `> [!NOTE]` / `> [!TIP]` / `> [!WARNING]` |
+| `ac:name="expand"` with title | `**title**\ncontent` |
+| `ac:name="jira"` with key param | Plain text key (e.g., `NCOP-123`) |
+| `ac:name="toc"` / `children` / `recently-updated` | Removed (navigation-only) |
+| `ac:task-list` with tasks | `- [x] done\n- [ ] todo` |
+| `ac:image` with `ri:url` | `![alt](https://url)` |
+| `ac:image` with `ri:attachment` | `![filename](encoded-filename)` |
