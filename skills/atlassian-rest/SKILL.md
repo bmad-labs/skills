@@ -22,6 +22,8 @@ Portable Jira & Confluence integration via REST APIs. Works in any agent environ
 
 ## First-Use Setup
 
+`<skill-path>` throughout this document refers to the directory where this skill is installed. Resolve it from the skill invocation context (e.g., the path shown by `claude plugin list` or the skill's directory in `.claude/plugins/`).
+
 Before any operation, verify the user has credentials configured. Run:
 
 ```bash
@@ -52,12 +54,7 @@ When the user asks you to do something with Jira or Confluence, follow these pri
 
 4. **Compose operations naturally.** Many user requests require multiple script calls. For example, "assign PROJ-123 to Sarah" requires: (a) `lookup-user "Sarah"` to get the account ID, then (b) `edit PROJ-123 --assignee <accountId>`.
 
-5. **Prefer sync.mjs for document-based operations.** When creating Jira issues from a local markdown file (story docs, specs, epics), use the sync workflow instead of raw `jira.mjs create`:
-   - First check if a field mapping exists: `ls <skill-path>/memory/jira-<docType>-field-mapping.json`
-   - If no mapping exists, create one: `node <skill-path>/scripts/sync.mjs setup-mapping --type <docType> --sample <EXISTING-TICKET-KEY>` (uses an existing ticket to auto-detect custom fields)
-   - Then link & create: `node <skill-path>/scripts/sync.mjs link <file> --type <docType> --project <KEY> --create`
-   - This automatically: (a) maps doc sections to Jira fields per the mapping config, (b) updates the source document with the Jira link, (c) stores sync state for future push/pull
-   - Only use `jira.mjs create` for ad-hoc issues not backed by a local document.
+5. **Prefer sync.mjs for document-based operations.** When creating Jira issues from a local markdown file (story docs, specs, epics), use `sync.mjs` instead of raw `jira.mjs create` — it handles field mapping, link tracking, and sync state automatically. See the Document Sync Operations section below for details. Only use `jira.mjs create` for ad-hoc issues not backed by a local document.
 
 6. **Use workflows for complex tasks.** If the user's request matches one of the workflows below, read the corresponding file and follow its step-by-step process.
 
@@ -111,6 +108,8 @@ When creating child stories under an Epic, include `--priority Medium` unless th
 ```bash
 jira.mjs edit PROJ-123 --summary "Updated title" --priority Medium
 jira.mjs edit PROJ-123 --labels "backend,v2" --components "API"
+# For long descriptions, use a file:
+jira.mjs edit PROJ-123 --description-file /tmp/desc.md
 ```
 
 ### Comments
@@ -217,14 +216,14 @@ confluence.mjs get-page 12345 --format view
 confluence.mjs create-page --space TEAM --title "Sprint Report" --body "Report content"
 confluence.mjs create-page --space TEAM --title "Sub Page" \
   --body "<h2>Heading</h2><p>Content</p>" --parent 12345
-confluence.mjs create-page --space TEAM --title "Full Doc" --body-file /tmp/body.html
+confluence.mjs create-page --space TEAM --title "Full Doc" --body-file /tmp/body.md
 ```
 The `--body` flag accepts **markdown** (recommended), plain text, or raw HTML storage format (if it starts with `<`). The script automatically converts markdown to Confluence storage format — headings, lists, tables, and code blocks (converted to `ac:structured-macro ac:name="code"` with language detection) are all handled. Prefer writing markdown and letting the script handle conversion rather than manually constructing storage format XHTML. Use `--body-file` for long documents that would exceed shell argument limits.
 
 ### Update Page
 ```bash
 confluence.mjs update-page 12345 --title "Updated Title" --body "New content"
-confluence.mjs update-page 12345 --title "Updated Title" --body-file /tmp/body.html
+confluence.mjs update-page 12345 --title "Updated Title" --body-file /tmp/body.md
 ```
 Version is auto-incremented — no need to track it manually. Use `--body-file` for large page updates.
 
@@ -252,7 +251,7 @@ confluence.mjs descendants 12345       # Get child pages
 
 ## Workflows
 
-For complex multi-step operations, read the corresponding workflow file and follow its process:
+For complex multi-step operations that require user interaction across several turns, read the corresponding workflow file and follow its step-by-step process. For simple one-shot commands, use the operations sections above directly.
 
 | Workflow | When to use | File |
 |----------|-------------|------|
@@ -296,4 +295,4 @@ Load these as needed — don't read them all upfront:
 | `references/epic-templates.md` | Writing epic descriptions |
 | `references/ticket-writing-guide.md` | Writing clear ticket summaries and descriptions |
 | `references/breakdown-examples.md` | Breaking specs into stories and tasks |
-| `references/sync-mapping-guide.md` | Configuring field mappings and sync state for BMAD document sync |
+| `references/sync-mapping-guide.md` | Before first document sync, when mapping fields fail, or configuring custom field mappings |
