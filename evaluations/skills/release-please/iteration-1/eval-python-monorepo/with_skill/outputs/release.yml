@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      paths_released: ${{ steps.release.outputs.paths_released }}
+      core-release: ${{ steps.release.outputs['packages/core--release_created'] }}
+      core-version: ${{ steps.release.outputs['packages/core--version'] }}
+      core-tag: ${{ steps.release.outputs['packages/core--tag_name'] }}
+      cli-release: ${{ steps.release.outputs['packages/cli--release_created'] }}
+      cli-version: ${{ steps.release.outputs['packages/cli--version'] }}
+      cli-tag: ${{ steps.release.outputs['packages/cli--tag_name'] }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+
+  publish-core:
+    needs: release-please
+    if: needs.release-please.outputs.core-release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    environment: pypi
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - working-directory: packages/core
+        run: python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/core/dist/
+
+  publish-cli:
+    needs: release-please
+    if: needs.release-please.outputs.cli-release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    environment: pypi
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - working-directory: packages/cli
+        run: python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/cli/dist/

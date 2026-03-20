@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-commit-message",
+  "variant": "without_skill",
+  "expectations": [
+    { "text": "conventional_format", "passed": true, "evidence": "Uses feat!: replace API key authentication with Bearer token auth" },
+    { "text": "breaking_indicator", "passed": true, "evidence": "Uses ! after type: feat!" },
+    { "text": "has_breaking_footer", "passed": true, "evidence": "Has BREAKING CHANGE: footer with migration steps" },
+    { "text": "imperative_mood", "passed": true, "evidence": "Description starts with 'replace' (imperative)" },
+    { "text": "no_ai_coauthor", "passed": true, "evidence": "No Co-Authored-By trailer present" }
+  ]
+}

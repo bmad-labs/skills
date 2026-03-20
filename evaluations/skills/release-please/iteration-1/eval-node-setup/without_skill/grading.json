@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-node-setup",
+  "variant": "without_skill",
+  "expectations": [
+    { "text": "correct_release_type", "passed": true, "evidence": "Config has \"release-type\": \"node\"" },
+    { "text": "correct_version", "passed": true, "evidence": "Manifest has \".\": \"2.1.0\"" },
+    { "text": "has_concurrency", "passed": false, "evidence": "No concurrency group in workflow" },
+    { "text": "publish_gated", "passed": false, "evidence": "Publish steps use if: ${{ steps.release.outputs.release_created }} inline per-step, not as a separate gated job" },
+    { "text": "npm_publish", "passed": true, "evidence": "Has npm publish with NPM_TOKEN" },
+    { "text": "has_schema", "passed": true, "evidence": "Config includes $schema field" },
+    { "text": "bump_minor_pre_major", "passed": false, "evidence": "Config does not include bump-minor-pre-major" }
+  ]
+}

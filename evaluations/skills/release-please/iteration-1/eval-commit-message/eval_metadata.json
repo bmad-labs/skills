@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-commit-message",
+  "prompt": "I just changed our REST API to require Bearer tokens instead of API keys on all endpoints. Help me write a good commit message for this breaking change.",
+  "assertions": [
+    { "name": "conventional_format", "description": "Message follows type(scope): description format" },
+    { "name": "breaking_indicator", "description": "Uses ! in header OR BREAKING CHANGE: footer" },
+    { "name": "has_breaking_footer", "description": "Includes BREAKING CHANGE: footer with migration details" },
+    { "name": "imperative_mood", "description": "Description uses imperative tense (e.g., 'require' not 'required')" },
+    { "name": "no_ai_coauthor", "description": "No Co-Authored-By trailer present" }
+  ]
+}

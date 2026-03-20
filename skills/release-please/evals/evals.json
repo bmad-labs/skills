@@ -1,0 +1,20 @@
+{
+  "skill_name": "release-please",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up release-please for my Node.js project. It's a library published to npm, currently at version 2.1.0, single package, main branch. No pre-releases needed.",
+      "expected_output": "Generates release-please-config.json with release-type node, .release-please-manifest.json with version 2.1.0, and .github/workflows/release.yml with npm publish step. Should skip most questions since all info is provided."
+    },
+    {
+      "id": 2,
+      "prompt": "I just changed our REST API to require Bearer tokens instead of API keys on all endpoints. Help me write a good commit message for this breaking change.",
+      "expected_output": "Drafts a conventional commit message with feat or refactor type, ! breaking indicator, and BREAKING CHANGE footer explaining migration impact. Should follow the commit assistance protocol."
+    },
+    {
+      "id": 3,
+      "prompt": "Configure release-please for a Python monorepo with two packages: packages/core and packages/cli. We publish to PyPI. Currently both at 0.0.0, default branch is main.",
+      "expected_output": "Generates config with release-type python, two package entries with component names, manifest with both packages at 0.0.0, and workflow with per-package PyPI publish jobs using trusted publishers."
+    }
+  ]
+}

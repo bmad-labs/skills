@@ -1,0 +1,81 @@
+{
+  "skill_name": "release-please",
+  "iteration": 1,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "evals": [
+        {
+          "eval_name": "eval-node-setup",
+          "pass_rate": 1.0,
+          "passed": 7,
+          "total": 7,
+          "tokens": 17577,
+          "duration_seconds": 36.1
+        },
+        {
+          "eval_name": "eval-commit-message",
+          "pass_rate": 1.0,
+          "passed": 5,
+          "total": 5,
+          "tokens": 17057,
+          "duration_seconds": 30.2
+        },
+        {
+          "eval_name": "eval-python-monorepo",
+          "pass_rate": 1.0,
+          "passed": 6,
+          "total": 6,
+          "tokens": 29782,
+          "duration_seconds": 42.9
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "stddev_pass_rate": 0.0,
+        "mean_tokens": 21472,
+        "mean_duration_seconds": 36.4
+      }
+    },
+    {
+      "name": "without_skill",
+      "evals": [
+        {
+          "eval_name": "eval-node-setup",
+          "pass_rate": 0.571,
+          "passed": 4,
+          "total": 7,
+          "tokens": 12560,
+          "duration_seconds": 22.5
+        },
+        {
+          "eval_name": "eval-commit-message",
+          "pass_rate": 1.0,
+          "passed": 5,
+          "total": 5,
+          "tokens": 12170,
+          "duration_seconds": 26.7
+        },
+        {
+          "eval_name": "eval-python-monorepo",
+          "pass_rate": 1.0,
+          "passed": 6,
+          "total": 6,
+          "tokens": 13114,
+          "duration_seconds": 32.7
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.857,
+        "stddev_pass_rate": 0.205,
+        "mean_tokens": 12615,
+        "mean_duration_seconds": 27.3
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate": "+14.3%",
+    "tokens": "+70.2%",
+    "duration": "+33.3%"
+  }
+}

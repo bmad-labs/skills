@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-commit-message",
+  "variant": "with_skill",
+  "expectations": [
+    { "text": "conventional_format", "passed": true, "evidence": "Uses feat(api)!: require Bearer token authentication on all endpoints" },
+    { "text": "breaking_indicator", "passed": true, "evidence": "Uses ! after scope: feat(api)!" },
+    { "text": "has_breaking_footer", "passed": true, "evidence": "Has BREAKING CHANGE: footer with migration details" },
+    { "text": "imperative_mood", "passed": true, "evidence": "Description starts with 'require' (imperative)" },
+    { "text": "no_ai_coauthor", "passed": true, "evidence": "No Co-Authored-By trailer present" }
+  ]
+}
