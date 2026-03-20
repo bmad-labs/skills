@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      core--release_created: ${{ steps.release.outputs['packages/core--release_created'] }}
+      core--tag_name: ${{ steps.release.outputs['packages/core--tag_name'] }}
+      cli--release_created: ${{ steps.release.outputs['packages/cli--release_created'] }}
+      cli--tag_name: ${{ steps.release.outputs['packages/cli--tag_name'] }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish-core:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.core--release_created == 'true' }}
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install build tools
+        run: pip install build
+      - name: Build package
+        working-directory: packages/core
+        run: python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/core/dist/
+
+  publish-cli:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.cli--release_created == 'true' }}
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install build tools
+        run: pip install build
+      - name: Build package
+        working-directory: packages/cli
+        run: python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/cli/dist/

@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-node-setup",
+  "variant": "with_skill",
+  "expectations": [
+    { "text": "correct_release_type", "passed": true, "evidence": "Config has \"release-type\": \"node\"" },
+    { "text": "correct_version", "passed": true, "evidence": "Manifest has \".\": \"2.1.0\"" },
+    { "text": "has_concurrency", "passed": true, "evidence": "Workflow has concurrency group with cancel-in-progress: false" },
+    { "text": "publish_gated", "passed": true, "evidence": "Publish job has if: needs.release-please.outputs.release_created == 'true'" },
+    { "text": "npm_publish", "passed": true, "evidence": "Workflow has npm publish --provenance --access public with NPM_TOKEN" },
+    { "text": "has_schema", "passed": true, "evidence": "Config includes $schema field" },
+    { "text": "bump_minor_pre_major", "passed": true, "evidence": "Config has bump-minor-pre-major: true" }
+  ]
+}

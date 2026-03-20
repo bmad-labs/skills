@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-node-setup",
+  "prompt": "Set up release-please for my Node.js project. It's a library published to npm, currently at version 2.1.0, single package, main branch. No pre-releases needed.",
+  "assertions": [
+    { "name": "correct_release_type", "description": "Config uses release-type: node" },
+    { "name": "correct_version", "description": "Manifest has \".\": \"2.1.0\" (not 0.0.0)" },
+    { "name": "has_concurrency", "description": "Workflow includes concurrency group with cancel-in-progress: false" },
+    { "name": "publish_gated", "description": "Publish job is gated on release_created == true" },
+    { "name": "npm_publish", "description": "Workflow includes npm publish step with NPM_TOKEN" },
+    { "name": "has_schema", "description": "Config includes $schema field" },
+    { "name": "bump_minor_pre_major", "description": "Config includes bump-minor-pre-major option" }
+  ]
+}

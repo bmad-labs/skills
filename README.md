@@ -179,6 +179,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [ai-multimodal](skills/ai-multimodal) | Process and generate multimedia content using Google Gemini API (audio, images, videos, documents) | Data |
 | [atlassian-rest](skills/atlassian-rest) | Jira & Confluence integration via REST APIs — tickets, epics, pages, status reports, triage, bidirectional BMAD document sync | Productivity |
 | [multi-repo-git-ops](skills/multi-repo-git-ops) | Git operations across multi-repo systems with submodules — branching, committing, pushing, syncing across parent and service repos | Development |
+| [release-please](skills/release-please) | Automated versioning and releases with Google's release-please — pipeline setup, Conventional Commits, pre-releases, monorepos | Development |
 
 ## Recommended Skills from Other Repositories
 

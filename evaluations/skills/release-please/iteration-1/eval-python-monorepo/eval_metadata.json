@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-python-monorepo",
+  "prompt": "Configure release-please for a Python monorepo with two packages: packages/core and packages/cli. We publish to PyPI. Currently both at 0.0.0, default branch is main.",
+  "assertions": [
+    { "name": "correct_release_type", "description": "Both packages use release-type: python" },
+    { "name": "two_packages", "description": "Config has entries for both packages/core and packages/cli" },
+    { "name": "has_components", "description": "Each package has a component field" },
+    { "name": "manifest_matches", "description": "Manifest has both package paths at 0.0.0" },
+    { "name": "pypi_publish", "description": "Workflow uses PyPI trusted publishers (pypa/gh-action-pypi-publish)" },
+    { "name": "per_package_publish", "description": "Separate publish jobs for each package" }
+  ]
+}

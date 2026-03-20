@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-python-monorepo",
+  "variant": "with_skill",
+  "expectations": [
+    { "text": "correct_release_type", "passed": true, "evidence": "Both packages have release-type: python" },
+    { "text": "two_packages", "passed": true, "evidence": "Config has packages/core and packages/cli entries" },
+    { "text": "has_components", "passed": true, "evidence": "core has component: core, cli has component: cli" },
+    { "text": "manifest_matches", "passed": true, "evidence": "Manifest has packages/core: 0.0.0 and packages/cli: 0.0.0" },
+    { "text": "pypi_publish", "passed": true, "evidence": "Both publish jobs use pypa/gh-action-pypi-publish@release/v1 with id-token: write and environment: pypi" },
+    { "text": "per_package_publish", "passed": true, "evidence": "Has separate publish-core and publish-cli jobs with correct working-directory and packages-dir" }
+  ]
+}
