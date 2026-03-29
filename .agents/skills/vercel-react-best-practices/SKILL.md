@@ -1,6 +1,7 @@
 ---
 name: vercel-react-best-practices
-description: React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.
+description: >
+  Apply Vercel Engineering's React and Next.js performance rules: parallelize async calls with Promise.all, eliminate barrel-file imports, lazy-load heavy components via next/dynamic, cache server fetches with React.cache and LRU, reduce re-renders through memoization and derived state, and optimize bundle size with conditional dynamic imports. Use when writing, reviewing, or refactoring React components, Next.js pages, data fetching, or bundle configuration.
 license: MIT
 metadata:
   author: vercel
@@ -43,6 +44,17 @@ Reference these guidelines when:
 - `async-api-routes` - Start promises early, await late in API routes
 - `async-suspense-boundaries` - Use Suspense to stream content
 
+**Example — `async-parallel`:** Fetch independent data in parallel, not sequentially:
+
+```tsx
+// Bad: sequential waterfalls
+const user = await getUser(id);
+const posts = await getPosts(id);
+
+// Good: parallel fetching
+const [user, posts] = await Promise.all([getUser(id), getPosts(id)]);
+```
+
 ### 2. Bundle Size Optimization (CRITICAL)
 
 - `bundle-barrel-imports` - Import directly, avoid barrel files
@@ -50,6 +62,27 @@ Reference these guidelines when:
 - `bundle-defer-third-party` - Load analytics/logging after hydration
 - `bundle-conditional` - Load modules only when feature is activated
 - `bundle-preload` - Preload on hover/focus for perceived speed
+
+**Example — `bundle-barrel-imports`:** Import from the specific module, not the barrel:
+
+```tsx
+// Bad: pulls in entire package via barrel file
+import { Button } from '@/components';
+
+// Good: direct import, tree-shakeable
+import { Button } from '@/components/ui/Button';
+```
+
+**Example — `bundle-dynamic-imports`:** Lazy-load heavy components:
+
+```tsx
+import dynamic from 'next/dynamic';
+
+const Chart = dynamic(() => import('@/components/Chart'), {
+  loading: () => <p>Loading chart...</p>,
+  ssr: false,
+});
+```
 
 ### 3. Server-Side Performance (HIGH)
 
@@ -115,6 +148,22 @@ Reference these guidelines when:
 - `advanced-event-handler-refs` - Store event handlers in refs
 - `advanced-init-once` - Initialize app once per app load
 - `advanced-use-latest` - useLatest for stable callback refs
+
+## Workflow Checklists
+
+### Reviewing a Component
+1. Check for sequential awaits — convert independent fetches to `Promise.all()`
+2. Check imports — replace barrel imports with direct module paths
+3. Check for heavy dependencies — wrap with `next/dynamic` or `React.lazy`
+4. Check re-renders — ensure props use primitives, memoize expensive children
+5. Check event handlers — use functional `setState` for stable callbacks
+
+### Optimizing a Page
+1. Parallelize all server-side data fetching (Promise.all / Suspense boundaries)
+2. Audit bundle: identify and defer third-party scripts (analytics, logging)
+3. Add `content-visibility: auto` for long scrollable sections
+4. Use `React.cache()` for per-request dedup, LRU for cross-request caching
+5. Preload critical resources on hover/focus for perceived speed
 
 ## How to Use
 

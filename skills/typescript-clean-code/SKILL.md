@@ -1,43 +1,30 @@
 ---
 name: typescript-clean-code
 description: |
-  Clean Code principles, professional practices, and workflows for TypeScript developers. Based on Robert C. Martin's "Clean Code" and "The Clean Coder" books.
-
-  IMPORTANT: When this skill is active, always load and consult the reference files (rules.md, examples.md) before giving advice or writing code. Reference content takes precedence over general knowledge.
+  Applies Robert C. Martin's Clean Code and Clean Coder principles to TypeScript. Enforces naming conventions, function size limits (2-5 lines ideal), SOLID principles, and a 50+ code smell catalog — all adapted for TypeScript with concrete thresholds from curated reference files.
 
   Use this skill when:
-  - Writing TypeScript/JavaScript code
-  - Reviewing code or pull requests
-  - Refactoring existing code
-  - Following test-driven development (TDD)
-  - Fixing bugs with proper test coverage
-  - Planning test strategy for features
-  - Estimating tasks accurately
-  - Handling deadlines and commitments professionally
-  - Working effectively with teams
+  - Improving naming clarity, function length, or class design in TypeScript
+  - Detecting code smells (long methods, feature envy, data clumps, etc.)
+  - Applying SOLID principles or DRY refactoring
+  - Running TDD red-green-refactor cycles
+  - Reviewing code or PRs against Clean Code standards
+  - Estimating tasks with PERT or negotiating deadlines
 ---
 
 # Clean Code
 
 Principles, practices, and workflows for TypeScript developers.
 
-## Critical: Reference-First Approach
+## Reference-First Approach
 
-**Always load and consult the reference files before applying any principle or making any recommendation.** The references in this skill contain curated, authoritative knowledge from Robert C. Martin's books, adapted for TypeScript. When this skill is active:
-
-1. **Read references before responding** - For any code quality or professional practice topic, load the relevant `rules.md` and `examples.md` files from `references/` before giving advice or writing code. Do not rely on general knowledge alone.
-2. **Reference content overrides internal knowledge** - If your general knowledge conflicts with what the reference files state, follow the reference files. They contain the specific rules, thresholds, and patterns this skill enforces.
-3. **Cite specific rules** - When making recommendations, reference the specific rule (e.g., "per `references/functions/rules.md` Rule 1: Keep Functions Small, 2-5 lines ideal") so the user can trace the guidance back to its source.
-4. **Use examples from reference files** - Prefer the bad/good code examples in `references/[topic]/examples.md` over generating your own. These examples are curated for TypeScript and demonstrate the exact patterns intended.
-5. **Follow workflows step-by-step** - When executing a task (review, refactoring, TDD, etc.), load the corresponding workflow file and follow each step, loading the reference files each step points to.
-
-**Do not skip loading references.** Even if you "know" Clean Code principles, the reference files contain specific TypeScript adaptations, thresholds, checklists, and smell catalogs that your general knowledge may not match exactly.
+**Before applying any principle, load the relevant `rules.md` and `examples.md` from `references/`.** Reference content overrides general knowledge — it contains TypeScript-specific thresholds, checklists, and smell catalogs. When making recommendations, cite specific rules (e.g., "per `references/functions/rules.md` Rule 1: Keep Functions Small, 2-5 lines ideal"). Prefer curated examples from reference files over generated ones. For multi-step tasks, load the corresponding workflow and follow each step.
 
 ## Quick Start
 
-1. **For a task**: Check `guidelines.md` → find the right workflow → load it → follow each step (loading referenced files)
-2. **For reference**: Load the specific `rules.md` and `examples.md` files relevant to your work → apply them
-3. **Follow the workflow**: Step-by-step process for consistent results — always load the files each step references
+1. **For a task**: Check `guidelines.md` → find the right workflow → load it → follow each step
+2. **For reference**: Load the specific `rules.md` and `examples.md` for the topic → apply them
+3. **Follow the workflow**: Step-by-step process for consistent results
 
 ## Workflows
 
@@ -98,9 +85,7 @@ The code review, PR review, and refactoring workflows use a **step-file architec
 | pressure | 3 | Working under pressure |
 | collaboration | 3 | Working with teams |
 
-## Key Principles (Summary Only — Always Load Full References)
-
-These are abbreviated reminders. **Always load the corresponding reference files for the full rules, thresholds, and examples before applying.**
+## Key Principles
 
 ### Code Quality
 1. **Readability** → `references/formatting/rules.md`, `references/naming/rules.md`
@@ -124,11 +109,24 @@ See `guidelines.md` for:
 - Situation → reference file mapping
 - Decision tree for common scenarios
 
-## Reference Loading Checklist
+## Inline Example: Naming Transformation
 
-Before giving any code advice or writing code, verify:
-- [ ] Identified which reference categories apply to the current task
-- [ ] Loaded the `rules.md` for each applicable category
-- [ ] Loaded `examples.md` if demonstrating patterns or reviewing code
-- [ ] Loaded the relevant `workflow/*.md` if executing a multi-step task
-- [ ] Will cite specific rules/files in recommendations
+A quick before/after applying `references/naming/rules.md`:
+
+```typescript
+// Bad: unclear abbreviation, boolean without predicate
+const d: number = getElapsed();
+const status: boolean = check(user);
+
+// Good: intention-revealing name, boolean reads as question
+const elapsedDays: number = getElapsedSinceCreation();
+const isEligibleForDiscount: boolean = hasActiveSubscription(user);
+```
+
+## Inline Example: TDD Red-Green-Refactor Cycle
+
+Per `workflows/tdd.md`, every change follows three steps:
+
+1. **Red** — Write a failing test: `it('rejects negative amounts', () => expect(() => transfer(-1)).toThrow());`
+2. **Green** — Write the minimum code to pass: add an `if (amount < 0) throw ...` guard.
+3. **Refactor** — Extract the guard into a reusable `assertPositive(amount)` helper, re-run tests to confirm green.

@@ -1,6 +1,15 @@
 ---
 name: ui-ux-pro-max
-description: "UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app, .html, .tsx, .vue, .svelte. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient. Integrations: shadcn/ui MCP for component search and examples."
+description: >
+  Use when designing, building, or improving UI/UX for web or mobile applications,
+  or when the user mentions specific design styles, component libraries, or frontend frameworks.
+  UI/UX design intelligence with 50 styles, 97 palettes, 57 font pairings, 25 chart types
+  across 9 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui).
+  Covers: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode,
+  skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography,
+  font pairing, spacing, hover, shadow, gradient. Elements: button, modal, navbar, sidebar, card,
+  table, form, chart. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS,
+  portfolio, blog, mobile app. Integrates with shadcn/ui MCP for component search and examples.
 ---
 
 # UI/UX Pro Max - Design Intelligence
@@ -91,33 +100,6 @@ Search specific domains using the CLI tool below.
 
 ---
 
-## Prerequisites
-
-Check if Python is installed:
-
-```bash
-python3 --version || python --version
-```
-
-If Python is not installed, install it based on user's OS:
-
-**macOS:**
-```bash
-brew install python3
-```
-
-**Ubuntu/Debian:**
-```bash
-sudo apt update && sudo apt install python3
-```
-
-**Windows:**
-```powershell
-winget install Python.Python.3.12
-```
-
----
-
 ## How to Use This Skill
 
 When user requests UI/UX work (design, build, create, implement, review, fix, improve), follow this workflow:
@@ -137,12 +119,6 @@ Extract key information from user request:
 ```bash
 python3 skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
 ```
-
-This command:
-1. Searches 5 domains in parallel (product, style, color, landing, typography)
-2. Applies reasoning rules from `ui-reasoning.csv` to select best matches
-3. Returns complete design system: pattern, style, colors, typography, effects
-4. Includes anti-patterns to avoid
 
 **Example:**
 ```bash
