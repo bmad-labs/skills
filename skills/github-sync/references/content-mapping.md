@@ -25,7 +25,7 @@ How to transform BMAD artifacts into GitHub issues, fields, labels, and mileston
 | `3-1-add-monitoring-and-alerts.md` | `3.1 Add Monitoring and Alerts` |
 | `4.1-integrate-external-api.md` | `4.1 Integrate External API` |
 | `6-1-build-web-dashboard.md` | `6.1 Build Web Dashboard` |
-| `12-4-docker-containerization-ci-cd.md` | `12.4 Docker Containerization + CI/CD` |
+| `12-4-deploy-and-release.md` | `12.4 Deploy and Release` |
 
 ---
 
@@ -149,14 +149,16 @@ Each field has exactly one owner. The sync direction determines whether the fiel
 | Acceptance Criteria text | BMAD story files | Push to GitHub | Summarized on push |
 | Task list text | BMAD story files | Push to GitHub | Task 2+ only |
 | Status | GitHub Projects | Pull to BMAD | `Status: {mapped_value}` in story file |
-| Sprint | BMAD `sprint-plan.md` | Push to GitHub | Sets milestone + date fields |
+| Sprint | BMAD `sprint-plan.md` | Push to GitHub | Sets Sprint field + milestone + date fields |
 | Dev assignment | GitHub | Pull to BMAD | Set via issue assignee + Dev field |
 | Epic | BMAD `epics.md` | Push to GitHub | Sets label + Epic custom field |
-| Phase | BMAD `sprint-plan.md` | Push to GitHub | Sets label + Phase custom field |
+| Phase | BMAD `sprint-plan.md` | Push to GitHub | Sets label only — expressed through milestone, NOT a custom field |
 | Task checkboxes (checked/unchecked) | GitHub | Pull to BMAD | Devs check off tasks in GitHub |
 | Story Points | GitHub only | N/A | Not in BMAD files |
 | Priority | GitHub only | N/A | Not in BMAD files |
-| Dependencies | BMAD story files | Push to GitHub | Cross-referenced with `#N` issue numbers |
+| Dependencies | BMAD `sprint-plan.md` | Push to GitHub | Source is the Dependencies column in sprint-plan.md, NOT the story body |
+| Parent relationship | BMAD `epics.md` grouping | Push to GitHub | Epic tracking issue is parent of all its stories |
+| Blocked-by relationship | BMAD `sprint-plan.md` | Push to GitHub | Set via `addBlockedBy` GraphQL mutation |
 
 ---
 
@@ -186,22 +188,15 @@ It is NOT YAML frontmatter. Parse with: `^Status:\s*(.+)$`
 
 17 labels total. Create all labels before syncing issues.
 
-### Epic Labels (12)
+### Epic Labels (1 per epic)
 
 | Label | Hex Color | Purpose |
 |-------|-----------|---------|
-| `epic:1-foundation` | `#0075ca` | Epic 1 stories |
-| `epic:2-navigation` | `#008672` | Epic 2 stories |
-| `epic:3-safety` | `#d73a4a` | Epic 3 stories |
-| `epic:4-inspection` | `#a2eeef` | Epic 4 stories |
-| `epic:5-reporting` | `#7057ff` | Epic 5 stories |
-| `epic:6-tablet` | `#008672` | Epic 6 stories |
-| `epic:7-audit` | `#e4e669` | Epic 7 stories |
-| `epic:8-reliability` | `#d73a4a` | Epic 8 stories |
-| `epic:9-reports-pro` | `#7057ff` | Epic 9 stories |
-| `epic:10-mission` | `#0e8a16` | Epic 10 stories |
-| `epic:11-security` | `#b60205` | Epic 11 stories |
-| `epic:12-testing` | `#5319e7` | Epic 12 stories |
+| `epic:{N}-{slug}` | (varies) | Stories belonging to epic N |
+
+Example: `epic:1-foundation`, `epic:2-navigation`, `epic:3-safety`, etc.
+Derive the slug from the epic name in `epics.md` (lowercase, hyphenated).
+Colors should be visually distinct across epics.
 
 ### Phase Labels (2)
 
@@ -220,25 +215,40 @@ It is NOT YAML frontmatter. Parse with: `^Status:\s*(.+)$`
 
 ## 8. Milestone Scheme
 
-12 milestones, one per sprint. Create all milestones before syncing issues.
+Milestones represent **project phases**, not individual sprints. Create one milestone per phase.
+The Sprint single-select field (Section 14) handles per-sprint grouping on the board.
 
-Milestones are dynamically derived from `sprint-plan.md`. The parser script extracts sprint numbers, dates, objectives, and story counts. Do not hardcode milestone values — always read them from the parsed sprint data.
+**Milestone names are user-defined.** During onboarding, ask the user what their phase milestones
+should be called. Common patterns:
 
-**Example:**
+- `PoC` / `Production Hardening` (this project's choice)
+- `MVP 1` / `MVP 2` / `MVP 3`
+- `Alpha` / `Beta` / `GA`
 
-| Milestone | Due Date (ISO) | Description Template |
-|-----------|---------------|----------------------|
-| `Sprint 1` | `{end_date}` | Sprint Objective: {objective} / Demo Date: {demo_date} / Working Days: {count} / Stories: {story_count} |
-| `Sprint 2` | `{end_date}` | ... |
-| ... | ... | ... |
+Always derive due dates and sprint ranges from the actual planning artifacts.
 
-### Milestone Description Format
+| Milestone | Due Date | Sprint Range | Description |
+|-----------|----------|-------------|-------------|
+| `PoC` | Sprint 6 end date | Sprints 1–6 | Phase 1: Proof of Concept |
+| `Production Hardening` | Sprint 12 end date | Sprints 7–12 | Phase 2: Production Hardening |
 
-```
-Sprint Objective: {objective}
-Demo Date: {friday date}
-Working Days: {count}
-Stories: {count}
+Additional phase milestones (e.g., MVP 1, MVP 2) can be added if the project roadmap defines them.
+Always derive milestone names and due dates from the actual planning artifacts.
+
+### Phase Derivation
+
+| Sprint Range | Phase | Milestone |
+|-------------|-------|-----------|
+| 1–6 | PoC | `PoC` |
+| 7–12 | Hardening | `Production Hardening` |
+
+### Creating Phase Milestones
+
+```bash
+gh api repos/{owner}/{repo}/milestones --method POST \
+  -f title="{phase_name}" \
+  -f due_on="{phase_end_date}T00:00:00Z" \
+  -f description="{phase_description_from_sprint_plan}"
 ```
 
 ---
@@ -283,7 +293,7 @@ Files like `epics.md` and `sprint-plan.md` have `---` YAML frontmatter.
 ---
 status: complete
 gh_item_url: https://github.com/OWNER/REPO/issues/99
-last_synced: "2026-04-01T10:30:00Z"
+last_synced: "2025-01-15T10:30:00Z"
 ---
 ```
 
@@ -296,7 +306,7 @@ gh_item_urls:
   epic_1: https://github.com/OWNER/REPO/issues/100
   epic_2: https://github.com/OWNER/REPO/issues/101
   epic_3: https://github.com/OWNER/REPO/issues/102
-last_synced: "2026-04-01T10:30:00Z"
+last_synced: "2025-01-15T10:30:00Z"
 ---
 ```
 
@@ -361,9 +371,9 @@ Filenames follow two formats (inconsistent naming in the repo):
 | Filename Pattern | Example | Story ID |
 |-----------------|---------|----------|
 | `{epic}-{story}-{slug}.md` (dash separator) | `1-1-set-up-project-structure.md` | `1.1` |
-| `{epic}-{story}-{slug}.md` (dash separator) | `3-1-power-manager-node-with-range-estimation.md` | `3.1` |
-| `{epic}.{story}-{slug}.md` (dot separator) | `4.1-stop-and-scan-capture-image.md` | `4.1` |
-| `{epic}.{story}-{slug}.md` (dot separator) | `4.2-quality-gate-evaluate-image.md` | `4.2` |
+| `{epic}-{story}-{slug}.md` (dash separator) | `3-1-create-monitoring-service.md` | `3.1` |
+| `{epic}.{story}-{slug}.md` (dot separator) | `4.1-integrate-external-api.md` | `4.1` |
+| `{epic}.{story}-{slug}.md` (dot separator) | `4.2-add-caching-layer.md` | `4.2` |
 
 ### Extraction Logic
 
@@ -376,9 +386,9 @@ Story ID: "{group1}.{group2}"
 
 Examples:
 - `1-1-set-up-project-structure...` --> match `1`, `1` --> `1.1`
-- `3-1-power-manager-node...` --> match `3`, `1` --> `3.1`
-- `4.1-stop-and-scan...` --> match `4`, `1` --> `4.1`
-- `12-4-docker-containerization...` --> match `12`, `4` --> `12.4`
+- `3-1-create-monitoring-service...` --> match `3`, `1` --> `3.1`
+- `4.1-integrate-external-api...` --> match `4`, `1` --> `4.1`
+- `12-4-deploy-and-release...` --> match `12`, `4` --> `12.4`
 
 ---
 
@@ -388,18 +398,9 @@ The story ID prefix determines the epic number.
 
 | Story ID Prefix | Epic |
 |----------------|------|
-| `1.x` | Epic 1: Foundation |
-| `2.x` | Epic 2: Navigation |
-| `3.x` | Epic 3: Safety |
-| `4.x` | Epic 4: Inspection |
-| `5.x` | Epic 5: Reporting |
-| `6.x` | Epic 6: Tablet |
-| `7.x` | Epic 7: Audit Trail |
-| `8.x` | Epic 8: Reliability |
-| `9.x` | Epic 9: Reports Pro |
-| `10.x` | Epic 10: Mission Planning |
-| `11.x` | Epic 11: Security |
-| `12.x` | Epic 12: Testing |
+| `{N}.x` | Epic N: {Epic Name from epics.md} |
+
+Example: `1.x` → Epic 1, `2.x` → Epic 2, `10.x` → Epic 10.
 
 ### Derivation
 
@@ -414,47 +415,104 @@ The epic slug comes from the label scheme in Section 7 (e.g., `foundation`, `nav
 
 ## 13. Sprint Derivation
 
-The sprint assignment for each story must be looked up from the Story-to-Sprint Summary table in `_bmad-output/planning-artifacts/sprint-plan.md`.
+The sprint assignment for each story must be looked up from the Story-to-Sprint Summary table in `.artifacts/planning-artifacts/sprint-plan.md`.
 
 There is no formula to derive sprint from story ID. The mapping is explicit.
 
 ### Lookup Table (from sprint-plan.md)
 
+The story-to-sprint mapping is **always read from sprint-plan.md**. There is no formula to
+derive sprint from story ID. The mapping is explicit and project-specific.
+
+Example format:
+
 | Story | Sprint |
 |-------|--------|
 | 1.1, 1.2, 1.3, 1.4 | 1 |
 | 2.1, 2.2, 2.3 | 2 |
-| 2.4, 2.5, 3.1, 3.2, 3.3, 3.4, 3.5 | 3 |
-| 4.1, 4.2, 4.4 | 4 |
-| 4.3, 4.5, 5.1, 5.2 | 5 |
-| 5.3, 6.1, 6.2, 6.3, 6.4, 6.5 | 6 |
-| 7.1, 7.2, 7.3 | 7 |
-| 8.1, 8.2, 11.1, 11.2, 11.3 | 8 |
-| 9.1, 9.2, 9.3 | 9 |
-| 10.1, 10.2, 10.3 | 10 |
-| 12.1, 12.2, 12.3 | 11 |
-| 12.4, 12.5 | 12 |
+| ... | ... |
 
 ### Phase Derivation from Sprint
 
 | Sprint Range | Phase | Label |
 |-------------|-------|-------|
-| 1--6 | PoC | `phase:poc` |
-| 7--12 | Hardening | `phase:hardening` |
+| 1–6 | PoC | `phase:poc` |
+| 7–12 | Hardening | `phase:hardening` |
 
-### Sprint Date Ranges (for Sprint Start/End project fields)
+### Sprint Date Ranges
+
+Always read from `sprint-plan.md`. Date ranges are project-specific.
+
+Example format:
 
 | Sprint | Start | End |
 |--------|-------|-----|
-| 1 | 2026-04-01 | 2026-04-10 |
-| 2 | 2026-04-13 | 2026-04-24 |
-| 3 | 2026-04-27 | 2026-05-08 |
-| 4 | 2026-05-11 | 2026-05-22 |
-| 5 | 2026-05-25 | 2026-06-05 |
-| 6 | 2026-06-08 | 2026-06-19 |
-| 7 | 2026-07-06 | 2026-07-17 |
-| 8 | 2026-07-20 | 2026-07-31 |
-| 9 | 2026-08-03 | 2026-08-14 |
-| 10 | 2026-08-17 | 2026-08-28 |
-| 11 | 2026-08-31 | 2026-09-11 |
-| 12 | 2026-09-14 | 2026-09-25 |
+| 1 | YYYY-MM-DD | YYYY-MM-DD |
+| 2 | YYYY-MM-DD | YYYY-MM-DD |
+| ... | ... | ... |
+
+---
+
+## 14. Sprint Field (Single-Select)
+
+The Sprint field is a SINGLE_SELECT field (not DATE) that enables board grouping by sprint.
+It is separate from the Sprint Start/Sprint End DATE fields.
+
+### Options
+
+| Option | Color | Description |
+|--------|-------|-------------|
+| Sprint 01 | RED | Sprint objective from sprint-plan.md |
+| Sprint 02 | ORANGE | Sprint objective |
+| Sprint 03 | YELLOW | Sprint objective |
+| Sprint 04 | GREEN | Sprint objective |
+| Sprint 05 | BLUE | Sprint objective |
+| Sprint 06 | PURPLE | Sprint objective (end of PoC) |
+| Sprint 07 | PINK | Sprint objective (start of Hardening) |
+| Sprint 08 | RED | Sprint objective |
+| Sprint 09 | ORANGE | Sprint objective |
+| Sprint 10 | YELLOW | Sprint objective |
+| Sprint 11 | GREEN | Sprint objective |
+| Sprint 12 | BLUE | Sprint objective (final demo) |
+
+### Setting Colors and Descriptions
+
+Use the `updateProjectV2Field` GraphQL mutation (see `references/gh-commands.md` section 13).
+
+> **Warning:** This mutation replaces ALL options and issues new option IDs. Always re-query
+> option IDs after calling it and update `.github-sync.yaml`.
+
+---
+
+## 15. Dependency Mapping
+
+Dependencies come from the `Dependencies` column in each sprint's story table in `sprint-plan.md`,
+**not** from the story file bodies. Story bodies may paraphrase dependencies but sprint-plan.md is
+authoritative.
+
+### Reading Dependencies from sprint-plan.md
+
+Each sprint has a table like:
+
+| Story | Title | Dev | Dependencies |
+|-------|-------|-----|-------------|
+| 2.1 | Feature A | All | 1.3, 1.4 |
+| 2.2 | Feature B | All | 2.1 |
+
+The `Dependencies` column lists story IDs that must be complete first.
+
+### Relationship Types
+
+| Relationship | GitHub Mechanism | Meaning |
+|-------------|-----------------|---------|
+| Epic → Story | `addSubIssue` | Epic tracking issue is parent of story issue |
+| A depends on B | `addBlockedBy(A, B)` | Story A is blocked by story B |
+| B blocks A | Inverse of above | Automatically shown on B when A is blocked |
+
+### Workflow
+
+1. First ensure all story issues exist (created in Push Step 6)
+2. Get issue node IDs via GraphQL repository issues query
+3. Create epic tracking issues if not yet created (see Section 10)
+4. Set `addSubIssue` for each story → its epic
+5. Parse sprint-plan.md dependency table and set `addBlockedBy` for each dependency pair
