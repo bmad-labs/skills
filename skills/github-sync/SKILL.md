@@ -7,7 +7,8 @@ description: >
   "onboard github project", "create github issues from stories",
   "update stories from github", "sync status", or wants to manage
   BMAD artifacts in GitHub Projects. Also trigger when user mentions
-  "gh project", "github board", "sprint board", or "project roadmap"
+  "gh project", "github board", "sprint board", "project roadmap",
+  "relationship field", "blocked by", or "parent issue"
   in the context of BMAD artifacts. Trigger on implicit cues like
   "I want to track stories in github", "let's set up a project board",
   "what's out of sync", "push the sprint to github".
@@ -26,7 +27,7 @@ markdown files and GitHub Projects v2 for visual project tracking.
 
 ---
 
-## Three Rules (Never Break These)
+## Four Rules (Never Break These)
 
 1. **Never sync automatically.** Every mutating operation (create issues, update fields, modify
    files) requires generating a sync report first, presenting it to the user, and waiting for
@@ -40,6 +41,13 @@ markdown files and GitHub Projects v2 for visual project tracking.
 3. **Idempotent operations.** Running the same sync twice produces the same result. Link-back
    identifiers (H1 title links in story files, `gh_item_url` in planning frontmatter) prevent
    duplicate creation. Always check for existing sync state before creating.
+
+4. **Never auto-parse issue bodies with a script.** Issue body generation requires reading each
+   story file directly with the Read tool and crafting the body manually following the template
+   in `references/content-mapping.md`. Auto-parsing scripts fail silently in subtle ways:
+   they strip task lists when formatting assumptions are wrong, gut dev notes by removing code
+   blocks, and produce empty section headers. One bad push contaminates all 27 issues at once.
+   **Read the file. Write the body. No shortcuts.**
 
 ---
 
@@ -78,7 +86,8 @@ Step 4: (For push/pull/status only) Check .github-sync.yaml exists
 
 ## Onboarding Workflow
 
-This is the first-time setup. It creates the GitHub Project, custom fields, labels, and milestones.
+This is the first-time setup. It creates or connects to a GitHub Project, creates custom
+fields, labels, and phase-based milestones.
 
 ### Step 1: Detect BMAD Artifacts
 
@@ -86,27 +95,32 @@ Run the parser to discover what exists:
 
 ```bash
 python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode scan \
-  --stories-dir _bmad-output/implementation-artifacts
+  --stories-dir .artifacts/implementation-artifacts
 ```
 
 Also check that these files exist:
-- `_bmad-output/planning-artifacts/epics.md`
-- `_bmad-output/planning-artifacts/sprint-plan.md`
+- `.artifacts/planning-artifacts/epics.md`
+- `.artifacts/planning-artifacts/sprint-plan.md`
+
+> **Note:** The artifacts path `.artifacts/` may differ per project. Check the actual
+> directory structure — some projects use `_bmad-output/`. Confirm the correct paths with
+> the user and use them throughout. Update `paths.*` in the config accordingly.
 
 Report the count: "Found N story files, M epics, K sprints."
 
 ### Step 2: Gather GitHub Details
 
-Ask the user for:
-- **Owner**: GitHub user or organization login
-- **Repository**: Repository name
-
-Try to auto-detect from the current repo:
+Auto-detect the current repo:
 ```bash
 gh repo view --json owner,name --jq '.owner.login + "/" + .name'
 ```
 
-Present the detected values and ask for confirmation.
+List existing projects and ask the user whether to use one or create new:
+```bash
+gh project list --owner {owner} --format json
+```
+
+Present detected owner/repo and existing projects. Ask for confirmation before proceeding.
 
 ### Step 3: Parse Epic and Sprint Data
 
@@ -117,14 +131,11 @@ Then parse the actual artifacts:
 
 ```bash
 python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode epics \
-  --file _bmad-output/planning-artifacts/epics.md
+  --file .artifacts/planning-artifacts/epics.md
 
 python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode sprints \
-  --file _bmad-output/planning-artifacts/sprint-plan.md
+  --file .artifacts/planning-artifacts/sprint-plan.md
 ```
-
-Use the parsed data combined with the label/milestone schemes from the reference file
-to determine the exact epic names, label colors, sprint dates, and story counts.
 
 ### Step 4: Generate Onboarding Report
 
@@ -134,24 +145,30 @@ Present a report showing everything that WILL be created:
 === GITHUB SYNC — ONBOARDING REPORT ===
 
 Repository: {owner}/{repo}
+Project: #{N} "{title}" (existing) OR new project "{title}"
 
-Will create:
-  1 GitHub Project v2: "{project_title}"
-  8 custom fields:
-    - Story ID (TEXT)
-    - Epic (SINGLE_SELECT: 12 options)
-    - Phase (SINGLE_SELECT: PoC, Hardening)
-    - Dev (SINGLE_SELECT: All, Dev 1, Dev 2, Dev 3)
-    - Priority (SINGLE_SELECT: Critical Path, Standard, Nice-to-Have)
-    - Sprint Start (DATE)
-    - Sprint End (DATE)
-    - Story Points (NUMBER)
+Will create/verify:
+  Custom fields (7):
+    - Story ID      (TEXT)
+    - Epic          (SINGLE_SELECT: 12 options, rainbow colors)
+    - Sprint        (SINGLE_SELECT: Sprint 01–12, rainbow colors + sprint goal descriptions)
+    - Dev           (SINGLE_SELECT: All, Dev 1, Dev 2, Dev 3, Dev 1+2)
+    - Sprint Start  (DATE)
+    - Sprint End    (DATE)
+    - Story Points  (NUMBER)
+  Built-in fields to set:
+    - Start date    (DATE, pre-existing)   ← same dates as Sprint Start
+    - Target date   (DATE, pre-existing)   ← same dates as Sprint End
+    - Status        (single-select, pre-existing)
   {N} labels:
-    - 12 epic labels (epic:1-foundation ... epic:12-testing)
-    - 2 phase labels (phase:poc, phase:hardening)
+    - Epic labels (one per epic, e.g., epic:1-foundation ... epic:12-testing)
+    - Phase labels (e.g., phase:poc, phase:hardening)
     - Layer labels (optional, project-specific architecture layers)
-  {K} milestones:
-    - Sprint 1 (due: 2026-04-10) ... Sprint 12 (due: 2026-09-25)
+  {K} milestones (phase-based, NOT per-sprint):
+    - PoC              (due: {sprint_6_end})    Sprints 1–6
+    - Production Hardening (due: {sprint_12_end}) Sprints 7–12
+
+Note: No "Phase" custom field — the milestone covers phase membership.
 
 Proceed with onboarding? [Y/N]
 ```
@@ -162,19 +179,28 @@ Proceed with onboarding? [Y/N]
 
 **Read `references/gh-commands.md` now** — you need the exact commands for every operation below.
 
-If approved, execute in this order using the commands from that reference:
+If approved, execute in this order:
 
-1. **Create GitHub Project** via GraphQL `createProjectV2` mutation (section 2)
-2. **Create custom fields** via `gh project field-create` (section 3, 8 commands)
-3. **Query field IDs and option IDs** via GraphQL field query (section 4)
-4. **Create labels** via `gh label create` (section 5, one per label)
-5. **Create milestones** via `gh api repos/{owner}/{repo}/milestones` (section 6, one per sprint)
+1. **Create or connect GitHub Project** (section 2) — if using existing, just get its node ID
+2. **Create custom fields** (section 3) — Story ID, Epic, Sprint, Dev, Sprint Start, Sprint End, Story Points
+3. **Query all field IDs** (section 4) — including the pre-existing Start date, Target date, Status fields
+4. **Apply rainbow colors + sprint goal descriptions to Sprint and Epic fields** (section 13)
+   - Sprint options: cycle RED→ORANGE→YELLOW→GREEN→BLUE→PURPLE→PINK, repeat
+   - Sprint description = sprint objective from sprint-plan.md
+   - Epic options: RED→ORANGE→YELLOW→GREEN→BLUE→PURPLE→PINK→RED→ORANGE→YELLOW→GREEN→BLUE
+5. **Create labels** (section 5) — 17 labels total
+6. **Create phase-based milestones** (section 6) — PoC and Production Hardening
+
+> **Critical:** After calling `updateProjectV2Field` to set colors/descriptions, the single-select
+> option IDs CHANGE (the mutation replaces the options list). Always re-query option IDs after
+> calling this mutation and use the new IDs in the config.
 
 ### Step 6: Write Config
 
 **Read `references/config-schema.md` now** — you need the exact YAML format.
 
 Create `.github-sync.yaml` at project root with all populated IDs following that schema.
+Note: No `phase` field in `field_ids` or `option_ids` — Phase was replaced by milestones.
 
 ### Step 7: Report Completion
 
@@ -190,7 +216,8 @@ Next: Run "push stories to github" to create issues.
 
 ## Push Workflow (Files → GitHub)
 
-Pushes BMAD story files to GitHub as issues, adds them to the project, and sets custom fields.
+Pushes BMAD story files to GitHub as issues, adds them to the project, sets all fields,
+sets date fields, and establishes relationships.
 
 ### Step 1: Load Config
 
@@ -201,48 +228,36 @@ field IDs from GitHub (the IDs may have been lost).
 
 ```bash
 python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode scan \
-  --stories-dir _bmad-output/implementation-artifacts
+  --stories-dir .artifacts/implementation-artifacts
 ```
 
-For each story, determine **create** vs **edit** mode based on sync status:
-- `synced: false` → CREATE (new issue)
-- `synced: true` → UPDATE (edit existing issue)
+For each story, determine **create** vs **edit** mode:
+- H1 is plain `# Story X.X: Title` (no link) → CREATE
+- H1 contains `# [Story X.X: Title](url)` → UPDATE (already synced)
 
 ### Step 3: Handle Partial Sync (Optional)
 
 If the user specified a filter (e.g., "push stories 1.1 1.2", "push epic 1", "push sprint 2"),
 filter the story list before proceeding. If no filter, push all stories.
 
-### Step 4: Read Story Files
+### Step 4: Read Story Files and Build Issue Content
 
-For each story to push, **read the story file directly** using the Read tool. You need to
-understand the content to build the GitHub issue body. As you read each story, identify:
-- The user story (## Story section)
-- Acceptance criteria (## Acceptance Criteria)
-- Tasks and subtasks (## Tasks / Subtasks)
-- Dev notes (## Dev Notes)
-- Dependencies
+**⚠️ Rule 4 applies here: Read each file with the Read tool. Build bodies manually. No scripts.**
 
-**Exclude tasks that are AI agent instructions** — tasks whose subtasks are predominantly
-"Read `.knowledge-base/...`" or "Load skill `...`" directives. These are setup steps for
-AI agents, not human-actionable work. Use your judgment to identify them by content.
+For each story:
 
-Also load sprint and epic data to determine sprint number, dev assignment, epic label.
+1. **Read the file** using the Read tool
+2. **Read `references/content-mapping.md`** — sections 1–4 and 9 for the exact format
+3. **Build the issue body** following the template:
+   - User story blockquote
+   - AC as one-line Then-clause summaries (checkboxes)
+   - Full task list (Task 2+ only — exclude agent-only tasks by reading content, not by position)
+   - Dependencies with `#N` GitHub issue numbers
+   - Collapsible dev notes: tables, config snippets, architecture patterns — NOT code skeletons,
+     NOT ASCII trees, NOT "What NOT to Do" lists, NOT references
+4. **Look up sprint/dev/epic** from sprint-plan.md (NOT from the story file body)
 
-### Step 5: Build Issue Content
-
-**Read `references/content-mapping.md` now** — sections 1 (Issue Title Format), 2 (Issue Body
-Template), 3 (AC Summarization Rules), 4 (Content Exclusion List), and 9 (Link-Back Strategy).
-You need these to correctly transform story files into GitHub issues.
-
-For each story, build the GitHub issue content following those templates:
-- **Title**: `{story_id} {short_title}` (section 1 rules)
-- **Body**: User story blockquote → AC checklist → Tasks → Dependencies → Collapsible dev notes → Collapsible standards → Sync footer (section 2 template)
-- **Labels**: `epic:{N}-{name}`, `phase:{phase}` (section 7 scheme)
-- **Milestone**: `Sprint {N}` (section 8 scheme)
-- **Assignee**: Map dev alias to GitHub username via config `dev_mapping`
-
-### Step 6: Generate Sync Report
+### Step 5: Generate Sync Report
 
 ```
 === GITHUB SYNC — PUSH REPORT ===
@@ -252,17 +267,14 @@ Generated: {timestamp}
 
   [CREATE] {story_id} {short_title}
            File: {story_file_path}
-           Epic: {epic_label} | Sprint: {sprint_number} | Dev: {dev}
+           Epic: {epic_label} | Sprint: {sprint} | Dev: {dev} | Phase: {phase}
            Labels: epic:{N}-{name}, phase:{phase}
-           Milestone: Sprint {N}
-
-  [CREATE] ...
-           ...
+           Milestone: {PoC | Production Hardening}
 
 --- UPDATES ({count} existing issues) ---
 
   [UPDATE] {story_id} {short_title} (#{issue_number})
-           Changes: body updated (AC changed)
+           Changes: body updated
 
 --- SKIPPED ({count} items) ---
 
@@ -270,30 +282,94 @@ Generated: {timestamp}
 
 --- SUMMARY ---
 Creates: {N} | Updates: {N} | Skips: {N}
-Estimated API calls: ~{N} (within rate limits)
 
 Proceed? [Y/N]
 ```
 
 **HALT HERE. Wait for user approval.**
 
-### Step 7: Execute Push
+### Step 6: Execute Push
 
 If approved, for each **CREATE**:
-1. Write issue body to a temp file
-2. `gh issue create --title "..." --body-file /tmp/... --label "..." --milestone "Sprint N"`
+1. Write issue body to a temp file (`/tmp/issue-{story_id}.md`)
+2. `gh issue create --title "..." --body-file /tmp/... --label "epic:X-name" --label "phase:poc" --milestone "{PoC|Production Hardening}"`
 3. Extract issue URL from output
 4. `gh project item-add {project_number} --owner {owner} --url {issue_url} --format json`
 5. Extract item ID from JSON output
-6. `gh project item-edit` for each custom field (Story ID, Epic, Phase, Dev, Sprint Start, Sprint End)
-7. Write link-back to local file:
-   - Story files: replace H1 with `# [title](issue_url)`
-   - Planning files: add `gh_item_url` to frontmatter
+6. Set all project fields using `gh project item-edit`:
+   - Story ID (text)
+   - Epic (single-select option)
+   - Sprint (single-select option, e.g., "Sprint 01")
+   - Dev (single-select option)
+   - Sprint Start (date from sprint-plan.md)
+   - Sprint End (date from sprint-plan.md)
+   - Status (Backlog)
+   - **Start date** (same date as Sprint Start — pre-existing field)
+   - **Target date** (same date as Sprint End — pre-existing field)
+7. Write link-back to local file: replace H1 with `# [Story X.X: Title](issue_url)`
 
 For each **UPDATE**:
 1. Write updated body to temp file
-2. `gh issue edit {number} --body-file /tmp/...`
-3. Update labels/milestone if changed
+2. `gh issue edit {number} --body-file /tmp/... --milestone "{phase_milestone}"`
+3. Update project fields if sprint/epic changed
+
+### Step 7: Set Up Relationships
+
+After all issues are created, establish GitHub native relationships.
+
+**Read `references/gh-commands.md` section 12** for the exact GraphQL mutations.
+
+#### 7a. Epic tracking issues as parents
+
+Create one epic tracking issue per epic (if not already created). See
+`references/content-mapping.md` section 10 for the body template. Then for each story,
+set its epic tracking issue as its parent:
+
+```graphql
+mutation {
+  addSubIssue(input: {
+    issueId: "{epic_tracking_issue_node_id}"
+    subIssueId: "{story_issue_node_id}"
+    replaceParent: true
+  }) {
+    issue { number }
+    subIssue { number }
+  }
+}
+```
+
+#### 7b. Blocked-by dependencies
+
+Read the dependency table from `sprint-plan.md` (the `Dependencies` column in each sprint's
+story table). For each dependency `A → B` (story A depends on story B):
+
+```graphql
+mutation {
+  addBlockedBy(input: {
+    issueId: "{story_A_node_id}"
+    blockingIssueId: "{story_B_node_id}"
+  }) {
+    issue { number }
+    blockingIssue { number }
+  }
+}
+```
+
+> **Always source dependencies from sprint-plan.md, not from story file bodies.**
+> The sprint plan is the authoritative dependency record.
+
+Get issue node IDs via:
+```bash
+gh api graphql -f query='
+  query {
+    repository(owner:"{owner}", name:"{repo}") {
+      issues(first:50, orderBy:{field:CREATED_AT, direction:ASC}) {
+        nodes { number id title }
+      }
+    }
+  }
+'
+```
 
 ### Step 8: Report Completion
 
@@ -302,6 +378,7 @@ Push complete!
   Created: {N} issues
   Updated: {N} issues
   Skipped: {N} items
+  Relationships set: {N} parent, {M} blocked-by
 
 Config updated: last_synced = {timestamp}
 ```
@@ -315,7 +392,7 @@ Pulls status, assignees, and task completion from GitHub back into local BMAD fi
 ### Step 1: Load Config and Query GitHub
 
 Read `.github-sync.yaml`. Then **read `references/gh-commands.md` section 9** to get the full
-GraphQL items query with all field types. Execute that query to fetch all project items.
+GraphQL items query. Execute it to fetch all project items.
 
 ### Step 2: Match Items to Local Files
 
@@ -338,16 +415,13 @@ Generated: {timestamp}
            Status: ready-for-dev → done (from GitHub #{issue_number})
            Assignee: (none) → @{username}
 
-  [UPDATE] {story_filename}.md
-           Status: ready-for-dev → in-progress (from GitHub #{issue_number})
-
 --- NO CHANGES ({count} items) ---
 
   [OK] {story_filename}.md — in sync
 
 --- GITHUB-ONLY ({count} items) ---
 
-  [WARN] GitHub #55 "Extra item" — no matching local file (Story ID: "X.X")
+  [WARN] GitHub #{N} "{title}" — no matching local file
 
 --- SUMMARY ---
 File updates: {N} | No changes: {N} | Warnings: {N}
@@ -365,16 +439,6 @@ If approved, for each file update:
 3. Write the file back
 4. Update config `last_synced`
 
-### Step 5: Report Completion
-
-```
-Pull complete!
-  Updated: {N} files
-  Unchanged: {N} files
-
-Config updated: last_synced = {timestamp}
-```
-
 ---
 
 ## Status Check (Read-Only)
@@ -384,10 +448,10 @@ Compare local files with GitHub state without making any changes. No approval ne
 ```bash
 # Scan local files
 python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode scan \
-  --stories-dir _bmad-output/implementation-artifacts
+  --stories-dir .artifacts/implementation-artifacts
 
-# Query GitHub items
-gh api graphql -f query='...'  # (items query from references/gh-commands.md)
+# Query GitHub items (full field values)
+# Use GraphQL query from references/gh-commands.md section 9
 ```
 
 Output a comparison table:
@@ -395,12 +459,11 @@ Output a comparison table:
 ```
 === GITHUB SYNC — STATUS ===
 
-| Story | Local Status | GitHub Status | Synced? | Issue |
-|-------|-------------|---------------|---------|-------|
-| 1.1   | ready-for-dev | Done        | NO      | #42   |
-| 1.2   | ready-for-dev | Ready       | YES     | #43   |
-| 2.1   | ready-for-dev | (not synced)| NO      | —     |
-| ...   | ...          | ...          | ...     | ...   |
+| Story | Local Status  | GitHub Status | Sprint | Synced? | Issue |
+|-------|--------------|---------------|--------|---------|-------|
+| 1.1   | ready-for-dev | Done          | 01     | NO      | #1    |
+| 1.2   | ready-for-dev | Ready         | 01     | YES     | #2    |
+| 2.1   | backlog       | (not synced)  | 02     | NO      | —     |
 
 Summary: {N} in sync, {M} out of sync, {K} not yet pushed
 ```
@@ -408,8 +471,6 @@ Summary: {N} in sync, {M} out of sync, {K} not yet pushed
 ---
 
 ## Partial Sync Filters
-
-The user can limit push/pull to a subset of stories:
 
 | Filter | Example | Effect |
 |--------|---------|--------|
@@ -419,8 +480,6 @@ The user can limit push/pull to a subset of stories:
 | By status | `push unsynced` | Only stories not yet pushed |
 | All | `push` or `push all` | All stories (default) |
 
-Parse the filter from the user's message. If ambiguous, ask for clarification.
-
 ---
 
 ## Error Handling
@@ -428,12 +487,16 @@ Parse the filter from the user's message. If ambiguous, ask for clarification.
 | Error | Action |
 |-------|--------|
 | `gh` command returns non-zero exit code | Show the error output, suggest fix, halt |
-| Field ID missing from config | Re-query field IDs: `gh project field-list --format json` |
+| Field ID missing from config | Re-query field IDs via section 4 of gh-commands.md |
 | Rate limit hit (HTTP 429) | Show warning, suggest waiting 60 seconds, halt |
 | Story file has unexpected format | Skip with warning in the sync report |
 | Milestone already exists | Skip creation (idempotent) |
 | Label already exists | Skip creation (idempotent) |
-| Issue already exists for story | Switch to update mode instead of create |
+| Issue already exists for story | Switch to update mode |
+| Single-select option IDs stale | Re-query after any `updateProjectV2Field` call — the mutation replaces all options and issues new IDs |
+| `addBlockedBy` payload field error | Return field is `blockingIssue` (not `blockedByIssue`) |
+| `updateProjectV2Field` rejects `projectId` | This mutation takes only `fieldId`, not `projectId` |
+| `updateProjectV2Field` rejects option `id` | Options use `name`/`color`/`description` only — no `id` field |
 
 ---
 

@@ -2,7 +2,9 @@
 
 ## Config File Location
 
-The config lives at `{project-root}/.github-sync.yaml`. It is created during the onboarding workflow and updated during sync operations. The file should be committed to version control (it contains no secrets -- only GitHub Project metadata IDs).
+The config lives at `{project-root}/.github-sync.yaml`. It is created during the onboarding
+workflow and updated during sync operations. The file should be committed to version control
+(it contains no secrets — only GitHub Project metadata IDs).
 
 ## Full Schema
 
@@ -14,48 +16,78 @@ github:
   owner: ""              # GitHub user or org login (e.g., "my-org")
   repo: ""               # Repository name (e.g., "my-project")
   project_number: 0      # GitHub Project v2 number (visible in URL)
-  project_id: ""         # GraphQL node ID (auto-populated during onboarding, starts with "PVT_")
+  project_id: ""         # GraphQL node ID (auto-populated, starts with "PVT_")
 
 paths:
-  stories: "_bmad-output/implementation-artifacts"
-  planning: "_bmad-output/planning-artifacts"
-  epics_file: "_bmad-output/planning-artifacts/epics.md"
-  sprint_plan_file: "_bmad-output/planning-artifacts/sprint-plan.md"
+  stories: ".artifacts/implementation-artifacts"          # adjust per project
+  planning: ".artifacts/planning-artifacts"
+  epics_file: ".artifacts/planning-artifacts/epics.md"
+  sprint_plan_file: ".artifacts/planning-artifacts/sprint-plan.md"
 
 field_ids:               # Auto-populated by onboarding (field name -> GraphQL ID)
-  story_id: ""
-  epic: ""
-  phase: ""
-  dev: ""
-  priority: ""
-  sprint_start: ""
-  sprint_end: ""
-  story_points: ""
+  story_id: ""           # Custom TEXT field "Story ID"
+  epic: ""               # Custom SINGLE_SELECT field "Epic"
+  sprint: ""             # Custom SINGLE_SELECT field "Sprint" (Sprint 01–12)
+  dev: ""                # Custom SINGLE_SELECT field "Dev"
+  sprint_start: ""       # Custom DATE field "Sprint Start"
+  sprint_end: ""         # Custom DATE field "Sprint End"
+  story_points: ""       # Custom NUMBER field "Story Points"
   status: ""             # Built-in Status field ID
+  start_date: ""         # Pre-existing DATE field "Start date" (set same as sprint_start)
+  target_date: ""        # Pre-existing DATE field "Target date" (set same as sprint_end)
+
+# Note: No "phase" field — phase is expressed through the milestone, not a custom field.
 
 option_ids:              # Auto-populated by onboarding (field.option -> GraphQL ID)
+  # WARNING: option IDs change whenever updateProjectV2Field is called to update colors/
+  # descriptions. Always re-query and update this section after any field update mutation.
   epic:
-    "1: Foundation": ""
-    "2: Navigation": ""
-    # ... etc
-  phase:
-    "PoC": ""
-    "Hardening": ""
+    "1: {Epic Name}": ""
+    "2: {Epic Name}": ""
+    # ... one entry per epic, names from epics.md
+  sprint:
+    "Sprint 01": ""      # Colors: RED
+    "Sprint 02": ""      # ORANGE
+    "Sprint 03": ""      # YELLOW
+    "Sprint 04": ""      # GREEN
+    "Sprint 05": ""      # BLUE
+    "Sprint 06": ""      # PURPLE (end of PoC)
+    "Sprint 07": ""      # PINK (start of Hardening)
+    "Sprint 08": ""      # RED
+    "Sprint 09": ""      # ORANGE
+    "Sprint 10": ""      # YELLOW
+    "Sprint 11": ""      # GREEN
+    "Sprint 12": ""      # BLUE (final demo)
   dev:
     "All": ""
     "Dev 1": ""
     "Dev 2": ""
     "Dev 3": ""
-  priority:
-    "Critical Path": ""
-    "Standard": ""
-    "Nice-to-Have": ""
+    "Dev 1+2": ""
   status:
     "Backlog": ""
     "Ready": ""
     "In Progress": ""
     "In Review": ""
     "Done": ""
+
+milestones:              # Milestone number -> phase name
+  "PoC": 0               # Sprints 1–6, due Sprint 6 end date
+  "Production Hardening": 0  # Sprints 7–12, due Sprint 12 end date
+
+milestone_mapping:       # Sprint number -> milestone name
+  1: "PoC"
+  2: "PoC"
+  3: "PoC"
+  4: "PoC"
+  5: "PoC"
+  6: "PoC"
+  7: "Production Hardening"
+  8: "Production Hardening"
+  9: "Production Hardening"
+  10: "Production Hardening"
+  11: "Production Hardening"
+  12: "Production Hardening"
 
 dev_mapping:             # GitHub username -> BMAD dev alias (user-configured)
   # example_user: "Dev 1"
@@ -66,6 +98,11 @@ status_mapping:          # BMAD status text -> GitHub Status option name
   in-review: "In Review"
   done: "Done"
 
+epic_tracking_issues:    # Epic number -> GitHub issue number (created during push)
+  # 1: 28
+  # 2: 29
+  # ... etc
+
 last_synced: null        # ISO 8601 timestamp of last successful sync
 ```
 
@@ -73,39 +110,41 @@ last_synced: null        # ISO 8601 timestamp of last successful sync
 
 ### Auto-populated Fields
 
-These fields are populated automatically during onboarding by querying the GitHub Projects v2 GraphQL API. You should never need to edit them manually.
+These fields are populated automatically during onboarding by querying the GitHub Projects v2
+GraphQL API. You should never need to edit them manually.
 
 | Field | Source | Example Value |
 |-------|--------|---------------|
 | `github.project_id` | `gh api graphql` query on project number | `PVT_kwHOABcdefg` |
 | `field_ids.*` | Project fields query | `PVTF_lAHOABcdefg` |
 | `option_ids.*.*` | Single-select field options query | `fc4af0c7` |
+| `milestones.*` | Milestone creation response | `13` |
 
 ### User-configured Fields
-
-These require user input during onboarding:
 
 | Field | Description | Example |
 |-------|-------------|---------|
 | `github.owner` | GitHub user or organization | `my-org` |
 | `github.repo` | Repository name | `my-project` |
-| `github.project_number` | Project number from the URL (`/projects/N`) | `3` |
+| `github.project_number` | Project number from the URL (`/projects/N`) | `6` |
 | `dev_mapping` | Map of GitHub username to BMAD dev alias | `paul: "Dev 1"` |
 
 ### Paths
 
-Defaults work for the standard BMAD output structure. Override only if your project uses a non-standard layout.
+Defaults shown above use `.artifacts/`. If the project uses `_bmad-output/` (older BMAD layout),
+update all `paths.*` values accordingly.
 
-| Path | Default | Description |
-|------|---------|-------------|
-| `paths.stories` | `_bmad-output/implementation-artifacts` | Directory containing story `.md` files |
-| `paths.planning` | `_bmad-output/planning-artifacts` | Directory containing epics and sprint plan |
-| `paths.epics_file` | `_bmad-output/planning-artifacts/epics.md` | Path to the epics breakdown file |
-| `paths.sprint_plan_file` | `_bmad-output/planning-artifacts/sprint-plan.md` | Path to the sprint plan file |
+### Critical: Option IDs After Field Updates
+
+When `updateProjectV2Field` is called to set colors or descriptions on a single-select field,
+GitHub replaces the entire options list and issues **new option IDs**. The old IDs in
+`option_ids` become invalid immediately. Always:
+
+1. After calling `updateProjectV2Field`, re-query the field options
+2. Update `option_ids.epic` or `option_ids.sprint` with the new IDs
+3. Re-apply all field values to project items using the new option IDs
 
 ### Status Mapping
-
-Maps the `Status:` line in BMAD story files to GitHub Project status column names. The defaults match the standard BMAD workflow:
 
 | BMAD Status (in file) | GitHub Status (on board) |
 |------------------------|--------------------------|
@@ -113,15 +152,15 @@ Maps the `Status:` line in BMAD story files to GitHub Project status column name
 | `in-progress` | In Progress |
 | `in-review` | In Review |
 | `done` | Done |
-
-Stories without a recognized status (or with no `Status:` line) default to **Backlog**.
+| (none / unrecognized) | Backlog |
 
 ## How to Refresh IDs
 
-If GitHub Project field IDs become stale (e.g., after deleting and recreating a field), you can refresh them:
+If GitHub Project field IDs become stale (e.g., after deleting and recreating a field):
 
 1. Delete the `field_ids` and `option_ids` sections from `.github-sync.yaml`
-2. Keep `github.*`, `paths.*`, `dev_mapping`, and `status_mapping` intact
-3. Re-run the onboarding workflow -- it will re-query GitHub and repopulate the deleted sections
+2. Keep `github.*`, `paths.*`, `dev_mapping`, `status_mapping`, and `milestones` intact
+3. Re-run the onboarding workflow — it will re-query GitHub and repopulate the deleted sections
 
-The onboarding workflow is idempotent: it will not overwrite user-configured fields that already have values.
+The onboarding workflow is idempotent: it will not overwrite user-configured fields that
+already have values.
