@@ -1,0 +1,23 @@
+{
+  "skill_name": "github-sync",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to set up a github project board for tracking our BMAD stories and sprints. Can you help me get started?",
+      "expected_output": "Agent loads github-sync skill, runs prerequisite checks, scans BMAD artifacts with parse-artifacts.py, asks for GitHub owner/repo, generates onboarding report listing project/fields/labels/milestones to create, and halts for approval.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "push the sprint 1 stories to github",
+      "expected_output": "Agent loads github-sync skill, checks for .github-sync.yaml config (fails since it doesn't exist), routes to onboarding first OR generates a push report showing Sprint 1 stories (1.1-1.4) that would be created as issues with correct titles, labels, and milestones, then halts for approval.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "what's the sync status between our local stories and github?",
+      "expected_output": "Agent loads github-sync skill, runs parse-artifacts.py scan, attempts to query GitHub (may fail without config), shows a status table comparing local story state vs GitHub state.",
+      "files": []
+    }
+  ]
+}
