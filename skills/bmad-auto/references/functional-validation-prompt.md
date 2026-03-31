@@ -40,6 +40,29 @@ If neither is available, suggest both options to the user.
 
 Follow the validation strategy from the guide. At minimum, always attempt to BUILD the project.
 
+### Infrastructure Verification (Critical)
+
+When the story introduces or depends on infrastructure components, go beyond unit tests:
+
+- **Docker Compose services**: If the project has `docker-compose.yml`, attempt `docker compose up -d`
+  and verify services start (check health endpoints, port availability, or `docker compose ps`).
+- **Database migrations**: If the story adds Alembic/Prisma/Knex migrations, attempt to run them
+  against a real database (local or Docker). Don't just check that the migration file exists.
+- **External Docker images**: If the story references a Docker image, pull it to verify it exists
+  and is accessible: `docker pull <image>`.
+- **Message queues / task workers**: If the story uses Redis/RabbitMQ/ARQ, verify the queue
+  service starts and the worker can connect.
+- **API integration**: If the story adds endpoints that another component calls, attempt a real
+  HTTP request if the server can be started locally.
+
+If infrastructure tools aren't available (no Docker, no database), report as PARTIAL — never
+silently skip infrastructure verification. The gap must be visible in the report so it can be
+tracked and resolved.
+
+The reason this matters: unit tests with mocked dependencies can pass perfectly while the actual
+infrastructure is misconfigured, missing, or incompatible. This class of bugs compounds across
+stories and becomes harder to fix the longer it goes undetected.
+
 ## Step 5: Report Results
 
 Report results to the team lead via SendMessage with one of these outcomes:

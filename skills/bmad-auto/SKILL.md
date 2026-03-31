@@ -335,8 +335,15 @@ For each epic (in order):
 ### A. Epic Start
 
 If epic status is `backlog`:
-1. Invoke `skill: "bmad-bmm-sprint-planning"`.
-2. Re-read `sprint-status.yaml`. If epic status is still `backlog`, halt with error:
+1. **Check retro action items** — if a retrospective exists for the previous epic, read it and
+   extract any items marked CRITICAL, HIGH, or "must resolve before next epic." For each:
+   - Attempt to verify/resolve it (e.g., run `docker compose up`, pull a Docker image, run a
+     migration, verify a service starts). Spawn a sub-agent if the verification is non-trivial.
+   - If resolved → continue. If unresolvable → report to user with details and pause.
+   This prevents known infrastructure debt from compounding across epics. The retro is not
+   just documentation — it's a pre-flight checklist for the next epic.
+2. Invoke `skill: "bmad-bmm-sprint-planning"`.
+3. Re-read `sprint-status.yaml`. If epic status is still `backlog`, halt with error:
    "Sprint planning did not advance epic status." Report to user and pause.
 
 ### B. Story Loop
@@ -446,7 +453,8 @@ When the reviewer reports issues, do NOT send fixes back to the developer. Inste
 
 #### Step 4.5: Functional Validation
 
-Build, run, and test the implementation to catch issues code review cannot.
+Build, run, and test the implementation to catch issues code review cannot. This step goes
+beyond unit tests — it should verify that the code actually works in its runtime environment.
 
 > **Reference:** Sub-agent reads `references/functional-validation-prompt.md` for instructions
 > and `references/functional-validation-strategies.md` for project-type detection. Guides are in
@@ -463,6 +471,21 @@ prompt: |
   Follow all steps (detect project type, read guide, check tools, validate, report).
   Report as PASS, PARTIAL, or FAIL.
 ```
+
+**Infrastructure validation (important):** When the story introduces or depends on infrastructure
+(Docker services, databases, message queues, external APIs), functional validation MUST attempt
+to verify the infrastructure actually works — not just that unit tests pass with mocks. Examples:
+- Story adds a Docker Compose service → run `docker compose up -d` and verify health endpoints
+- Story adds a DB migration → run the migration against a real (local/Docker) database
+- Story adds an API endpoint → attempt a real HTTP request (if the server can be started)
+- Story depends on an external Docker image → pull and verify it exists
+
+If infrastructure can't be verified (e.g., Docker not available), report as PARTIAL with
+specific details about what couldn't be verified, so the gap is visible and tracked.
+
+The purpose of this step is to catch the class of bugs that unit tests with mocks cannot:
+misconfigured services, missing Docker images, broken migrations, incompatible dependency
+versions, and integration failures between components.
 
 - **PASS** → Step 5.
 - **PARTIAL** → log warning → Step 5. Include in commit message.
@@ -482,7 +505,10 @@ prompt: |
 
 1. Invoke `skill: "bmad-bmm-sprint-status"` for status report.
 2. Invoke `skill: "bmad-bmm-retrospective"` for the completed epic.
-3. Report: "Epic complete. Moving to next epic." Continue to next epic.
+3. **Extract action items from the retro.** Read the generated retro file and identify any items
+   tagged as CRITICAL or HIGH risk. Summarize these to the user as "items that must be resolved
+   before the next epic starts" — the next Epic Start step (A) will gate on them.
+4. Report: "Epic complete. Moving to next epic." Continue to next epic.
 
 ## Resumability
 
@@ -513,3 +539,10 @@ When done or user stops: shut down all sub-agents → `TeamDelete`.
 13. **Detailed inter-agent messages.** Every message between agents must include context,
     specific findings (file paths, line numbers, snippets), reasoning, and actionable
     instructions. See Inter-Agent Communication Standards.
+14. **Verify infrastructure, not just tests.** When a story introduces or depends on
+    infrastructure (Docker, databases, queues, external services), functional validation must
+    attempt to verify the infrastructure actually works — mocked unit tests alone are not
+    sufficient. If infrastructure can't be verified, report PARTIAL so the gap is tracked.
+15. **Act on retro findings.** Retrospective items marked CRITICAL or HIGH are not just
+    documentation — they are pre-flight checks for the next epic. The orchestrator must attempt
+    to resolve them before starting the next epic (see Epic Start step A).
