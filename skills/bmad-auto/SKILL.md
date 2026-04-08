@@ -1,18 +1,16 @@
 ---
 name: bmad-auto
 description: >
-  Orchestrates BMAD implementation workflows automatically — both the full Phase 4 epic/story pipeline
-  and the Quick Flow for small, well-understood changes. Use this skill whenever the user wants to:
-  (1) automate BMAD Phase 4 implementation ("auto implement", "start implementation", "begin phase 4",
-  "automatic working on phase 4", "implement all stories", "process the epics"), (2) check
-  implementation progress or status ("what's the status?", "how many stories are done?"), (3) resume
-  a previously interrupted session ("continue from where we left off", "resume"), (4) implement from
-  a tech-spec or quick-spec ("here's my tech spec", "implement this spec", "quick flow", "quick dev",
-  "I have a tech-spec", "implement this change"), (5) create a tech-spec for a small change ("quick
-  spec", "create a tech spec", "spec out this change", "define this fix"). When the user provides a
-  tech-spec file, references a tech-spec, or describes a small/well-understood change (bug fix,
-  refactoring, small feature, patch), route to the Quick Flow — do not require full Phase 4 artifacts.
-  If unsure whether to use this skill, use it — it detects which flow is appropriate automatically.
+  Orchestrates BMAD implementation workflows — Phase 4 epic/story pipeline and Quick Flow for small
+  changes. Use when the user wants to: (1) automate Phase 4 implementation ("auto implement", "start
+  implementation", "begin phase 4", "implement all stories", "process the epics"), (2) check
+  implementation progress ("what's the status?", "how many stories are done?"), (3) resume a session
+  ("continue from where we left off", "resume"), (4) implement from a tech-spec ("implement this
+  spec", "quick flow", "quick dev", "implement this change"), (5) create a tech-spec ("quick spec",
+  "create a tech spec", "spec out this change"). Routes to Quick Flow when the user provides a
+  tech-spec, references one, or describes a small change (bug fix, refactoring, small feature, patch).
+  Routes to Phase 4 when sprint-status.yaml exists with pending work. If unsure, use this skill — it
+  auto-detects the appropriate flow.
 ---
 
 # BMAD Auto-Implementation Orchestrator
@@ -121,15 +119,11 @@ misunderstandings. Every message between agents must include:
    but "In `src/auth/login.ts:45`, the catch block swallows the error silently. Wrap it in
    a custom `AuthError` and re-throw so the caller can handle it."
 
-**Bad example:** "Code review found issues. Please fix the error handling and naming."
-
-**Good example:** "Code review found 2 issues in the authentication module:
-1. `src/auth/login.ts:45` — The catch block catches `Error` but logs and continues. This means
-   authentication failures are silently ignored. Fix: re-throw as `AuthenticationError` with the
-   original error as cause, so the route handler returns 401.
-2. `src/auth/types.ts:12` — `AuthResp` interface name is abbreviated. Project conventions
-   (per `CLAUDE.md` line 15) require full names. Rename to `AuthenticationResponse` and update
-   all 3 import sites: `login.ts:3`, `register.ts:5`, `middleware.ts:8`."
+**Bad:** "Code review found issues. Please fix the error handling and naming."
+**Good:** "Code review found 2 issues: (1) `src/auth/login.ts:45` — catch block silently swallows
+auth failures. Fix: re-throw as `AuthenticationError` so route handler returns 401. (2)
+`src/auth/types.ts:12` — `AuthResp` violates full-name convention (per `CLAUDE.md` line 15).
+Rename to `AuthenticationResponse`, update imports in `login.ts:3`, `register.ts:5`, `middleware.ts:8`."
 
 For sub-agents that make implementation decisions (development, code review, spec creation),
 also append the `{CONTEXT_BLOCK}`:
@@ -268,18 +262,8 @@ prompt: |
 - **Issues found** → reviewer fixes them directly (see below), then spawn new reviewer to
   verify. Retry up to 2 rounds.
 
-**Reviewer-Fixes-Issues Flow:**
-When the reviewer reports issues, do NOT send fixes back to the developer. Instead:
-1. Send the reviewer a message asking it to fix the issues it found. Include:
-   - Acknowledgment of each reported issue
-   - Instruction to apply the fixes directly to the codebase
-   - Reminder to run relevant tests after fixing
-2. The reviewer already has full context of what's wrong and why — it identified the problems,
-   so it's best positioned to fix them correctly without context loss.
-3. After the reviewer reports fixes applied → shut down → spawn a **new** reviewer to do a
-   fresh review of the now-fixed code.
-4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds).
-5. After 2 rounds still failing → escalation ladder.
+**Reviewer-Fixes-Issues Flow:** Same as Phase 4 Step 4 — reviewer fixes issues directly, then
+a new reviewer verifies. Up to 2 fix rounds, then escalation ladder.
 
 ## Quick Flow Step 4: Functional Validation
 

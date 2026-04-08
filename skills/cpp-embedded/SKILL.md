@@ -2,21 +2,15 @@
 name: cpp-embedded
 description: >
   Expert guidance for writing C (C99/C11) and C++ (C++17) code for embedded systems and microcontrollers.
-  Use this skill whenever the user is working with: STM32, ESP32, Arduino, PIC, AVR, nRF52, or any other MCU;
-  FreeRTOS, Zephyr, ThreadX, or any RTOS; bare-metal firmware; hardware registers, DMA, interrupts, or
-  memory-mapped I/O; memory pools, allocators, or fixed-size buffers; MISRA C or MISRA C++ compliance;
-  smart pointers or RAII in embedded contexts; stack vs heap decisions; placement new; volatile correctness;
-  alignment and struct packing; C99/C11 patterns; C and C++ interoperability; debugging firmware crashes,
-  HardFaults, stack overflows, or heap corruption; firmware architecture decisions (superloop vs RTOS vs
-  event-driven); low-power modes (WFI/WFE/sleep); CubeMX project setup; HAL vs LL driver selection;
-  CI/CD for firmware; embedded code review; MPU configuration; watchdog strategies; safety-critical
-  design (IEC 61508, SIL); peripheral protocol selection (UART/I2C/SPI/CAN); linker script memory
-  placement; or C/C++ callback patterns. Also trigger on implicit cues like "my MCU keeps crashing",
-  "writing firmware", "ISR safe", "embedded allocator", "no dynamic memory", "power consumption",
-  "CubeMX regenerated my code", "which RTOS pattern should I use", "MPU fault", "watchdog keeps
-  resetting", "which protocol should I use for my sensor", "ESP32 deep sleep", "PSRAM vs DRAM",
-  "ESP32 heap keeps shrinking", "ESP.getFreeHeap()", "task stack overflow on ESP32", or
-  "WiFi reconnect after deep sleep is slow".
+  Use when working with STM32, ESP32, Arduino, AVR, nRF52, or any MCU; FreeRTOS, Zephyr, or any RTOS;
+  bare-metal firmware; hardware registers, DMA, interrupts, memory-mapped I/O; memory pools, allocators,
+  fixed-size buffers; MISRA C/C++ compliance; RAII and smart pointers in embedded; stack vs heap decisions;
+  volatile correctness; struct packing; C/C++ interop; debugging HardFaults, stack overflows, heap corruption;
+  firmware architecture (superloop vs RTOS vs event-driven); low-power modes; CubeMX and HAL vs LL drivers;
+  CI/CD for firmware; MPU configuration; watchdog strategies; safety-critical design (IEC 61508);
+  peripheral protocols (UART/I2C/SPI/CAN); linker scripts; callback patterns; ESP32 memory (PSRAM vs DRAM),
+  deep sleep, and heap fragmentation. Also triggers on "MCU crashing", "writing firmware",
+  "ISR safe", "no dynamic memory", "RTOS pattern", "MPU fault", or "task stack overflow".
 ---
 
 # Embedded C and C++ Skill
