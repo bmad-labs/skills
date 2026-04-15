@@ -1,0 +1,23 @@
+{
+  "skill_name": "trade-off-analysis",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to decide between PostgreSQL and MongoDB for our new microservice that processes shipping container tracking events. We're on NestJS with Kafka. The events are high-volume (10K/sec) but the query patterns are simple lookups by container ID. Help me create a trade-off analysis.",
+      "expected_output": "A trade-off document comparing PostgreSQL vs MongoDB (and possibly other options like DynamoDB) with dimensions like write throughput, query patterns, ACID compliance, NestJS integration, operational complexity. Should produce a scored matrix with star ratings and a clear recommendation.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "We're building an internal dashboard for our ops team. Currently evaluating React with Next.js vs Vue with Nuxt vs a simple server-rendered approach with HTMX. The team has strong TypeScript skills but limited frontend experience. We need something maintainable. Create a comparison analysis for me — store it in /tmp/dashboard-analysis/",
+      "expected_output": "A trade-off document at /tmp/dashboard-analysis/ comparing the three frontend approaches with dimensions like developer experience, learning curve, bundle size, SSR support, TypeScript integration, component ecosystem. Should detect topic_type as 'frontend' and suggest appropriate dimensions.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Our team is debating whether to consolidate our 6 separate Redis instances into 1-2 shared instances or keep them isolated. Each service currently has its own Redis for caching and session storage. We're on GKE. I want a formal trade-off analysis to present to the architecture review board.",
+      "expected_output": "A trade-off document comparing consolidation options (full consolidation, partial consolidation, status quo) with dimensions like availability/blast radius, performance isolation, operational complexity, cost savings, security. Should detect topic_type as 'infrastructure' and produce a professional document suitable for architecture review.",
+      "files": []
+    }
+  ]
+}
