@@ -1,0 +1,10 @@
+# Default configuration for trade-off analysis skill
+# Used when {project-root}/_bmad/bmm/config.yaml does not exist
+
+user_name: "Author"
+communication_language: English
+document_output_language: English
+user_skill_level: intermediate
+planning_artifacts: "{project-root}/docs"
+output_folder: "{project-root}/docs"
+date: "auto"
