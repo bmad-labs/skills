@@ -111,6 +111,7 @@ If you only need specific skills, add them individually to your project's `.clau
 - `github:bmad-labs/skills/skills/ai-multimodal`
 - `github:bmad-labs/skills/skills/atlassian-rest`
 - `github:bmad-labs/skills/skills/multi-repo-git-ops`
+- `github:bmad-labs/skills/skills/trade-off-analysis`
 
 ### Troubleshooting
 
@@ -180,6 +181,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [atlassian-rest](skills/atlassian-rest) | Jira & Confluence integration via REST APIs — tickets, epics, pages, status reports, triage, bidirectional BMAD document sync | Productivity |
 | [multi-repo-git-ops](skills/multi-repo-git-ops) | Git operations across multi-repo systems with submodules — branching, committing, pushing, syncing across parent and service repos | Development |
 | [release-please](skills/release-please) | Automated versioning and releases with Google's release-please — pipeline setup, Conventional Commits, pre-releases, monorepos | Development |
+| [trade-off-analysis](skills/trade-off-analysis) | Structured technology trade-off analysis with scored comparison matrices for architecture decisions, build-vs-buy, and technology selection | Productivity |
 
 ## Recommended Skills from Other Repositories
 
