@@ -1,0 +1,40 @@
+{
+  "skill_name": "load-docs",
+  "evals": [
+    {
+      "id": 0,
+      "name": "single-file",
+      "prompt": "Use the load-docs skill to load this file: /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/single-file/notes.md",
+      "expected_output": "Agent reads the file completely with the Read tool, then responds 'DONE'.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "folder-recursive-with-filter",
+      "prompt": "Use the load-docs skill to load every document in this folder: /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/mixed-folder",
+      "expected_output": "Agent recursively reads README.md, config.yaml, changelog.md, subdir/oncall-runbook.md, subdir/handler.py. Agent SKIPS node_modules/, .git/, and package-lock.json. Agent ends with 'DONE'.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "url",
+      "prompt": "Use the load-docs skill to load this URL: https://raw.githubusercontent.com/anthropics/anthropic-cookbook/main/README.md",
+      "expected_output": "Agent fetches the URL with WebFetch and reads the content, then responds 'DONE'.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "no-args-asks-user",
+      "prompt": "Use the load-docs skill.",
+      "expected_output": "Agent does NOT read any files. Agent asks the user what to load. Agent does NOT respond 'DONE' (because nothing was loaded).",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "multiple-mixed",
+      "prompt": "Use the load-docs skill to load all of these:\n- /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/single-file/notes.md\n- /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/mixed-folder/README.md\n- /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/mixed-folder/subdir/oncall-runbook.md",
+      "expected_output": "Agent reads all three files completely, tracks them with TodoWrite, then responds 'DONE'.",
+      "files": []
+    }
+  ]
+}
