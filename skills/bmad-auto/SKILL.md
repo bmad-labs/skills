@@ -80,16 +80,37 @@ found, the list is empty — do not halt or ask the user to create one.
 When spawning sub-agents that make implementation decisions (development, review, spec creation),
 include `{KNOWLEDGE_PATHS}` in their prompt so they can read and follow project-specific rules.
 
+## Team Naming
+
+Generate a unique `{TEAM_NAME}` at startup so concurrent `bmad-auto` sessions (same project in
+multiple terminals, or different projects at once) never share a team. A shared team name causes
+`TeamCreate` collisions and cross-session message routing bugs.
+
+**Format:** `bmad-auto-{cwd-slug}-{timestamp}`
+
+- `{cwd-slug}` — the current working directory's basename, lowercased, non-alphanumerics collapsed
+  to hyphens, truncated to 20 chars. Example: `/Users/me/Works/My Project` → `my-project`.
+- `{timestamp}` — `YYYYMMDD-HHMMSS` in local time. Run `date +%Y%m%d-%H%M%S` if you need it.
+
+Example: `bmad-auto-my-project-20260422-143052`
+
+Compute `{TEAM_NAME}` **once** at the start of the session and reuse the exact same string for
+`TeamCreate`, every `Agent` spawn's `team_name`, and every `SendMessage` target. Do not regenerate
+mid-session — sub-agents spawned with a different team name cannot reach the orchestrator.
+
+Everywhere this skill shows `team_name: "{TEAM_NAME}"`, substitute the concrete value you
+generated.
+
 ## Team-Based Sub-Agent Architecture
 
 Use **Agent teams** so sub-agents persist with full context. Create the team once at startup:
 ```
-TeamCreate: { team_name: "bmad-auto", description: "BMAD implementation orchestration" }
+TeamCreate: { team_name: "{TEAM_NAME}", description: "BMAD implementation orchestration" }
 ```
 
 ### Sub-Agent Lifecycle
 
-1. Orchestrator spawns a sub-agent with `team_name: "bmad-auto"` for a workflow step.
+1. Orchestrator spawns a sub-agent with `team_name: "{TEAM_NAME}"` for a workflow step.
 2. Sub-agent works and reports results via `SendMessage` to `"team-lead"`.
 3. Orchestrator reviews. If issues → sends feedback to the **same sub-agent** (preserving context).
 4. Sub-agent fixes and reports back. Repeat until done or retry limit reached.
@@ -199,7 +220,7 @@ Report to the user which step will execute and what the change is about.
 Spawn sub-agent:
 ```
 name: "quick-spec-creator"
-team_name: "bmad-auto"
+team_name: "{TEAM_NAME}"
 prompt: |
   {AGENT_HEADER}
   {CONTEXT_BLOCK}
@@ -222,7 +243,7 @@ prompt: |
 Spawn sub-agent:
 ```
 name: "quick-developer"
-team_name: "bmad-auto"
+team_name: "{TEAM_NAME}"
 prompt: |
   {AGENT_HEADER}
   {CONTEXT_BLOCK}
@@ -246,7 +267,7 @@ prompt: |
 Spawn sub-agent:
 ```
 name: "quick-reviewer"
-team_name: "bmad-auto"
+team_name: "{TEAM_NAME}"
 prompt: |
   {AGENT_HEADER}
   {CONTEXT_BLOCK}
@@ -360,7 +381,7 @@ Determine story status and resume from appropriate step:
 Spawn sub-agent:
 ```
 name: "story-creator"
-team_name: "bmad-auto"
+team_name: "{TEAM_NAME}"
 prompt: |
   {AGENT_HEADER}
   Invoke Skill: "bmad-bmm-create-story", args: "<story_id>"
@@ -375,7 +396,7 @@ Issues: feedback up to 2 rounds → escalation ladder.
 Spawn sub-agent:
 ```
 name: "story-validator"
-team_name: "bmad-auto"
+team_name: "{TEAM_NAME}"
 prompt: |
   {AGENT_HEADER}
   Invoke Skill: "bmad-bmm-create-story", args: "validate <story_id>"
@@ -389,7 +410,7 @@ Passes → Step 3. Issues → feedback up to 2 rounds → escalation ladder.
 Spawn sub-agent:
 ```
 name: "story-developer"
-team_name: "bmad-auto"
+team_name: "{TEAM_NAME}"
 prompt: |
   {AGENT_HEADER}
   {CONTEXT_BLOCK}
@@ -416,7 +437,7 @@ After report → re-read `sprint-status.yaml` (should be `review`).
 Spawn sub-agent:
 ```
 name: "code-reviewer"
-team_name: "bmad-auto"
+team_name: "{TEAM_NAME}"
 prompt: |
   {AGENT_HEADER}
   {CONTEXT_BLOCK}
@@ -463,7 +484,7 @@ beyond unit tests — it should verify that the code actually works in its runti
 Spawn sub-agent:
 ```
 name: "func-validator"
-team_name: "bmad-auto"
+team_name: "{TEAM_NAME}"
 prompt: |
   {AGENT_HEADER}
   ## Task: Functional Validation for Story <story_id>
