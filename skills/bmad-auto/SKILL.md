@@ -127,33 +127,97 @@ You may receive messages from teammates. Collaborate via SendMessage to resolve 
 When you receive a shutdown_request, approve it.
 ```
 
-### Inter-Agent Communication Standards
+### Delegation Packet — the shape of every handoff message
 
-When agents send messages to each other (feedback, fix requests, issue reports, collaboration),
-the message must be **specific, detailed, and actionable**. Vague messages waste rounds and cause
-misunderstandings. Every message between agents must include:
+When the orchestrator sends work to a sub-agent — whether it's the first spawn, a feedback round,
+a fix request, a reviewer-fixes-issues handoff, or an escalation — it is **handing off context the
+sub-agent does not have**. A fresh sub-agent has no memory of the prior report, no read of the PRD,
+no view of the project knowledge base, and no awareness of which skill would help it. If the
+orchestrator just says "Apply fixes for all 4 issues found", the sub-agent has to rediscover
+everything, and the fix quality drops to whatever it can reconstruct on its own.
 
-1. **Context** — What was done, what was being checked, what the current state is.
-2. **Specific findings** — Exact file paths, line numbers, code snippets, error messages.
-   Never say "there are issues" without listing them concretely.
-3. **Reasoning** — Why something is wrong, why a particular approach is needed, what the
-   consequences of the issue are. This helps the receiving agent make good decisions.
-4. **Actionable instructions** — What exactly needs to change. Not "fix the error handling"
-   but "In `src/auth/login.ts:45`, the catch block swallows the error silently. Wrap it in
-   a custom `AuthError` and re-throw so the caller can handle it."
+The fix is not "write longer messages." The fix is: every outgoing message must be a **Delegation
+Packet** — a structured bundle of the context the orchestrator already has but the sub-agent
+doesn't. The slots below aren't a checklist to pad messages; they're a forcing function that stops
+the orchestrator from degrading its own context on the way out.
 
-**Bad example:** "Code review found issues. Please fix the error handling and naming."
+**Delegation Packet template** — fill every slot that applies; omit a slot only when it genuinely
+doesn't apply (e.g., no prior report on a first spawn):
 
-**Good example:** "Code review found 2 issues in the authentication module:
-1. `src/auth/login.ts:45` — The catch block catches `Error` but logs and continues. This means
-   authentication failures are silently ignored. Fix: re-throw as `AuthenticationError` with the
-   original error as cause, so the route handler returns 401.
-2. `src/auth/types.ts:12` — `AuthResp` interface name is abbreviated. Project conventions
-   (per `CLAUDE.md` line 15) require full names. Rename to `AuthenticationResponse` and update
-   all 3 import sites: `login.ts:3`, `register.ts:5`, `middleware.ts:8`."
+```
+## Task
+<One sentence: what this sub-agent needs to do right now.>
+
+## Why this matters
+<The reason behind the task — what bug, what risk, what standard is being upheld. This is
+what lets the sub-agent make good judgment calls on edge cases instead of following the
+letter of instructions and missing the spirit.>
+
+## Prior findings / report (verbatim)
+<If this is a feedback or fix-request message: paste the previous report as-is, then
+annotate. Do not summarize away file paths, line numbers, snippets, or the reviewer's
+reasoning — those are the load-bearing parts.>
+
+## Specific actions requested
+<Numbered list. For each: file path + line, what to change, what the end state should look
+like. Reference the item in the prior report so the sub-agent can cross-check.>
+
+## Knowledge sources to consult
+<Explicit paths the sub-agent should read before acting. Pull from {KNOWLEDGE_PATHS} and
+add any ad-hoc ones relevant to this task:
+  - Project rules: e.g. `CLAUDE.md`, `.cursorrules`, `docs/conventions.md`
+  - Architecture & PRD: `_bmad-output/planning-artifacts/` (name the specific file if known)
+  - The story file or tech-spec driving this work
+  - References inside this skill if relevant (e.g. `references/functional-validation-*.md`)
+Name the specific sections or line ranges when you know them — "CLAUDE.md §Testing" beats
+"read CLAUDE.md".>
+
+## Relevant skills
+<Skills the sub-agent should invoke (not just mention). Examples:
+  - `typescript-clean-code` for TS changes
+  - `bmad-bmm-code-review` for review work
+  - `typescript-unit-testing` when the change needs tests
+Pick based on the task; don't list skills that don't apply.>
+
+## Success criteria
+<How the sub-agent will know it's done. Concrete checks: "all 4 issues fixed, `npm test`
+passes, no new issues introduced in the touched files, lint clean." Round number if this
+is a retry ("Round 1/2").>
+
+## Report back with
+<What the sub-agent's SendMessage to team-lead should contain. Usually: which items were
+fixed, verification evidence (tests run, lint output), anything deferred and why.>
+```
+
+**Why each slot earns its place:**
+- *Task* and *Why* are inseparable — the task without the why produces literal but wrong fixes.
+- *Prior findings verbatim* matters because summarizing loses the file paths and reasoning that
+  made the finding actionable in the first place. Copy-paste beats paraphrase.
+- *Knowledge sources* and *Relevant skills* are the orchestrator's single biggest value-add —
+  it scanned for these at startup; sub-agents didn't. Naming them explicitly turns a generic
+  developer into one grounded in this project's conventions.
+- *Success criteria* and *Report back with* close the loop so the next round (if any) starts
+  with verifiable state, not hand-waving.
+
+**Anti-pattern — don't do this:**
+> "Apply fixes for all 4 issues found"
+
+This is the default failure mode. The sub-agent has to guess which 4 issues, re-read the whole
+review, re-derive the reasoning, and re-discover project conventions. It burns a round and
+produces shallow fixes.
+
+> **Worked examples:** see `references/delegation-packet-examples.md` for three filled-in
+> packets (reviewer-fixes-issues, story-developer feedback, escalation to tech-researcher).
+> Read it the first time you compose a packet in a session — the shape is clearer with
+> concrete file paths and reasoning in front of you than with the template alone.
+
+### Context Block — appended to first-spawn prompts
 
 For sub-agents that make implementation decisions (development, code review, spec creation),
-also append the `{CONTEXT_BLOCK}`:
+append the `{CONTEXT_BLOCK}` below to the first-spawn prompt. On subsequent messages, the
+Delegation Packet's *Knowledge sources* slot carries the same information more specifically —
+don't repeat the generic block; point at the exact file/section.
+
 ```
 ## Project Context
 Read and follow these project knowledge sources (skip any that don't exist):
@@ -187,8 +251,11 @@ All steps follow the same 3-tier escalation:
    communicate directly via `SendMessage`. The orchestrator monitors and only intervenes to shut down.
 3. **Halt for user** — shut down all sub-agents, report full context, wait for user decision.
 
-**All escalation messages must follow the Inter-Agent Communication Standards** — include context,
-specific findings, reasoning, and actionable instructions. Vague escalation messages waste rounds.
+**All escalation messages must be Delegation Packets** (see earlier section). Escalation is the
+point where context loss is most expensive — the sub-agent is already stuck, and a vague message
+gives it nothing new to work with. At minimum: restate the task, paste the prior reports verbatim,
+name the exact knowledge sources and skills the researcher should bring to bear, and state what
+"unblocked" looks like.
 
 > **Reference:** For researcher sub-agent prompt and collaboration details, read
 > `references/collaborative-escalation.md` in this skill's directory.
@@ -236,7 +303,8 @@ prompt: |
 **After sub-agent reports:**
 1. Read the spec. Present summary to user (problem, approach, task list).
 2. Ask: "Does this spec look good? I can proceed to implementation, or you can request changes."
-3. Approved → shut down agent → Step 2. Changes requested → send feedback (up to 3 rounds).
+3. Approved → shut down agent → Step 2. Changes requested → send a Delegation Packet with the
+   user's requested changes as *Specific actions* (up to 3 rounds).
 
 ## Quick Flow Step 2: Implement from Tech-Spec
 
@@ -291,15 +359,27 @@ prompt: |
 
 **Reviewer-Fixes-Issues Flow:**
 When the reviewer reports issues, do NOT send fixes back to the developer. Instead:
-1. Send the reviewer a message asking it to fix the issues it found. Include:
-   - Acknowledgment of each reported issue
-   - Instruction to apply the fixes directly to the codebase
-   - Reminder to run relevant tests after fixing
-2. The reviewer already has full context of what's wrong and why — it identified the problems,
-   so it's best positioned to fix them correctly without context loss.
+1. Send the reviewer a **Delegation Packet** (see the Delegation Packet template above) asking
+   it to fix the issues it found. The packet MUST include, at minimum:
+   - *Prior findings verbatim* — the reviewer's own report, copied unchanged. Don't say
+     "apply the 4 fixes" — paste the 4 findings with their file paths, line numbers, snippets,
+     and the reviewer's own reasoning.
+   - *Why this matters* — the user-visible or architectural consequence of each issue. The
+     reviewer explained this in its report; surface it so the fix preserves intent.
+   - *Knowledge sources* — the tech-spec path, any project rule files (`CLAUDE.md`,
+     `.cursorrules`, etc.) relevant to the issues. If a finding cited a specific convention
+     file, name that file and section.
+   - *Relevant skills* — e.g. `typescript-clean-code` for TS, plus whatever testing skill
+     fits. The reviewer should invoke these, not just know about them.
+   - *Success criteria* — fixes applied, story/spec tests pass, no regressions in the files
+     touched. Include the concrete test command.
+2. The reviewer already has full context of what's wrong and why — the packet's job is to
+   prevent that context from being lost when the reviewer picks up the fix task, and to add the
+   project-standard references the reviewer may not have consulted during review.
 3. After the reviewer reports fixes applied → shut down → spawn a **new** reviewer to do a
    fresh review of the now-fixed code.
-4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds).
+4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds). Each retry
+   packet must include the round number ("Round 2/2") and what changed since the last round.
 5. After 2 rounds still failing → escalation ladder.
 
 ## Quick Flow Step 4: Functional Validation
@@ -459,18 +539,35 @@ prompt: |
 
 **Reviewer-Fixes-Issues Flow:**
 When the reviewer reports issues, do NOT send fixes back to the developer. Instead:
-1. Send the reviewer a message asking it to fix the issues it found. The message must include:
-   - Acknowledgment of each reported issue
-   - Instruction to apply the fixes directly to the codebase
-   - Reminder to run the story's tests after fixing to ensure nothing breaks
-   - Context: the story file path and tech-spec (if any) so it understands intent
-2. The reviewer already has full context of what's wrong and why — it identified the problems,
-   so it's best positioned to fix them correctly without context loss.
+1. Send the reviewer a **Delegation Packet** (see the Delegation Packet template in the
+   architecture section) asking it to fix the issues it found. The packet MUST include, at
+   minimum:
+   - *Prior findings verbatim* — the reviewer's own report copied unchanged. If the review
+     listed 4 issues with file paths, reasoning, and recommended fixes, paste all 4 back. Do
+     not replace them with "apply the fixes" — the specifics are the whole point.
+   - *Why this matters* — for each finding, the consequence the reviewer identified (e.g.
+     "key-alias conflict risk could cause librdkafka to use the wrong ack semantics"). This
+     is what lets the fix preserve intent instead of being literal.
+   - *Knowledge sources* — the story file path, tech-spec path, PRD sections relevant to the
+     story, and project rule files (`CLAUDE.md`, `.cursorrules`, architecture doc sections).
+     When a finding cited a specific convention, name that file + section explicitly.
+   - *Relevant skills* — domain skills the reviewer should invoke while fixing (e.g.
+     `typescript-clean-code`, `typescript-unit-testing`, or project-specific skills the
+     knowledge base identifies).
+   - *Success criteria* — all issues fixed, story's tests pass (include the command), no
+     regressions, lint/typecheck clean.
+2. The reviewer already has full context of what's wrong and why — the packet's job is to
+   prevent that context from being lost across the message boundary, and to add project-
+   standard references that sharpen the fix. A common failure mode is the orchestrator
+   compressing "4 detailed findings with reasoning" into "apply the 4 fixes"; the template
+   exists to prevent exactly that.
 3. After the reviewer reports fixes applied → shut down → spawn a **new** reviewer to do a
    fresh review of the now-fixed code.
-4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds).
+4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds). Each retry
+   packet includes the round number and a diff of what changed since last round.
 5. After 2 rounds still failing → escalation ladder (collaborative escalation with the
-   original "story-developer" if still alive, or a new developer with full issue context).
+   original "story-developer" if still alive, or a new developer with a full Delegation
+   Packet containing all prior review reports and fix attempts).
 
 #### Step 4.5: Functional Validation
 
@@ -510,8 +607,10 @@ versions, and integration failures between components.
 
 - **PASS** → Step 5.
 - **PARTIAL** → log warning → Step 5. Include in commit message.
-- **FAIL** → send fix instructions to validator or re-spawn developer → re-run Steps 4+4.5.
-  Escalation ladder if still failing.
+- **FAIL** → send a Delegation Packet (with the validator's full failure report as *Prior
+  findings verbatim*, the runtime environment details as *Knowledge sources*, and concrete
+  reproduction steps as *Specific actions*) to the validator or re-spawn developer → re-run
+  Steps 4+4.5. Escalation ladder if still failing.
 
 #### Step 5: Commit
 
@@ -557,9 +656,12 @@ When done or user stops: shut down all sub-agents → `TeamDelete`.
 10. **Create team once.** Don't recreate per story or epic.
 11. **Escalate before halting.** Always attempt collaborative escalation before asking user.
 12. **Automate before asking for help.** Sub-agents must investigate automation first.
-13. **Detailed inter-agent messages.** Every message between agents must include context,
-    specific findings (file paths, line numbers, snippets), reasoning, and actionable
-    instructions. See Inter-Agent Communication Standards.
+13. **Every handoff is a Delegation Packet.** Feedback rounds, fix requests, reviewer-fixes-
+    issues handoffs, and escalation messages all use the Delegation Packet template (Task,
+    Why this matters, Prior findings verbatim, Specific actions, Knowledge sources, Relevant
+    skills, Success criteria, Report back with). Never compress a detailed prior report into a
+    single-line instruction like "apply the 4 fixes" — the sub-agent loses the reasoning,
+    file paths, and project-standard references that make a good fix possible.
 14. **Verify infrastructure, not just tests.** When a story introduces or depends on
     infrastructure (Docker, databases, queues, external services), functional validation must
     attempt to verify the infrastructure actually works — mocked unit tests alone are not
