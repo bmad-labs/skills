@@ -260,11 +260,67 @@ name the exact knowledge sources and skills the researcher should bring to bear,
 > **Reference:** For researcher sub-agent prompt and collaboration details, read
 > `references/collaborative-escalation.md` in this skill's directory.
 
-## Model Recommendations
+## Model Selection
 
-Informational for manual optimization:
-- Story creation, code review, quick-spec: Opus 4.6 (thorough analysis)
-- Story development, quick-dev: Sonnet 4.6 (execution-focused, fast)
+Model detection varies by tool. **At startup**, run this detection once and store the results
+as `{MODEL_OPUS}`, `{MODEL_SONNET}`, `{MODEL_HAIKU}` for use throughout the session.
+
+### Detection logic
+
+**Claude Code** (Anthropic direct, AWS Bedrock, Google Vertex, or any proxy):
+```bash
+echo $ANTHROPIC_DEFAULT_OPUS_MODEL    # e.g. "bedrock-opus", "claude-opus-4-7", or empty
+echo $ANTHROPIC_DEFAULT_SONNET_MODEL
+echo $ANTHROPIC_DEFAULT_HAIKU_MODEL
+```
+If these vars are set, you are on Claude Code. The `Agent` tool accepts **abstract tier names**
+(`"opus"` / `"sonnet"` / `"haiku"`) — CC resolves them to the correct provider model IDs
+automatically. Never hard-code a concrete model ID like `claude-opus-4-7` or `bedrock-opus` in
+an `Agent` spawn. Use the resolved names only in progress reports so the user can see what's running.
+
+**OpenCode** (`OPENCODE_EXPERIMENTAL` env var is set, or `opencode` binary is in PATH):
+```bash
+opencode models    # lists all available models in "provider/model-id" format
+```
+OpenCode does not expose the current session model via env vars. Use `opencode models` to get
+the available list, then pick the best match by capability tier. Format when spawning:
+`anthropic/claude-opus-4-7` (analysis), `anthropic/claude-sonnet-4-6` (execution). If the user
+is on a non-Anthropic provider (e.g. `github-copilot/claude-opus-4.7`), prefer that provider's
+equivalent tier from the `opencode models` output.
+
+**All other tools** (GitHub Copilot CLI, Cursor, Windsurf, Gemini CLI, Codex):
+These tools do not expose model info to agents. Omit the `model` parameter entirely and let the
+tool use its configured default.
+
+### Decision table
+
+| Condition | `{MODEL_OPUS}` to pass | `{MODEL_SONNET}` to pass |
+|---|---|---|
+| `ANTHROPIC_DEFAULT_OPUS_MODEL` is set | `"opus"` (abstract tier) | `"sonnet"` |
+| `OPENCODE_EXPERIMENTAL` set or `opencode` in PATH | best opus-tier from `opencode models` | best sonnet-tier from `opencode models` |
+| Otherwise | _(omit model param)_ | _(omit model param)_ |
+
+### Tier and effort assignments (by workload type)
+
+Effort is only meaningful on Anthropic-hosted models (direct or Bedrock/Vertex). When on
+OpenCode or other tools, omit the effort parameter.
+
+Check model capabilities at startup: if `ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES`
+contains `effort`, effort is supported. Store this as `{EFFORT_SUPPORTED}` (true/false).
+
+| Sub-agent | Model tier | Effort | Rationale |
+|---|---|---|---|
+| `story-creator` | `{MODEL_OPUS}` | `xhigh` | Deep codebase analysis, story decomposition needs thorough reasoning |
+| `story-validator` | `{MODEL_OPUS}` | `high` | Validation is structured — high is the quality/cost sweet spot |
+| `story-developer` | `{MODEL_SONNET}` | `xhigh` | Long-horizon coding work; xhigh is the recommended starting point for agentic coding |
+| `code-reviewer` | `{MODEL_OPUS}` | `high` | Reviewing is bounded in scope; high provides thorough analysis without over-spending |
+| `func-validator` | `{MODEL_SONNET}` | `high` | Running tests and checking infra; high balances quality and speed |
+| `quick-spec-creator` | `{MODEL_OPUS}` | `high` | Spec creation is bounded; high is the quality/cost sweet spot |
+| `quick-developer` | `{MODEL_SONNET}` | `xhigh` | Coding work; same rationale as story-developer |
+| `quick-reviewer` | `{MODEL_OPUS}` | `high` | Same as code-reviewer |
+| `tech-researcher` (escalation) | `{MODEL_OPUS}` | `xhigh` | Escalation means the problem is hard — give it room to think |
+
+When `{EFFORT_SUPPORTED}` is false, omit the effort parameter from all Agent spawns.
 
 ---
 
