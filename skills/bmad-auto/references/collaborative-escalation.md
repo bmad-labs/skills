@@ -12,7 +12,7 @@ This preserves the worker's full implementation context while bringing in fresh 
 ```
 Agent tool:
   name: "tech-researcher"
-  team_name: "bmad-auto"
+  team_name: "{TEAM_NAME}"  # use the same unique name generated at session startup
   prompt: |
     You are a BMAD team sub-agent. Do NOT make any git commits.
     After completing your work, report results to the team lead via SendMessage.
