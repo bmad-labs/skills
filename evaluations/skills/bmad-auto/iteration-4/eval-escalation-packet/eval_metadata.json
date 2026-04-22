@@ -1,0 +1,15 @@
+{
+  "eval_id": "escalation-packet",
+  "eval_name": "escalation-packet",
+  "prompt": "Orchestrator composes initial tech-researcher message for story 3-1 TLS/ESM escalation.",
+  "assertions": [
+    {"text": "Has a clearly labeled Task section", "check": "section_task"},
+    {"text": "Has a Why-this-matters section citing Epic 3 critical path / 6 downstream blockers", "check": "section_why"},
+    {"text": "Pastes BOTH developer prior attempts (ERR_REQUIRE_ESM + TLS handshake failure) substantively", "check": "both_attempts_verbatim"},
+    {"text": "Explicitly states TLS verification must stay on (no workaround that disables cert validation)", "check": "tls_constraint"},
+    {"text": "Instructs researcher to message the developer directly, not via team-lead", "check": "direct_collab_instruction"},
+    {"text": "Names knowledge sources: at minimum package.json (for CJS context) and architecture.md §External integrations", "check": "knowledge_sources_named"},
+    {"text": "Invokes at least one relevant skill (typescript-clean-code or claude-api)", "check": "skills_named"},
+    {"text": "Defines success criteria (story AC passes, no TLS compromise, etc.)", "check": "success_criteria"}
+  ]
+}

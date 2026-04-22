@@ -1,0 +1,65 @@
+{
+  "expectations": [
+    {
+      "text": "Has a clearly labeled Task section",
+      "passed": false,
+      "evidence": ""
+    },
+    {
+      "text": "Has a Why-this-matters section",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Pastes developer's prior report verbatim",
+      "passed": false,
+      "evidence": ""
+    },
+    {
+      "text": "Names both gaps: retry tests AND structured-log format",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Cites exact file lines (:82-140 and :95)",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "References docs/logging.md",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "References story AC3",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Invokes at least one relevant skill",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Defines success criteria",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Includes Round 1/2 marker",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+      "passed": false,
+      "evidence": "0/8 slots present"
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 3,
+    "total": 11,
+    "pass_rate": 0.7272727272727273
+  }
+}

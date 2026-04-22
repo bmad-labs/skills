@@ -1,0 +1,55 @@
+{
+  "expectations": [
+    {
+      "text": "Has a clearly labeled Task section",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Has a Why-this-matters section",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Pastes reviewer's prior report verbatim (blockquote with original header/phrasing)",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Mentions all 4 specific findings",
+      "passed": true,
+      "evidence": "4/4"
+    },
+    {
+      "text": "Names knowledge sources: CLAUDE.md and docs/kafka-conventions.md",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Invokes at least one relevant skill",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Defines success criteria",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Includes Round 1/2 marker",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+      "passed": true,
+      "evidence": "8/8 slots present"
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "pass_rate": 1.0
+  }
+}

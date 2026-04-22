@@ -1,0 +1,16 @@
+{
+  "eval_id": "story-dev-feedback",
+  "eval_name": "story-dev-feedback",
+  "prompt": "Orchestrator composes Round 1/2 feedback to story-developer covering two post-done gaps.",
+  "assertions": [
+    {"text": "Has a clearly labeled Task section", "check": "section_task"},
+    {"text": "Has a Why-this-matters section explaining why the gaps are not optional (regression risk + dashboard parsing)", "check": "section_why"},
+    {"text": "Names both gaps: missing retry-path unit tests AND structured-log format mismatch", "check": "both_gaps_named"},
+    {"text": "Cites the exact file locations: src/kafka/consumer.ts:82-140 for tests and src/kafka/consumer.ts:95 for log line", "check": "file_lines_cited"},
+    {"text": "References docs/logging.md (with §Structured log events or similar specificity)", "check": "logging_doc_referenced"},
+    {"text": "References story AC3 (the test-coverage acceptance criterion)", "check": "ac3_referenced"},
+    {"text": "Invokes at least one relevant skill (typescript-unit-testing or typescript-clean-code)", "check": "skills_named"},
+    {"text": "Defines success criteria (specific tests added, specific command to verify, lint clean, etc.)", "check": "success_criteria"},
+    {"text": "Includes Round 1/2 marker", "check": "round_marker"}
+  ]
+}

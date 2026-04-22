@@ -1,0 +1,473 @@
+{
+  "metadata": {
+    "skill_name": "bmad-auto",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-04-22T05:01:08Z",
+    "evals_run": [
+      "escalation-packet",
+      "reviewer-fixes-handoff",
+      "story-dev-feedback"
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": "escalation-packet",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 8,
+        "failed": 2,
+        "total": 10,
+        "time_seconds": 80.2,
+        "tokens": 36574,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Has a clearly labeled Task section",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Has a Why-this-matters section citing Epic 3 critical path",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Pastes developer's prior 2 reports verbatim (not paraphrased)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "text": "Mentions both failure causes (ESM + TLS)",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Explicitly states TLS verification must stay on",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Instructs researcher to message developer directly / no relay",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Names knowledge sources: package.json and architecture.md",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Invokes at least one relevant skill",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Defines success criteria",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+          "passed": false,
+          "evidence": "2/8 slots present"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "reviewer-fixes-handoff",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.7777777777777778,
+        "passed": 7,
+        "failed": 2,
+        "total": 9,
+        "time_seconds": 65.1,
+        "tokens": 34311,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Has a clearly labeled Task section",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "text": "Has a Why-this-matters section",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Pastes reviewer's prior report verbatim (blockquote with original header/phrasing)",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Mentions all 4 specific findings",
+          "passed": true,
+          "evidence": "4/4"
+        },
+        {
+          "text": "Names knowledge sources: CLAUDE.md and docs/kafka-conventions.md",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Invokes at least one relevant skill",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Defines success criteria",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Includes Round 1/2 marker",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+          "passed": false,
+          "evidence": "0/8 slots present"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "story-dev-feedback",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.7272727272727273,
+        "passed": 8,
+        "failed": 3,
+        "total": 11,
+        "time_seconds": 73.6,
+        "tokens": 34149,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Has a clearly labeled Task section",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "text": "Has a Why-this-matters section",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Pastes developer's prior report verbatim",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "text": "Names both gaps: retry tests AND structured-log format",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Cites exact file lines (:82-140 and :95)",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "References docs/logging.md",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "References story AC3",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Invokes at least one relevant skill",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Defines success criteria",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Includes Round 1/2 marker",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+          "passed": false,
+          "evidence": "0/8 slots present"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "escalation-packet",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 79.6,
+        "tokens": 42479,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Has a clearly labeled Task section",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Has a Why-this-matters section citing Epic 3 critical path",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Pastes developer's prior 2 reports verbatim (not paraphrased)",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Mentions both failure causes (ESM + TLS)",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Explicitly states TLS verification must stay on",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Instructs researcher to message developer directly / no relay",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Names knowledge sources: package.json and architecture.md",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Invokes at least one relevant skill",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Defines success criteria",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+          "passed": true,
+          "evidence": "8/8 slots present"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "reviewer-fixes-handoff",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 75.0,
+        "tokens": 40402,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Has a clearly labeled Task section",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Has a Why-this-matters section",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Pastes reviewer's prior report verbatim (blockquote with original header/phrasing)",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Mentions all 4 specific findings",
+          "passed": true,
+          "evidence": "4/4"
+        },
+        {
+          "text": "Names knowledge sources: CLAUDE.md and docs/kafka-conventions.md",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Invokes at least one relevant skill",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Defines success criteria",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Includes Round 1/2 marker",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+          "passed": true,
+          "evidence": "8/8 slots present"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "story-dev-feedback",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 11,
+        "failed": 0,
+        "total": 11,
+        "time_seconds": 64.2,
+        "tokens": 41936,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Has a clearly labeled Task section",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Has a Why-this-matters section",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Pastes developer's prior report verbatim",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Names both gaps: retry tests AND structured-log format",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Cites exact file lines (:82-140 and :95)",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "References docs/logging.md",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "References story AC3",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Invokes at least one relevant skill",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Defines success criteria",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Includes Round 1/2 marker",
+          "passed": true,
+          "evidence": ""
+        },
+        {
+          "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+          "passed": true,
+          "evidence": "8/8 slots present"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "old_skill": {
+      "pass_rate": {
+        "mean": 0.7684,
+        "stddev": 0.0373,
+        "min": 0.7273,
+        "max": 0.8
+      },
+      "time_seconds": {
+        "mean": 72.9667,
+        "stddev": 7.5699,
+        "min": 65.1,
+        "max": 80.2
+      },
+      "tokens": {
+        "mean": 35011.3333,
+        "stddev": 1355.7309,
+        "min": 34149,
+        "max": 36574
+      }
+    },
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 72.9333,
+        "stddev": 7.9053,
+        "min": 64.2,
+        "max": 79.6
+      },
+      "tokens": {
+        "mean": 41605.6667,
+        "stddev": 1077.1826,
+        "min": 40402,
+        "max": 42479
+      }
+    },
+    "delta": {
+      "pass_rate": "-0.23",
+      "time_seconds": "+0.0",
+      "tokens": "-6594"
+    }
+  },
+  "notes": []
+}
