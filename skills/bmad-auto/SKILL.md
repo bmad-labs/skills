@@ -33,19 +33,39 @@ You **never** ask sub-agents to make decisions. You **never** let sub-agents com
 
 The very first thing you do every session, **before** loading flow-specific instructions, is:
 
-1. **Detect the model context window** — check the model powering this session:
-   - If model ID contains `1m` (e.g. `claude-opus-4-7[1m]`), or `ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES` lists `1m_context`: **default recommendation = `team-persistent`**.
-   - Otherwise (200k models, non-Anthropic, unknown): **default recommendation = `team-respawn`**.
+1. **Detect the leader's own model context window.**
+   - If your own model ID contains `[1m]` (e.g. `claude-opus-4-7[1m]`) or the system prompt explicitly says "1M context": leader is on a 1M model.
+   - Otherwise: leader is on a 200k (or unknown) model.
 
-2. **Ask the user two questions** — use the `AskUserQuestion` tool. Present the recommendation as the first option labeled `(Recommended)`. These run every session, even on resume — the user may want to switch modes based on current conditions (different model, different story complexity).
+   This only tells you about the model running *this conversation*. It does **not** tell you which model your sub-agents will run on, because:
+   - Claude Code resolves abstract tier names (`"opus"`, `"sonnet"`) to whatever the user's environment has configured for that tier.
+   - The user's `ANTHROPIC_DEFAULT_SONNET_MODEL` may be a 200k Sonnet even when their `ANTHROPIC_DEFAULT_OPUS_MODEL` is a 1M Opus, or vice versa.
+   - Env vars and capability flags don't reliably distinguish 1M vs. 200k variants in Claude Code today.
+
+   **Do not assume sub-agent context windows from your own.** Ask the user.
+
+2. **If leader is on a 1M model, ask whether the other tiers are also 1M.** Use `AskUserQuestion`:
+
+   *"I'm running on a 1M-context model. To recommend the right execution mode, I need to know about the model your sub-agents will use. Are your sub-agent tiers (the model behind `opus` and `sonnet` in your config) also 1M-context?"*
+
+   Options:
+   - `Yes, all 1M` → recommend `team-persistent`
+   - `Only opus is 1M; sonnet is 200k` → recommend `hybrid` (leader does heavy thinking; 200k sonnet sub-agents respawn per step)
+   - `Only sonnet is 1M; opus is 200k` → recommend `team-persistent` but expect sm and researcher to be tighter
+   - `All 200k except this conversation` → recommend `team-respawn`
+   - `I don't know` → recommend `team-respawn` as the safe default; you can switch later if sub-agent context proves tight
+
+   If the leader is **not** on a 1M model, skip this question and default-recommend `team-respawn`.
+
+3. **Ask the user two mode questions** — use `AskUserQuestion`. Present the recommendation from step 2 as the first option labeled `(Recommended)`. Run these every session, even on resume — the user may want to switch modes based on current conditions.
 
    **Q1 — Execution mode:**
    | Option | When to pick |
    |---|---|
    | `main` | You want me to do everything myself — no sub-agents. Cheapest tokens. Best for very small changes or when you want maximum control. |
-   | `team-persistent` | 1M-context model. I spawn `sm`, `developer`, `tester` once per epic and reuse them across stories in that epic. Lower token cost across multi-story epics. |
-   | `team-respawn` | 200k-context model. Each workflow step gets a fresh sub-agent. Smaller per-agent context windows but more setup overhead per story. |
-   | `hybrid` | I (the leader) handle decision-heavy steps (story validation, code review, planning, all commits) directly in this conversation. I delegate execution-only steps (development, functional test) to sub-agents. Good middle ground. |
+   | `team-persistent` | All sub-agent tiers are 1M context. I spawn `sm`, `developer`, `tester` once per epic and reuse them across stories. Lowest token cost across multi-story epics. |
+   | `team-respawn` | Sub-agent tiers are 200k (or unknown). Each workflow step gets a fresh sub-agent. Smaller per-agent context windows but more setup overhead per story. |
+   | `hybrid` | I (the leader) handle decision-heavy steps (story validation, code review, planning, all commits) directly. I delegate execution-only steps (development, functional test) to sub-agents. Good middle ground when only some tiers are 1M. |
 
    **Q2 — Auto-progression:**
    | Option | Behavior |
@@ -53,9 +73,9 @@ The very first thing you do every session, **before** loading flow-specific inst
    | `auto-commit` | After each story passes validation, I commit and move to the next story without asking. I still ask before destructive ops. |
    | `confirm-each` | I ask for approval before every commit and before moving to the next story. |
 
-3. **Hold the choice in conversation memory.** Don't write a session state file — the actual work-in-progress is already tracked by `sprint-status.yaml` (Phase 4) or the tech-spec + git state (Quick Flow), and those are what matters for resume. Mode is a per-session preference, not project state.
+4. **Hold the choices in conversation memory.** Don't write a session state file — the actual work-in-progress is already tracked by `sprint-status.yaml` (Phase 4) or the tech-spec + git state (Quick Flow). Mode is a per-session preference, not project state.
 
-4. **Load the mode file** — read `modes/<chosen-mode>.md` from this skill's directory. That file contains everything mode-specific: how to spawn agents (or not), team naming, agent header templates, lifecycle rules. Do **not** apply spawning rules from this SKILL.md — they live in the mode file.
+5. **Load the mode file** — read `modes/<chosen-mode>.md`. That file contains everything mode-specific: how to spawn agents (or not), team naming, agent header templates, lifecycle rules. Do **not** apply spawning rules from this SKILL.md — they live in the mode file.
 
 ---
 
@@ -154,14 +174,14 @@ At startup, run detection once:
 
 **Effort support:** if `ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES` contains `effort`, set `{EFFORT_SUPPORTED}=true`. Otherwise omit effort everywhere.
 
-**Tier and effort table** — chosen to keep cost reasonable while preserving quality on the agentic-coding seats:
+**Tier and effort table** — chosen to keep cost reasonable while preserving quality on the agentic-coding seats. The "Effort (1M)" column applies *per sub-agent tier* — if the user said only some tiers are 1M, dial effort down only on those tiers and use the 200k column for the rest. (Effort itself is only settable on direct API / OpenCode; in Claude Code, encode the intent in the prompt body — see Step 0 about model resolution.)
 
-| Sub-agent | Model | Effort (1M context) | Effort (200k context) | Notes |
+| Sub-agent | Model | Effort (this tier is 1M) | Effort (this tier is 200k) | Notes |
 |---|---|---|---|---|
 | `sm` / `story-creator` | opus | `medium` | `xhigh` | 1M ctx + opus carries the planning load on its own; medium effort is enough. |
 | `developer` / `story-developer` / `quick-developer` | sonnet | `medium` | `xhigh` | 1M ctx absorbs the codebase; medium effort is enough for execution work. |
-| `tester` / `func-validator` | sonnet | `high` | `high` | Validation needs to actually catch bugs — keep effort up even on 1M. |
-| `tech-researcher` (escalation) | opus | `xhigh` | `xhigh` | Escalation = hard problem; give it room. |
+| `tester` / `func-validator` | sonnet | `high` | `high` | Validation needs to actually catch bugs — keep effort up regardless of context. |
+| `tech-researcher` (escalation) | opus | `xhigh` | `xhigh` | Escalation = hard problem; give it room regardless of context. |
 
 **Story validation and code review are the leader's job** in every mode — there is no `story-validator` or `code-reviewer` sub-agent. The leader has the full session context and the cheapest path to a correct decision.
 
