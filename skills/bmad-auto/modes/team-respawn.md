@@ -8,14 +8,13 @@ A 200k window fills quickly: project context + PRD + architecture + story file +
 
 ## Sub-agents (created per step, then shut down)
 
-| Step | Sub-agent name | Used for |
-|---|---|---|
-| Story create | `story-creator` | `bmad-bmm-create-story` |
-| Story develop | `story-developer` | `bmad-bmm-dev-story` |
-| Functional validate | `func-validator` | Per-story functional validation |
-| Quick spec | `quick-spec-creator` | `bmad-quick-spec` |
-| Quick develop | `quick-developer` | `bmad-quick-dev` |
-| Escalation only | `tech-researcher` | `bmad-bmm-technical-research` |
+| Step | Sub-agent name | Role-skill to invoke (first action) | Workflow skill (per request) |
+|---|---|---|---|
+| Story create | `story-creator` | `bmad-agent-pm` | `bmad-create-story` |
+| Story develop | `story-developer` | `bmad-agent-dev` | `bmad-dev-story` |
+| Functional validate | `func-validator` | `{TESTER_PERSONA}` (resolved at startup — see SKILL.md → "Tester persona/skill availability check") | `{TESTER_SKILL}` (resolved at startup) + bmad-auto's `references/functional-validation.md` for runtime smoke |
+| Quick develop | `quick-developer` | `bmad-agent-dev` | `bmad-quick-dev` |
+| Escalation only | `tech-researcher` | `bmad-agent-analyst` | `bmad-technical-research` |
 
 **Story validation and code review are NOT in this list.** The leader does both in this conversation, in every mode. Do not spawn `story-validator` or `code-reviewer` sub-agents.
 
@@ -29,7 +28,7 @@ Use the 200k-context column from SKILL.md:
 
 | Sub-agent | Model | Effort |
 |---|---|---|
-| `story-creator` / `quick-spec-creator` | opus | `xhigh` |
+| `story-creator` | opus | `xhigh` |
 | `story-developer` / `quick-developer` | sonnet | `xhigh` |
 | `func-validator` | sonnet | `high` |
 | `tech-researcher` | opus | `xhigh` |
@@ -47,25 +46,29 @@ Per-role context-block values:
 | `story-creator` | Story manager creating one specific story (id + epic). Fresh-spawn per story. | Reads the story file, validates it (leader job), then sends to developer. |
 | `story-developer` | Developer implementing one specific story. Fresh-spawn per story. | Reviews the diff (leader job), then sends to func-validator. Fix requests come back as Delegation Packets. |
 | `func-validator` | Functional tester for one story (light or full per epic-aware policy). Fresh-spawn per story. | Reads PASS/PARTIAL/FAIL and decides commit / commit-with-caveat / fix-cycle. |
-| `quick-spec-creator` | Spec author for a single quick-flow change. One-shot. | Reads the spec, validates it, then sends to quick-developer. |
 | `quick-developer` | Developer implementing one quick-flow change. One-shot. | Reviews + sends to func-validator. Fix requests come back as packets. |
 | `tech-researcher` | Researcher unblocking a stuck worker via peer collaboration. | See `references/escalation.md`. |
 
 Spawn skeleton:
 
 ```
-{AGENT_HEADER with Flow, Mode (team-respawn), specific role, and what-leader-does-with-output filled in per the table above}
+{AGENT_HEADER — including project root, story/spec file path, Flow, Mode (team-respawn),
+specific role, and what-leader-does-with-output filled in per the table above; the
+"First action — invoke your BMAD role-skill" line names the persona from the table above}
 
 ## Task
 <Single sentence: what this sub-agent does in this step.>
 
-## Skill to invoke
-<Exact skill name and args.>
+## Workflow skill to invoke (after role-skill is invoked)
+<Exact workflow skill name from the table above (the `bmad-*` family) and args.>
 
 ## Project Context
+Working directory: <absolute project root — operate here, do NOT cd into subfolders>
 Knowledge sources: {KNOWLEDGE_PATHS}
 Architecture & PRD: _bmad-output/planning-artifacts/
 Story file (if applicable): _bmad-output/implementation-artifacts/<story>.md
+  → Read this first; the leader will tell you which sections are most relevant
+    (e.g. "Dev Notes describes what was just implemented; check that against AC").
 Read these before acting.
 
 ## Manual task handling (developer & quick-developer only)
@@ -73,9 +76,12 @@ Investigate automation first (CLI, scripts, APIs, Docker, mocks). If automatable
 If truly impossible → report to team-lead with: what the task is, automation approaches
 considered and why each fails, what user action is needed. Then wait.
 
-## Reporting
-Report via SendMessage to "team-lead" with:
-<Step-specific report shape — see flow file for details.>
+## Reporting (document-first)
+Write your detailed work into the story / tech-spec file (Dev Notes for developer,
+QA Results for tester, Review Notes for review fixes). Then SendMessage to "team-lead"
+with the short summary:
+  "<Step result>. File: <path>. Status: <one word>. Headline: <one line>."
+Leader reads the file for the full picture.
 ```
 
 The `{AGENT_HEADER}` and Delegation Packet shape come from SKILL.md. Don't redefine them here.

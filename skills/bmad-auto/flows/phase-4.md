@@ -23,7 +23,7 @@ If the user only asks about status, summarize `sprint-status.yaml` and stop. Do 
 1. **Retro action items from prior epic** — if `_bmad-output/implementation-artifacts/retrospective-epic-{N-1}.md` exists, read it and pull every CRITICAL or HIGH item. For each:
    - Try to verify/resolve it (run a docker compose up, pull an image, run a migration, hit a health endpoint). In team modes, you can dispatch this to the developer or tester; in main/hybrid, just do it.
    - Resolved → continue. Unresolvable → report to user with details and pause.
-2. Invoke `Skill: "bmad-bmm-sprint-planning"` (leader does this directly in every mode — it's a planning decision, not coding).
+2. Invoke `Skill: "bmad-sprint-planning"` (leader does this directly in every mode — it's a planning decision, not coding).
 3. Re-read `sprint-status.yaml`. If epic is still `backlog`, halt: *"Sprint planning did not advance epic status."* Pause.
 4. **In team modes (`team-persistent`, `team-respawn`, `hybrid` with epic-persistent agents):** spawn the epic team now. See your mode file for the spawn prompts.
 
@@ -38,7 +38,7 @@ Determine the resume point from story status:
 
 #### Step 1: Create Story (delegated to `sm` or done by leader)
 
-In `team-persistent`, `team-respawn`, `hybrid` (if you choose to delegate creation): send a Delegation Packet to the sm/story-creator naming `Skill: "bmad-bmm-create-story"`, args `<story_id>`. In `main` (or `hybrid` electing to do creation directly): invoke the skill yourself.
+In `team-persistent`, `team-respawn`, `hybrid` (if you choose to delegate creation): send a Delegation Packet to the sm/story-creator naming `Skill: "bmad-create-story"`, args `<story_id>`. In `main` (or `hybrid` electing to do creation directly): invoke the skill yourself.
 
 **If the story surfaces planning ambiguity** — unclear architecture, unclear approach, library/pattern choice the PRD doesn't pin down — the sm should report it back rather than guess. The leader then runs the memory-first check (`{MEMORY_SOURCES}` → `{KNOWLEDGE_PATHS}`); if no existing answer, spawn a one-shot planning-phase researcher per `references/escalation.md` to get a recommendation before finalizing the story. Do this *before* moving to Step 2 — fixing ambiguity in the spec is much cheaper than fixing it in code.
 
@@ -58,34 +58,36 @@ Validation passes → Step 3. Validation fails → either fix the story directly
 
 #### Step 3: Develop Story
 
-Send a Delegation Packet to the developer naming `Skill: "bmad-bmm-dev-story"`. The packet must include:
+Send a Delegation Packet to the developer naming `Skill: "bmad-dev-story"`. The packet must include:
 - Story id and story file path.
 - *Why this matters* — the user-facing or architectural reason for this story.
 - *Knowledge sources* — `{KNOWLEDGE_PATHS}` + the story file + relevant architecture sections.
 - *Success criteria* — every AC met, tests pass, lint clean, sprint-status advanced to `review`.
 - *Report back with* — task completion summary, test output, anything deferred.
 
-In `main` mode the leader invokes `bmad-bmm-dev-story` directly.
+In `main` mode the leader invokes `bmad-dev-story` directly.
 
 After report: re-read `sprint-status.yaml` (should be `review`).
 - Successful → Step 4.
 - Manual task reported → review the developer's investigation. If you can suggest an automation, do (Round 1/2). Else halt for user.
-- Blocked → escalation ladder. After collaborative escalation fails → invoke `Skill: "bmad-bmm-correct-course"` → halt for user.
+- Blocked → escalation ladder. After collaborative escalation fails → invoke `Skill: "bmad-correct-course"` → halt for user.
 
 #### Step 4: Code Review (LEADER ONLY, every mode)
 
-The leader reviews the diff in this conversation. Use `Skill: "bmad-bmm-code-review"` if you want the structured workflow, or read the diff yourself. Check:
+The leader reviews the diff in this conversation. Use `Skill: "bmad-code-review"` if you want the structured workflow, or read the diff yourself. Check:
 - Story ACs satisfied.
 - Project conventions followed (consult `{KNOWLEDGE_PATHS}`).
 - Tests cover the new behavior.
 - No regressions in touched files.
 - No security or perf foot-guns.
 
-Pass → Step 4.5. Issues → fix-request Delegation Packet to the **developer** (not a separate reviewer):
-- *Prior findings verbatim* — your review notes, full text, no summarization.
-- *Specific actions* — numbered, file path + line, what to change.
-- *Success criteria* — every issue fixed, tests still pass.
+Pass → Step 4.5. Issues → write your full review findings into the story file's **Review Notes** section first (file paths, line numbers, what's wrong, recommended fixes — verbatim, not summarized). Then send a fix-request Delegation Packet to the **developer** (not a separate reviewer):
+- *Knowledge sources* — story file path, point at the new Review Notes section ("read Review Notes first; that's the full review").
+- *Specific actions* — numbered, file path + line, what to change. Cross-reference the items in Review Notes.
+- *Success criteria* — every issue in Review Notes fixed, tests still pass.
 - Mark "Round 1/2".
+
+The detail lives in the story file, not the packet — keeps the leader's conversation context lean and gives the developer one canonical place to read.
 
 Developer fixes → you re-review in conversation. Up to 2 leader rounds → escalation ladder.
 
@@ -108,7 +110,7 @@ In team modes, send the tester a Delegation Packet specifying "light" or "full" 
 **Outcomes:**
 - **PASS** → Step 5.
 - **PARTIAL** → log warning, proceed to Step 5, include partial details in commit message.
-- **FAIL** → fix-request Delegation Packet to the developer with the validator's report as *Prior findings verbatim* → re-run Steps 4 + 4.5. Escalation ladder if still failing.
+- **FAIL** → tester's failure detail is already in the story file's QA Results section. Send a fix-request Delegation Packet to the developer with *Knowledge sources* pointing at the QA Results section ("read the latest QA Results entry — full failure context is there") and *Specific actions* naming the failing test/command. Re-run Steps 4 + 4.5 after fix. Escalation ladder if still failing.
 
 **Infrastructure verification is non-optional.** If the story touches Docker / DB / queue / external API, the validator must hit the real thing or report PARTIAL. Mocked tests passing while infra is broken is exactly what this step exists to prevent.
 
@@ -128,8 +130,8 @@ In team modes, send the tester a Delegation Packet specifying "light" or "full" 
 After the last story in the epic is `done`:
 
 1. **Run the full epic suite** (only if per-story validations were "light", i.e. epic had >3 stories): send the tester a "full epic" Delegation Packet, or run it yourself in main/hybrid. Outcome handling same as Step 4.5.
-2. Invoke `Skill: "bmad-bmm-sprint-status"` for a status report (leader-direct).
-3. Invoke `Skill: "bmad-bmm-retrospective"` for the completed epic (leader-direct).
+2. Invoke `Skill: "bmad-sprint-status"` for a status report (leader-direct).
+3. Invoke `Skill: "bmad-retrospective"` for the completed epic (leader-direct).
 4. Read the retro and surface CRITICAL/HIGH items to the user as *"items that must be resolved before Epic {N+1} starts."* Epic Start step A will gate on them.
 5. **In `team-persistent` and epic-persistent `hybrid`:** shut down the sm + developer + tester for this epic. Do NOT carry them into the next epic — fresh trio per epic.
 6. Report: *"Epic {N} complete. Moving to Epic {N+1}."* Continue.

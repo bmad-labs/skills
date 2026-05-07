@@ -70,7 +70,7 @@ Agent tool:
     Research and recommend an approach for: <one-paragraph concrete question>
 
     ## Skill to invoke
-    bmad-bmm-technical-research, args: "<research topic>"
+    bmad-technical-research, args: "<research topic>"
 
     ## What I (team-lead) need from you
     1. Run the technical-research skill on the question above.
@@ -129,7 +129,7 @@ Agent tool:
     A teammate "<worker-name>" is blocked on: <blocker description from worker's reports>.
 
     ## Skill to invoke
-    bmad-bmm-technical-research, args: "<research topic>"
+    bmad-technical-research, args: "<research topic>"
 
     ## How to collaborate
     1. Run the technical-research skill. Read the resulting research file.
@@ -204,7 +204,7 @@ The leader does not invent a path forward when both Tiers 1 and 2 have failed. T
 
 Some problems are obviously not solvable by a sub-agent and shouldn't burn rounds:
 
-- **Architectural decisions** (e.g., "should we add a new microservice?") — Tier 3 immediately. Optionally invoke `Skill: "bmad-bmm-correct-course"` first.
+- **Architectural decisions** (e.g., "should we add a new microservice?") — Tier 3 immediately. Optionally invoke `Skill: "bmad-correct-course"` first.
 - **External dependencies the user controls** (e.g., "we need an API key from a third party") — Tier 3 immediately.
 - **Spec ambiguity that requires the user's intent** (e.g., "the AC says X but the architecture implies Y; which?") — Tier 3 immediately.
 

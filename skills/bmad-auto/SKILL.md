@@ -187,6 +187,111 @@ At startup, run detection once:
 
 ---
 
+## Working Directory and Document-First Handoffs
+
+Two non-negotiable rules that apply to every sub-agent in every mode:
+
+### 1. Always spawn at the project root
+
+Every `Agent` call must be issued from the project root — the directory the user invoked `bmad-auto` from (the same directory that contains `_bmad-output/`). Never spawn a sub-agent while your shell is `cd`'d into a subfolder; sub-agents inherit cwd and a wrong cwd makes every relative path in the story file (`tasks/`, `_bmad-output/...`, `src/...`) resolve incorrectly.
+
+In the spawn prompt's *Project Context* section, **state the project root explicitly**:
+
+```
+## Working directory
+You are operating at the project root: <absolute path, e.g. /Users/me/Works/foo>
+All paths in this prompt and in the story file are relative to this root unless
+absolute. Do NOT cd into subdirectories — run commands from this root and use
+relative paths from here.
+```
+
+If the leader needs to run a command itself (build, test, git), do it from project root too. The only legitimate `cd` is into a temporary scratch dir for one-off operations the sub-agents won't touch.
+
+### 2. Document-first handoffs (heavy context lives in files, not messages)
+
+Sub-agents do their thinking in **files**, not in `SendMessage` payloads. The pattern:
+
+- **Developer finishes a story** → writes the full implementation summary, decisions made, files touched, test results, deferrals, and any noteworthy reasoning into the **story file's Dev Notes / Dev Agent Record section** (the slot the BMAD `bmad-create-story` workflow generated). Then sends a *short* message back: `"Done. Story file: <path>. Status: <review|blocked>. Headline: <one line>."`
+- **Tester finishes validation** → appends results to a **QA Results / Validation Results section** in the same story file, with PASS/PARTIAL/FAIL, command output snippets, and any warnings. Sends a short message: `"Validation: <PASS|PARTIAL|FAIL>. See QA Results in <path>."`
+- **SM finishes story creation** → the workflow already produces the story file; SM just reports `"Story file: <path>. Ready for leader validation."`
+- **Leader finishes code review** → writes review findings into a **Review Notes section** of the story file before sending a fix-request to the developer. The fix-request packet then says *"see Review Notes in <story_file>"* instead of pasting 200 lines of findings into the message.
+- **For Quick Flow** → use the tech-spec file as the equivalent of the story file. Append a "Dev Notes" section, a "Validation Results" section, etc.
+
+**Why this matters**:
+- Messages live in conversation memory and burn context on every relay. Files don't.
+- The next sub-agent in line (e.g. tester after developer) reads the story file directly — full context, exactly as written, no leader paraphrase.
+- Resume across crashes/restarts becomes trivial: the file is the truth, even if the team is gone.
+- Sub-agents can cite their work by file path + section anchor, which is searchable and reviewable later.
+
+**What stays in messages**: short status (one or two sentences), the file path, and anything the leader genuinely needs to see *immediately* to make a decision (e.g. an unrecoverable error message). Anything longer goes in the file.
+
+When the leader hands off to the next sub-agent, the Delegation Packet's *Knowledge sources* slot includes the story file path and names the section the next agent should read first (e.g. `"Read story-1-3.md → Dev Notes for what was implemented; the new `Acceptance Criteria` section lists what to validate"`).
+
+---
+
+## BMAD Skills — Roles and Workflow (canonical mapping)
+
+In the current BMAD setup, **personas and workflows are both exposed as skills** via the `Skill` tool — there's no separate "agent activation" mechanism. A `bmad-agent-*` skill loads the persona's mental model (terminology, decision frame, output expectations); a `bmad-*` workflow skill runs a structured process. Both are invoked the same way.
+
+Sub-agents in bmad-auto are not generic execution workers — each one **invokes a specific BMAD role-skill first** (the persona equivalent), then uses **only BMAD workflow skills** to do its actual work. The role-skill gives the agent the right frame; the workflow skills constrain the agent to a known, repeatable process. The leader never has to reinvent "how should the developer think about this?" — the role-skill already encodes it.
+
+### Role → role-skill → workflow skills
+
+All entries in both columns are invoked via the `Skill` tool — they're regular skills, not a separate persona-activation mechanism. "Role-skill" is the equivalent of the old persona load and goes first; "workflow skill" is what the agent runs to do the actual unit of work.
+
+| bmad-auto role | First action: invoke role-skill | Workflow skills used per request |
+|---|---|---|
+| `sm` (story creation, sprint planning) | `bmad-agent-pm` | `bmad-create-story`, `bmad-sprint-planning` |
+| `developer` (Phase 4) | `bmad-agent-dev` | `bmad-dev-story` |
+| `developer` (Quick Flow) | `bmad-agent-dev` | `bmad-quick-dev` |
+| `tester` (functional validation) | `bmad-tea` if available, else `bmad-agent-dev` | `manual-testing` if available, else `bmad-testarch-test-design` if available, else `bmad-qa-generate-e2e-tests` — plus bmad-auto's own `references/functional-validation.md` for the runtime smoke / build / infra checks in every case |
+| `tech-researcher` | `bmad-agent-analyst` | `bmad-technical-research` |
+| Leader — story validation | (no persona load — leader stays as orchestrator) | `bmad-create-story` invoked in validate mode |
+| Leader — code review | (no persona load) | `bmad-code-review` |
+| Leader — epic completion | (no persona load) | `bmad-sprint-status`, `bmad-retrospective` |
+| Leader — spec/PRD/architecture writes | (no persona load) | `bmad-create-prd`, `bmad-create-architecture`, `bmad-correct-course` |
+
+### Tester persona/skill availability check (one-time, at startup)
+
+The tester slot has fallbacks because the dedicated test-engineering skills (`bmad-tea`, `manual-testing`, `bmad-testarch-test-design`) aren't installed in every BMAD environment. At session start, the leader checks the available-skills list once and locks in:
+
+- `{TESTER_PERSONA}` = `bmad-tea` if it appears in the available skills list; otherwise `bmad-agent-dev`.
+- `{TESTER_SKILL}` = the first match in this preference order from the available skills list:
+  1. `manual-testing` (preferred — closest fit to the runtime-smoke + main-cases approach light validation needs)
+  2. `bmad-testarch-test-design` (test architecture / design fallback)
+  3. `bmad-qa-generate-e2e-tests` (always available; generates E2E tests when the project warrants them)
+
+The runtime smoke / build / infra checks from `references/functional-validation.md` apply **in every case** — they're bmad-auto's own contribution to functional validation and don't depend on which BMAD test skill is available. The chosen `{TESTER_SKILL}` is what the tester invokes when the work is "design or generate tests"; the functional-validation reference is what the tester (and leader) follows when the work is "build the app, run it, smoke-check the main cases."
+
+Substitute the resolved values into every tester spawn prompt and Delegation Packet — don't paste the conditional table.
+
+### Role-skill invocation rule
+
+The **first thing** a sub-agent does on first spawn is invoke its role-skill via the `Skill` tool. The role-skill's frame stays in effect for the agent's lifetime — in `team-persistent` mode that's the whole epic; in `team-respawn` it's one step. The leader names the role-skill explicitly in the spawn prompt:
+
+```
+## First action — invoke your BMAD role-skill
+Invoke: Skill tool with skill name "bmad-agent-dev"
+This loads the BMAD developer role frame and its menu of workflow commands.
+Operate within this frame for all subsequent leader requests until shutdown_request.
+```
+
+Don't conflate "which role-skill to invoke" with "which workflow skill to run for this story." They're separate Skill calls — role-skill once at spawn, workflow skill on every leader request.
+
+### Workflow-only rule
+
+Sub-agents may invoke **only** BMAD workflow skills (the `bmad-*` family — `bmad-create-story`, `bmad-dev-story`, `bmad-quick-dev`, `bmad-code-review`, etc.) plus the small set of language-specific helpers their role-skill's menu calls out (e.g. `typescript-clean-code`, `typescript-unit-testing`). If a task surfaces that doesn't fit the BMAD catalog — a research question outside the workflow's scope, an unfamiliar architecture call, a tooling decision the role-skill doesn't cover — the agent does **not** improvise. It reports to team-lead and waits for guidance.
+
+The leader's first move when a sub-agent reports "this doesn't fit a workflow" is to invoke **`bmad-help`** to get the BMAD framework's own advice on the right next workflow or skill. Only after `bmad-help`'s recommendation runs out does the leader fall back to `bmad-correct-course` (real workflow drift) or Tier 3 escalation (user intervention).
+
+### Why constrain sub-agents to BMAD skills?
+
+Two reasons. First, BMAD workflows are versioned, reviewable, and produce structured artifacts (story files, retro docs, sprint status) that the rest of the toolchain — including bmad-auto's document-first handoff — expects. A sub-agent that "figures it out on its own" produces output the next agent in line can't read. Second, the personas encode hard-won decisions about *when* to write tests, *how* to scope a fix, *what* counts as done — replicating that in ad-hoc prompts wastes the leader's time and produces inconsistent results across stories.
+
+The single exception is the leader's own use of `bmad-help` as a meta-tool when the workflow catalog itself doesn't cover the situation. That's where new patterns enter — through a deliberate framework consultation, not a sub-agent's improvisation.
+
+---
+
 ## The One Rule for Every Sub-Agent Prompt
 
 Every sub-agent prompt **must** start with this header (call it `{AGENT_HEADER}` in the mode files). It has two parts: who you are in the bigger picture, then the hard rules.
@@ -206,17 +311,37 @@ feeds back to the leader, who validates, reviews, and decides what happens next.
 Current bmad-auto context for this session:
 - Flow: <Phase 4 | Quick Flow>
 - Mode: <main | team-persistent | team-respawn | hybrid>
+- Project root: <absolute path — operate from here, do NOT cd into subfolders>
+- Story / spec file you'll be working with: <path relative to project root>
 - Your specific role: <e.g. "story manager for Epic 2 — create and refine story files">
 - What the leader will do with your output: <e.g. "validate the story spec, then send it to
   the developer; if the spec has gaps the leader will send you a fix-request packet">
+
+## First action — invoke your BMAD role-skill
+Before doing anything else, invoke the Skill tool with skill name: <role-skill,
+e.g. "bmad-agent-dev">. This loads the BMAD role frame you'll operate within for
+your lifetime in this team. Stay in this frame until you receive shutdown_request.
+The role-skill's menu of workflow commands is what you operate within.
 
 ## Hard rules
 - Do NOT make any git commits. The leader handles all git operations.
 - Do NOT make scope or design decisions. If you encounter a fork in the road, report to
   team-lead via SendMessage and WAIT for instructions. Do not pick a path yourself.
 - Do NOT skip steps you were asked to do. If a step is impossible, report and wait.
-- Do invoke any skill the leader names. Do not substitute a different skill.
+- Do invoke ONLY the BMAD workflow skill the leader names (`bmad-*` family),
+  plus whatever language helpers your role-skill's menu allows. Do not improvise with
+  non-BMAD skills.
+- If a task doesn't fit a BMAD workflow, do NOT improvise. Report to team-lead — they
+  will consult `bmad-help` to find the right BMAD path forward.
 - When you receive a shutdown_request, approve it.
+
+## Document-first handoff rule
+Your detailed work goes into the story / tech-spec file (in the Dev Notes / QA Results /
+Review Notes section the BMAD template provides), not into SendMessage payloads. When you
+report back to team-lead, the message stays short:
+  "Done. <File>: <path>. Status: <one word>. Headline: <one line>."
+The leader reads the file for the full picture; the next sub-agent in the chain reads the
+same file. This keeps everyone's context lean and the handoff durable.
 
 You may receive messages from teammates. Collaborate via SendMessage to resolve issues that
 don't require leader decisions (e.g., asking the developer for a file path).
@@ -238,7 +363,7 @@ Every message you send to a sub-agent — first spawn, feedback round, fix reque
 <The reason — what bug, what risk, what standard.>
 
 ## Skill to invoke
-<Exact skill name, e.g. "bmad-bmm-dev-story". Never let the sub-agent pick.>
+<Exact skill name, e.g. "bmad-dev-story". Never let the sub-agent pick.>
 
 ## Prior findings / report (verbatim, if applicable)
 <Paste prior reports unchanged. No paraphrase.>
@@ -319,12 +444,12 @@ The "light vs full" definition and the project-type detection (web app, embedded
 
 1. **Leader does all git commits.** Sub-agents never run `git commit`. Period.
 2. **Leader makes all decisions.** Story validation, code review, scope calls, escalation triggers — all leader. Sub-agents execute and report.
-3. **Leader gives sub-agents the exact skill to invoke.** Never write "figure out which skill to use." Always name the skill: `bmad-bmm-create-story`, `bmad-bmm-dev-story`, etc.
+3. **Leader gives sub-agents the exact role-skill AND workflow skill to invoke.** First action on spawn = invoke the BMAD role-skill (`bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-architect`, `bmad-agent-analyst` per the canonical mapping). Per-request action = invoke the named workflow skill (`bmad-create-story`, `bmad-dev-story`, `bmad-quick-dev`, etc.). Both go through the `Skill` tool. Never write "figure out which skill to use" — and never let a sub-agent invoke a non-BMAD skill outside its role-skill's menu.
 4. **One sub-agent per execution step.** Don't combine "develop + test + review" into one agent.
 5. **Re-read sprint-status.yaml after every sub-agent report** — it's ground truth.
 6. **Follow BMAD workflows.** Don't bypass slash command workflows that the project depends on.
 7. **Respect epic order.** Epics are sequentially dependent.
-8. **Align with architecture/PRD.** Misalignment → invoke `bmad-bmm-correct-course`.
+8. **Align with architecture/PRD.** Misalignment → invoke `bmad-correct-course`.
 9. **Always attempt build validation before commit.** Never commit code that doesn't compile.
 10. **Every handoff is a Delegation Packet.** No "apply the fixes" one-liners.
 11. **Verify infrastructure, not just tests.** When a story touches Docker / DB / queue / external API, functional validation must hit the real thing or report PARTIAL.
@@ -332,6 +457,9 @@ The "light vs full" definition and the project-type detection (web app, embedded
 13. **In `auto-commit` mode, still ask before destructive ops.** Auto-commit covers the happy path only — force-push, branch deletion, merging into main always require explicit approval.
 14. **Researcher is lazy, not gated.** Don't pre-spawn or keep one alive "just in case." Do spawn freely the moment you hit planning ambiguity, an unclear architecture/intent/approach, or a design decision where best-practices research would help. Shut it down once the question is answered.
 15. **Memory before research, research before halting.** Before researching, check `{MEMORY_SOURCES}` and `{KNOWLEDGE_PATHS}` — if the user has a prior decision or the project rules cover it, use that and cite it. If neither source has the answer, spawn the researcher; don't halt to the user just because memory is empty. Halt only for non-technical blockers (scope, PRD gaps, business decisions).
+16. **Spawn sub-agents from project root.** Every `Agent` call must be issued at the project root (the directory containing `_bmad-output/`), and the spawn prompt must explicitly state the absolute project root path so sub-agents anchor relative paths correctly. Never spawn from a subfolder.
+17. **Document-first handoffs.** Sub-agents write their detailed work — implementation summaries, validation results, review findings — into the **story file** (Phase 4) or **tech-spec** (Quick Flow), not into `SendMessage` payloads. Reports back to the leader stay short: status, file path, headline. The next sub-agent in line reads the file directly. This keeps the leader's conversation context lean and gives every handoff a durable, resumable artifact.
+18. **Sub-agents work only via BMAD role-skills and workflow skills.** Every sub-agent invokes its assigned BMAD role-skill first (`bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-architect`, `bmad-agent-analyst`) and uses only BMAD workflow skills (the `bmad-*` family) for the work itself. No improvisation. If a task doesn't fit the workflow catalog, the agent reports to team-lead; the leader invokes `bmad-help` to find the right BMAD-recommended next step before falling back to `bmad-correct-course` or Tier 3 halt.
 
 ---
 
