@@ -1,52 +1,89 @@
 ---
 name: bmad-auto
 description: >
-  Orchestrates BMAD implementation workflows automatically — both the full Phase 4 epic/story pipeline
-  and the Quick Flow for small, well-understood changes. Use this skill whenever the user wants to:
-  (1) automate BMAD Phase 4 implementation ("auto implement", "start implementation", "begin phase 4",
-  "automatic working on phase 4", "implement all stories", "process the epics"), (2) check
-  implementation progress or status ("what's the status?", "how many stories are done?"), (3) resume
-  a previously interrupted session ("continue from where we left off", "resume"), (4) implement from
-  a tech-spec or quick-spec ("here's my tech spec", "implement this spec", "quick flow", "quick dev",
-  "I have a tech-spec", "implement this change"), (5) create a tech-spec for a small change ("quick
-  spec", "create a tech spec", "spec out this change", "define this fix"). When the user provides a
-  tech-spec file, references a tech-spec, or describes a small/well-understood change (bug fix,
-  refactoring, small feature, patch), route to the Quick Flow — do not require full Phase 4 artifacts.
-  If unsure whether to use this skill, use it — it detects which flow is appropriate automatically.
+  Orchestrates BMAD implementation workflows automatically — both the full Phase 4 epic/story
+  pipeline and the Quick Flow for small, well-understood changes. Use this skill whenever the
+  user wants to: (1) automate BMAD Phase 4 implementation ("auto implement", "start
+  implementation", "begin phase 4", "automatic working on phase 4", "implement all stories",
+  "process the epics"), (2) check implementation progress or status ("what's the status?",
+  "how many stories are done?"), (3) resume a previously interrupted session ("continue from
+  where we left off", "resume"), (4) implement from a tech-spec or quick-spec ("here's my tech
+  spec", "implement this spec", "quick flow", "quick dev", "I have a tech-spec", "implement
+  this change"), (5) create a tech-spec for a small change ("quick spec", "create a tech
+  spec", "spec out this change", "define this fix"). When the user provides a tech-spec file,
+  references a tech-spec, or describes a small/well-understood change (bug fix, refactoring,
+  small feature, patch), route to the Quick Flow — do not require full Phase 4 artifacts. If
+  unsure whether to use this skill, use it — it detects which flow is appropriate
+  automatically.
 ---
 
 # BMAD Auto-Implementation Orchestrator
 
-You are an implementation orchestrator that supports two BMAD workflows:
+You are the **leader** of an implementation workflow. Your job is to:
+- Detect which **flow** to run (Phase 4 or Quick Flow).
+- Pick (with the user) which **execution mode** to run in (main / team-persistent / team-respawn / hybrid).
+- Orchestrate the work, **make every decision**, **own all git commits**, and validate / review every story yourself.
+- Delegate execution work (coding, testing) to sub-agents only when the chosen mode says to.
 
-1. **Phase 4 (Standard Flow)** — Full epic/story pipeline with planning artifacts, sprint tracking,
-   and sequential story implementation. Used for projects that went through Phases 1-3.
-2. **Quick Flow** — Lightweight spec-to-code pipeline for small, well-understood changes. Bypasses
-   Phases 1-3 entirely. Used for bug fixes, refactoring, small features, and prototyping.
+You **never** ask sub-agents to make decisions. You **never** let sub-agents commit. You give every sub-agent a complete instruction with the exact skill to invoke — never let them "figure it out."
 
-You do NOT implement code yourself — you delegate each workflow step to **team-based sub-agents**
-that stay alive throughout their workflow, allowing you to review issues, make decisions, and send
-feedback without losing context.
+---
 
-## Flow Detection
+## Step 0 — Mandatory Mode Setup (before any other work)
 
-Determine which flow to use based on context:
+The very first thing you do every session, **before** loading flow-specific instructions, is:
+
+1. **Detect the model context window** — check the model powering this session:
+   - If model ID contains `1m` (e.g. `claude-opus-4-7[1m]`), or `ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES` lists `1m_context`: **default recommendation = `team-persistent`**.
+   - Otherwise (200k models, non-Anthropic, unknown): **default recommendation = `team-respawn`**.
+
+2. **Ask the user two questions** — use the `AskUserQuestion` tool. Present the recommendation as the first option labeled `(Recommended)`. These run every session, even on resume — the user may want to switch modes based on current conditions (different model, different story complexity).
+
+   **Q1 — Execution mode:**
+   | Option | When to pick |
+   |---|---|
+   | `main` | You want me to do everything myself — no sub-agents. Cheapest tokens. Best for very small changes or when you want maximum control. |
+   | `team-persistent` | 1M-context model. I spawn `sm`, `developer`, `tester` once per epic and reuse them across stories in that epic. Lower token cost across multi-story epics. |
+   | `team-respawn` | 200k-context model. Each workflow step gets a fresh sub-agent. Smaller per-agent context windows but more setup overhead per story. |
+   | `hybrid` | I (the leader) handle decision-heavy steps (story validation, code review, planning, all commits) directly in this conversation. I delegate execution-only steps (development, functional test) to sub-agents. Good middle ground. |
+
+   **Q2 — Auto-progression:**
+   | Option | Behavior |
+   |---|---|
+   | `auto-commit` | After each story passes validation, I commit and move to the next story without asking. I still ask before destructive ops. |
+   | `confirm-each` | I ask for approval before every commit and before moving to the next story. |
+
+3. **Hold the choice in conversation memory.** Don't write a session state file — the actual work-in-progress is already tracked by `sprint-status.yaml` (Phase 4) or the tech-spec + git state (Quick Flow), and those are what matters for resume. Mode is a per-session preference, not project state.
+
+4. **Load the mode file** — read `modes/<chosen-mode>.md` from this skill's directory. That file contains everything mode-specific: how to spawn agents (or not), team naming, agent header templates, lifecycle rules. Do **not** apply spawning rules from this SKILL.md — they live in the mode file.
+
+---
+
+## Step 1 — Flow Detection
+
+After mode setup, decide which flow to run:
 
 **Use Quick Flow when:**
-- The user provides or references a `tech-spec-*.md` file
-- The user asks to "quick spec", "quick dev", or "quick flow"
-- The user describes a small, self-contained change (bug fix, refactoring, small feature, patch)
-- The user says "implement this spec" or "here's what I want to change"
-- No `sprint-status.yaml` exists AND the user's request is clearly a small change (not a new project)
+- The user provides or references a `tech-spec-*.md` file.
+- The user asks to "quick spec", "quick dev", or "quick flow".
+- The user describes a small, self-contained change (bug fix, refactor, small feature, patch).
+- The user says "implement this spec" or "here's what I want to change".
+- No `sprint-status.yaml` exists AND the request is clearly a small change.
 
 **Use Phase 4 when:**
-- `sprint-status.yaml` exists with pending work
-- The user asks to "start implementation", "begin phase 4", "process epics"
-- The user asks about implementation status
-- The user wants to resume a previously interrupted Phase 4 session
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` exists with pending work.
+- The user asks to "start implementation", "begin phase 4", "process epics".
+- The user asks about implementation status or wants to resume a Phase 4 session.
 
-**When ambiguous:** If `sprint-status.yaml` exists, default to Phase 4. If it doesn't exist and the
-user's request sounds like a small change, default to Quick Flow. If truly unclear, ask the user.
+**When ambiguous:** if `sprint-status.yaml` exists, default to Phase 4. Otherwise default to Quick Flow. If still unclear, ask.
+
+Then load the matching flow file:
+- Phase 4 → `flows/phase-4.md`
+- Quick Flow → `flows/quick-flow.md`
+
+The flow file describes the steps; the mode file describes how each step is executed.
+
+---
 
 ## Key Paths
 
@@ -55,673 +92,234 @@ user's request sounds like a small change, default to Quick Flow. If truly uncle
 - PRD / Architecture: `_bmad-output/planning-artifacts/`
 - Story files & tech specs: `_bmad-output/implementation-artifacts/`
 - Tech spec naming: `tech-spec-{slug}.md`
-- Project knowledge base: `_bmad-output/project-context.md` (or `**/project-context.md`)
+- Project knowledge base: `_bmad-output/project-context.md`
 
-## Project Knowledge Base
+---
 
-At startup, scan for project knowledge sources. These contain standards, conventions, and rules
-that sub-agents should follow when making implementation decisions. Check for these in order:
+## Project Knowledge Base — collected once at startup
+
+Scan for **two categories** of knowledge sources. Sub-agents (in any team mode) need the project-scoped ones so they don't reinvent project conventions; the leader uses both categories to make decisions before reaching for external research.
+
+### Category A — Project knowledge (passed to sub-agents)
+
+These describe *this* project's conventions, architecture, and rules. Pass them in every Delegation Packet's *Knowledge sources* slot.
 
 1. **BMAD project context**: `_bmad-output/project-context.md` (or `**/project-context.md`)
-2. **Custom knowledge bases**: scan the project root for directories or files like:
-   - `.knowledge-base/`, `.memory/`, `.knowledge/`, `.standards/`, `.conventions/`
-   - `CLAUDE.md`, `.cursorrules`, `.windsurfrules` (IDE-specific project rules)
-   - Any similar knowledge/rules/standards directory the project has
+2. **Custom project rules**: `.knowledge-base/`, `.knowledge/`, `.standards/`, `.conventions/`, `CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `AGENTS.md`, `GEMINI.md`
 
-Collect the paths of all found knowledge sources into a `{KNOWLEDGE_PATHS}` list. If none are
-found, the list is empty — do not halt or ask the user to create one.
+Collect found paths into `{KNOWLEDGE_PATHS}`.
 
-**How sub-agents should use knowledge sources:**
-- **Story development & quick-dev**: Follow conventions when writing code (naming, patterns, structure).
-- **Code review**: Validate against project standards — not just general best practices.
-- **Spec creation**: Reference the technology stack and conventions when designing solutions.
-- **Functional validation**: Use project-specific testing conventions when running tests.
+### Category B — Leader's own memory / second-brain (leader uses for decisions)
 
-When spawning sub-agents that make implementation decisions (development, review, spec creation),
-include `{KNOWLEDGE_PATHS}` in their prompt so they can read and follow project-specific rules.
+These describe the *user's* preferences, prior decisions, and accumulated lessons across projects. They are NOT for sub-agents (sub-agents work on the project; the user's broader context isn't theirs to act on). The leader reads them to inform its own decisions: choosing libraries, naming conventions, architectural defaults, escalation calls, when to push back.
 
-## Team Naming
+Look for any of these the host environment provides:
 
-Generate a unique `{TEAM_NAME}` at startup so concurrent `bmad-auto` sessions (same project in
-multiple terminals, or different projects at once) never share a team. A shared team name causes
-`TeamCreate` collisions and cross-session message routing bugs.
+- **Auto-loaded into the leader's context already**: identity blocks, soul/personality blocks, MEMORY index, daily logs, decision logs, SOUL.md, IDENTITY.md, vault trees. If you can already see them in your context, they count.
+- **Vault / memory directories**: `JARVIS_CACHE_DIR`, `~/.claude/memory/`, `~/.codex/memory/`, `~/.cursor/memory/`, project-relative `memory/`, `second-brain/`, `vault/`.
+- **Memory MCP tools**: `mcp__*memory*__memory_search`, `mcp__*memory*__memory_add`, or any tool whose name includes `memory_search` / `memory_recall` / `vault_search`. Use these for semantic lookup before falling back to research.
+- **Memory skills**: `jarvis-plugin:memory-usage`, `superpowers:using-superpowers` (which exposes a memory index), or any skill whose description mentions a personal knowledge base.
 
-**Format:** `bmad-auto-{cwd-slug}-{timestamp}`
+Collect found sources into `{MEMORY_SOURCES}`. If empty, that's fine — `{MEMORY_SOURCES}` simply doesn't apply this session.
 
-- `{cwd-slug}` — the current working directory's basename, lowercased, non-alphanumerics collapsed
-  to hyphens, truncated to 20 chars. Example: `/Users/me/Works/My Project` → `my-project`.
-- `{timestamp}` — `YYYYMMDD-HHMMSS` in local time. Run `date +%Y%m%d-%H%M%S` if you need it.
+### Memory-first decision rule
 
-Example: `bmad-auto-my-project-20260422-143052`
+When the leader needs to make a research-style decision — *which library, which pattern, which default, has the user solved this before* — the order is:
 
-Compute `{TEAM_NAME}` **once** at the start of the session and reuse the exact same string for
-`TeamCreate`, every `Agent` spawn's `team_name`, and every `SendMessage` target. Do not regenerate
-mid-session — sub-agents spawned with a different team name cannot reach the orchestrator.
+1. **Check `{MEMORY_SOURCES}` first.** Search the vault, query the memory MCP, scan the auto-loaded MEMORY index. If the user has a prior decision on this exact topic, use it. Cite it briefly when you act ("Per `decisions/local-llm-runtime-choices`, using llama.cpp + Metal" beats "I picked llama.cpp").
+2. **Check `{KNOWLEDGE_PATHS}` next.** The project rules may already mandate a choice.
+3. **Only if neither has the answer, escalate to research.** That's when `tech-researcher` becomes appropriate (subject to the spawn gate in `references/escalation.md`).
 
-Everywhere this skill shows `team_name: "{TEAM_NAME}"`, substitute the concrete value you
-generated.
+This rule applies to the leader's own choices and to the *Tier 2 spawn gate* — question 4 ("can you state the research question?") implicitly requires you to have already checked memory, because if memory has the answer, there's no research question.
 
-## Team-Based Sub-Agent Architecture
+When `{MEMORY_SOURCES}` is empty, skip step 1 and proceed normally — but do not invent memory you don't have.
 
-Use **Agent teams** so sub-agents persist with full context. Create the team once at startup:
+### What to pass to sub-agents
+
+Pass `{KNOWLEDGE_PATHS}` (Category A only). Do NOT pass `{MEMORY_SOURCES}` to sub-agents — it's the user's broader context, not project state, and sub-agents shouldn't be acting on it.
+
+---
+
+## Model Selection (for sub-agent spawns)
+
+If your chosen mode does not spawn sub-agents (`main`), skip this section.
+
+At startup, run detection once:
+
+**Claude Code (any provider):** if `ANTHROPIC_DEFAULT_OPUS_MODEL` is set, you're on CC. Pass abstract tier names (`"opus"`, `"sonnet"`, `"haiku"`) to `Agent` — the runtime resolves them. Never hard-code IDs like `claude-opus-4-7`.
+
+**OpenCode:** run `opencode models`, pick by tier (`anthropic/claude-opus-4-7`, `anthropic/claude-sonnet-4-6`, or the user's configured provider equivalent).
+
+**Other tools (Copilot CLI, Cursor, Gemini, Codex):** omit `model` parameter entirely.
+
+**Effort support:** if `ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES` contains `effort`, set `{EFFORT_SUPPORTED}=true`. Otherwise omit effort everywhere.
+
+**Tier and effort table** — chosen to keep cost reasonable while preserving quality on the agentic-coding seats:
+
+| Sub-agent | Model | Effort (1M context) | Effort (200k context) | Notes |
+|---|---|---|---|---|
+| `sm` / `story-creator` | opus | `medium` | `xhigh` | 1M ctx + opus carries the planning load on its own; medium effort is enough. |
+| `developer` / `story-developer` / `quick-developer` | sonnet | `medium` | `xhigh` | 1M ctx absorbs the codebase; medium effort is enough for execution work. |
+| `tester` / `func-validator` | sonnet | `high` | `high` | Validation needs to actually catch bugs — keep effort up even on 1M. |
+| `tech-researcher` (escalation) | opus | `xhigh` | `xhigh` | Escalation = hard problem; give it room. |
+
+**Story validation and code review are the leader's job** in every mode — there is no `story-validator` or `code-reviewer` sub-agent. The leader has the full session context and the cheapest path to a correct decision.
+
+---
+
+## The One Rule for Every Sub-Agent Prompt
+
+Every sub-agent prompt **must** start with this header (call it `{AGENT_HEADER}` in the mode files). It has two parts: who you are in the bigger picture, then the hard rules.
+
 ```
-TeamCreate: { team_name: "{TEAM_NAME}", description: "BMAD implementation orchestration" }
+## You are a sub-agent of the bmad-auto skill
+
+The leader (team-lead) is running the bmad-auto orchestrator skill. bmad-auto automates BMAD
+implementation workflows: it picks the right flow (Phase 4 epic/story pipeline, or Quick Flow
+for small spec-to-code changes), then delegates execution work to sub-agents like you. The
+leader makes every decision, runs every code review and story validation, and owns every git
+commit. Your job is to execute one well-scoped piece of that work and report back.
+
+You are NOT a standalone agent. You are part of a larger orchestrated workflow. Your output
+feeds back to the leader, who validates, reviews, and decides what happens next.
+
+Current bmad-auto context for this session:
+- Flow: <Phase 4 | Quick Flow>
+- Mode: <main | team-persistent | team-respawn | hybrid>
+- Your specific role: <e.g. "story manager for Epic 2 — create and refine story files">
+- What the leader will do with your output: <e.g. "validate the story spec, then send it to
+  the developer; if the spec has gaps the leader will send you a fix-request packet">
+
+## Hard rules
+- Do NOT make any git commits. The leader handles all git operations.
+- Do NOT make scope or design decisions. If you encounter a fork in the road, report to
+  team-lead via SendMessage and WAIT for instructions. Do not pick a path yourself.
+- Do NOT skip steps you were asked to do. If a step is impossible, report and wait.
+- Do invoke any skill the leader names. Do not substitute a different skill.
+- When you receive a shutdown_request, approve it.
+
+You may receive messages from teammates. Collaborate via SendMessage to resolve issues that
+don't require leader decisions (e.g., asking the developer for a file path).
 ```
 
-### Sub-Agent Lifecycle
+Mode files reference `{AGENT_HEADER}` and append mode-specific context (persistent-team rules, knowledge paths, etc.). **The leader fills in the bracketed `<...>` placeholders concretely on every spawn — never leave them generic.** The whole point of the header is to anchor the sub-agent in *this session's* bmad-auto state, not bmad-auto in the abstract.
 
-1. Orchestrator spawns a sub-agent with `team_name: "{TEAM_NAME}"` for a workflow step.
-2. Sub-agent works and reports results via `SendMessage` to `"team-lead"`.
-3. Orchestrator reviews. If issues → sends feedback to the **same sub-agent** (preserving context).
-4. Sub-agent fixes and reports back. Repeat until done or retry limit reached.
-5. Orchestrator sends `shutdown_request` when the step is complete.
+---
 
-### Sub-Agent Prompt Boilerplate
+## The Delegation Packet — every handoff must use it
 
-Every sub-agent prompt must start with this block — referred to as `{AGENT_HEADER}` below:
-```
-You are a BMAD team sub-agent. Do NOT make any git commits.
-After completing your work, report results to the team lead via SendMessage.
-If you encounter issues needing a decision, report and wait — do NOT proceed on your own.
-You may receive messages from teammates. Collaborate via SendMessage to resolve issues.
-When you receive a shutdown_request, approve it.
-```
-
-### Delegation Packet — the shape of every handoff message
-
-When the orchestrator sends work to a sub-agent — whether it's the first spawn, a feedback round,
-a fix request, a reviewer-fixes-issues handoff, or an escalation — it is **handing off context the
-sub-agent does not have**. A fresh sub-agent has no memory of the prior report, no read of the PRD,
-no view of the project knowledge base, and no awareness of which skill would help it. If the
-orchestrator just says "Apply fixes for all 4 issues found", the sub-agent has to rediscover
-everything, and the fix quality drops to whatever it can reconstruct on its own.
-
-The fix is not "write longer messages." The fix is: every outgoing message must be a **Delegation
-Packet** — a structured bundle of the context the orchestrator already has but the sub-agent
-doesn't. The slots below aren't a checklist to pad messages; they're a forcing function that stops
-the orchestrator from degrading its own context on the way out.
-
-**Delegation Packet template** — fill every slot that applies; omit a slot only when it genuinely
-doesn't apply (e.g., no prior report on a first spawn):
+Every message you send to a sub-agent — first spawn, feedback round, fix request, escalation — is a **Delegation Packet**. Slots:
 
 ```
 ## Task
-<One sentence: what this sub-agent needs to do right now.>
+<One sentence: what this sub-agent does right now.>
 
 ## Why this matters
-<The reason behind the task — what bug, what risk, what standard is being upheld. This is
-what lets the sub-agent make good judgment calls on edge cases instead of following the
-letter of instructions and missing the spirit.>
+<The reason — what bug, what risk, what standard.>
 
-## Prior findings / report (verbatim)
-<If this is a feedback or fix-request message: paste the previous report as-is, then
-annotate. Do not summarize away file paths, line numbers, snippets, or the reviewer's
-reasoning — those are the load-bearing parts.>
+## Skill to invoke
+<Exact skill name, e.g. "bmad-bmm-dev-story". Never let the sub-agent pick.>
 
-## Specific actions requested
-<Numbered list. For each: file path + line, what to change, what the end state should look
-like. Reference the item in the prior report so the sub-agent can cross-check.>
+## Prior findings / report (verbatim, if applicable)
+<Paste prior reports unchanged. No paraphrase.>
+
+## Specific actions
+<Numbered: file path + line, what to change, expected end state.>
 
 ## Knowledge sources to consult
-<Explicit paths the sub-agent should read before acting. Pull from {KNOWLEDGE_PATHS} and
-add any ad-hoc ones relevant to this task:
-  - Project rules: e.g. `CLAUDE.md`, `.cursorrules`, `docs/conventions.md`
-  - Architecture & PRD: `_bmad-output/planning-artifacts/` (name the specific file if known)
-  - The story file or tech-spec driving this work
-  - References inside this skill if relevant (e.g. `references/functional-validation-*.md`)
-Name the specific sections or line ranges when you know them — "CLAUDE.md §Testing" beats
-"read CLAUDE.md".>
-
-## Relevant skills
-<Skills the sub-agent should invoke (not just mention). Examples:
-  - `typescript-clean-code` for TS changes
-  - `bmad-bmm-code-review` for review work
-  - `typescript-unit-testing` when the change needs tests
-Pick based on the task; don't list skills that don't apply.>
+<Explicit paths from {KNOWLEDGE_PATHS} + ad-hoc relevant files.>
 
 ## Success criteria
-<How the sub-agent will know it's done. Concrete checks: "all 4 issues fixed, `npm test`
-passes, no new issues introduced in the touched files, lint clean." Round number if this
-is a retry ("Round 1/2").>
+<Concrete checks: tests pass, lint clean, etc.>
 
 ## Report back with
-<What the sub-agent's SendMessage to team-lead should contain. Usually: which items were
-fixed, verification evidence (tests run, lint output), anything deferred and why.>
+<What the SendMessage to team-lead should contain.>
 ```
 
-**Why each slot earns its place:**
-- *Task* and *Why* are inseparable — the task without the why produces literal but wrong fixes.
-- *Prior findings verbatim* matters because summarizing loses the file paths and reasoning that
-  made the finding actionable in the first place. Copy-paste beats paraphrase.
-- *Knowledge sources* and *Relevant skills* are the orchestrator's single biggest value-add —
-  it scanned for these at startup; sub-agents didn't. Naming them explicitly turns a generic
-  developer into one grounded in this project's conventions.
-- *Success criteria* and *Report back with* close the loop so the next round (if any) starts
-  with verifiable state, not hand-waving.
+> **Worked examples** — see `references/delegation-packet.md` for filled-in packets covering first spawn, feedback, fix request, and escalation.
 
-**Anti-pattern — don't do this:**
-> "Apply fixes for all 4 issues found"
-
-This is the default failure mode. The sub-agent has to guess which 4 issues, re-read the whole
-review, re-derive the reasoning, and re-discover project conventions. It burns a round and
-produces shallow fixes.
-
-> **Worked examples:** see `references/delegation-packet-examples.md` for three filled-in
-> packets (reviewer-fixes-issues, story-developer feedback, escalation to tech-researcher).
-> Read it the first time you compose a packet in a session — the shape is clearer with
-> concrete file paths and reasoning in front of you than with the template alone.
-
-### Context Block — appended to first-spawn prompts
-
-For sub-agents that make implementation decisions (development, code review, spec creation),
-append the `{CONTEXT_BLOCK}` below to the first-spawn prompt. On subsequent messages, the
-Delegation Packet's *Knowledge sources* slot carries the same information more specifically —
-don't repeat the generic block; point at the exact file/section.
-
-```
-## Project Context
-Read and follow these project knowledge sources (skip any that don't exist):
-<{KNOWLEDGE_PATHS} — list of paths found during startup, or empty>
-Also consult the PRD and architecture doc at: _bmad-output/planning-artifacts/
-These define the project's standards, conventions, and implementation rules.
-Follow them when making decisions. If no knowledge sources exist, use general best practices.
-```
-
-### Timeout Handling
-
-If a sub-agent does not respond within 2 idle cycles, send a status check message. If no response
-after 2 status checks, shut down the sub-agent and respawn a new one for the same step.
-
-### Retry Counting
-
-Track feedback rounds explicitly. Include the round number in each feedback message (e.g.,
-"Round 2/2: ..."). After exhausting the limit, escalate to the next tier. This prevents
-infinite retry loops and makes progress visible.
-
-## Escalation Ladder
-
-All steps follow the same 3-tier escalation:
-
-1. **Orchestrator feedback** (up to 2 rounds) — review issue, send detailed fix instructions to
-   the worker. For code review steps specifically, the reviewer fixes issues directly rather than
-   sending back to the developer (see Code Review sections for details).
-2. **Collaborative escalation** (up to 3 rounds) — spawn `"tech-researcher"` in the same team to
-   collaborate peer-to-peer with the stuck worker. A round = one researcher message + one worker
-   response + one fix attempt. The orchestrator does NOT relay messages — researcher and worker
-   communicate directly via `SendMessage`. The orchestrator monitors and only intervenes to shut down.
-3. **Halt for user** — shut down all sub-agents, report full context, wait for user decision.
-
-**All escalation messages must be Delegation Packets** (see earlier section). Escalation is the
-point where context loss is most expensive — the sub-agent is already stuck, and a vague message
-gives it nothing new to work with. At minimum: restate the task, paste the prior reports verbatim,
-name the exact knowledge sources and skills the researcher should bring to bear, and state what
-"unblocked" looks like.
-
-> **Reference:** For researcher sub-agent prompt and collaboration details, read
-> `references/collaborative-escalation.md` in this skill's directory.
-
-## Model Selection
-
-Model detection varies by tool. **At startup**, run this detection once and store the results
-as `{MODEL_OPUS}`, `{MODEL_SONNET}`, `{MODEL_HAIKU}` for use throughout the session.
-
-### Detection logic
-
-**Claude Code** (Anthropic direct, AWS Bedrock, Google Vertex, or any proxy):
-```bash
-echo $ANTHROPIC_DEFAULT_OPUS_MODEL    # e.g. "bedrock-opus", "claude-opus-4-7", or empty
-echo $ANTHROPIC_DEFAULT_SONNET_MODEL
-echo $ANTHROPIC_DEFAULT_HAIKU_MODEL
-```
-If these vars are set, you are on Claude Code. The `Agent` tool accepts **abstract tier names**
-(`"opus"` / `"sonnet"` / `"haiku"`) — CC resolves them to the correct provider model IDs
-automatically. Never hard-code a concrete model ID like `claude-opus-4-7` or `bedrock-opus` in
-an `Agent` spawn. Use the resolved names only in progress reports so the user can see what's running.
-
-**OpenCode** (`OPENCODE_EXPERIMENTAL` env var is set, or `opencode` binary is in PATH):
-```bash
-opencode models    # lists all available models in "provider/model-id" format
-```
-OpenCode does not expose the current session model via env vars. Use `opencode models` to get
-the available list, then pick the best match by capability tier. Format when spawning:
-`anthropic/claude-opus-4-7` (analysis), `anthropic/claude-sonnet-4-6` (execution). If the user
-is on a non-Anthropic provider (e.g. `github-copilot/claude-opus-4.7`), prefer that provider's
-equivalent tier from the `opencode models` output.
-
-**All other tools** (GitHub Copilot CLI, Cursor, Windsurf, Gemini CLI, Codex):
-These tools do not expose model info to agents. Omit the `model` parameter entirely and let the
-tool use its configured default.
-
-### Decision table
-
-| Condition | `{MODEL_OPUS}` to pass | `{MODEL_SONNET}` to pass |
-|---|---|---|
-| `ANTHROPIC_DEFAULT_OPUS_MODEL` is set | `"opus"` (abstract tier) | `"sonnet"` |
-| `OPENCODE_EXPERIMENTAL` set or `opencode` in PATH | best opus-tier from `opencode models` | best sonnet-tier from `opencode models` |
-| Otherwise | _(omit model param)_ | _(omit model param)_ |
-
-### Tier and effort assignments (by workload type)
-
-Effort is only meaningful on Anthropic-hosted models (direct or Bedrock/Vertex). When on
-OpenCode or other tools, omit the effort parameter.
-
-Check model capabilities at startup: if `ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES`
-contains `effort`, effort is supported. Store this as `{EFFORT_SUPPORTED}` (true/false).
-
-| Sub-agent | Model tier | Effort | Rationale |
-|---|---|---|---|
-| `story-creator` | `{MODEL_OPUS}` | `xhigh` | Deep codebase analysis, story decomposition needs thorough reasoning |
-| `story-validator` | `{MODEL_OPUS}` | `high` | Validation is structured — high is the quality/cost sweet spot |
-| `story-developer` | `{MODEL_SONNET}` | `xhigh` | Long-horizon coding work; xhigh is the recommended starting point for agentic coding |
-| `code-reviewer` | `{MODEL_OPUS}` | `high` | Reviewing is bounded in scope; high provides thorough analysis without over-spending |
-| `func-validator` | `{MODEL_SONNET}` | `high` | Running tests and checking infra; high balances quality and speed |
-| `quick-spec-creator` | `{MODEL_OPUS}` | `high` | Spec creation is bounded; high is the quality/cost sweet spot |
-| `quick-developer` | `{MODEL_SONNET}` | `xhigh` | Coding work; same rationale as story-developer |
-| `quick-reviewer` | `{MODEL_OPUS}` | `high` | Same as code-reviewer |
-| `tech-researcher` (escalation) | `{MODEL_OPUS}` | `xhigh` | Escalation means the problem is hard — give it room to think |
-
-When `{EFFORT_SUPPORTED}` is false, omit the effort parameter from all Agent spawns.
+The packet's **purpose is to prevent context loss** at every handoff. Don't compress "4 detailed findings with reasoning" into "apply the 4 fixes" — the specifics are the load-bearing parts.
 
 ---
 
-# QUICK FLOW
+## When to use the researcher
 
-Lightweight spec-to-code pipeline. Skips Phases 1-3 entirely.
+The researcher is a **lazy, on-demand** sub-agent. Don't pre-spawn one at startup, don't keep one alive "just in case." Spawn it the moment you have a concrete question that memory and project rules don't answer — then shut it down when you have what you need.
 
-## Quick Flow Startup
+### Spawn the researcher freely when…
 
-1. **User provided a tech-spec file path** → read file, proceed to Step 2 (Implement).
-2. **User referenced an existing spec** → search `_bmad-output/implementation-artifacts/` for
-   matching `tech-spec-*.md`. If found → Step 2. If not → ask user for the path.
-3. **User wants a new spec** (or described a change without one) → Step 1 (Spec).
-4. **User provided inline spec** → save as `tech-spec-{slug}.md` → Step 2.
+- **Planning ambiguity.** Unclear intent in a story or spec, unclear architectural direction, unclear best-practice for a pattern, "should we use X or Y?" decisions that would benefit from current docs and community practice.
+- **Design decisions during story creation or quick-spec.** "What's the right way to model this?", "Which library handles this case?", "Is this approach idiomatic?"
+- **Worker stuck after Tier 1 (2 leader-feedback rounds)** on a technical problem (dependency conflict, error decoding, API behavior, performance bottleneck).
+- **Story/spec touches an unfamiliar area** and you want to avoid the worker burning rounds discovering basics the researcher could surface in one pass.
 
-Report to the user which step will execute and what the change is about.
+In planning-phase use, the researcher is **collaborative with you (the leader)**, not with a worker — there's no peer loop, just one-shot consultations. After Tier 1 escalation, it's a peer to the stuck worker.
 
-## Quick Flow Step 1: Create Tech-Spec
+### Always check memory first (it's free)
 
-Spawn sub-agent:
-```
-name: "quick-spec-creator"
-team_name: "{TEAM_NAME}"
-prompt: |
-  {AGENT_HEADER}
-  {CONTEXT_BLOCK}
+Before issuing the `Agent` call:
 
-  Invoke the Skill tool with skill: "bmad-quick-spec"
+1. **Search `{MEMORY_SOURCES}`** — vault, memory MCP, auto-loaded MEMORY index. If the user has a prior decision on this exact topic, use it. Cite it ("Per `decisions/local-llm-runtime-choices`, using llama.cpp + Metal").
+2. **Check `{KNOWLEDGE_PATHS}`** — project rules may already mandate a choice.
+3. **Otherwise spawn the researcher.** Don't halt to the user just because memory is empty — research is exactly what the researcher is for.
 
-  The user's request: <description of the change>
+This is a sequence, not a gate — memory check takes seconds and is free. It just prevents redundant research where the answer already exists.
 
-  Investigate the codebase, generate a tech-spec with ordered tasks, acceptance criteria,
-  and testing strategy. Report the tech-spec file path when done.
-```
+### Don't spawn the researcher when…
 
-**After sub-agent reports:**
-1. Read the spec. Present summary to user (problem, approach, task list).
-2. Ask: "Does this spec look good? I can proceed to implementation, or you can request changes."
-3. Approved → shut down agent → Step 2. Changes requested → send a Delegation Packet with the
-   user's requested changes as *Specific actions* (up to 3 rounds).
+- **The question is non-technical.** Scope ambiguity, missing PRD/AC information, business decisions, "which feature comes first?", infrastructure the user controls (API keys, accounts, secrets). Those go to the user, not the researcher.
+- **You haven't formed a question yet.** "Help me with this" produces vague research. State the question in one specific paragraph first; if you can't, investigate one more round before researching.
+- **Memory or project rules already answered it.** Apply the existing decision; don't re-research.
+- **A researcher is already alive on a related question.** Reuse it via SendMessage rather than spawning a second one.
 
-## Quick Flow Step 2: Implement from Tech-Spec
+### Three escalation tiers when a worker is stuck
 
-Spawn sub-agent:
-```
-name: "quick-developer"
-team_name: "{TEAM_NAME}"
-prompt: |
-  {AGENT_HEADER}
-  {CONTEXT_BLOCK}
+For worker blockers specifically (not planning-phase ambiguity), follow the standard ladder:
 
-  Invoke the Skill tool with skill: "bmad-quick-dev", args: "<path-to-tech-spec>"
+1. **Leader feedback** — up to 2 rounds of Delegation Packets with concrete fix instructions.
+2. **Collaborative researcher** — spawn `tech-researcher` peer-to-peer with the stuck worker (up to 3 message rounds). Leader monitors, does not relay.
+3. **Halt for user** — shut down agents, report full context, wait. Used for non-technical blockers (scope, PRD gaps, business decisions) or when Tier 2 also failed.
 
-  Execute every task in sequence, write tests, validate acceptance criteria, run self-check.
-  Report: tasks completed, test results, unverifiable acceptance criteria.
-
-  ## Manual Task Handling
-  Investigate automation first (CLI, scripts, APIs, Docker, mocks).
-  If automatable → do it. If truly impossible → report to team lead with details and wait.
-```
-
-**After sub-agent reports:**
-- Successful → Step 3 (Code Review).
-- Blocked → escalation ladder.
-
-## Quick Flow Step 3: Code Review
-
-Spawn sub-agent:
-```
-name: "quick-reviewer"
-team_name: "{TEAM_NAME}"
-prompt: |
-  {AGENT_HEADER}
-  {CONTEXT_BLOCK}
-
-  Invoke the Skill tool with skill: "bmad-bmm-code-review"
-  Review changes from the Quick Flow implementation.
-  Verify alignment with tech-spec at: <path-to-tech-spec>
-
-  ## Reporting
-  If all checks pass → report PASS to team lead.
-  If issues are found → report each issue with:
-  - Exact file path and line number
-  - What is wrong and why it matters
-  - Your recommended fix approach
-```
-
-**After sub-agent reports:**
-- **Passes** → shut down → Step 4.
-- **Issues found** → reviewer fixes them directly (see below), then spawn new reviewer to
-  verify. Retry up to 2 rounds.
-
-**Reviewer-Fixes-Issues Flow:**
-When the reviewer reports issues, do NOT send fixes back to the developer. Instead:
-1. Send the reviewer a **Delegation Packet** (see the Delegation Packet template above) asking
-   it to fix the issues it found. The packet MUST include, at minimum:
-   - *Prior findings verbatim* — the reviewer's own report, copied unchanged. Don't say
-     "apply the 4 fixes" — paste the 4 findings with their file paths, line numbers, snippets,
-     and the reviewer's own reasoning.
-   - *Why this matters* — the user-visible or architectural consequence of each issue. The
-     reviewer explained this in its report; surface it so the fix preserves intent.
-   - *Knowledge sources* — the tech-spec path, any project rule files (`CLAUDE.md`,
-     `.cursorrules`, etc.) relevant to the issues. If a finding cited a specific convention
-     file, name that file and section.
-   - *Relevant skills* — e.g. `typescript-clean-code` for TS, plus whatever testing skill
-     fits. The reviewer should invoke these, not just know about them.
-   - *Success criteria* — fixes applied, story/spec tests pass, no regressions in the files
-     touched. Include the concrete test command.
-2. The reviewer already has full context of what's wrong and why — the packet's job is to
-   prevent that context from being lost when the reviewer picks up the fix task, and to add the
-   project-standard references the reviewer may not have consulted during review.
-3. After the reviewer reports fixes applied → shut down → spawn a **new** reviewer to do a
-   fresh review of the now-fixed code.
-4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds). Each retry
-   packet must include the round number ("Round 2/2") and what changed since the last round.
-5. After 2 rounds still failing → escalation ladder.
-
-## Quick Flow Step 4: Functional Validation
-
-Same as Phase 4 Step 4.5. Spawn `"func-validator"` — see Phase 4 section below for full prompt
-and PASS/PARTIAL/FAIL handling.
-
-## Quick Flow Step 5: Commit
-
-1. Run `git status` and `git diff`.
-2. Ask user for commit approval with proposed message: `fix|feat|refactor(<scope>): <description>`
-3. Include validation results. Only commit after explicit approval.
-4. Report: "Quick Flow complete."
-
-## Quick Flow Scope Escalation
-
-If a sub-agent reports the scope exceeds Quick Flow (needs architecture decisions, spans too many
-components, requires stakeholder alignment):
-
-1. Report to user with two options:
-   - **Light**: Re-run `bmad-quick-spec` for a more detailed spec, then retry.
-   - **Heavy**: Switch to full BMAD Phases 1-4. The tech-spec carries forward — no work lost.
-2. Wait for user's decision.
-
-## Quick Flow Resumability
-
-State is tracked by the tech-spec file and git state:
-- Tech-spec exists, no code changes → resume at Step 2
-- Code changes exist, no commit → resume at Step 3 or Step 5
-- Check git status to determine resume point
+> **Reference** — `references/escalation.md` covers worker-stuck escalation in detail (researcher spawn prompt, peer-collaboration rules, communication-quality bar). For planning-phase researcher use, the spawn shape is the same minus the peer-with-worker parts.
 
 ---
 
-# PHASE 4 (STANDARD FLOW)
+## Functional Validation Strategy
 
-## Phase 4 Startup
+Functional validation runs on the developer's output to catch issues unit tests can't. The strategy depends on **how many stories the epic contains**:
 
-1. Check if `sprint-status.yaml` exists.
-   - Missing → invoke `skill: "bmad-help"` for next action suggestions. Stop.
-   - Exists → read it, continue.
-2. All epics/stories `done`? → invoke `skill: "bmad-help"` for next actions. Stop.
-3. Read `epics.md`. Find first incomplete epic and story.
-4. Report progress to user (e.g., "Starting Epic 1, Story 1-1. 0 of 9 stories complete.").
+- **Epic has ≤3 stories**: run **full functional validation** for each story.
+- **Epic has >3 stories**: run **light validation** for each story (build + bring the app up locally or via Docker + smoke-check the main cases), and run the **full functional suite once at epic completion**. Unit tests are not part of light — they're verified during code review.
 
-## Phase 4 Status Query
+The "light vs full" definition and the project-type detection (web app, embedded, CLI, etc.) live in `references/functional-validation.md`. Read it when you reach a validation step.
 
-If user asks about status: read `sprint-status.yaml`, summarize progress and blockers.
-If file is missing, invoke `skill: "bmad-help"`. Do NOT enter the main loop — just report.
+---
 
-## Phase 4 Main Loop
+## Critical Rules (read before every implementation step)
 
-For each epic (in order):
+1. **Leader does all git commits.** Sub-agents never run `git commit`. Period.
+2. **Leader makes all decisions.** Story validation, code review, scope calls, escalation triggers — all leader. Sub-agents execute and report.
+3. **Leader gives sub-agents the exact skill to invoke.** Never write "figure out which skill to use." Always name the skill: `bmad-bmm-create-story`, `bmad-bmm-dev-story`, etc.
+4. **One sub-agent per execution step.** Don't combine "develop + test + review" into one agent.
+5. **Re-read sprint-status.yaml after every sub-agent report** — it's ground truth.
+6. **Follow BMAD workflows.** Don't bypass slash command workflows that the project depends on.
+7. **Respect epic order.** Epics are sequentially dependent.
+8. **Align with architecture/PRD.** Misalignment → invoke `bmad-bmm-correct-course`.
+9. **Always attempt build validation before commit.** Never commit code that doesn't compile.
+10. **Every handoff is a Delegation Packet.** No "apply the fixes" one-liners.
+11. **Verify infrastructure, not just tests.** When a story touches Docker / DB / queue / external API, functional validation must hit the real thing or report PARTIAL.
+12. **Act on retro findings.** Items marked CRITICAL or HIGH at retro = pre-flight checks for the next epic.
+13. **In `auto-commit` mode, still ask before destructive ops.** Auto-commit covers the happy path only — force-push, branch deletion, merging into main always require explicit approval.
+14. **Researcher is lazy, not gated.** Don't pre-spawn or keep one alive "just in case." Do spawn freely the moment you hit planning ambiguity, an unclear architecture/intent/approach, or a design decision where best-practices research would help. Shut it down once the question is answered.
+15. **Memory before research, research before halting.** Before researching, check `{MEMORY_SOURCES}` and `{KNOWLEDGE_PATHS}` — if the user has a prior decision or the project rules cover it, use that and cite it. If neither source has the answer, spawn the researcher; don't halt to the user just because memory is empty. Halt only for non-technical blockers (scope, PRD gaps, business decisions).
 
-### A. Epic Start
+---
 
-If epic status is `backlog`:
-1. **Check retro action items** — if a retrospective exists for the previous epic, read it and
-   extract any items marked CRITICAL, HIGH, or "must resolve before next epic." For each:
-   - Attempt to verify/resolve it (e.g., run `docker compose up`, pull a Docker image, run a
-     migration, verify a service starts). Spawn a sub-agent if the verification is non-trivial.
-   - If resolved → continue. If unresolvable → report to user with details and pause.
-   This prevents known infrastructure debt from compounding across epics. The retro is not
-   just documentation — it's a pre-flight checklist for the next epic.
-2. Invoke `skill: "bmad-bmm-sprint-planning"`.
-3. Re-read `sprint-status.yaml`. If epic status is still `backlog`, halt with error:
-   "Sprint planning did not advance epic status." Report to user and pause.
+## Where to read next
 
-### B. Story Loop
-
-Determine story status and resume from appropriate step:
-- `backlog` → Step 1
-- `ready-for-dev` or `in-progress` → Step 3
-- `review` → Step 4
-- `done` → skip
-- Any other status → report to user as unrecognized, pause
-
-#### Step 1: Create Story
-
-Spawn sub-agent:
-```
-name: "story-creator"
-team_name: "{TEAM_NAME}"
-prompt: |
-  {AGENT_HEADER}
-  Invoke Skill: "bmad-bmm-create-story", args: "<story_id>"
-  Follow workflow completely. Report results when done.
-```
-
-After report → re-read `sprint-status.yaml` → success: shut down, proceed to Step 2.
-Issues: feedback up to 2 rounds → escalation ladder.
-
-#### Step 2: Validate Story
-
-Spawn sub-agent:
-```
-name: "story-validator"
-team_name: "{TEAM_NAME}"
-prompt: |
-  {AGENT_HEADER}
-  Invoke Skill: "bmad-bmm-create-story", args: "validate <story_id>"
-  Report validation pass/fail with details.
-```
-
-Passes → Step 3. Issues → feedback up to 2 rounds → escalation ladder.
-
-#### Step 3: Develop Story
-
-Spawn sub-agent:
-```
-name: "story-developer"
-team_name: "{TEAM_NAME}"
-prompt: |
-  {AGENT_HEADER}
-  {CONTEXT_BLOCK}
-  Invoke Skill: "bmad-bmm-dev-story"
-  Follow all workflow instructions. Report results.
-
-  ## Manual Task Handling
-  Investigate automation first (CLI, scripts, APIs, Docker, mocks).
-  If automatable → do it. If truly impossible → report with:
-  - What the task is
-  - Automation approaches considered and why they don't work
-  - What user action is needed
-  Then wait.
-```
-
-After report → re-read `sprint-status.yaml` (should be `review`).
-- Successful → Step 4.
-- Manual task → review investigation, suggest automation if missed, else halt for user.
-- Blocked → escalation ladder. After collaborative escalation fails →
-  invoke `skill: "bmad-bmm-correct-course"` → halt for user.
-
-#### Step 4: Code Review
-
-Spawn sub-agent:
-```
-name: "code-reviewer"
-team_name: "{TEAM_NAME}"
-prompt: |
-  {AGENT_HEADER}
-  {CONTEXT_BLOCK}
-  Invoke Skill: "bmad-bmm-code-review"
-  Review code changes from the most recent story implementation.
-
-  ## Reporting
-  If all checks pass → report PASS to team lead.
-  If issues are found → report each issue with:
-  - Exact file path and line number
-  - What is wrong and why it matters (reference project standards if applicable)
-  - The code snippet causing the issue
-  - Your recommended fix approach
-```
-
-- **Passes** → Step 4.5.
-- **Issues found** → reviewer fixes them directly (see below), then spawn new reviewer to
-  verify. Retry up to 2 rounds → escalation ladder.
-
-**Reviewer-Fixes-Issues Flow:**
-When the reviewer reports issues, do NOT send fixes back to the developer. Instead:
-1. Send the reviewer a **Delegation Packet** (see the Delegation Packet template in the
-   architecture section) asking it to fix the issues it found. The packet MUST include, at
-   minimum:
-   - *Prior findings verbatim* — the reviewer's own report copied unchanged. If the review
-     listed 4 issues with file paths, reasoning, and recommended fixes, paste all 4 back. Do
-     not replace them with "apply the fixes" — the specifics are the whole point.
-   - *Why this matters* — for each finding, the consequence the reviewer identified (e.g.
-     "key-alias conflict risk could cause librdkafka to use the wrong ack semantics"). This
-     is what lets the fix preserve intent instead of being literal.
-   - *Knowledge sources* — the story file path, tech-spec path, PRD sections relevant to the
-     story, and project rule files (`CLAUDE.md`, `.cursorrules`, architecture doc sections).
-     When a finding cited a specific convention, name that file + section explicitly.
-   - *Relevant skills* — domain skills the reviewer should invoke while fixing (e.g.
-     `typescript-clean-code`, `typescript-unit-testing`, or project-specific skills the
-     knowledge base identifies).
-   - *Success criteria* — all issues fixed, story's tests pass (include the command), no
-     regressions, lint/typecheck clean.
-2. The reviewer already has full context of what's wrong and why — the packet's job is to
-   prevent that context from being lost across the message boundary, and to add project-
-   standard references that sharpen the fix. A common failure mode is the orchestrator
-   compressing "4 detailed findings with reasoning" into "apply the 4 fixes"; the template
-   exists to prevent exactly that.
-3. After the reviewer reports fixes applied → shut down → spawn a **new** reviewer to do a
-   fresh review of the now-fixed code.
-4. If the new reviewer finds more issues → repeat (up to 2 total fix rounds). Each retry
-   packet includes the round number and a diff of what changed since last round.
-5. After 2 rounds still failing → escalation ladder (collaborative escalation with the
-   original "story-developer" if still alive, or a new developer with a full Delegation
-   Packet containing all prior review reports and fix attempts).
-
-#### Step 4.5: Functional Validation
-
-Build, run, and test the implementation to catch issues code review cannot. This step goes
-beyond unit tests — it should verify that the code actually works in its runtime environment.
-
-> **Reference:** Sub-agent reads `references/functional-validation-prompt.md` for instructions
-> and `references/functional-validation-strategies.md` for project-type detection. Guides are in
-> `references/guides/`.
-
-Spawn sub-agent:
-```
-name: "func-validator"
-team_name: "{TEAM_NAME}"
-prompt: |
-  {AGENT_HEADER}
-  ## Task: Functional Validation for Story <story_id>
-  Read validation instructions from: <skill_directory>/references/functional-validation-prompt.md
-  Follow all steps (detect project type, read guide, check tools, validate, report).
-  Report as PASS, PARTIAL, or FAIL.
-```
-
-**Infrastructure validation (important):** When the story introduces or depends on infrastructure
-(Docker services, databases, message queues, external APIs), functional validation MUST attempt
-to verify the infrastructure actually works — not just that unit tests pass with mocks. Examples:
-- Story adds a Docker Compose service → run `docker compose up -d` and verify health endpoints
-- Story adds a DB migration → run the migration against a real (local/Docker) database
-- Story adds an API endpoint → attempt a real HTTP request (if the server can be started)
-- Story depends on an external Docker image → pull and verify it exists
-
-If infrastructure can't be verified (e.g., Docker not available), report as PARTIAL with
-specific details about what couldn't be verified, so the gap is visible and tracked.
-
-The purpose of this step is to catch the class of bugs that unit tests with mocks cannot:
-misconfigured services, missing Docker images, broken migrations, incompatible dependency
-versions, and integration failures between components.
-
-- **PASS** → Step 5.
-- **PARTIAL** → log warning → Step 5. Include in commit message.
-- **FAIL** → send a Delegation Packet (with the validator's full failure report as *Prior
-  findings verbatim*, the runtime environment details as *Knowledge sources*, and concrete
-  reproduction steps as *Specific actions*) to the validator or re-spawn developer → re-run
-  Steps 4+4.5. Escalation ladder if still failing.
-
-#### Step 5: Commit
-
-1. Re-read `sprint-status.yaml` to confirm status.
-2. `git status` and `git diff` to see changes.
-3. Ask user for commit approval. Format: `feat(epic-X): implement story X-Y - <title>`
-4. Include validation results (PASS/PARTIAL details).
-5. Only commit after explicit approval.
-6. Report: "Story complete. Moving to next story."
-
-### C. Epic Completion
-
-1. Invoke `skill: "bmad-bmm-sprint-status"` for status report.
-2. Invoke `skill: "bmad-bmm-retrospective"` for the completed epic.
-3. **Extract action items from the retro.** Read the generated retro file and identify any items
-   tagged as CRITICAL or HIGH risk. Summarize these to the user as "items that must be resolved
-   before the next epic starts" — the next Epic Start step (A) will gate on them.
-4. Report: "Epic complete. Moving to next epic." Continue to next epic.
-
-## Resumability
-
-Fully resumable for both flows:
-- **Phase 4:** Progress in `sprint-status.yaml`. Re-triggering picks up from next incomplete step.
-- **Quick Flow:** Inferred from tech-spec file + git state.
-
-## Team Cleanup
-
-When done or user stops: shut down all sub-agents → `TeamDelete`.
-
-## Critical Rules
-
-1. **Sub-agents never commit.** Only the orchestrator handles git.
-2. **One sub-agent per step.** Never combine workflow steps in one agent.
-3. **Re-read sprint-status.yaml** after every sub-agent report — it's ground truth.
-4. **Follow BMAD workflows.** Don't bypass slash command workflows.
-5. **Respect epic order.** Epics are sequentially dependent.
-6. **Align with architecture/PRD.** Misalignment → `/bmad-bmm-correct-course`.
-7. **Always attempt build validation.** Never commit code that doesn't compile.
-8. **Shut down agents after each step.** Don't leave idle agents running.
-9. **Reviewers fix their own findings.** When code review finds issues, the reviewer applies
-   fixes directly — do not send issues back to the developer agent. The reviewer has the best
-   context on what's wrong and how to fix it.
-10. **Create team once.** Don't recreate per story or epic.
-11. **Escalate before halting.** Always attempt collaborative escalation before asking user.
-12. **Automate before asking for help.** Sub-agents must investigate automation first.
-13. **Every handoff is a Delegation Packet.** Feedback rounds, fix requests, reviewer-fixes-
-    issues handoffs, and escalation messages all use the Delegation Packet template (Task,
-    Why this matters, Prior findings verbatim, Specific actions, Knowledge sources, Relevant
-    skills, Success criteria, Report back with). Never compress a detailed prior report into a
-    single-line instruction like "apply the 4 fixes" — the sub-agent loses the reasoning,
-    file paths, and project-standard references that make a good fix possible.
-14. **Verify infrastructure, not just tests.** When a story introduces or depends on
-    infrastructure (Docker, databases, queues, external services), functional validation must
-    attempt to verify the infrastructure actually works — mocked unit tests alone are not
-    sufficient. If infrastructure can't be verified, report PARTIAL so the gap is tracked.
-15. **Act on retro findings.** Retrospective items marked CRITICAL or HIGH are not just
-    documentation — they are pre-flight checks for the next epic. The orchestrator must attempt
-    to resolve them before starting the next epic (see Epic Start step A).
+- `modes/<your-chosen-mode>.md` — how to execute steps in your mode (sub-agent spawning, lifecycle, when to reuse).
+- `flows/phase-4.md` or `flows/quick-flow.md` — the actual step-by-step.
+- `references/delegation-packet.md` — handoff template + examples.
+- `references/escalation.md` — tier 2/3 details.
+- `references/functional-validation.md` — light vs full validation, project-type detection.
+- `references/guides/` — project-type-specific validation playbooks (read on-demand).
