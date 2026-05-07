@@ -5,7 +5,7 @@ You (the leader) handle the **decision-heavy steps directly** in this conversati
 ## What you do yourself (always, no sub-agent)
 
 - **Mode + flow detection** (Step 0 / Step 1 from SKILL.md).
-- **Story creation reading** — if `bmad-bmm-create-story` is the right tool, you can either invoke it yourself (cheap) or delegate, but **the resulting story file you validate yourself**.
+- **Story creation reading** — if `bmad-create-story` is the right tool, you can either invoke it yourself (cheap) or delegate, but **the resulting story file you validate yourself**.
 - **Story validation** — you read the story file and decide pass/fail. No `story-validator` sub-agent.
 - **Code review** — you read the diff and decide pass/fail. No `code-reviewer` sub-agent.
 - **All git commits** and all `sprint-status.yaml` updates.
@@ -14,11 +14,11 @@ You (the leader) handle the **decision-heavy steps directly** in this conversati
 
 ## What you delegate (sub-agents)
 
-- **`developer`** — `bmad-bmm-dev-story` or `bmad-quick-dev`. The long-running coding work.
+- **`developer`** — `bmad-dev-story` or `bmad-quick-dev`. The long-running coding work.
 - **`tester`** — functional validation per story (light or full per the policy in `references/functional-validation.md`); full epic suite at epic completion.
 - **`tech-researcher`** — escalation only.
 
-You do **not** spawn `story-creator`, `story-validator`, `code-reviewer`, or `quick-spec-creator` in this mode. If you want story creation as a sub-agent task, switch to `team-persistent` or `team-respawn`.
+You do **not** spawn `story-creator`, `story-validator`, or `code-reviewer` in this mode. If you want story creation as a sub-agent task, switch to `team-persistent` or `team-respawn`.
 
 ## Persistence inside hybrid
 

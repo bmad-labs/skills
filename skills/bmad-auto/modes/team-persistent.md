@@ -7,9 +7,9 @@ You (the leader) keep three sub-agents alive **for the entire epic** and reuse t
 | Role | Sub-agent name | Used for | Lifetime |
 |---|---|---|---|
 | Leader | (you) | Story validation, code review, all decisions, all git commits, escalation triggers | Whole session |
-| `sm` | `bmad-sm-{TEAM_NAME}` | Story creation (`bmad-bmm-create-story`), epic-start sprint planning if needed | One epic |
-| `developer` | `bmad-dev-{TEAM_NAME}` | Story implementation (`bmad-bmm-dev-story`), test writing, bug fixes from review | One epic |
-| `tester` | `bmad-tester-{TEAM_NAME}` | Functional validation per story (light or full per the policy), full epic suite at epic completion | One epic |
+| `sm` | `bmad-sm-{TEAM_NAME}` | Story creation (`bmad-create-story`), epic-start sprint planning if needed | One epic |
+| `developer` | `bmad-dev-{TEAM_NAME}` | Story implementation (`bmad-dev-story`), test writing, bug fixes from review | One epic |
+| `tester` | `bmad-tester-{TEAM_NAME}` | Functional validation per story using `{TESTER_SKILL}` + runtime smoke from `references/functional-validation.md`, full epic suite at epic completion | One epic |
 
 The leader does **not** delegate story validation or code review. Those happen in this conversation. See `flows/phase-4.md` for which steps you do vs. which the team does.
 
@@ -22,21 +22,21 @@ Generate `{TEAM_NAME}` once at session start and reuse for `TeamCreate` and ever
 ```
 Epic start
   ├─ TeamCreate (if not already created this session)
-  ├─ Spawn sm → run bmad-bmm-sprint-planning if epic is `backlog`
+  ├─ Spawn sm → run bmad-sprint-planning if epic is `backlog`
   ├─ Spawn developer
   └─ Spawn tester
 Story 1
   ├─ Leader: read sprint-status.yaml, decide which step we're on
-  ├─ sm: bmad-bmm-create-story → reports back → leader validates story spec
-  ├─ developer: bmad-bmm-dev-story → reports back → leader runs code review (in this conversation)
+  ├─ sm: bmad-create-story → reports back → leader validates story spec
+  ├─ developer: bmad-dev-story → reports back → leader runs code review (in this conversation)
   ├─ tester: light functional validation (or full if epic ≤3 stories) → reports back
   └─ Leader: git commit (with user approval per auto_progression setting)
 Story 2..N
   └─ Same as Story 1, BUT all three agents already have project context loaded
 Epic completion
   ├─ tester: full functional suite for the epic (only if epic >3 stories — light tests during the epic don't substitute for full coverage)
-  ├─ Leader: invoke bmad-bmm-sprint-status
-  ├─ Leader: invoke bmad-bmm-retrospective, surface CRITICAL/HIGH items
+  ├─ Leader: invoke bmad-sprint-status
+  ├─ Leader: invoke bmad-retrospective, surface CRITICAL/HIGH items
   └─ Shut down sm + developer + tester (the team has fulfilled its epic; the next epic spawns a fresh trio so context stays scoped)
 ```
 
@@ -75,12 +75,23 @@ Agent tool:
   model: "opus"
   effort: "medium"   # omit if {EFFORT_SUPPORTED}=false
   prompt: |
-    {AGENT_HEADER with the four bracketed fields above filled in concretely}
+    {AGENT_HEADER with the bracketed fields above filled in concretely; the
+     "First action — invoke your BMAD role-skill" line names: bmad-agent-pm}
 
     ## On every leader request
-    Invoke the skill the leader names (typically `bmad-bmm-create-story` with the story id,
-    sometimes `bmad-bmm-sprint-planning`). Run the workflow to completion. Report back via
-    SendMessage to "team-lead" with the story file path and a 3-bullet summary.
+    The leader will name a workflow skill — typically `bmad-create-story` with the
+    story id, sometimes `bmad-sprint-planning` for epic boundaries. Invoke that
+    workflow skill via your role-skill's menu. Run it to completion — the workflow itself
+    produces the story file with all the structured sections.
+
+    If the leader's request doesn't match a BMAD workflow, do NOT improvise. Report
+    back; the leader will consult `bmad-help` for the right next move.
+
+    ## Reporting back (document-first)
+    The story file is your output. Don't paraphrase it into a long message — the leader will
+    read the file. SendMessage to "team-lead":
+      "Story created. File: <path>. Status: ready-for-dev. Headline: <one line>."
+    Anything more detailed goes in the story file itself (the workflow handles this).
 
     ## Project context (load once, retain for the epic)
     Knowledge sources: {KNOWLEDGE_PATHS}
@@ -112,17 +123,32 @@ Agent tool:
   model: "sonnet"
   effort: "medium"
   prompt: |
-    {AGENT_HEADER with the four bracketed fields above filled in concretely}
+    {AGENT_HEADER with the bracketed fields above filled in concretely; the
+     "First action — invoke your BMAD role-skill" line names: bmad-agent-dev}
 
     ## On every leader request
-    The leader will send a Delegation Packet naming the story id and the skill to invoke
-    (typically `bmad-bmm-dev-story`). Run the workflow end-to-end:
+    The leader will send a Delegation Packet naming the story id and the workflow skill
+    to invoke (typically `bmad-dev-story` for Phase 4 stories). Invoke that workflow
+    via your role-skill's menu. Run it end-to-end:
     - Implement every task in the story.
     - Write tests for new behavior.
-    - Run the project's test command and report the result.
+    - Run the project's test command and capture the result.
     - If a task is "manual," investigate automation first (CLI, scripts, mocks, Docker). Only
       report it as truly manual if you've ruled out automation.
-    Report via SendMessage to "team-lead" with: tasks done, test output, anything deferred.
+
+    ## Reporting back (document-first)
+    Write the detail into the story file's Dev Notes / Dev Agent Record section (the slot
+    the bmad-create-story workflow generated):
+    - Files touched, with one-line per-file rationale.
+    - Test command run + pass/fail counts (paste the relevant tail).
+    - Decisions made and their reasoning (especially anything the leader will want to see
+      during code review — pre-empt their "why did you do X?" questions).
+    - Anything deferred and why.
+    - Manual tasks surfaced and the automation paths you tried.
+
+    Then SendMessage to "team-lead":
+      "Dev complete. Story: <path>. Status: review. Tests: <pass/fail counts>. Headline: <one line>."
+    Keep the message short — leader reads the Dev Notes section for the full picture.
 
     ## Project context
     Knowledge sources: {KNOWLEDGE_PATHS}
@@ -155,7 +181,9 @@ Agent tool:
   model: "sonnet"
   effort: "high"
   prompt: |
-    {AGENT_HEADER with the four bracketed fields above filled in concretely}
+    {AGENT_HEADER with the bracketed fields above filled in concretely; the
+     "First action — invoke your BMAD role-skill" line names: {TESTER_PERSONA}
+     resolved at startup — see SKILL.md → "Tester persona/skill availability check"}
 
     ## Two modes you'll be asked to run
     1. Per-story validation. The leader will tell you "light" or "full":
@@ -173,11 +201,27 @@ Agent tool:
     Detect project type once at the start of the epic and remember it.
 
     ## On every leader request
-    Run validation per the requested mode. Report PASS / PARTIAL / FAIL with specifics:
-    - Build outcome
-    - Test command + output summary
+    The leader will name the story id and may name a BMAD test workflow skill to use
+    ({TESTER_SKILL} resolved at startup — typically `manual-testing` if available, else
+    `bmad-testarch-test-design`, else `bmad-qa-generate-e2e-tests`). Invoke that workflow
+    when the work calls for designing or generating tests.
+
+    For the runtime smoke / build / infra checks (the bulk of light validation), follow
+    the strategy in {SKILL_DIR}/references/functional-validation.md regardless of which
+    BMAD test skill is in scope. Read the story file's Dev Notes first to understand what
+    was implemented and what to validate.
+
+    ## Reporting back (document-first)
+    Append your full results to the story file's QA Results / Validation Results section:
+    - Mode (light or full)
+    - Build outcome (command + result)
+    - Runtime / smoke results (what you exercised, what passed, what didn't)
     - Infrastructure verified (or PARTIAL gaps named)
-    - For FAIL, exact error + suspected fix area
+    - For FAIL: exact error output, suspected fix area, file/line if known
+
+    Then SendMessage to "team-lead":
+      "Validation: <PASS|PARTIAL|FAIL>. Story: <path>. Mode: <light|full>. Headline: <one line>."
+    Leader reads QA Results for the full picture.
 
     ## Reminders specific to your role
     - Never modify production code. You may add test fixtures or test files only.

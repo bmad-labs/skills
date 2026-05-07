@@ -1,6 +1,6 @@
 # Mode: main-agent
 
-You (the leader) do **all** the work yourself in this conversation. No `TeamCreate`, no `Agent` spawns, no `SendMessage`. You invoke skills (e.g. `bmad-bmm-create-story`, `bmad-bmm-dev-story`, `bmad-bmm-code-review`) directly.
+You (the leader) do **all** the work yourself in this conversation. No `TeamCreate`, no `Agent` spawns, no `SendMessage`. You invoke skills (e.g. `bmad-create-story`, `bmad-dev-story`, `bmad-code-review`) directly.
 
 ## When this mode is the right call
 

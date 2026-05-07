@@ -16,7 +16,7 @@ This is what lets the agent make good judgment calls on edge cases instead of
 following the letter of instructions and missing the spirit.>
 
 ## Skill to invoke
-<Exact skill name, e.g. "bmad-bmm-dev-story". Always name it. Never write
+<Exact skill name, e.g. "bmad-dev-story". Always name it. Never write
 "figure out which skill to use".>
 
 ## Prior findings / report (verbatim)
@@ -31,9 +31,11 @@ check off each one.>
 
 ## Knowledge sources to consult
 <Explicit paths. Pull from {KNOWLEDGE_PATHS} and add ad-hoc relevant ones:
+  - **Story file / tech-spec (always include for story-bound work)**: name the file
+    AND the section the agent should read first. E.g. "story-1-3.md → Dev Notes for
+    what was implemented; Acceptance Criteria for what to validate."
   - Project rules: CLAUDE.md, .cursorrules, docs/conventions.md
   - Architecture & PRD: _bmad-output/planning-artifacts/{specific-file}
-  - Story file or tech-spec driving this work
   - References inside this skill (e.g. references/functional-validation.md)
 Name sections or line ranges when you know them — "CLAUDE.md §Naming" beats "read CLAUDE.md".>
 
@@ -41,9 +43,17 @@ Name sections or line ranges when you know them — "CLAUDE.md §Naming" beats "
 <How the agent knows it's done. Concrete: "all 4 issues fixed, `npm test` passes,
 no new issues in touched files, lint clean." Round number for retries ("Round 1/2").>
 
-## Report back with
-<What the SendMessage to "team-lead" should contain. Usually: items resolved,
-verification evidence (tests run, lint output), anything deferred and why.>
+## Where to write your detailed work (document-first)
+<The section in the story file / tech-spec to append to:
+  - Developer work → Dev Notes / Dev Agent Record
+  - Validation results → QA Results / Validation Results
+  - Code review findings (when leader writes them before fix-request) → Review Notes
+The agent puts the *detail* there, not in the SendMessage reply.>
+
+## Report back with (short message)
+<The SendMessage to "team-lead" stays compact. Usually:
+  "<Step result>. File: <story or spec path>. Status: <one word>. Headline: <one line>."
+Anything longer goes in the file, not the message. The leader reads the file.>
 ```
 
 ## Why each slot earns its place
@@ -74,97 +84,96 @@ This is the default failure mode. The agent has to guess which 4 issues, re-read
 
 Three filled-in packets covering the most common handoffs. The examples are deliberately specific — real file paths, real reasoning, real skill names — because the point of the template is to surface concreteness the leader already has.
 
-## Example 1 — Reviewer-fixes-issues handoff
+## Example 1 — Reviewer-fixes-issues handoff (document-first)
 
-Scenario: leader's code review found 2 issues in the auth module. Leader is asking the developer (the same agent that wrote the code) to apply the fixes.
+Scenario: leader's code review found 2 issues in the auth module. Leader has already written the full review into `story-1-4.md → Review Notes`. Now asking the developer (same agent that wrote the code) to apply the fixes.
 
 ```
 ## Task
-Round 1/2: apply the 2 fixes I identified in code review of story 1-4 (authentication module).
+Round 1/2: apply the 2 fixes I logged in story-1-4's Review Notes.
 
 ## Why this matters
-Issue 1 is a real auth bug — failures are silently swallowed, so users get a generic 500
-instead of a 401 and we can't see the failure in logs. Issue 2 is a naming drift that
-CLAUDE.md line 15 explicitly prohibits; letting it land makes the convention meaningless.
+Issue 1 is a real auth bug (401 vs 500 leak); issue 2 is a CLAUDE.md naming-convention
+breach. Both are blocking the story from being shipped — see Review Notes for the full
+reasoning, including the consequence chain on each.
 
 ## Skill to invoke
 typescript-clean-code (for the rename + error class shape)
 typescript-unit-testing (to cover the new 401 path)
 
-## Prior findings (my review, verbatim)
-> Code review found 2 issues:
-> 1. src/auth/login.ts:45 — catch block catches Error but logs and continues. Auth failures
->    are silently ignored. Fix: re-throw as AuthenticationError with original error as cause,
->    so the route handler returns 401.
-> 2. src/auth/types.ts:12 — `AuthResp` interface name is abbreviated. Project conventions
->    (CLAUDE.md line 15) require full names. Rename to `AuthenticationResponse` and update
->    all 3 import sites: login.ts:3, register.ts:5, middleware.ts:8.
-
 ## Specific actions
-1. Fix issue 1 at src/auth/login.ts:45 per the recommendation (wrap + re-throw as
-   AuthenticationError). Ensure src/auth/routes.ts returns 401.
-2. Fix issue 2: rename AuthResp → AuthenticationResponse and update the 3 import sites.
+1. Read story-1-4.md → Review Notes (latest entry). It lists 2 numbered findings with
+   file paths, line numbers, snippets, and recommended fixes.
+2. Apply both fixes. Cross-reference each finding number when you commit your work to
+   Dev Notes so I can match them up.
 
 ## Knowledge sources to consult
-- CLAUDE.md §Naming conventions (line 15 is the rule)
+- _bmad-output/implementation-artifacts/story-1-4.md
+  → Review Notes (the 2 findings — read first; this is the full review)
+  → Acceptance Criteria (the bar you can't break)
+  → Dev Notes (your prior implementation summary — for context)
+- CLAUDE.md §Naming conventions (line 15 — issue 2 cites this)
 - _bmad-output/planning-artifacts/architecture.md §Error handling
-- Story file: _bmad-output/implementation-artifacts/story-1-4.md (the AC you can't break)
+
+## Where to write your detailed work
+Append to story-1-4.md → Dev Notes: list each finding number, what you changed, the diff
+summary, the test you added for the 401 path, and the test command output.
 
 ## Success criteria
-- Both issues fixed in-place.
+- Both findings in Review Notes resolved.
 - Existing story-1-4 tests still pass: `npm test -- auth`.
 - New test covers the 401 path (≥1 negative-case assertion).
 - Lint/typecheck clean.
 
-## Report back with
-- Confirmation each issue is resolved + diff summary.
-- Test output (pass/fail counts).
-- Anything deferred and why.
+## Report back with (short message)
+"Fixes applied. Story: story-1-4.md. Status: review. Tests: <pass/fail>. Headline: 401
+path now covered, AuthResp renamed."
 ```
 
-## Example 2 — Feedback to a story-developer (Round 1/2)
+Notice: the packet does NOT paste the review findings inline. They live in the story file's Review Notes section. The packet just points at the file and tells the developer where to read and where to write back.
 
-Scenario: developer reported "done" but unit tests for the new error path are missing and the log format doesn't match project conventions.
+## Example 2 — Feedback to a story-developer (Round 1/2, document-first)
+
+Scenario: developer reported "done" but unit tests for the new error path are missing and the log format doesn't match project conventions. Leader logged both gaps in `story-2-3.md → Review Notes` before sending this packet.
 
 ```
 ## Task
-Round 1/2: finish story 2-3 — you reported done, but two gaps need closing before code review.
+Round 1/2: close the 2 gaps I logged in story-2-3's Review Notes before code review.
 
 ## Why this matters
-- The retry-backoff feature is in the critical path for Kafka reconnects. A regression there
-  means the service stops consuming with no alert. Tests on the new retry code aren't optional.
-- The log format mismatch will break our Grafana dashboard (grafana.internal/d/kafka), which
+- The retry-backoff feature is on the critical path for Kafka reconnects. A regression
+  there means the service stops consuming with no alert.
+- The log format mismatch breaks the Grafana dashboard (grafana.internal/d/kafka) which
   parses log lines by regex against the project's log schema.
 
 ## Skill to invoke
 typescript-unit-testing (use fake timers for backoff)
 
-## Prior findings (your last report)
-> Implementation complete. 3 unit tests passing. Lint clean. Ready for review.
-
 ## Specific actions
-1. Add unit tests for the retry path in src/kafka/consumer.ts:82-140:
-   - first call succeeds → no retry invoked
-   - transient failure → 3 retries with exponential backoff → success
-   - permanent failure → exhausts retries, emits RetryExhaustedError
-2. Update the log call at src/kafka/consumer.ts:95 to use
-   logger.info({ event: 'kafka.retry', attempt, delayMs })
-   instead of logger.info(`retry ${attempt}`) — schema is structured JSON only.
+1. Read story-2-3.md → Review Notes (latest entry). It names the 2 gaps with file paths,
+   line numbers, and the missing test cases / log schema example.
+2. Address both. Append your fix summary to Dev Notes when done.
 
 ## Knowledge sources to consult
-- docs/logging.md §Structured log events (the schema the dashboard parses)
+- _bmad-output/implementation-artifacts/story-2-3.md
+  → Review Notes (the 2 gaps — read first)
+  → AC3 (test coverage AC, the bar to honestly check)
+  → Dev Notes (your prior implementation — for context on retry path location)
+- docs/logging.md §Structured log events (schema the dashboard parses)
 - _bmad-output/planning-artifacts/architecture.md §Observability
-- Story file: _bmad-output/implementation-artifacts/story-2-3.md §AC3
+
+## Where to write your detailed work
+Append to story-2-3.md → Dev Notes: list each gap number, the test names you added,
+the diff for the log line, and full test output.
 
 ## Success criteria
-- 3 new tests added and passing.
-- Log line at 95 matches schema; `grep "logger.info(\`retry" src/kafka/consumer.ts` returns 0 hits.
-- Story AC3 (test coverage) honestly checkable.
+- 3 new tests added and passing (the cases listed in Review Notes).
+- Log line at src/kafka/consumer.ts:95 matches schema; `grep "logger.info(\`retry"` finds 0 hits.
+- AC3 honestly checkable.
 
-## Report back with
-- Tests added (names + what they cover)
-- Confirmation of the log change
-- Full test output
+## Report back with (short message)
+"Gaps closed. Story: story-2-3.md. Status: review. Tests: <pass/fail>. Headline: retry
+path covered, log schema fixed."
 ```
 
 ## Example 3 — Escalation to tech-researcher
@@ -183,7 +192,7 @@ downstream stories. A workaround that compromises security (disabling cert valid
 is not acceptable.
 
 ## Skill to invoke
-bmad-bmm-technical-research
+bmad-technical-research
 
 ## Prior findings (developer's last 2 reports, verbatim)
 > Round 1 attempt: upgraded node-fetch to v3 per leader suggestion. Failure: ERR_REQUIRE_ESM —
