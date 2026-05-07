@@ -3,17 +3,18 @@ name: bmad-auto
 description: >
   Orchestrates BMAD implementation workflows automatically — both the full Phase 4 epic/story
   pipeline and the Quick Flow for small, well-understood changes. Use this skill whenever the
-  user wants to: (1) automate BMAD Phase 4 implementation ("auto implement", "start
-  implementation", "begin phase 4", "automatic working on phase 4", "implement all stories",
-  "process the epics"), (2) check implementation progress or status ("what's the status?",
-  "how many stories are done?"), (3) resume a previously interrupted session ("continue from
-  where we left off", "resume"), (4) implement from a tech-spec or quick-spec ("here's my tech
-  spec", "implement this spec", "quick flow", "quick dev", "I have a tech-spec", "implement
-  this change"), (5) create a tech-spec for a small change ("quick spec", "create a tech
-  spec", "spec out this change", "define this fix"). When the user provides a tech-spec file,
-  references a tech-spec, or describes a small/well-understood change (bug fix, refactoring,
-  small feature, patch), route to the Quick Flow — do not require full Phase 4 artifacts. If
-  unsure whether to use this skill, use it — it detects which flow is appropriate
+  user wants to: (1) automate Phase 4 implementation ("auto implement", "start implementation",
+  "begin phase 4", "automatic working on phase 4", "implement all stories", "process the
+  epics"), (2) check implementation progress or status ("what's the status?", "how many
+  stories are done?"), (3) resume a previously interrupted session ("continue from where we
+  left off", "resume"), (4) implement a small self-contained change without going through full
+  BMAD planning ("quick dev", "quick flow", "implement this change", a described bug fix,
+  refactor, or small feature, patch). When the user describes a small change or asks to
+  quickly implement something, route to Quick Flow — `bmad-quick-dev` handles intent-to-code
+  directly without a separate spec step. If a multi-story project is already in flight
+  (`sprint-status.yaml` exists) AND the user's current request is a substantive epic/story
+  task, route to Phase 4; if the request is a small one-off, route to Quick Flow regardless.
+  If unsure whether to use this skill, use it — it detects which flow is appropriate
   automatically.
 ---
 
@@ -44,18 +45,17 @@ The very first thing you do every session, **before** loading flow-specific inst
 
    **Do not assume sub-agent context windows from your own.** Ask the user.
 
-2. **If leader is on a 1M model, ask whether the other tiers are also 1M.** Use `AskUserQuestion`:
+2. **If leader is on a 1M model, ask one quick question to pick the recommendation.** Use `AskUserQuestion`. Phrase it plainly — don't dump config jargon:
 
-   *"I'm running on a 1M-context model. To recommend the right execution mode, I need to know about the model your sub-agents will use. Are your sub-agent tiers (the model behind `opus` and `sonnet` in your config) also 1M-context?"*
+   *"I'm on a 1M-context model. Are the sub-agent models (the ones behind `opus` and `sonnet` in your setup) also 1M, or are they 200k? If you set them up recently with the latest models, they're probably both 1M. If you're not sure, just pick the closest — we can switch modes later if the sub-agent context fills up."*
 
    Options:
-   - `Yes, all 1M` → recommend `team-persistent`
-   - `Only opus is 1M; sonnet is 200k` → recommend `hybrid` (leader does heavy thinking; 200k sonnet sub-agents respawn per step)
-   - `Only sonnet is 1M; opus is 200k` → recommend `team-persistent` but expect sm and researcher to be tighter
-   - `All 200k except this conversation` → recommend `team-respawn`
-   - `I don't know` → recommend `team-respawn` as the safe default; you can switch later if sub-agent context proves tight
+   - `All 1M` → recommend `team-persistent`
+   - `Mixed — opus 1M, sonnet 200k` → recommend `hybrid` (leader does the heavy thinking; 200k sonnet sub-agents respawn per step)
+   - `All 200k` → recommend `team-respawn`
+   - `Not sure` → recommend `team-respawn` as the safe default; switching later is cheap
 
-   If the leader is **not** on a 1M model, skip this question and default-recommend `team-respawn`.
+   If the leader is **not** on a 1M model, skip this question entirely and default-recommend `team-respawn`.
 
 3. **Ask the user two mode questions** — use `AskUserQuestion`. Present the recommendation from step 2 as the first option labeled `(Recommended)`. Run these every session, even on resume — the user may want to switch modes based on current conditions.
 
@@ -81,21 +81,17 @@ The very first thing you do every session, **before** loading flow-specific inst
 
 ## Step 1 — Flow Detection
 
-After mode setup, decide which flow to run:
+After mode setup, decide which flow to run. **Detect intent first, then look at project state.** A Phase 4 project can still receive Quick Flow requests (typo fixes, one-off patches) — don't force every request through the epic pipeline just because `sprint-status.yaml` exists.
 
-**Use Quick Flow when:**
-- The user provides or references a `tech-spec-*.md` file.
-- The user asks to "quick spec", "quick dev", or "quick flow".
-- The user describes a small, self-contained change (bug fix, refactor, small feature, patch).
-- The user says "implement this spec" or "here's what I want to change".
-- No `sprint-status.yaml` exists AND the request is clearly a small change.
+**Detect intent (look at the user's actual request):**
 
-**Use Phase 4 when:**
-- `_bmad-output/implementation-artifacts/sprint-status.yaml` exists with pending work.
-- The user asks to "start implementation", "begin phase 4", "process epics".
-- The user asks about implementation status or wants to resume a Phase 4 session.
+- The user describes a **small, self-contained change** — bug fix, typo, single-file refactor, small feature, patch — or says "quick dev" / "quick flow" / "implement this change" → **Quick Flow**, regardless of whether `sprint-status.yaml` exists.
+- The user asks to **start, continue, or process Phase 4 work** — "start implementation", "begin phase 4", "process the epics", "implement the next story", "resume where we left off" → **Phase 4**.
+- The user asks for **status only** — "what's the status?", "how many stories are done?" → load `flows/phase-4.md` and follow its Status Query path; do not enter the main loop.
 
-**When ambiguous:** if `sprint-status.yaml` exists, default to Phase 4. Otherwise default to Quick Flow. If still unclear, ask.
+**When the request is genuinely ambiguous** (e.g. "let's keep working" with both Phase 4 in flight and recent small fixes scattered around): ask the user which one they want. Don't guess.
+
+**Edge case — small fix during an active Phase 4 project**: route to Quick Flow. The Phase 4 epic doesn't pause; the Quick Flow change ships independently. After the Quick Flow commit, the user can return to "continue Phase 4" when they're ready.
 
 Then load the matching flow file:
 - Phase 4 → `flows/phase-4.md`
@@ -246,7 +242,7 @@ All entries in both columns are invoked via the `Skill` tool — they're regular
 | `developer` (Quick Flow) | `bmad-agent-dev` | `bmad-quick-dev` |
 | `tester` (functional validation) | `bmad-tea` if available, else `bmad-agent-dev` | `manual-testing` if available, else `bmad-testarch-test-design` if available, else `bmad-qa-generate-e2e-tests` — plus bmad-auto's own `references/functional-validation.md` for the runtime smoke / build / infra checks in every case |
 | `tech-researcher` | `bmad-agent-analyst` | `bmad-technical-research` |
-| Leader — story validation | (no persona load — leader stays as orchestrator) | `bmad-create-story` invoked in validate mode |
+| Leader — story validation | (no role-skill — the leader does this directly) | `bmad-create-story` invoked in validate mode |
 | Leader — code review | (no persona load) | `bmad-code-review` |
 | Leader — epic completion | (no persona load) | `bmad-sprint-status`, `bmad-retrospective` |
 | Leader — spec/PRD/architecture writes | (no persona load) | `bmad-create-prd`, `bmad-create-architecture`, `bmad-correct-course` |
@@ -353,37 +349,11 @@ Mode files reference `{AGENT_HEADER}` and append mode-specific context (persiste
 
 ## The Delegation Packet — every handoff must use it
 
-Every message you send to a sub-agent — first spawn, feedback round, fix request, escalation — is a **Delegation Packet**. Slots:
+Every message you send to a sub-agent — first spawn, feedback round, fix request, escalation — is a **Delegation Packet**. The packet's purpose is to prevent context loss at every handoff: don't compress "4 detailed findings with reasoning" into "apply the 4 fixes" — the specifics are the load-bearing parts.
 
-```
-## Task
-<One sentence: what this sub-agent does right now.>
+**Read `references/delegation-packet.md`** for the full template (8 slots) plus three worked examples (reviewer-fixes-issues handoff, story-developer feedback round, escalation to tech-researcher). Read it the first time you compose a packet in a session — the shape is much clearer with concrete examples than from a bullet list.
 
-## Why this matters
-<The reason — what bug, what risk, what standard.>
-
-## Skill to invoke
-<Exact skill name, e.g. "bmad-dev-story". Never let the sub-agent pick.>
-
-## Prior findings / report (verbatim, if applicable)
-<Paste prior reports unchanged. No paraphrase.>
-
-## Specific actions
-<Numbered: file path + line, what to change, expected end state.>
-
-## Knowledge sources to consult
-<Explicit paths from {KNOWLEDGE_PATHS} + ad-hoc relevant files.>
-
-## Success criteria
-<Concrete checks: tests pass, lint clean, etc.>
-
-## Report back with
-<What the SendMessage to team-lead should contain.>
-```
-
-> **Worked examples** — see `references/delegation-packet.md` for filled-in packets covering first spawn, feedback, fix request, and escalation.
-
-The packet's **purpose is to prevent context loss** at every handoff. Don't compress "4 detailed findings with reasoning" into "apply the 4 fixes" — the specifics are the load-bearing parts.
+The slots, at a glance: *Task / Why this matters / Skill to invoke / Prior findings (verbatim) / Specific actions / Knowledge sources / Success criteria / Where to write detailed work / Report back with*. Detail and worked examples in the reference.
 
 ---
 
@@ -442,24 +412,25 @@ The "light vs full" definition and the project-type detection (web app, embedded
 
 ## Critical Rules (read before every implementation step)
 
-1. **Leader does all git commits.** Sub-agents never run `git commit`. Period.
-2. **Leader makes all decisions.** Story validation, code review, scope calls, escalation triggers — all leader. Sub-agents execute and report.
+1. **Leader does all git commits.** Sub-agents never run `git commit`. Period. Why: commits are decisions about what ships; sub-agents don't have the cross-step view to make them safely.
+2. **Leader makes all decisions.** Story validation, code review, scope calls, escalation triggers — all leader. Sub-agents execute and report. Why: decisions need the leader's full conversation context, which sub-agents don't have.
 3. **Leader gives sub-agents the exact role-skill AND workflow skill to invoke.** First action on spawn = invoke the BMAD role-skill (`bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-architect`, `bmad-agent-analyst` per the canonical mapping). Per-request action = invoke the named workflow skill (`bmad-create-story`, `bmad-dev-story`, `bmad-quick-dev`, etc.). Both go through the `Skill` tool. Never write "figure out which skill to use" — and never let a sub-agent invoke a non-BMAD skill outside its role-skill's menu.
-4. **One sub-agent per execution step.** Don't combine "develop + test + review" into one agent.
-5. **Re-read sprint-status.yaml after every sub-agent report** — it's ground truth.
-6. **Follow BMAD workflows.** Don't bypass slash command workflows that the project depends on.
-7. **Respect epic order.** Epics are sequentially dependent.
-8. **Align with architecture/PRD.** Misalignment → invoke `bmad-correct-course`.
-9. **Always attempt build validation before commit.** Never commit code that doesn't compile.
-10. **Every handoff is a Delegation Packet.** No "apply the fixes" one-liners.
-11. **Verify infrastructure, not just tests.** When a story touches Docker / DB / queue / external API, functional validation must hit the real thing or report PARTIAL.
-12. **Act on retro findings.** Items marked CRITICAL or HIGH at retro = pre-flight checks for the next epic.
-13. **In `auto-commit` mode, still ask before destructive ops.** Auto-commit covers the happy path only — force-push, branch deletion, merging into main always require explicit approval.
-14. **Researcher is lazy, not gated.** Don't pre-spawn or keep one alive "just in case." Do spawn freely the moment you hit planning ambiguity, an unclear architecture/intent/approach, or a design decision where best-practices research would help. Shut it down once the question is answered.
-15. **Memory before research, research before halting.** Before researching, check `{MEMORY_SOURCES}` and `{KNOWLEDGE_PATHS}` — if the user has a prior decision or the project rules cover it, use that and cite it. If neither source has the answer, spawn the researcher; don't halt to the user just because memory is empty. Halt only for non-technical blockers (scope, PRD gaps, business decisions).
-16. **Spawn sub-agents from project root.** Every `Agent` call must be issued at the project root (the directory containing `_bmad-output/`), and the spawn prompt must explicitly state the absolute project root path so sub-agents anchor relative paths correctly. Never spawn from a subfolder.
-17. **Document-first handoffs.** Sub-agents write their detailed work — implementation summaries, validation results, review findings — into the **story file** (Phase 4) or **tech-spec** (Quick Flow), not into `SendMessage` payloads. Reports back to the leader stay short: status, file path, headline. The next sub-agent in line reads the file directly. This keeps the leader's conversation context lean and gives every handoff a durable, resumable artifact.
-18. **Sub-agents work only via BMAD role-skills and workflow skills.** Every sub-agent invokes its assigned BMAD role-skill first (`bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-architect`, `bmad-agent-analyst`) and uses only BMAD workflow skills (the `bmad-*` family) for the work itself. No improvisation. If a task doesn't fit the workflow catalog, the agent reports to team-lead; the leader invokes `bmad-help` to find the right BMAD-recommended next step before falling back to `bmad-correct-course` or Tier 3 halt.
+4. **One sub-agent per execution step.** Don't combine "develop + test + review" into one agent. Why: separation lets the leader review each step's output before the next begins; combining defeats that.
+5. **Follow BMAD workflows.** Don't bypass slash command workflows that the project depends on. Workflows produce the structured artifacts (story files, retro docs, sprint status) that the next step expects.
+6. **Respect epic order.** Epics are sequentially dependent.
+7. **Align with architecture/PRD.** Misalignment → invoke `bmad-correct-course`. Why: drift becomes invisible debt fast; correct course is cheaper than rework later.
+8. **Always attempt build validation before commit.** Never commit code that doesn't compile.
+9. **Every handoff is a Delegation Packet.** No "apply the fixes" one-liners. The packet's specifics are what prevent the next round from rediscovering everything.
+10. **Verify infrastructure, not just tests.** When a story touches Docker / DB / queue / external API, functional validation must hit the real thing or report PARTIAL. Why: mocked unit tests can pass perfectly while real infra is misconfigured — that class of bug compounds across stories.
+11. **Act on retro findings.** Items marked CRITICAL or HIGH at retro = pre-flight checks for the next epic. The retro isn't documentation; it's a checklist.
+12. **In `auto-commit` mode, still ask before destructive ops.** Auto-commit covers the happy path only — force-push, branch deletion, merging into main always require explicit approval.
+13. **Researcher is lazy, not gated.** Don't pre-spawn or keep one alive "just in case." Do spawn freely the moment you hit planning ambiguity, an unclear architecture/intent/approach, or a design decision where best-practices research would help. Shut it down once the question is answered.
+14. **Memory before research, research before halting.** Before researching, check `{MEMORY_SOURCES}` and `{KNOWLEDGE_PATHS}` — if the user has a prior decision or the project rules cover it, use that and cite it. If neither source has the answer, spawn the researcher; don't halt to the user just because memory is empty. Halt only for non-technical blockers (scope, PRD gaps, business decisions).
+15. **Spawn sub-agents from project root.** Every `Agent` call must be issued at the project root (the directory containing `_bmad-output/`), and the spawn prompt must explicitly state the absolute project root path so sub-agents anchor relative paths correctly. Never spawn from a subfolder. Why: sub-agents inherit cwd, and a wrong cwd silently breaks every relative path in the story file.
+16. **Document-first handoffs.** Sub-agents write their detailed work — implementation summaries, validation results, review findings — into the **story file** (Phase 4) or **quick-doc file** (Quick Flow), not into `SendMessage` payloads. Reports back to the leader stay short: status, file path, headline. The next sub-agent in line reads the file directly. This keeps the leader's conversation context lean and gives every handoff a durable, resumable artifact.
+17. **Sub-agents work only via BMAD role-skills and workflow skills.** Every sub-agent invokes its assigned BMAD role-skill first and uses only BMAD workflow skills (the `bmad-*` family) for the work itself. No improvisation. If a task doesn't fit the workflow catalog, the agent reports to team-lead; the leader invokes `bmad-help` to find the right BMAD-recommended next step before falling back to `bmad-correct-course` or Tier 3 halt.
+
+> Note on `sprint-status.yaml`: re-read it after every Phase 4 sub-agent report. It's the ground truth for "what step are we on" and surviving crash-resume. (Not a numbered rule because every Phase 4 step in `flows/phase-4.md` already calls this out at the point of use.)
 
 ---
 
