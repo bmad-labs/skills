@@ -12,7 +12,7 @@ A 200k window fills quickly: project context + PRD + architecture + story file +
 |---|---|---|---|
 | Story create | `story-creator` | `bmad-agent-pm` | `bmad-create-story` |
 | Story develop | `story-developer` | `bmad-agent-dev` | `bmad-dev-story` |
-| Functional validate | `func-validator` | `{TESTER_PERSONA}` (resolved at startup — see SKILL.md → "Tester persona/skill availability check") | `{TESTER_SKILL}` (resolved at startup) + bmad-auto's `references/functional-validation.md` for runtime smoke |
+| Functional validate | `func-validator` | `{TESTER_PERSONA}` (resolved at startup — see SKILL.md → "Tester role-skill availability check") | `{TESTER_SKILL}` (resolved at startup) + bmad-auto's `references/functional-validation.md` for runtime smoke |
 | Quick develop | `quick-developer` | `bmad-agent-dev` | `bmad-quick-dev` |
 | Escalation only | `tech-researcher` | `bmad-agent-analyst` | `bmad-technical-research` |
 
@@ -54,7 +54,7 @@ Spawn skeleton:
 ```
 {AGENT_HEADER — including project root, story/spec file path, Flow, Mode (team-respawn),
 specific role, and what-leader-does-with-output filled in per the table above; the
-"First action — invoke your BMAD role-skill" line names the persona from the table above}
+"First action — invoke your BMAD role-skill" line names the role-skill from the table above}
 
 ## Task
 <Single sentence: what this sub-agent does in this step.>
@@ -113,6 +113,26 @@ We do not spawn a separate `code-reviewer` sub-agent. The leader reviews; the de
 ## Functional validation in this mode
 
 `func-validator` is spawned per story. The leader tells it "light" or "full" in the Delegation Packet, per the policy in `references/functional-validation.md`. At epic completion, spawn one more `func-validator` for the full epic suite if the per-story runs were light.
+
+## Context-budget sanity check
+
+Per-step respawn already makes this mode resilient to context overflow — each agent gets a clean window for every step. The default `team-persistent` threshold (70% on a 200k tier) is too aggressive here: a per-step agent that hits 70% mid-step would have to go through the Handover protocol's round-trip even though it's about to be shut down at the step boundary anyway. Wasted cost.
+
+Use a higher threshold — **90%** — so the check only fires on genuine in-step runaway context (a single step that's actually about to hit the wall):
+
+```bash
+python3 <skill-dir>/scripts/context-usage.py \
+    --agent-name "<spawn-name>" \
+    --context-window 200000  \
+    --policy 200k \
+    --threshold-pct 90
+```
+
+When to actually run this check: **before** extending a sub-agent's life past its current step (rare), or **mid-step** when the agent has been doing tool-heavy work and the next instruction would push it deeper (e.g. another large file read, another long debug round). Don't run it at every reporting boundary — that's just overhead.
+
+If the recommendation is `respawn-with-handover` even at 90%, run the same six-step Handover protocol described in `team-persistent.md` → "Respawn-with-handover protocol": ask the outgoing agent to write a `## Handover` subsection into the story / spec file, wait for confirmation, shutdown, spawn fresh, and have the new agent read the Handover note as its onboarding.
+
+Note: the script returns `respawn-with-handover` regardless of threshold if any prior auto-compaction happened during the agent's session — that's an unconditional reasoning-degradation signal, not a budget question.
 
 ## Idle / cross-talk
 

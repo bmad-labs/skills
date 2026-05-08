@@ -46,6 +46,10 @@ The first message after spawn is the Delegation Packet for the story or quick-sp
 
 Always persist for the epic. Use the tester prompt from `team-persistent.md`. The leader sends "light" or "full" per story.
 
+## Context-budget check between stories
+
+Hybrid persists the developer and tester across stories, same as `team-persistent`. Run the same per-story context-usage check (`scripts/context-usage.py`) on each — see `team-persistent.md` → "Context-budget check between stories" + "Respawn-with-handover protocol" for the procedure. If you're running the developer in story-persistence sub-mode (respawn-per-story), you can skip the check on the developer; keep it on the tester.
+
 ## Code review handoff in hybrid
 
 The leader does code review in-conversation. When fixes are needed:

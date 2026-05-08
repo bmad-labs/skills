@@ -42,6 +42,68 @@ Epic completion
 
 Why shut down at epic boundary instead of running for the whole project? Each epic is a natural context boundary — different stories, different focus, different files. Reusing across epics risks the agent dragging stale Epic-1 context into Epic-2 decisions. Reusing within an epic is the sweet spot.
 
+## Context-budget check between stories (mandatory)
+
+After every story completes — *before* delegating the next story to the same dev or tester — the leader runs a script to measure each persistent sub-agent's actual context usage. Self-reported "I have plenty of room" is unreliable; the script reads the agent's session transcript and computes the same number Claude Code's status line displays.
+
+```bash
+python3 <skill-dir>/scripts/context-usage.py \
+    --agent-name "<agent-name, e.g. bmad-dev-{TEAM_NAME}>" \
+    --context-window <1000000 if this tier is 1M, else 200000>
+```
+
+The script returns JSON with `used_pct`, `compaction_count`, and a `recommendation` field. Honor the recommendation:
+
+- **`ok`** → keep the agent alive; delegate the next story as usual.
+- **`respawn-with-handover`** → run the respawn-with-handover protocol below before delegating the next story. The script returns this when usage exceeds 50% on a 1M-tier agent, exceeds 70% on a 200k-tier agent, or when *any* prior auto-compaction happened during the agent's session.
+
+Run the check on **all three persistent agents — sm, dev, and tester** — between every story. SM rarely fills its window in practice (story creation is bounded), but the check is cheap (~50ms), and an SM that *does* fill (large epic, lots of cross-referencing across many story files) carries the same reasoning-degradation risk as a stuffed dev. Belt-and-braces: check all three.
+
+If the leader is on a tier-mixed setup (e.g. opus 1M, sonnet 200k), pass the appropriate window per agent: `1000000` for the opus-backed sm, `200000` for the sonnet-backed dev/tester.
+
+The script is a port of ccstatusline's algorithm, so its numbers match the Claude Code status line a user could check manually.
+
+### Why respawn instead of compact?
+
+We tested whether the leader could remotely trigger `/compact` in a sub-agent. It can't: an assistant emitting `/compact` in its output is treated as inert text content, not a slash command. The harness's slash-command parser only listens to the user input channel, and `SendMessage` doesn't write to that channel. Claude Code's auto-compact does fire automatically — but only at ~99% of the effective context window, not at a configurable user threshold. So the only way to get fresh-window reasoning at 50% used is to respawn. The document-first handoff (Dev Notes / Review Notes / QA Results sections in the story file) makes the respawn cheap from a continuity perspective: the new agent reads the file, picks up where the old one left off.
+
+### Respawn-with-handover protocol
+
+Same procedure for every persistent agent (dev, tester, sm), every time the script returns `respawn-with-handover`. Six steps:
+
+1. **Ask the outgoing agent for a Handover note.** Send a `SendMessage`:
+
+   > *"Your context utilization has crossed the threshold for this tier. I'm going to respawn you with a fresh window before the next request. Before you go, append a `## Handover (<timestamp>)` subsection to `<story-or-spec-file>` with:*
+   > - *What's done in this session (point at Dev Notes if applicable)*
+   > - *What's in-flight or partially complete*
+   > - *Decisions you made that aren't visible in the code diff yet (the "why" behind choices)*
+   > - *Anything the next dev/tester should know — open questions, gotchas, project-specific quirks you learned*
+   >
+   > *Reply with `Handover written.` once the file is updated. Then I'll send shutdown."*
+
+2. **Wait for confirmation.** The agent appends the section and replies. If it says anything other than confirmation (asks a question, reports a problem) — handle that, then re-issue the handover request.
+
+3. **Verify the file was actually updated.** Read the story file and confirm the new `## Handover` subsection exists with non-trivial content. If missing or empty, retry once with a more pointed request. If still empty, log it and proceed anyway — the existing Dev Notes plus whatever the next agent can reconstruct from the diff is the fallback.
+
+4. **Send shutdown.** `SendMessage({type: "shutdown_request"})`. Wait for the approval response.
+
+5. **Spawn a fresh agent in the same role.** Use the same spawn prompt as the original (sm / developer / tester block in this file), with the same role-skill, model, and effort. The new `{AGENT_HEADER}` includes the same project root, knowledge sources, and a *Story / spec file* field pointing at the file with the just-written Handover note.
+
+6. **First Delegation Packet to the fresh agent** is the next story's normal Delegation Packet, but with one extra item in *Knowledge sources*: *"Read <story-or-spec-file> → `## Handover (<timestamp>)` first — that's your onboarding from the previous agent. Treat it as authoritative for the prior session's context. Then read Dev Notes for the broader history, then the new story's Acceptance Criteria."* The new agent reads the file once, starts work with the prior context internalized but at near-zero cache cost.
+
+### Why this works
+
+The previous agent's reasoning is preserved as **explicit, durable text** rather than implicit, lossy summary. The new agent gets:
+- A concrete state snapshot it can re-read at any point in the story.
+- The "why" behind earlier decisions, not just the "what" visible in code.
+- A clean window for the new story — no carry-over from prior story's tool calls, file reads, or scratch work.
+
+And because the Handover note lives in the story file, it survives crashes, restarts, mode switches, and even cross-session resumes. A leader picking up after a hard interrupt sees the same Handover note and routes the next agent the same way.
+
+### Mid-story respawn (rare but possible)
+
+If the script's check returns `respawn-with-handover` *during* a story (e.g. after a long debug session where the dev hasn't yet finished the current story), the protocol is identical — except the *Knowledge sources* in step 6 says *"the prior agent did not finish the story; resume from the Handover note's 'in-flight' section."* The new agent picks up the half-done work, the cache cost of the Handover-note round-trip is paid once, and overall reasoning quality stays high.
+
 ## Effort tuning (the token-saver)
 
 This mode runs on a 1M-context model. Effort is dialed down for the agents whose value comes from carrying lots of context (sm, developer); kept high for the agent whose value comes from rigor (tester):
@@ -183,7 +245,7 @@ Agent tool:
   prompt: |
     {AGENT_HEADER with the bracketed fields above filled in concretely; the
      "First action — invoke your BMAD role-skill" line names: {TESTER_PERSONA}
-     resolved at startup — see SKILL.md → "Tester persona/skill availability check"}
+     resolved at startup — see SKILL.md → "Tester role-skill availability check"}
 
     ## Two modes you'll be asked to run
     1. Per-story validation. The leader will tell you "light" or "full":
