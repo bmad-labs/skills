@@ -65,44 +65,40 @@ The script is a port of ccstatusline's algorithm, so its numbers match the Claud
 
 ### Why respawn instead of compact?
 
-We tested whether the leader could remotely trigger `/compact` in a sub-agent. It can't: an assistant emitting `/compact` in its output is treated as inert text content, not a slash command. The harness's slash-command parser only listens to the user input channel, and `SendMessage` doesn't write to that channel. Claude Code's auto-compact does fire automatically — but only at ~99% of the effective context window, not at a configurable user threshold. So the only way to get fresh-window reasoning at 50% used is to respawn. The document-first handoff (Dev Notes / Review Notes / QA Results sections in the story file) makes the respawn cheap from a continuity perspective: the new agent reads the file, picks up where the old one left off.
+We tested whether the leader could remotely trigger `/compact` in a sub-agent. It can't: an assistant emitting `/compact` in its output is treated as inert text content, not a slash command. The harness's slash-command parser only listens to the user input channel, and `SendMessage` doesn't write to that channel. Claude Code's auto-compact fires automatically but only at ~99% of the effective context window, not at a configurable user threshold. So the only way to get fresh-window reasoning at 50% used is to respawn. The document-first handoff (Dev Notes / Review Notes / QA Results sections already written into the story file during the just-completed story) makes the respawn cheap from a continuity perspective.
 
 ### Respawn-with-handover protocol
 
-Same procedure for every persistent agent (dev, tester, sm), every time the script returns `respawn-with-handover`. Six steps:
+**Important: this fires only at story boundaries, never mid-story.** The check runs after a story is fully complete (Dev Notes / QA Results / Review Notes written, leader has committed the work). If a sub-agent's context fills *during* a story, the agent finishes the current story first — partial-story respawn is more disruptive than the lossy auto-compact that would fire at 99% in the worst case. The next story-boundary check then catches the `compaction_count > 0` signal and respawns the agent with a fresh window.
 
-1. **Ask the outgoing agent for a Handover note.** Send a `SendMessage`:
+Same procedure for every persistent agent (sm, dev, tester), every time the script returns `respawn-with-handover` after a story completes. Six steps, designed so the **leader never reads the handover content** — just passes the path:
 
-   > *"Your context utilization has crossed the threshold for this tier. I'm going to respawn you with a fresh window before the next request. Before you go, append a `## Handover (<timestamp>)` subsection to `<story-or-spec-file>` with:*
-   > - *What's done in this session (point at Dev Notes if applicable)*
-   > - *What's in-flight or partially complete*
-   > - *Decisions you made that aren't visible in the code diff yet (the "why" behind choices)*
-   > - *Anything the next dev/tester should know — open questions, gotchas, project-specific quirks you learned*
+1. **Ask the outgoing agent to write a handover file.** Send a `SendMessage`:
+
+   > *"Your context utilization has crossed the threshold for this tier. After this story finishes, I'll respawn you with a fresh window. Before you go, write a handover file to `/tmp/bmad-handover-<TEAM_NAME>-<role>-<unix-timestamp>.md` containing:*
+   > - *What's done across the stories you've worked on this session (point at the relevant Dev Notes / QA Results sections in the story files for full detail).*
+   > - *Decisions you made that aren't visible in the code diff yet (the "why" behind choices, especially anything that future stories in this epic will depend on).*
+   > - *Project-specific gotchas, conventions, or patterns you learned that the next agent should know up front (saves them rediscovering the same things).*
+   > - *Anything in-flight that you didn't finish — but only if it's small/trivial enough to be worth picking up. If anything is genuinely incomplete and non-trivial, flag that to me instead, don't try to hand it off.*
    >
-   > *Reply with `Handover written.` once the file is updated. Then I'll send shutdown."*
+   > *Reply with the absolute path of the file you wrote. Then I'll send shutdown."*
 
-2. **Wait for confirmation.** The agent appends the section and replies. If it says anything other than confirmation (asks a question, reports a problem) — handle that, then re-issue the handover request.
+2. **Wait for confirmation.** The agent writes the file and replies with the path. If it says anything other than a path (asks a question, reports a problem) — handle that, then re-issue the request.
 
-3. **Verify the file was actually updated.** Read the story file and confirm the new `## Handover` subsection exists with non-trivial content. If missing or empty, retry once with a more pointed request. If still empty, log it and proceed anyway — the existing Dev Notes plus whatever the next agent can reconstruct from the diff is the fallback.
+3. **Verify the file exists.** Run `ls -la <path>` to confirm the file is non-empty (>0 bytes). The leader does NOT read the file content — that's the whole point. If the file is missing or empty, retry once. If still missing, log it and proceed anyway; the existing Dev Notes / QA Results in the story files are the fallback record.
 
 4. **Send shutdown.** `SendMessage({type: "shutdown_request"})`. Wait for the approval response.
 
-5. **Spawn a fresh agent in the same role.** Use the same spawn prompt as the original (sm / developer / tester block in this file), with the same role-skill, model, and effort. The new `{AGENT_HEADER}` includes the same project root, knowledge sources, and a *Story / spec file* field pointing at the file with the just-written Handover note.
+5. **Spawn a fresh agent in the same role.** Use the same spawn prompt as the original (sm / developer / tester block in this file), with the same role-skill, model, and effort. The new `{AGENT_HEADER}` includes the same project root and knowledge sources.
 
-6. **First Delegation Packet to the fresh agent** is the next story's normal Delegation Packet, but with one extra item in *Knowledge sources*: *"Read <story-or-spec-file> → `## Handover (<timestamp>)` first — that's your onboarding from the previous agent. Treat it as authoritative for the prior session's context. Then read Dev Notes for the broader history, then the new story's Acceptance Criteria."* The new agent reads the file once, starts work with the prior context internalized but at near-zero cache cost.
+6. **First Delegation Packet to the fresh agent** is the next story's normal Delegation Packet, with one extra item in *Knowledge sources*: *"Before doing anything else, read `/tmp/bmad-handover-<...>.md` — that's your handover from the previous agent in this role. Treat it as authoritative for prior context this session. Then proceed with the story below."* The new agent reads the handover file once at startup; the leader never reads it at all.
 
 ### Why this works
 
-The previous agent's reasoning is preserved as **explicit, durable text** rather than implicit, lossy summary. The new agent gets:
-- A concrete state snapshot it can re-read at any point in the story.
-- The "why" behind earlier decisions, not just the "what" visible in code.
-- A clean window for the new story — no carry-over from prior story's tool calls, file reads, or scratch work.
-
-And because the Handover note lives in the story file, it survives crashes, restarts, mode switches, and even cross-session resumes. A leader picking up after a hard interrupt sees the same Handover note and routes the next agent the same way.
-
-### Mid-story respawn (rare but possible)
-
-If the script's check returns `respawn-with-handover` *during* a story (e.g. after a long debug session where the dev hasn't yet finished the current story), the protocol is identical — except the *Knowledge sources* in step 6 says *"the prior agent did not finish the story; resume from the Handover note's 'in-flight' section."* The new agent picks up the half-done work, the cache cost of the Handover-note round-trip is paid once, and overall reasoning quality stays high.
+- **Leader stays lean.** The handover content lives in a file the leader knows the path to but never opens. No pass-through token cost.
+- **The new agent gets concrete prior context.** Decisions, gotchas, conventions — explicit text, not inferred from code or compressed by auto-compact.
+- **Clean window for the new agent's actual work.** Just one file read at startup, then back to the new story.
+- **Story files remain the durable record.** Dev Notes / QA Results / Review Notes already document what was *done* in each story. The /tmp handover only captures what the *outgoing agent learned* across stories that isn't visible in those records — the "why" and the gotchas. Once the next agent absorbs it, the file's job is done; /tmp rotates naturally on reboot.
 
 ## Effort tuning (the token-saver)
 
