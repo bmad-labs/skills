@@ -130,7 +130,7 @@ python3 <skill-dir>/scripts/context-usage.py \
 
 When to actually run this check: **before** extending a sub-agent's life past its current step (rare), or **mid-step** when the agent has been doing tool-heavy work and the next instruction would push it deeper (e.g. another large file read, another long debug round). Don't run it at every reporting boundary — that's just overhead.
 
-If the recommendation is `respawn-with-handover` even at 90%, run the same six-step Handover protocol described in `team-persistent.md` → "Respawn-with-handover protocol": ask the outgoing agent to write a `## Handover` subsection into the story / spec file, wait for confirmation, shutdown, spawn fresh, and have the new agent read the Handover note as its onboarding.
+If the recommendation is `respawn-with-handover` even at 90% — and the agent has finished its current step (don't interrupt mid-step) — run the same six-step protocol described in `team-persistent.md` → "Respawn-with-handover protocol". The outgoing agent writes a handover file to `/tmp/bmad-handover-<TEAM_NAME>-<role>-<timestamp>.md` and reports the path; the leader verifies existence (`ls -la`, no read), shuts down, spawns fresh, and the new agent reads the tmp file as its first onboarding action. Leader never reads the content — that's the design.
 
 Note: the script returns `respawn-with-handover` regardless of threshold if any prior auto-compaction happened during the agent's session — that's an unconditional reasoning-degradation signal, not a budget question.
 
