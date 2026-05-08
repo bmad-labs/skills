@@ -247,7 +247,7 @@ All entries in both columns are invoked via the `Skill` tool — they're regular
 | Leader — epic completion | (no persona load) | `bmad-sprint-status`, `bmad-retrospective` |
 | Leader — spec/PRD/architecture writes | (no persona load) | `bmad-create-prd`, `bmad-create-architecture`, `bmad-correct-course` |
 
-### Tester persona/skill availability check (one-time, at startup)
+### Tester role-skill availability check (one-time, at startup)
 
 The tester slot has fallbacks because the dedicated test-engineering skills (`bmad-tea`, `manual-testing`, `bmad-testarch-test-design`) aren't installed in every BMAD environment. At session start, the leader checks the available-skills list once and locks in:
 
@@ -282,7 +282,7 @@ The leader's first move when a sub-agent reports "this doesn't fit a workflow" i
 
 ### Why constrain sub-agents to BMAD skills?
 
-Two reasons. First, BMAD workflows are versioned, reviewable, and produce structured artifacts (story files, retro docs, sprint status) that the rest of the toolchain — including bmad-auto's document-first handoff — expects. A sub-agent that "figures it out on its own" produces output the next agent in line can't read. Second, the personas encode hard-won decisions about *when* to write tests, *how* to scope a fix, *what* counts as done — replicating that in ad-hoc prompts wastes the leader's time and produces inconsistent results across stories.
+Two reasons. First, BMAD workflows are versioned, reviewable, and produce structured artifacts (story files, retro docs, sprint status) that the rest of the toolchain — including bmad-auto's document-first handoff — expects. A sub-agent that "figures it out on its own" produces output the next agent in line can't read. Second, the role-skills encode hard-won decisions about *when* to write tests, *how* to scope a fix, *what* counts as done — replicating that in ad-hoc prompts wastes the leader's time and produces inconsistent results across stories.
 
 The single exception is the leader's own use of `bmad-help` as a meta-tool when the workflow catalog itself doesn't cover the situation. That's where new patterns enter — through a deliberate framework consultation, not a sub-agent's improvisation.
 
@@ -429,6 +429,7 @@ The "light vs full" definition and the project-type detection (web app, embedded
 15. **Spawn sub-agents from project root.** Every `Agent` call must be issued at the project root (the directory containing `_bmad-output/`), and the spawn prompt must explicitly state the absolute project root path so sub-agents anchor relative paths correctly. Never spawn from a subfolder. Why: sub-agents inherit cwd, and a wrong cwd silently breaks every relative path in the story file.
 16. **Document-first handoffs.** Sub-agents write their detailed work — implementation summaries, validation results, review findings — into the **story file** (Phase 4) or **quick-doc file** (Quick Flow), not into `SendMessage` payloads. Reports back to the leader stay short: status, file path, headline. The next sub-agent in line reads the file directly. This keeps the leader's conversation context lean and gives every handoff a durable, resumable artifact.
 17. **Sub-agents work only via BMAD role-skills and workflow skills.** Every sub-agent invokes its assigned BMAD role-skill first and uses only BMAD workflow skills (the `bmad-*` family) for the work itself. No improvisation. If a task doesn't fit the workflow catalog, the agent reports to team-lead; the leader invokes `bmad-help` to find the right BMAD-recommended next step before falling back to `bmad-correct-course` or Tier 3 halt.
+18. **Measure persistent sub-agent context, don't trust self-report.** In `team-persistent` and `hybrid` modes, before delegating each new story or step to a persistent dev/tester, run `scripts/context-usage.py --agent-name <name> --context-window <window>`. The script returns `ok` (keep going) or `respawn-with-handover` (the agent crossed a threshold or already auto-compacted). On `respawn-with-handover`, follow the six-step protocol in `modes/team-persistent.md` → "Respawn-with-handover protocol": ask the agent to append a Handover note to its story file, wait for confirmation, shutdown, spawn fresh, and have the new agent read the Handover note as its onboarding. Why: the leader cannot remotely trigger `/compact` (we tested — assistant-emitted slash commands are inert), and self-reported headroom is unreliable. Document-first handover preserves continuity at the cost of one round-trip.
 
 > Note on `sprint-status.yaml`: re-read it after every Phase 4 sub-agent report. It's the ground truth for "what step are we on" and surviving crash-resume. (Not a numbered rule because every Phase 4 step in `flows/phase-4.md` already calls this out at the point of use.)
 
@@ -442,3 +443,4 @@ The "light vs full" definition and the project-type detection (web app, embedded
 - `references/escalation.md` — tier 2/3 details.
 - `references/functional-validation.md` — light vs full validation, project-type detection.
 - `references/guides/` — project-type-specific validation playbooks (read on-demand).
+- `scripts/context-usage.py` — measure a persistent sub-agent's actual context usage from its session transcript. Run between stories to decide keep-alive vs compact vs respawn. See Critical Rule #18 and `modes/team-persistent.md` → "Context-budget check between stories".
