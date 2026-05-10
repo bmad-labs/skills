@@ -1,6 +1,8 @@
 # Mode: team-respawn (200k-context default)
 
-You (the leader) spawn a **fresh sub-agent per workflow step** and shut it down when the step is complete. This is the legacy behavior — appropriate when the model has only 200k context and reusing an agent across stories would risk context overflow.
+You (the leader) spawn a **fresh teammate per workflow step** and shut it down when the step is complete. This is the legacy behavior — appropriate when the model has only 200k context and reusing an agent across stories would risk context overflow.
+
+**Agent teams vs normal sub-agents:** Agent teams let teammates message each other directly and coordinate on shared tasks. Prefer agent teams when available. The spawning format below creates team members, not standalone sub-agents. If agent teams are not available in the current environment, fall back to normal sub-agents (same spawn format but without `team_name` and without `run_in_background: true`).
 
 ## Why per-step respawn (not per-story persistence) on 200k
 
@@ -8,7 +10,7 @@ A 200k window fills quickly: project context + PRD + architecture + story file +
 
 ## Sub-agents (created per step, then shut down)
 
-| Step | Sub-agent name | Role-skill to invoke (first action) | Workflow skill (per request) |
+| Step | Teammate name | Role-skill to invoke (first action) | Workflow skill (per request) |
 |---|---|---|---|
 | Story create | `story-creator` | `bmad-agent-pm` | `bmad-create-story` |
 | Story develop | `story-developer` | `bmad-agent-dev` | `bmad-dev-story` |
@@ -26,7 +28,7 @@ Same as `team-persistent.md`: generate `{TEAM_NAME}` once at session start (hold
 
 Use the 200k-context column from SKILL.md:
 
-| Sub-agent | Model | Effort |
+| Teammate | Model | Effort |
 |---|---|---|
 | `story-creator` | opus | `xhigh` |
 | `story-developer` / `quick-developer` | sonnet | `xhigh` |
@@ -35,7 +37,11 @@ Use the 200k-context column from SKILL.md:
 
 Pass abstract tier names (`"opus"`, `"sonnet"`); omit `effort` if `{EFFORT_SUPPORTED}=false`.
 
-## Spawning a step sub-agent
+## Spawning a step teammate
+
+**If agent teams are available:** spawn with `Agent` tool using `team_name: "{TEAM_NAME}"` and `run_in_background: true`. Teammates appear in the team display, can message each other, and receive shutdown requests via `SendMessage`.
+
+**If agent teams are not available:** fall back to normal sub-agents — same spawn format but without `team_name` and `run_in_background: true`. Sub-agents can only report back to the leader.
 
 For every step, the spawn prompt has this skeleton. **Fill in the four bracketed fields in `{AGENT_HEADER}` concretely** — never leave them as placeholders. The bmad-auto context block (in SKILL.md) is what tells the sub-agent it's part of an orchestrated workflow, not a standalone agent.
 
@@ -49,7 +55,7 @@ Per-role context-block values:
 | `quick-developer` | Developer implementing one quick-flow change. One-shot. | Reviews + sends to func-validator. Fix requests come back as packets. |
 | `tech-researcher` | Researcher unblocking a stuck worker via peer collaboration. | See `references/escalation.md`. |
 
-Spawn skeleton:
+Spawn skeleton (agent team mode — add `team_name: "{TEAM_NAME}"` and `run_in_background: true` to the Agent call; fall back to normal sub-agent without those fields if agent teams are unavailable):
 
 ```
 {AGENT_HEADER — including project root, story/spec file path, Flow, Mode (team-respawn),
@@ -142,4 +148,4 @@ In this mode, only one sub-agent is alive at a time (with rare exceptions during
 
 - After every step: `shutdown_request` to the step's sub-agent.
 - Never accumulate idle agents.
-- At session end: shut down anything alive + `TeamDelete`.
+- At session end: shut down anything alive + `TeamDelete` (if agent teams were created; otherwise just shut down sub-agents).

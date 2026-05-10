@@ -75,7 +75,20 @@ The very first thing you do every session, **before** loading flow-specific inst
 
 4. **Hold the choices in conversation memory.** Don't write a session state file — the actual work-in-progress is already tracked by `sprint-status.yaml` (Phase 4) or the tech-spec + git state (Quick Flow). Mode is a per-session preference, not project state.
 
-5. **Load the mode file** — read `modes/<chosen-mode>.md`. That file contains everything mode-specific: how to spawn agents (or not), team naming, agent header templates, lifecycle rules. Do **not** apply spawning rules from this SKILL.md — they live in the mode file.
+5. **TeamCreate — run this before loading any mode file.** After the mode questions and before reading `modes/<chosen-mode>.md`, create the team:
+
+   ```bash
+   TeamCreate(
+     team_name: "{TEAM_NAME}",
+     description: "bmad-auto orchestrator team for {TEAM_NAME} — handles Phase 4 epic/story pipeline and Quick Flow"
+   )
+   ```
+
+   Generate `{TEAM_NAME}` once here using the same formula as the mode files: `bmad-auto-{cwd-slug}-{timestamp}` where `{cwd-slug}` is `basename` of the project root lowercased + non-alnum→hyphens (max 20 chars), and `{timestamp}` is `YYYYMMDD-HHMMSS`. Hold in conversation memory. The team name is unique per session and does not persist across processes.
+
+   **Why TeamCreate first?** Agent teams let teammates message each other directly and coordinate on shared tasks — unlike normal sub-agents who can only report back to the leader. Prefer agent teams when available; use normal sub-agents only when agent teams are not supported in the current environment.
+
+6. **Load the mode file** — read `modes/<chosen-mode>.md`. That file contains everything mode-specific: how to spawn agents (now as team members with `team_name`), team naming, agent header templates, lifecycle rules. Do **not** apply spawning rules from this SKILL.md — they live in the mode file.
 
 ---
 

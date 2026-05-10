@@ -1,6 +1,8 @@
 # Mode: hybrid
 
-You (the leader) handle the **decision-heavy steps directly** in this conversation, and delegate only the **execution-heavy steps** to sub-agents. This is the middle ground between `main` and the team modes — you save tokens on validation/review/planning (no sub-agent context to load) and you save your own tokens on long-horizon coding (let a sub-agent burn its window on it).
+You (the leader) handle the **decision-heavy steps directly** in this conversation, and delegate only the **execution-heavy steps** to teammates. This is the middle ground between `main` and the team modes — you save tokens on validation/review/planning (no sub-agent context to load) and you save your own tokens on long-horizon coding (let a sub-agent burn its window on it).
+
+**Agent teams vs normal sub-agents:** Agent teams let teammates message each other directly and coordinate on shared tasks. Prefer agent teams when available. Spawn teammates with `team_name: "{TEAM_NAME}"` and `run_in_background: true`. If agent teams are not available, fall back to normal sub-agents (same spawn format but without `team_name` and `run_in_background: true`).
 
 ## What you do yourself (always, no sub-agent)
 
