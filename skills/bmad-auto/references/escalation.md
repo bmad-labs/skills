@@ -189,7 +189,7 @@ If a researcher or worker sends a vague message, the leader steps in once to ask
 
 Last resort. Leader:
 
-1. Shuts down all alive sub-agents (sm, developer, tester, researcher, anyone else).
+1. **If agent teams are active:** shut down all alive teammates using `SendMessage({type: "shutdown_request"})` to each (sm, developer, tester, researcher, anyone else), then `TeamDelete`. **If agent teams are not available:** send `shutdown_request` to each alive sub-agent via `SendMessage`.
 2. Reports the full picture to the user:
    - What story / spec was being worked on.
    - What the blocker is (root cause if known, symptoms otherwise).

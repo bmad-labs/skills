@@ -1,10 +1,12 @@
 # Mode: team-persistent (1M-context default)
 
-You (the leader) keep three sub-agents alive **for the entire epic** and reuse them across every story in that epic. Spawn at epic start, shut down at epic end. **No respawn per story.** This is the biggest token saver: each agent loads project context, knowledge base, and architecture **once**, then handles N stories with that context still warm.
+You (the leader) coordinate an agent **team** for the entire epic. Teammates are persisted across every story in that epic — no respawn per story. This is the biggest token saver: each teammate loads project context, knowledge base, and architecture **once**, then handles N stories with that context still warm.
+
+**Agent teams vs normal sub-agents:** Agent teams let teammates message each other directly and coordinate on shared tasks. Prefer agent teams when available. The spawning format below (`Agent` tool with `team_name`) creates team members, not standalone sub-agents. If agent teams are not available in the current environment, fall back to normal sub-agents (same spawn format but without `team_name` and without `run_in_background: true`).
 
 ## The team
 
-| Role | Sub-agent name | Used for | Lifetime |
+| Role | Teammate name | Used for | Lifetime |
 |---|---|---|---|
 | Leader | (you) | Story validation, code review, all decisions, all git commits, escalation triggers | Whole session |
 | `sm` | `bmad-sm-{TEAM_NAME}` | Story creation (`bmad-create-story`), epic-start sprint planning if needed | One epic |
@@ -21,7 +23,7 @@ Generate `{TEAM_NAME}` once at session start and reuse for `TeamCreate` and ever
 
 ```
 Epic start
-  ├─ TeamCreate (if not already created this session)
+  ├─ (SKILL.md already ran TeamCreate — team exists at this point)
   ├─ Spawn sm → run bmad-sprint-planning if epic is `backlog`
   ├─ Spawn developer
   └─ Spawn tester
@@ -104,7 +106,7 @@ Same procedure for every persistent agent (sm, dev, tester), every time the scri
 
 This mode runs on a 1M-context model. Effort is dialed down for the agents whose value comes from carrying lots of context (sm, developer); kept high for the agent whose value comes from rigor (tester):
 
-| Sub-agent | Model | Effort | Notes |
+| Teammate | Model | Effort | Notes |
 |---|---|---|---|
 | `sm` | opus | `medium` | 1M ctx + opus carries planning by itself; medium is enough. |
 | `developer` | sonnet | `medium` | 1M ctx absorbs the codebase; medium effort is enough for execution. |
@@ -114,6 +116,10 @@ This mode runs on a 1M-context model. Effort is dialed down for the agents whose
 Pass `model: "opus"` or `model: "sonnet"` (abstract tier — Claude Code resolves). Omit `effort` if `{EFFORT_SUPPORTED}=false` (see SKILL.md → Model Selection).
 
 ## Spawning the epic team
+
+**If agent teams are available** (`TeamCreate` succeeded): spawn teammates using the `Agent` tool with `team_name: "{TEAM_NAME}"` and `run_in_background: true`. Teammates will appear in the team display, can receive direct messages, and can message each other.
+
+**If agent teams are not available**: fall back to normal sub-agents. Spawn with the `Agent` tool without `team_name` and without `run_in_background: true`. Sub-agents can only report back to the leader; they cannot message each other. Use the same prompt templates below.
 
 Issue these three `Agent` calls at the start of an epic (and again at every subsequent epic, after shutting down the previous trio). Use parallel spawns — they don't depend on each other.
 
@@ -132,6 +138,7 @@ Agent tool:
   subagent_type: "general-purpose"
   model: "opus"
   effort: "medium"   # omit if {EFFORT_SUPPORTED}=false
+  run_in_background: true
   prompt: |
     {AGENT_HEADER with the bracketed fields above filled in concretely; the
      "First action — invoke your BMAD role-skill" line names: bmad-agent-pm}
@@ -180,6 +187,7 @@ Agent tool:
   subagent_type: "general-purpose"
   model: "sonnet"
   effort: "medium"
+  run_in_background: true
   prompt: |
     {AGENT_HEADER with the bracketed fields above filled in concretely; the
      "First action — invoke your BMAD role-skill" line names: bmad-agent-dev}
@@ -238,6 +246,7 @@ Agent tool:
   subagent_type: "general-purpose"
   model: "sonnet"
   effort: "high"
+  run_in_background: true
   prompt: |
     {AGENT_HEADER with the bracketed fields above filled in concretely; the
      "First action — invoke your BMAD role-skill" line names: {TESTER_PERSONA}
@@ -325,4 +334,4 @@ The three agents may message each other (e.g. tester pings developer about a mis
 
 ## Shutdown
 
-At epic completion (after retro): send `shutdown_request` to sm, developer, tester. They approve. Then re-spawn fresh trio for the next epic. At session end (or when the user halts): send shutdown to all + `TeamDelete`.
+At epic completion (after retro): send `shutdown_request` to sm, developer, tester. They approve. Then re-spawn fresh trio for the next epic. At session end (or when the user halts): send shutdown to all + `TeamDelete` (if agent teams were created). If agent teams are not available, just send `shutdown_request` to each sub-agent.
