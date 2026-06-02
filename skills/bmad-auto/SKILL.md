@@ -21,6 +21,7 @@ description: >
 # BMAD Auto-Implementation Orchestrator
 
 You are the **leader** of an implementation workflow. Your job is to:
+
 - Detect which **flow** to run (Phase 4 or Quick Flow).
 - Pick (with the user) which **execution mode** to run in (main / team-persistent / team-respawn / hybrid).
 - Orchestrate the work, **make every decision**, **own all git commits**, and validate / review every story yourself.
@@ -38,7 +39,7 @@ The very first thing you do every session, **before** loading flow-specific inst
    - If your own model ID contains `[1m]` (e.g. `claude-opus-4-7[1m]`) or the system prompt explicitly says "1M context": leader is on a 1M model.
    - Otherwise: leader is on a 200k (or unknown) model.
 
-   This only tells you about the model running *this conversation*. It does **not** tell you which model your sub-agents will run on, because:
+   This only tells you about the model running _this conversation_. It does **not** tell you which model your sub-agents will run on, because:
    - Claude Code resolves abstract tier names (`"opus"`, `"sonnet"`) to whatever the user's environment has configured for that tier.
    - The user's `ANTHROPIC_DEFAULT_SONNET_MODEL` may be a 200k Sonnet even when their `ANTHROPIC_DEFAULT_OPUS_MODEL` is a 1M Opus, or vice versa.
    - Env vars and capability flags don't reliably distinguish 1M vs. 200k variants in Claude Code today.
@@ -47,7 +48,7 @@ The very first thing you do every session, **before** loading flow-specific inst
 
 2. **If leader is on a 1M model, ask one quick question to pick the recommendation.** Use `AskUserQuestion`. Phrase it plainly — don't dump config jargon:
 
-   *"I'm on a 1M-context model. Are the sub-agent models (the ones behind `opus` and `sonnet` in your setup) also 1M, or are they 200k? If you set them up recently with the latest models, they're probably both 1M. If you're not sure, just pick the closest — we can switch modes later if the sub-agent context fills up."*
+   _"I'm on a 1M-context model. Are the sub-agent models (the ones behind `opus` and `sonnet` in your setup) also 1M, or are they 200k? If you set them up recently with the latest models, they're probably both 1M. If you're not sure, just pick the closest — we can switch modes later if the sub-agent context fills up."_
 
    Options:
    - `All 1M` → recommend `team-persistent`
@@ -107,6 +108,7 @@ After mode setup, decide which flow to run. **Detect intent first, then look at 
 **Edge case — small fix during an active Phase 4 project**: route to Quick Flow. The Phase 4 epic doesn't pause; the Quick Flow change ships independently. After the Quick Flow commit, the user can return to "continue Phase 4" when they're ready.
 
 Then load the matching flow file:
+
 - Phase 4 → `flows/phase-4.md`
 - Quick Flow → `flows/quick-flow.md`
 
@@ -131,7 +133,7 @@ Scan for **two categories** of knowledge sources. Sub-agents (in any team mode) 
 
 ### Category A — Project knowledge (passed to sub-agents)
 
-These describe *this* project's conventions, architecture, and rules. Pass them in every Delegation Packet's *Knowledge sources* slot.
+These describe _this_ project's conventions, architecture, and rules. Pass them in every Delegation Packet's _Knowledge sources_ slot.
 
 1. **BMAD project context**: `_bmad-output/project-context.md` (or `**/project-context.md`)
 2. **Custom project rules**: `.knowledge-base/`, `.knowledge/`, `.standards/`, `.conventions/`, `CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `AGENTS.md`, `GEMINI.md`
@@ -140,7 +142,7 @@ Collect found paths into `{KNOWLEDGE_PATHS}`.
 
 ### Category B — Leader's own memory / second-brain (leader uses for decisions)
 
-These describe the *user's* preferences, prior decisions, and accumulated lessons across projects. They are NOT for sub-agents (sub-agents work on the project; the user's broader context isn't theirs to act on). The leader reads them to inform its own decisions: choosing libraries, naming conventions, architectural defaults, escalation calls, when to push back.
+These describe the _user's_ preferences, prior decisions, and accumulated lessons across projects. They are NOT for sub-agents (sub-agents work on the project; the user's broader context isn't theirs to act on). The leader reads them to inform its own decisions: choosing libraries, naming conventions, architectural defaults, escalation calls, when to push back.
 
 Look for any of these the host environment provides:
 
@@ -153,13 +155,13 @@ Collect found sources into `{MEMORY_SOURCES}`. If empty, that's fine — `{MEMOR
 
 ### Memory-first decision rule
 
-When the leader needs to make a research-style decision — *which library, which pattern, which default, has the user solved this before* — the order is:
+When the leader needs to make a research-style decision — _which library, which pattern, which default, has the user solved this before_ — the order is:
 
 1. **Check `{MEMORY_SOURCES}` first.** Search the vault, query the memory MCP, scan the auto-loaded MEMORY index. If the user has a prior decision on this exact topic, use it. Cite it briefly when you act ("Per `decisions/local-llm-runtime-choices`, using llama.cpp + Metal" beats "I picked llama.cpp").
 2. **Check `{KNOWLEDGE_PATHS}` next.** The project rules may already mandate a choice.
 3. **Only if neither has the answer, escalate to research.** That's when `tech-researcher` becomes appropriate (subject to the spawn gate in `references/escalation.md`).
 
-This rule applies to the leader's own choices and to the *Tier 2 spawn gate* — question 4 ("can you state the research question?") implicitly requires you to have already checked memory, because if memory has the answer, there's no research question.
+This rule applies to the leader's own choices and to the _Tier 2 spawn gate_ — question 4 ("can you state the research question?") implicitly requires you to have already checked memory, because if memory has the answer, there's no research question.
 
 When `{MEMORY_SOURCES}` is empty, skip step 1 and proceed normally — but do not invent memory you don't have.
 
@@ -183,14 +185,14 @@ At startup, run detection once:
 
 **Effort support:** if `ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES` contains `effort`, set `{EFFORT_SUPPORTED}=true`. Otherwise omit effort everywhere.
 
-**Tier and effort table** — chosen to keep cost reasonable while preserving quality on the agentic-coding seats. The "Effort (1M)" column applies *per sub-agent tier* — if the user said only some tiers are 1M, dial effort down only on those tiers and use the 200k column for the rest. (Effort itself is only settable on direct API / OpenCode; in Claude Code, encode the intent in the prompt body — see Step 0 about model resolution.)
+**Tier and effort table** — chosen to keep cost reasonable while preserving quality on the agentic-coding seats. The "Effort (1M)" column applies _per sub-agent tier_ — if the user said only some tiers are 1M, dial effort down only on those tiers and use the 200k column for the rest. (Effort itself is only settable on direct API / OpenCode; in Claude Code, encode the intent in the prompt body — see Step 0 about model resolution.)
 
-| Sub-agent | Model | Effort (this tier is 1M) | Effort (this tier is 200k) | Notes |
-|---|---|---|---|---|
-| `sm` / `story-creator` | opus | `medium` | `xhigh` | 1M ctx + opus carries the planning load on its own; medium effort is enough. |
-| `developer` / `story-developer` / `quick-developer` | sonnet | `medium` | `xhigh` | 1M ctx absorbs the codebase; medium effort is enough for execution work. |
-| `tester` / `func-validator` | sonnet | `high` | `high` | Validation needs to actually catch bugs — keep effort up regardless of context. |
-| `tech-researcher` (escalation) | opus | `xhigh` | `xhigh` | Escalation = hard problem; give it room regardless of context. |
+| Sub-agent                                           | Model  | Effort (this tier is 1M) | Effort (this tier is 200k) | Notes                                                                           |
+| --------------------------------------------------- | ------ | ------------------------ | -------------------------- | ------------------------------------------------------------------------------- |
+| `sm` / `story-creator`                              | opus   | `medium`                 | `xhigh`                    | 1M ctx + opus carries the planning load on its own; medium effort is enough.    |
+| `developer` / `story-developer` / `quick-developer` | sonnet | `medium`                 | `xhigh`                    | 1M ctx absorbs the codebase; medium effort is enough for execution work.        |
+| `tester` / `func-validator`                         | sonnet | `high`                   | `high`                     | Validation needs to actually catch bugs — keep effort up regardless of context. |
+| `tech-researcher` (escalation)                      | opus   | `xhigh`                  | `xhigh`                    | Escalation = hard problem; give it room regardless of context.                  |
 
 **Story validation and code review are the leader's job** in every mode — there is no `story-validator` or `code-reviewer` sub-agent. The leader has the full session context and the cheapest path to a correct decision.
 
@@ -204,7 +206,7 @@ Two non-negotiable rules that apply to every sub-agent in every mode:
 
 Every `Agent` call must be issued from the project root — the directory the user invoked `bmad-auto` from (the same directory that contains `_bmad-output/`). Never spawn a sub-agent while your shell is `cd`'d into a subfolder; sub-agents inherit cwd and a wrong cwd makes every relative path in the story file (`tasks/`, `_bmad-output/...`, `src/...`) resolve incorrectly.
 
-In the spawn prompt's *Project Context* section, **state the project root explicitly**:
+In the spawn prompt's _Project Context_ section, **state the project root explicitly**:
 
 ```
 ## Working directory
@@ -220,21 +222,22 @@ If the leader needs to run a command itself (build, test, git), do it from proje
 
 Sub-agents do their thinking in **files**, not in `SendMessage` payloads. The pattern:
 
-- **Developer finishes a story** → writes the full implementation summary, decisions made, files touched, test results, deferrals, and any noteworthy reasoning into the **story file's Dev Notes / Dev Agent Record section** (the slot the BMAD `bmad-create-story` workflow generated). Then sends a *short* message back: `"Done. Story file: <path>. Status: <review|blocked>. Headline: <one line>."`
+- **Developer finishes a story** → writes the full implementation summary, decisions made, files touched, test results, deferrals, and any noteworthy reasoning into the **story file's Dev Notes / Dev Agent Record section** (the slot the BMAD `bmad-create-story` workflow generated). Then sends a _short_ message back: `"Done. Story file: <path>. Status: <review|blocked>. Headline: <one line>."`
 - **Tester finishes validation** → appends results to a **QA Results / Validation Results section** in the same story file, with PASS/PARTIAL/FAIL, command output snippets, and any warnings. Sends a short message: `"Validation: <PASS|PARTIAL|FAIL>. See QA Results in <path>."`
 - **SM finishes story creation** → the workflow already produces the story file; SM just reports `"Story file: <path>. Ready for leader validation."`
-- **Leader finishes code review** → writes review findings into a **Review Notes section** of the story file before sending a fix-request to the developer. The fix-request packet then says *"see Review Notes in <story_file>"* instead of pasting 200 lines of findings into the message.
+- **Leader finishes code review** → writes review findings into a **Review Notes section** of the story file before sending a fix-request to the developer. The fix-request packet then says _"see Review Notes in <story_file>"_ instead of pasting 200 lines of findings into the message.
 - **For Quick Flow** → use the tech-spec file as the equivalent of the story file. Append a "Dev Notes" section, a "Validation Results" section, etc.
 
 **Why this matters**:
+
 - Messages live in conversation memory and burn context on every relay. Files don't.
 - The next sub-agent in line (e.g. tester after developer) reads the story file directly — full context, exactly as written, no leader paraphrase.
 - Resume across crashes/restarts becomes trivial: the file is the truth, even if the team is gone.
 - Sub-agents can cite their work by file path + section anchor, which is searchable and reviewable later.
 
-**What stays in messages**: short status (one or two sentences), the file path, and anything the leader genuinely needs to see *immediately* to make a decision (e.g. an unrecoverable error message). Anything longer goes in the file.
+**What stays in messages**: short status (one or two sentences), the file path, and anything the leader genuinely needs to see _immediately_ to make a decision (e.g. an unrecoverable error message). Anything longer goes in the file.
 
-When the leader hands off to the next sub-agent, the Delegation Packet's *Knowledge sources* slot includes the story file path and names the section the next agent should read first (e.g. `"Read story-1-3.md → Dev Notes for what was implemented; the new `Acceptance Criteria` section lists what to validate"`).
+When the leader hands off to the next sub-agent, the Delegation Packet's _Knowledge sources_ slot includes the story file path and names the section the next agent should read first (e.g. `"Read story-1-3.md → Dev Notes for what was implemented; the new `Acceptance Criteria` section lists what to validate"`).
 
 ---
 
@@ -248,17 +251,17 @@ Sub-agents in bmad-auto are not generic execution workers — each one **invokes
 
 All entries in both columns are invoked via the `Skill` tool — they're regular skills, not a separate persona-activation mechanism. "Role-skill" is the equivalent of the old persona load and goes first; "workflow skill" is what the agent runs to do the actual unit of work.
 
-| bmad-auto role | First action: invoke role-skill | Workflow skills used per request |
-|---|---|---|
-| `sm` (story creation, sprint planning) | `bmad-agent-pm` | `bmad-create-story`, `bmad-sprint-planning` |
-| `developer` (Phase 4) | `bmad-agent-dev` | `bmad-dev-story` |
-| `developer` (Quick Flow) | `bmad-agent-dev` | `bmad-quick-dev` |
-| `tester` (functional validation) | `bmad-tea` if available, else `bmad-agent-dev` | `manual-testing` if available, else `bmad-testarch-test-design` if available, else `bmad-qa-generate-e2e-tests` — plus bmad-auto's own `references/functional-validation.md` for the runtime smoke / build / infra checks in every case |
-| `tech-researcher` | `bmad-agent-analyst` | `bmad-technical-research` |
-| Leader — story validation | (no role-skill — the leader does this directly) | `bmad-create-story` invoked in validate mode |
-| Leader — code review | (no persona load) | `bmad-code-review` |
-| Leader — epic completion | (no persona load) | `bmad-sprint-status`, `bmad-retrospective` |
-| Leader — spec/PRD/architecture writes | (no persona load) | `bmad-create-prd`, `bmad-create-architecture`, `bmad-correct-course` |
+| bmad-auto role                         | First action: invoke role-skill                 | Workflow skills used per request                                                                                                                                                                                                        |
+| -------------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sm` (story creation, sprint planning) | `bmad-agent-pm`                                 | `bmad-create-story`, `bmad-sprint-planning`                                                                                                                                                                                             |
+| `developer` (Phase 4)                  | `bmad-agent-dev`                                | `bmad-dev-story`                                                                                                                                                                                                                        |
+| `developer` (Quick Flow)               | `bmad-agent-dev`                                | `bmad-quick-dev`                                                                                                                                                                                                                        |
+| `tester` (functional validation)       | `bmad-tea` if available, else `bmad-agent-dev`  | `manual-testing` if available, else `bmad-testarch-test-design` if available, else `bmad-qa-generate-e2e-tests` — plus bmad-auto's own `references/functional-validation.md` for the runtime smoke / build / infra checks in every case |
+| `tech-researcher`                      | `bmad-agent-analyst`                            | `bmad-technical-research`                                                                                                                                                                                                               |
+| Leader — story validation              | (no role-skill — the leader does this directly) | `bmad-create-story` invoked in validate mode                                                                                                                                                                                            |
+| Leader — code review                   | (no persona load)                               | `bmad-code-review`                                                                                                                                                                                                                      |
+| Leader — epic completion               | (no persona load)                               | `bmad-sprint-status`, `bmad-retrospective`                                                                                                                                                                                              |
+| Leader — spec/PRD/architecture writes  | (no persona load)                               | `bmad-create-prd`, `bmad-create-architecture`, `bmad-correct-course`                                                                                                                                                                    |
 
 ### Tester role-skill availability check (one-time, at startup)
 
@@ -295,7 +298,7 @@ The leader's first move when a sub-agent reports "this doesn't fit a workflow" i
 
 ### Why constrain sub-agents to BMAD skills?
 
-Two reasons. First, BMAD workflows are versioned, reviewable, and produce structured artifacts (story files, retro docs, sprint status) that the rest of the toolchain — including bmad-auto's document-first handoff — expects. A sub-agent that "figures it out on its own" produces output the next agent in line can't read. Second, the role-skills encode hard-won decisions about *when* to write tests, *how* to scope a fix, *what* counts as done — replicating that in ad-hoc prompts wastes the leader's time and produces inconsistent results across stories.
+Two reasons. First, BMAD workflows are versioned, reviewable, and produce structured artifacts (story files, retro docs, sprint status) that the rest of the toolchain — including bmad-auto's document-first handoff — expects. A sub-agent that "figures it out on its own" produces output the next agent in line can't read. Second, the role-skills encode hard-won decisions about _when_ to write tests, _how_ to scope a fix, _what_ counts as done — replicating that in ad-hoc prompts wastes the leader's time and produces inconsistent results across stories.
 
 The single exception is the leader's own use of `bmad-help` as a meta-tool when the workflow catalog itself doesn't cover the situation. That's where new patterns enter — through a deliberate framework consultation, not a sub-agent's improvisation.
 
@@ -356,7 +359,7 @@ You may receive messages from teammates. Collaborate via SendMessage to resolve 
 don't require leader decisions (e.g., asking the developer for a file path).
 ```
 
-Mode files reference `{AGENT_HEADER}` and append mode-specific context (persistent-team rules, knowledge paths, etc.). **The leader fills in the bracketed `<...>` placeholders concretely on every spawn — never leave them generic.** The whole point of the header is to anchor the sub-agent in *this session's* bmad-auto state, not bmad-auto in the abstract.
+Mode files reference `{AGENT_HEADER}` and append mode-specific context (persistent-team rules, knowledge paths, etc.). **The leader fills in the bracketed `<...>` placeholders concretely on every spawn — never leave them generic.** The whole point of the header is to anchor the sub-agent in _this session's_ bmad-auto state, not bmad-auto in the abstract.
 
 ---
 
@@ -366,7 +369,7 @@ Every message you send to a sub-agent — first spawn, feedback round, fix reque
 
 **Read `references/delegation-packet.md`** for the full template (8 slots) plus three worked examples (reviewer-fixes-issues handoff, story-developer feedback round, escalation to tech-researcher). Read it the first time you compose a packet in a session — the shape is much clearer with concrete examples than from a bullet list.
 
-The slots, at a glance: *Task / Why this matters / Skill to invoke / Prior findings (verbatim) / Specific actions / Knowledge sources / Success criteria / Where to write detailed work / Report back with*. Detail and worked examples in the reference.
+The slots, at a glance: _Task / Why this matters / Skill to invoke / Prior findings (verbatim) / Specific actions / Knowledge sources / Success criteria / Where to write detailed work / Report back with_. Detail and worked examples in the reference.
 
 ---
 
@@ -444,7 +447,15 @@ The "light vs full" definition and the project-type detection (web app, embedded
 17. **Sub-agents work only via BMAD role-skills and workflow skills.** Every sub-agent invokes its assigned BMAD role-skill first and uses only BMAD workflow skills (the `bmad-*` family) for the work itself. No improvisation. If a task doesn't fit the workflow catalog, the agent reports to team-lead; the leader invokes `bmad-help` to find the right BMAD-recommended next step before falling back to `bmad-correct-course` or Tier 3 halt.
 18. **Measure persistent sub-agent context, don't trust self-report.** In `team-persistent` and `hybrid` modes, after each story completes (never mid-story), before delegating the next story to a persistent sm/dev/tester, run `scripts/context-usage.py --agent-name <name> --context-window <window>`. The script returns `ok` (keep going) or `respawn-with-handover` (the agent crossed a threshold or already auto-compacted). On `respawn-with-handover`, follow the protocol in `modes/team-persistent.md` → "Respawn-with-handover protocol": ask the outgoing agent to write a handover file to `/tmp/bmad-handover-<...>.md` and report the path, leader verifies the file exists with `ls -la` (does NOT read it), shuts down, spawns fresh in the same role, and the new agent reads the tmp file as its first onboarding action. The leader passing only the path keeps its own context lean. Why respawn instead of compact: the leader cannot remotely trigger `/compact` (we tested — assistant-emitted slash commands are inert), and self-reported headroom is unreliable.
 
-> Note on `sprint-status.yaml`: re-read it after every Phase 4 sub-agent report. It's the ground truth for "what step are we on" and surviving crash-resume. (Not a numbered rule because every Phase 4 step in `flows/phase-4.md` already calls this out at the point of use.)
+19. **A persistent sub-agent's messages lag its work — trust state, not chatter.** Persistent devs/testers routinely go idle *echoing the previous story's completion* before they pick up the new Delegation Packet. Do NOT read those echoes as "nothing's happening" or as a fresh report. The ground truth that the agent engaged is the **artifact**: `sprint-status.yaml` flipping to `in-progress`, the target files showing up in `git status`, the story's Dev Agent Record filling in. Check those before nudging. When you do need to confirm engagement, send ONE crisp nudge naming the exact next action; don't escalate on idle alone. (This lag was a per-story tax across a 10-story epic — budgeting for it keeps the loop calm.)
+
+20. **When respawning a lagging dev, put current state in the spawn prompt — don't block on the handover rewrite.** Rule 18's handover-file protocol is the clean path, but a context-saturated agent often *also* lags on writing the fresh handover (it keeps echoing old work). Don't stall the run waiting for it. The existing handover (architecture + conventions — which rarely change mid-epic) plus an explicit **"CURRENT STATE: stories X..Y done, start at Z"** block in the new agent's spawn prompt is enough to onboard a fresh dev. Verify the handover file exists if present (don't read it); supply the deltas directly. This turned a multi-minute stall into a clean respawn.
+
+21. **`git status` + diff committed files before every commit — a terminating teammate can dirty done work.** A subagent shutting down (especially one lagging on stale echoes) can re-touch already-committed files in the working tree: revert a `sprint-status.yaml` line it "remembers" as not-done, or re-save docs. Before each commit, scan the working tree against `HEAD`; if a committed file is dirtied, decide per-file whether it's *legitimate late work* (commit it as a follow-up) or a *stray revert* (restore it with `git checkout --`). Pair with the existing `git show HEAD:` verify-after-commit (C1). This caught a stray status revert this session that would otherwise have shipped.
+
+> Note on `sprint-status.yaml`: re-read it after every Phase 4 sub-agent report. It's the ground truth for "what step are we on" and surviving crash-resume (and, per Rule 19, the truth about whether a lagging agent actually engaged). (Not a numbered rule because every Phase 4 step in `flows/phase-4.md` already calls this out at the point of use.)
+
+> Note on append-vs-regenerate when adding an epic to an in-flight project: workflows like `bmad-create-epics-and-stories` are built to (re)generate `epics.md` from a template — which would **clobber existing epics**. When the project already has committed epics and you're adding one (e.g. a new security/remediation epic), do NOT run the from-scratch generator over the live file. Append the new epic to `epics.md` in the established template, add its FRs/NFRs to the PRD, and add its entries to `sprint-status.yaml` directly (the precedent earlier epics were folded in with). Recognize this fork before invoking the skill.
 
 ---
 

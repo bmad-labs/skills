@@ -41,6 +41,7 @@ For every step that the flow file lists (Phase 4: create story → validate → 
 - Any "best-practices for X?" question memory and project rules don't answer.
 
 **Before spawning, run the quick check from `references/escalation.md`:**
+
 1. Memory check — `{MEMORY_SOURCES}` and `{KNOWLEDGE_PATHS}`. If the answer's there, apply it and skip the researcher.
 2. Is the question technical-research-shaped? Scope / PRD gaps / business decisions go to the user, not a researcher.
 3. Can you state the question concretely? One specific paragraph.
@@ -50,6 +51,7 @@ If memory has the answer → apply it. If the question's not research-shaped →
 After the researcher reports, factor in the recommendation and continue. Shut it down — don't keep it alive across unrelated questions.
 
 The researcher's prompt must still start with the `{AGENT_HEADER}` from SKILL.md, with the bmad-auto context block filled in:
+
 - Flow: <Phase 4 | Quick Flow>
 - Mode: main
 - Your specific role: one-shot tech-researcher for the leader (no peer worker — main mode)

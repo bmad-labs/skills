@@ -32,10 +32,10 @@ When a sub-agent gets stuck on a technical issue, follow:
 
 The first response to any sub-agent issue. Leader sends a Delegation Packet (see `delegation-packet.md`) with:
 
-- *Prior findings verbatim* — the agent's own report, copied unchanged.
-- *Specific actions* — concrete fix instructions, file path + line.
-- *Knowledge sources* — the project rule files relevant to the issue.
-- *Success criteria* — what "fixed" looks like.
+- _Prior findings verbatim_ — the agent's own report, copied unchanged.
+- _Specific actions_ — concrete fix instructions, file path + line.
+- _Knowledge sources_ — the project rule files relevant to the issue.
+- _Success criteria_ — what "fixed" looks like.
 - Round number: "Round 1/2" or "Round 2/2".
 
 If after 2 rounds the agent still can't resolve it, move to Tier 2.
@@ -46,11 +46,12 @@ If after 2 rounds the agent still can't resolve it, move to Tier 2.
 
 Use when the leader hits an unclear intent, architecture, approach, library choice, or design pattern during story creation, quick-spec authoring, or its own decision-making. Memory was checked first and didn't have the answer; the question is technical-research-shaped; you can state it concretely. Spawn, get the answer, shut down.
 
-This is NOT peer-to-worker — there's no worker yet (often the question comes up *before* developing). The researcher reports back to team-lead directly.
+This is NOT peer-to-worker — there's no worker yet (often the question comes up _before_ developing). The researcher reports back to team-lead directly.
 
 ### Spawn prompt (planning-phase)
 
 When you fill in `{AGENT_HEADER}`, the bmad-auto context block fields look like:
+
 - Flow: <Phase 4 | Quick Flow>
 - Mode: <whatever the session mode is>
 - Your specific role: one-shot tech-researcher consulting the leader on a planning-phase question (e.g. library choice, design pattern, architecture approach). No peer worker — report findings directly to team-lead.
@@ -110,6 +111,7 @@ A "round" = one researcher message + one worker response + one fix attempt by th
 ### Researcher spawn prompt
 
 When you fill in `{AGENT_HEADER}`, the bmad-auto context block fields look like:
+
 - Flow: <Phase 4 | Quick Flow>
 - Mode: <whatever the session mode is>
 - Your specific role: tech-researcher escalation peer for `<worker-name>`, who has been blocked through 2 leader-feedback rounds. You collaborate peer-to-peer with the worker; you do NOT report through team-lead for routine messages.
@@ -208,4 +210,4 @@ Some problems are obviously not solvable by a sub-agent and shouldn't burn round
 - **External dependencies the user controls** (e.g., "we need an API key from a third party") — Tier 3 immediately.
 - **Spec ambiguity that requires the user's intent** (e.g., "the AC says X but the architecture implies Y; which?") — Tier 3 immediately.
 
-Tier 1 and Tier 2 are for *technical* problems where more research or a fresh angle plausibly helps. Don't waste rounds on problems where the answer fundamentally lives outside the codebase.
+Tier 1 and Tier 2 are for _technical_ problems where more research or a fresh angle plausibly helps. Don't waste rounds on problems where the answer fundamentally lives outside the codebase.

@@ -15,7 +15,7 @@ Lightweight pipeline for small, well-understood changes. Skips Phases 1-3 entire
 
 1. Read the user's change description. If it's vague (e.g. "fix the login thing"), ask one clarifying question to make the intent concrete before spawning anything.
 2. Check `{MEMORY_SOURCES}` and `{KNOWLEDGE_PATHS}` for prior decisions that affect the change. Cite anything relevant in the developer's Delegation Packet.
-3. **If the change surfaces real design ambiguity** (multiple plausible approaches, unclear library/pattern choice), spawn a one-shot planning-phase researcher per `references/escalation.md` *before* delegating to the developer. A 5-minute consultation here saves hours of rework. Memory check first; researcher only if memory is empty.
+3. **If the change surfaces real design ambiguity** (multiple plausible approaches, unclear library/pattern choice), spawn a one-shot planning-phase researcher per `references/escalation.md` _before_ delegating to the developer. A 5-minute consultation here saves hours of rework. Memory check first; researcher only if memory is empty.
 4. Tell the user the one-sentence summary of the change you're about to implement, and the approach you'll take. Confirm before proceeding.
 
 ---
@@ -25,17 +25,18 @@ Lightweight pipeline for small, well-understood changes. Skips Phases 1-3 entire
 Send a Delegation Packet (or invoke directly in `main` mode) for `Skill: "bmad-quick-dev"`. The packet includes:
 
 - The user's change description (verbatim).
-- *Why this matters* — the user-visible problem the change solves.
-- *Knowledge sources* — `{KNOWLEDGE_PATHS}` + any related prior decisions surfaced from `{MEMORY_SOURCES}` + relevant existing files.
-- *Specific actions* — "Use `bmad-quick-dev` end-to-end: shape the implementation plan, write the code, write tests for new behavior, run self-check."
-- *Where to write detailed work* — append a Dev Notes section to a new file at `_bmad-output/implementation-artifacts/quick-{slug}.md` with the implementation summary, files touched, decisions made, test results.
-- *Manual task handling* — investigate automation first; only report a task as truly manual after exhausting automation options.
-- *Success criteria* — change implemented, tests pass, no regressions in touched files.
-- *Report back with* — short message: `"Done. Quick-doc: <path>. Status: review. Tests: <pass/fail>. Headline: <one line>."`
+- _Why this matters_ — the user-visible problem the change solves.
+- _Knowledge sources_ — `{KNOWLEDGE_PATHS}` + any related prior decisions surfaced from `{MEMORY_SOURCES}` + relevant existing files.
+- _Specific actions_ — "Use `bmad-quick-dev` end-to-end: shape the implementation plan, write the code, write tests for new behavior, run self-check."
+- _Where to write detailed work_ — append a Dev Notes section to a new file at `_bmad-output/implementation-artifacts/quick-{slug}.md` with the implementation summary, files touched, decisions made, test results.
+- _Manual task handling_ — investigate automation first; only report a task as truly manual after exhausting automation options.
+- _Success criteria_ — change implemented, tests pass, no regressions in touched files.
+- _Report back with_ — short message: `"Done. Quick-doc: <path>. Status: review. Tests: <pass/fail>. Headline: <one line>."`
 
 In `main` mode the leader runs `bmad-quick-dev` directly and writes its own Dev Notes to the same `quick-{slug}.md` file.
 
 After report:
+
 - Successful → Step 2.
 - Blocked → escalation ladder (`references/escalation.md`).
 - Manual task surfaced → review investigation, suggest automation if missed; else halt for user.
@@ -46,7 +47,7 @@ After report:
 
 The leader reads the diff and verifies the change does what the user described and meets the project's standards. Use `Skill: "bmad-code-review"` if you want the structured workflow.
 
-Pass → Step 3. Issues → write your full review findings into `quick-{slug}.md` → **Review Notes** section, then send a fix-request Delegation Packet back to the same developer (same agent in team-persistent/hybrid; respawn quick-developer in team-respawn). The packet's *Knowledge sources* points at the new Review Notes section; *Specific actions* lists the numbered fixes. Up to 2 leader rounds → escalation ladder.
+Pass → Step 3. Issues → write your full review findings into `quick-{slug}.md` → **Review Notes** section, then send a fix-request Delegation Packet back to the same developer (same agent in team-persistent/hybrid; respawn quick-developer in team-respawn). The packet's _Knowledge sources_ points at the new Review Notes section; _Specific actions_ lists the numbered fixes. Up to 2 leader rounds → escalation ladder.
 
 > Same rule as Phase 4: the leader reviews, the developer fixes. No separate `quick-reviewer` sub-agent.
 
@@ -70,7 +71,7 @@ PASS → Step 4. PARTIAL → log warning, proceed to Step 4. FAIL → fix-reques
 4. **Commit policy:**
    - `auto_progression: confirm-each` → ask user → commit on yes.
    - `auto_progression: auto-commit` → commit directly. Still ask if `git status` shows files outside the change's scope.
-5. Report: *"Quick Flow complete."*
+5. Report: _"Quick Flow complete."_
 
 ---
 
@@ -87,6 +88,7 @@ Wait for the user to confirm before switching. Don't make this call yourself.
 ## Resumability
 
 State is inferred from the `quick-{slug}.md` document + git state:
+
 - Document exists, no code changes → resume at Step 1 (developer didn't finish or didn't start).
 - Code changes exist, no commit → resume at Step 2 or Step 3.
 - Code committed → flow done.

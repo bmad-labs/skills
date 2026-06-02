@@ -3,6 +3,7 @@
 Build, run, and test the implementation in its real runtime. Catches the class of bugs that unit tests with mocks cannot: misconfigured services, missing Docker images, broken migrations, dependency-version incompatibilities, and integration failures between components.
 
 This document covers:
+
 1. **Light vs. full** — when to run which (epic-aware).
 2. **Project type detection** — picking the right playbook.
 3. **Tool-availability strategy** — native first, Docker fallback, suggest both.
@@ -17,9 +18,9 @@ The per-project-type playbooks themselves live in `references/guides/`. Read thi
 
 The leader chooses light or full per story based on **epic size**, then writes the choice into the tester's Delegation Packet.
 
-| Epic size | Per-story validation | Epic completion |
-|---|---|---|
-| ≤3 stories | **Full** every story | (already covered story-by-story) |
+| Epic size  | Per-story validation  | Epic completion                        |
+| ---------- | --------------------- | -------------------------------------- |
+| ≤3 stories | **Full** every story  | (already covered story-by-story)       |
 | >3 stories | **Light** every story | **Full** epic suite once at completion |
 
 ### What "light" means
@@ -35,7 +36,7 @@ The goal of light validation is to verify the application **actually runs and th
   - Cross-cutting tests (security / a11y / perf) — those are full-mode only.
   - Heavy infra spin-up if it's not trivially scripted.
 
-Rule of thumb: light validation answers *"does the change actually work when the app is running?"* — which unit tests can't answer because they don't bring up the runtime. It should usually finish in a few minutes. If it's much longer, you're either running full by accident or the project's "main case" smoke is genuinely involved (which is fine, but worth noticing).
+Rule of thumb: light validation answers _"does the change actually work when the app is running?"_ — which unit tests can't answer because they don't bring up the runtime. It should usually finish in a few minutes. If it's much longer, you're either running full by accident or the project's "main case" smoke is genuinely involved (which is fine, but worth noticing).
 
 ### What "full" means
 
@@ -47,7 +48,7 @@ Rule of thumb: light validation answers *"does the change actually work when the
 
 ### Why epic-aware?
 
-A 1-3 story epic often *is* the work; running the full suite per story is the right granularity. A 5+ story epic accumulates churn — running full for every story is N× the cost and 80% redundant because most stories touch overlapping surfaces. Light per story + full at completion catches the same regressions for a fraction of the cost.
+A 1-3 story epic often _is_ the work; running the full suite per story is the right granularity. A 5+ story epic accumulates churn — running full for every story is N× the cost and 80% redundant because most stories touch overlapping surfaces. Light per story + full at completion catches the same regressions for a fraction of the cost.
 
 This isn't a license to skip infrastructure verification within a story that touches infra — see Section 4.
 
@@ -57,18 +58,18 @@ This isn't a license to skip infrastructure verification within a story that tou
 
 Detect once at the start of the epic (in team modes, the tester does this on first spawn and remembers; in main/hybrid, the leader does it). Apply the FIRST matching rule from the table — types are listed in priority order to handle ambiguity.
 
-| Priority | Marker | Type | Guide |
-|---|---|---|---|
-| 1 | `platformio.ini` (or `Makefile` with MCU targets) | Embedded/Firmware | `guides/embedded-linux-mac.md` or `guides/embedded-windows-wsl.md` (by OS) |
-| 2 | `main.tf` / `Pulumi.yaml` / `cdk.json` | Infrastructure as Code | `guides/infrastructure-as-code.md` |
-| 3 | `pubspec.yaml` (Flutter), or `package.json` with `react-native` | Mobile | `guides/mobile-application.md` |
-| 4 | `docker-compose.yml` + frontend framework in subdir | Full-Stack | `guides/fullstack-application.md` |
-| 5 | `package.json` with `react`/`next`/`vue`/`angular`/`svelte` | UI/Frontend | `guides/ui-application.md` |
-| 6 | `package.json` with `express`/`fastify`/`nestjs`/`hapi` | Backend/API | `guides/backend-application.md` |
-| 7 | `go.mod` or `Cargo.toml` with `actix`/`axum`/`rocket`/`warp` | Backend/API | `guides/backend-application.md` |
-| 8 | `Cargo.toml` or `setup.py`/`pyproject.toml` with CLI entry | CLI/Library | `guides/cli-library.md` |
-| 9 | `dvc.yaml` or ML imports (`torch`, `tensorflow`, `sklearn`) | Data Pipeline/ML | `guides/data-pipeline-ml.md` |
-| 10 | `Makefile` or `CMakeLists.txt` (no `platformio.ini`) | CLI/Library (C/C++) | `guides/cli-library.md` |
+| Priority | Marker                                                          | Type                   | Guide                                                                      |
+| -------- | --------------------------------------------------------------- | ---------------------- | -------------------------------------------------------------------------- |
+| 1        | `platformio.ini` (or `Makefile` with MCU targets)               | Embedded/Firmware      | `guides/embedded-linux-mac.md` or `guides/embedded-windows-wsl.md` (by OS) |
+| 2        | `main.tf` / `Pulumi.yaml` / `cdk.json`                          | Infrastructure as Code | `guides/infrastructure-as-code.md`                                         |
+| 3        | `pubspec.yaml` (Flutter), or `package.json` with `react-native` | Mobile                 | `guides/mobile-application.md`                                             |
+| 4        | `docker-compose.yml` + frontend framework in subdir             | Full-Stack             | `guides/fullstack-application.md`                                          |
+| 5        | `package.json` with `react`/`next`/`vue`/`angular`/`svelte`     | UI/Frontend            | `guides/ui-application.md`                                                 |
+| 6        | `package.json` with `express`/`fastify`/`nestjs`/`hapi`         | Backend/API            | `guides/backend-application.md`                                            |
+| 7        | `go.mod` or `Cargo.toml` with `actix`/`axum`/`rocket`/`warp`    | Backend/API            | `guides/backend-application.md`                                            |
+| 8        | `Cargo.toml` or `setup.py`/`pyproject.toml` with CLI entry      | CLI/Library            | `guides/cli-library.md`                                                    |
+| 9        | `dvc.yaml` or ML imports (`torch`, `tensorflow`, `sklearn`)     | Data Pipeline/ML       | `guides/data-pipeline-ml.md`                                               |
+| 10       | `Makefile` or `CMakeLists.txt` (no `platformio.ini`)            | CLI/Library (C/C++)    | `guides/cli-library.md`                                                    |
 
 ### PRD/Architecture override
 
@@ -79,16 +80,17 @@ If `_bmad-output/planning-artifacts/prd.md` or `architecture.md` explicitly stat
 ```bash
 uname -s 2>/dev/null || echo "Windows"
 ```
+
 Linux/macOS → `embedded-linux-mac.md`. Windows → `embedded-windows-wsl.md`.
 
 ### Cross-cutting guides (apply on top of the primary type, only in **full** mode)
 
-| Guide | When to apply |
-|---|---|
-| `guides/security-testing.md` | All projects — dep audit + secret scan |
-| `guides/container-testing.md` | Projects with `Dockerfile` or `docker-compose.yml` |
-| `guides/accessibility-testing.md` | UI/Frontend or Full-Stack |
-| `guides/performance-testing.md` | All projects — at minimum check build/binary size |
+| Guide                             | When to apply                                      |
+| --------------------------------- | -------------------------------------------------- |
+| `guides/security-testing.md`      | All projects — dep audit + secret scan             |
+| `guides/container-testing.md`     | Projects with `Dockerfile` or `docker-compose.yml` |
+| `guides/accessibility-testing.md` | UI/Frontend or Full-Stack                          |
+| `guides/performance-testing.md`   | All projects — at minimum check build/binary size  |
 
 Cross-cutting tests **warn but never block a commit** in full mode. They are not run in light mode.
 
@@ -150,7 +152,7 @@ When a story introduces or depends on infrastructure, full validation must attem
 
 If infrastructure can't be verified (no Docker, no DB, no network), **report PARTIAL with the specific gap named** — never silently skip it. The gap must be visible so it can be tracked.
 
-In light mode: bringing the app up (locally or via Docker) is the whole point — that includes whatever services the story touches if they're easy to start. If a story adds a Redis dependency and `docker compose up redis` is one command away, do it. The line for light mode is *"would running this take more than a few minutes?"* — if yes, defer the heavy parts (full migration replays, multi-service E2E spin-ups) to the epic-end full pass; if no, do them now.
+In light mode: bringing the app up (locally or via Docker) is the whole point — that includes whatever services the story touches if they're easy to start. If a story adds a Redis dependency and `docker compose up redis` is one command away, do it. The line for light mode is _"would running this take more than a few minutes?"_ — if yes, defer the heavy parts (full migration replays, multi-service E2E spin-ups) to the epic-end full pass; if no, do them now.
 
 ---
 
@@ -207,9 +209,10 @@ VALIDATION: FAIL
 ```
 
 The leader uses these reports to decide:
+
 - PASS → proceed to commit.
 - PARTIAL → log the gap in the commit message, proceed.
-- FAIL → fix-request Delegation Packet to the developer with the FAIL report as *Prior findings verbatim*.
+- FAIL → fix-request Delegation Packet to the developer with the FAIL report as _Prior findings verbatim_.
 
 ---
 

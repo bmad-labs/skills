@@ -6,12 +6,12 @@ You (the leader) coordinate an agent **team** for the entire epic. Teammates are
 
 ## The team
 
-| Role | Teammate name | Used for | Lifetime |
-|---|---|---|---|
-| Leader | (you) | Story validation, code review, all decisions, all git commits, escalation triggers | Whole session |
-| `sm` | `bmad-sm-{TEAM_NAME}` | Story creation (`bmad-create-story`), epic-start sprint planning if needed | One epic |
-| `developer` | `bmad-dev-{TEAM_NAME}` | Story implementation (`bmad-dev-story`), test writing, bug fixes from review | One epic |
-| `tester` | `bmad-tester-{TEAM_NAME}` | Functional validation per story using `{TESTER_SKILL}` + runtime smoke from `references/functional-validation.md`, full epic suite at epic completion | One epic |
+| Role        | Teammate name             | Used for                                                                                                                                              | Lifetime      |
+| ----------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| Leader      | (you)                     | Story validation, code review, all decisions, all git commits, escalation triggers                                                                    | Whole session |
+| `sm`        | `bmad-sm-{TEAM_NAME}`     | Story creation (`bmad-create-story`), epic-start sprint planning if needed                                                                            | One epic      |
+| `developer` | `bmad-dev-{TEAM_NAME}`    | Story implementation (`bmad-dev-story`), test writing, bug fixes from review                                                                          | One epic      |
+| `tester`    | `bmad-tester-{TEAM_NAME}` | Functional validation per story using `{TESTER_SKILL}` + runtime smoke from `references/functional-validation.md`, full epic suite at epic completion | One epic      |
 
 The leader does **not** delegate story validation or code review. Those happen in this conversation. See `flows/phase-4.md` for which steps you do vs. which the team does.
 
@@ -46,7 +46,7 @@ Why shut down at epic boundary instead of running for the whole project? Each ep
 
 ## Context-budget check between stories (mandatory)
 
-After every story completes — *before* delegating the next story to the same dev or tester — the leader runs a script to measure each persistent sub-agent's actual context usage. Self-reported "I have plenty of room" is unreliable; the script reads the agent's session transcript and computes the same number Claude Code's status line displays.
+After every story completes — _before_ delegating the next story to the same dev or tester — the leader runs a script to measure each persistent sub-agent's actual context usage. Self-reported "I have plenty of room" is unreliable; the script reads the agent's session transcript and computes the same number Claude Code's status line displays.
 
 ```bash
 python3 <skill-dir>/scripts/context-usage.py \
@@ -57,9 +57,9 @@ python3 <skill-dir>/scripts/context-usage.py \
 The script returns JSON with `used_pct`, `compaction_count`, and a `recommendation` field. Honor the recommendation:
 
 - **`ok`** → keep the agent alive; delegate the next story as usual.
-- **`respawn-with-handover`** → run the respawn-with-handover protocol below before delegating the next story. The script returns this when usage exceeds 50% on a 1M-tier agent, exceeds 70% on a 200k-tier agent, or when *any* prior auto-compaction happened during the agent's session.
+- **`respawn-with-handover`** → run the respawn-with-handover protocol below before delegating the next story. The script returns this when usage exceeds 50% on a 1M-tier agent, exceeds 70% on a 200k-tier agent, or when _any_ prior auto-compaction happened during the agent's session.
 
-Run the check on **all three persistent agents — sm, dev, and tester** — between every story. SM rarely fills its window in practice (story creation is bounded), but the check is cheap (~50ms), and an SM that *does* fill (large epic, lots of cross-referencing across many story files) carries the same reasoning-degradation risk as a stuffed dev. Belt-and-braces: check all three.
+Run the check on **all three persistent agents — sm, dev, and tester** — between every story. SM rarely fills its window in practice (story creation is bounded), but the check is cheap (~50ms), and an SM that _does_ fill (large epic, lots of cross-referencing across many story files) carries the same reasoning-degradation risk as a stuffed dev. Belt-and-braces: check all three.
 
 If the leader is on a tier-mixed setup (e.g. opus 1M, sonnet 200k), pass the appropriate window per agent: `1000000` for the opus-backed sm, `200000` for the sonnet-backed dev/tester.
 
@@ -71,19 +71,20 @@ We tested whether the leader could remotely trigger `/compact` in a sub-agent. I
 
 ### Respawn-with-handover protocol
 
-**Important: this fires only at story boundaries, never mid-story.** The check runs after a story is fully complete (Dev Notes / QA Results / Review Notes written, leader has committed the work). If a sub-agent's context fills *during* a story, the agent finishes the current story first — partial-story respawn is more disruptive than the lossy auto-compact that would fire at 99% in the worst case. The next story-boundary check then catches the `compaction_count > 0` signal and respawns the agent with a fresh window.
+**Important: this fires only at story boundaries, never mid-story.** The check runs after a story is fully complete (Dev Notes / QA Results / Review Notes written, leader has committed the work). If a sub-agent's context fills _during_ a story, the agent finishes the current story first — partial-story respawn is more disruptive than the lossy auto-compact that would fire at 99% in the worst case. The next story-boundary check then catches the `compaction_count > 0` signal and respawns the agent with a fresh window.
 
 Same procedure for every persistent agent (sm, dev, tester), every time the script returns `respawn-with-handover` after a story completes. Six steps, designed so the **leader never reads the handover content** — just passes the path:
 
 1. **Ask the outgoing agent to write a handover file.** Send a `SendMessage`:
 
-   > *"Your context utilization has crossed the threshold for this tier. After this story finishes, I'll respawn you with a fresh window. Before you go, write a handover file to `/tmp/bmad-handover-<TEAM_NAME>-<role>-<unix-timestamp>.md` containing:*
-   > - *What's done across the stories you've worked on this session (point at the relevant Dev Notes / QA Results sections in the story files for full detail).*
-   > - *Decisions you made that aren't visible in the code diff yet (the "why" behind choices, especially anything that future stories in this epic will depend on).*
-   > - *Project-specific gotchas, conventions, or patterns you learned that the next agent should know up front (saves them rediscovering the same things).*
-   > - *Anything in-flight that you didn't finish — but only if it's small/trivial enough to be worth picking up. If anything is genuinely incomplete and non-trivial, flag that to me instead, don't try to hand it off.*
+   > _"Your context utilization has crossed the threshold for this tier. After this story finishes, I'll respawn you with a fresh window. Before you go, write a handover file to `/tmp/bmad-handover-<TEAM_NAME>-<role>-<unix-timestamp>.md` containing:_
    >
-   > *Reply with the absolute path of the file you wrote. Then I'll send shutdown."*
+   > - _What's done across the stories you've worked on this session (point at the relevant Dev Notes / QA Results sections in the story files for full detail)._
+   > - _Decisions you made that aren't visible in the code diff yet (the "why" behind choices, especially anything that future stories in this epic will depend on)._
+   > - _Project-specific gotchas, conventions, or patterns you learned that the next agent should know up front (saves them rediscovering the same things)._
+   > - _Anything in-flight that you didn't finish — but only if it's small/trivial enough to be worth picking up. If anything is genuinely incomplete and non-trivial, flag that to me instead, don't try to hand it off._
+   >
+   > _Reply with the absolute path of the file you wrote. Then I'll send shutdown."_
 
 2. **Wait for confirmation.** The agent writes the file and replies with the path. If it says anything other than a path (asks a question, reports a problem) — handle that, then re-issue the request.
 
@@ -93,25 +94,25 @@ Same procedure for every persistent agent (sm, dev, tester), every time the scri
 
 5. **Spawn a fresh agent in the same role.** Use the same spawn prompt as the original (sm / developer / tester block in this file), with the same role-skill, model, and effort. The new `{AGENT_HEADER}` includes the same project root and knowledge sources.
 
-6. **First Delegation Packet to the fresh agent** is the next story's normal Delegation Packet, with one extra item in *Knowledge sources*: *"Before doing anything else, read `/tmp/bmad-handover-<...>.md` — that's your handover from the previous agent in this role. Treat it as authoritative for prior context this session. Then proceed with the story below."* The new agent reads the handover file once at startup; the leader never reads it at all.
+6. **First Delegation Packet to the fresh agent** is the next story's normal Delegation Packet, with one extra item in _Knowledge sources_: _"Before doing anything else, read `/tmp/bmad-handover-<...>.md` — that's your handover from the previous agent in this role. Treat it as authoritative for prior context this session. Then proceed with the story below."_ The new agent reads the handover file once at startup; the leader never reads it at all.
 
 ### Why this works
 
 - **Leader stays lean.** The handover content lives in a file the leader knows the path to but never opens. No pass-through token cost.
 - **The new agent gets concrete prior context.** Decisions, gotchas, conventions — explicit text, not inferred from code or compressed by auto-compact.
 - **Clean window for the new agent's actual work.** Just one file read at startup, then back to the new story.
-- **Story files remain the durable record.** Dev Notes / QA Results / Review Notes already document what was *done* in each story. The /tmp handover only captures what the *outgoing agent learned* across stories that isn't visible in those records — the "why" and the gotchas. Once the next agent absorbs it, the file's job is done; /tmp rotates naturally on reboot.
+- **Story files remain the durable record.** Dev Notes / QA Results / Review Notes already document what was _done_ in each story. The /tmp handover only captures what the _outgoing agent learned_ across stories that isn't visible in those records — the "why" and the gotchas. Once the next agent absorbs it, the file's job is done; /tmp rotates naturally on reboot.
 
 ## Effort tuning (the token-saver)
 
 This mode runs on a 1M-context model. Effort is dialed down for the agents whose value comes from carrying lots of context (sm, developer); kept high for the agent whose value comes from rigor (tester):
 
-| Teammate | Model | Effort | Notes |
-|---|---|---|---|
-| `sm` | opus | `medium` | 1M ctx + opus carries planning by itself; medium is enough. |
-| `developer` | sonnet | `medium` | 1M ctx absorbs the codebase; medium effort is enough for execution. |
-| `tester` | sonnet | `high` | Validation must actually catch bugs — don't dial this down. |
-| `tech-researcher` (escalation only) | opus | `xhigh` | Escalation is hard; pay the effort. |
+| Teammate                            | Model  | Effort   | Notes                                                               |
+| ----------------------------------- | ------ | -------- | ------------------------------------------------------------------- |
+| `sm`                                | opus   | `medium` | 1M ctx + opus carries planning by itself; medium is enough.         |
+| `developer`                         | sonnet | `medium` | 1M ctx absorbs the codebase; medium effort is enough for execution. |
+| `tester`                            | sonnet | `high`   | Validation must actually catch bugs — don't dial this down.         |
+| `tech-researcher` (escalation only) | opus   | `xhigh`  | Escalation is hard; pay the effort.                                 |
 
 Pass `model: "opus"` or `model: "sonnet"` (abstract tier — Claude Code resolves). Omit `effort` if `{EFFORT_SUPPORTED}=false` (see SKILL.md → Model Selection).
 
@@ -126,6 +127,7 @@ Issue these three `Agent` calls at the start of an epic (and again at every subs
 ### sm
 
 When you fill in `{AGENT_HEADER}`, the bmad-auto context block fields look like:
+
 - Flow: Phase 4
 - Mode: team-persistent
 - Your specific role: SM (story manager) for Epic {EPIC_NUM}: {EPIC_TITLE}. You'll be reused for every story in this epic.
@@ -175,6 +177,7 @@ Agent tool:
 ### developer
 
 When you fill in `{AGENT_HEADER}`, the bmad-auto context block fields look like:
+
 - Flow: Phase 4
 - Mode: team-persistent
 - Your specific role: developer for Epic {EPIC_NUM}: {EPIC_TITLE}. You'll be reused for every story in this epic.
@@ -234,6 +237,7 @@ Agent tool:
 ### tester
 
 When you fill in `{AGENT_HEADER}`, the bmad-auto context block fields look like:
+
 - Flow: Phase 4
 - Mode: team-persistent
 - Your specific role: functional tester for Epic {EPIC_NUM}: {EPIC_TITLE}. You'll be reused for every story in this epic plus a final epic-wide pass.
@@ -306,19 +310,20 @@ Agent tool:
 Even though the agent is alive and has prior context, **every story still gets a Delegation Packet**. The packet shape from `references/delegation-packet.md` is mandatory. The agent has been running for a while; without the packet, story-2's instructions blur into story-1's leftovers. The packet re-anchors the agent on the current story.
 
 Include in the packet:
+
 - Story id (e.g. "Story 1-3").
 - Path to the story file.
-- *Skill to invoke* — always name it explicitly.
-- *Knowledge sources* — same paths as the spawn prompt; restating costs nothing and prevents drift.
-- *Success criteria* — concrete checks for this story.
-- *Report back with* — exactly what fields you want in the response.
+- _Skill to invoke_ — always name it explicitly.
+- _Knowledge sources_ — same paths as the spawn prompt; restating costs nothing and prevents drift.
+- _Success criteria_ — concrete checks for this story.
+- _Report back with_ — exactly what fields you want in the response.
 
 ## Reviewer-fixes-issues handoff (when leader's code review finds issues)
 
 The leader does code review in this conversation. When you find issues:
 
 1. Send a Delegation Packet to the **developer** (not a separate reviewer) asking for fixes.
-2. Include *Prior findings verbatim* — your full review, copied unchanged. No "apply the 4 fixes."
+2. Include _Prior findings verbatim_ — your full review, copied unchanged. No "apply the 4 fixes."
 3. Mark round count: "Round 1/2".
 4. Developer fixes → reports back → you re-review in this conversation.
 5. After 2 rounds still failing → escalation ladder (`references/escalation.md`).
@@ -328,6 +333,7 @@ Sub-agents never review their own work. The leader is always the reviewer.
 ## Idle / cross-talk handling
 
 The three agents may message each other (e.g. tester pings developer about a missing build artifact). Allow this — that's the point of the team. You only intervene when:
+
 - A decision needs to be made.
 - An agent reports back to "team-lead".
 - An agent goes silent for 2 idle cycles → send status check; after 2 status checks → respawn.

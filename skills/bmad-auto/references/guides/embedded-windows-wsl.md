@@ -80,6 +80,7 @@ docker run --rm -v "$(pwd)":/src neszt/cppcheck:latest \
 ## WSL-Based Validation (Last Resort)
 
 WSL can work for simulation but has significant limitations for agent-driven workflows:
+
 - Agent cannot reliably interact with WSL shell (context switching between Windows and Linux)
 - Filesystem access across the boundary is slow and error-prone
 - WSLg display forwarding is unreliable for graphical simulators
@@ -111,6 +112,7 @@ wsl bash scripts/sim-run.sh
 ```
 
 For projects without simulator scripts:
+
 ```bash
 wsl pip install platformio
 wsl pio run -e <simulator_env>
