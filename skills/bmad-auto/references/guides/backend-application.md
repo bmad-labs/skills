@@ -10,6 +10,7 @@ and responds to API requests correctly.
 ## Required Tools
 
 ### Build Tools (language-specific)
+
 - **Node.js**: `npm` / `yarn` / `pnpm`
 - **Go**: `go`
 - **Rust**: `cargo`
@@ -17,14 +18,17 @@ and responds to API requests correctly.
 - **Java**: `gradle` / `mvn`
 
 ### Infrastructure
+
 - **Docker** + **Docker Compose** — for databases, message brokers, caches
 
 ### API Testing
+
 - `curl` (almost always available)
 - `httpie` (optional, nicer output)
 - `grpcurl` (for gRPC services)
 
 Check availability:
+
 ```bash
 command -v docker && docker info > /dev/null 2>&1 && echo "Docker: available"
 command -v docker && command -v docker compose version > /dev/null 2>&1 && echo "Docker Compose: available"
@@ -39,23 +43,23 @@ command -v grpcurl && echo "grpcurl: available"
 
 Language-specific build commands:
 
-| Language | Build Command | Success Criteria |
-|----------|--------------|-----------------|
-| Node.js | `npm run build` or `npx tsc` | Exit code 0 |
-| Go | `go build ./...` | Exit code 0 |
-| Rust | `cargo build` | Exit code 0 |
-| Python | `pip install -e .` or `poetry install` | Exit code 0 |
-| Java | `./gradlew build -x test` or `mvn compile` | Exit code 0 |
+| Language | Build Command                              | Success Criteria |
+| -------- | ------------------------------------------ | ---------------- |
+| Node.js  | `npm run build` or `npx tsc`               | Exit code 0      |
+| Go       | `go build ./...`                           | Exit code 0      |
+| Rust     | `cargo build`                              | Exit code 0      |
+| Python   | `pip install -e .` or `poetry install`     | Exit code 0      |
+| Java     | `./gradlew build -x test` or `mvn compile` | Exit code 0      |
 
 ### Step 2: Run Tests
 
-| Language | Test Command |
-|----------|-------------|
-| Node.js | `npm test` |
-| Go | `go test ./...` |
-| Rust | `cargo test` |
-| Python | `pytest` |
-| Java | `./gradlew test` or `mvn test` |
+| Language | Test Command                   |
+| -------- | ------------------------------ |
+| Node.js  | `npm test`                     |
+| Go       | `go test ./...`                |
+| Rust     | `cargo test`                   |
+| Python   | `pytest`                       |
+| Java     | `./gradlew test` or `mvn test` |
 
 ### Step 3: Start Infrastructure (if docker-compose.yml exists)
 
@@ -73,6 +77,7 @@ If Docker is not available, skip this step and note it as a gap.
 ### Step 4: Start Server and Test APIs
 
 1. Start the server in background:
+
    ```bash
    # Detect and run the appropriate start command
    npm start &  # or go run main.go & or cargo run & etc.
@@ -81,6 +86,7 @@ If Docker is not available, skip this step and note it as a gap.
    ```
 
 2. Test health/readiness endpoint:
+
    ```bash
    curl -sf http://localhost:${PORT:-3000}/health && echo "Health: OK"
    # or common alternatives:
@@ -90,6 +96,7 @@ If Docker is not available, skip this step and note it as a gap.
    ```
 
 3. Test key API endpoints from story acceptance criteria:
+
    ```bash
    # Example: test a GET endpoint
    curl -sf http://localhost:${PORT:-3000}/api/v1/resource | head -c 200
@@ -105,12 +112,12 @@ If Docker is not available, skip this step and note it as a gap.
 
 If the application uses message brokers, test connectivity:
 
-| Broker | Check Command |
-|--------|--------------|
-| Kafka | `docker compose exec kafka kafka-topics --list --bootstrap-server localhost:9092` |
-| RabbitMQ | `curl -sf http://guest:guest@localhost:15672/api/overview` |
-| Redis | `docker compose exec redis redis-cli ping` |
-| NATS | `curl -sf http://localhost:8222/varz` |
+| Broker   | Check Command                                                                     |
+| -------- | --------------------------------------------------------------------------------- |
+| Kafka    | `docker compose exec kafka kafka-topics --list --bootstrap-server localhost:9092` |
+| RabbitMQ | `curl -sf http://guest:guest@localhost:15672/api/overview`                        |
+| Redis    | `docker compose exec redis redis-cli ping`                                        |
+| NATS     | `curl -sf http://localhost:8222/varz`                                             |
 
 ### Step 6: gRPC Testing (if applicable)
 

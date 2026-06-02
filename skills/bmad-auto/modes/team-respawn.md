@@ -10,13 +10,13 @@ A 200k window fills quickly: project context + PRD + architecture + story file +
 
 ## Sub-agents (created per step, then shut down)
 
-| Step | Teammate name | Role-skill to invoke (first action) | Workflow skill (per request) |
-|---|---|---|---|
-| Story create | `story-creator` | `bmad-agent-pm` | `bmad-create-story` |
-| Story develop | `story-developer` | `bmad-agent-dev` | `bmad-dev-story` |
-| Functional validate | `func-validator` | `{TESTER_PERSONA}` (resolved at startup — see SKILL.md → "Tester role-skill availability check") | `{TESTER_SKILL}` (resolved at startup) + bmad-auto's `references/functional-validation.md` for runtime smoke |
-| Quick develop | `quick-developer` | `bmad-agent-dev` | `bmad-quick-dev` |
-| Escalation only | `tech-researcher` | `bmad-agent-analyst` | `bmad-technical-research` |
+| Step                | Teammate name     | Role-skill to invoke (first action)                                                              | Workflow skill (per request)                                                                                 |
+| ------------------- | ----------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Story create        | `story-creator`   | `bmad-agent-pm`                                                                                  | `bmad-create-story`                                                                                          |
+| Story develop       | `story-developer` | `bmad-agent-dev`                                                                                 | `bmad-dev-story`                                                                                             |
+| Functional validate | `func-validator`  | `{TESTER_PERSONA}` (resolved at startup — see SKILL.md → "Tester role-skill availability check") | `{TESTER_SKILL}` (resolved at startup) + bmad-auto's `references/functional-validation.md` for runtime smoke |
+| Quick develop       | `quick-developer` | `bmad-agent-dev`                                                                                 | `bmad-quick-dev`                                                                                             |
+| Escalation only     | `tech-researcher` | `bmad-agent-analyst`                                                                             | `bmad-technical-research`                                                                                    |
 
 **Story validation and code review are NOT in this list.** The leader does both in this conversation, in every mode. Do not spawn `story-validator` or `code-reviewer` sub-agents.
 
@@ -28,12 +28,12 @@ Same as `team-persistent.md`: generate `{TEAM_NAME}` once at session start (hold
 
 Use the 200k-context column from SKILL.md:
 
-| Teammate | Model | Effort |
-|---|---|---|
-| `story-creator` | opus | `xhigh` |
+| Teammate                              | Model  | Effort  |
+| ------------------------------------- | ------ | ------- |
+| `story-creator`                       | opus   | `xhigh` |
 | `story-developer` / `quick-developer` | sonnet | `xhigh` |
-| `func-validator` | sonnet | `high` |
-| `tech-researcher` | opus | `xhigh` |
+| `func-validator`                      | sonnet | `high`  |
+| `tech-researcher`                     | opus   | `xhigh` |
 
 Pass abstract tier names (`"opus"`, `"sonnet"`); omit `effort` if `{EFFORT_SUPPORTED}=false`.
 
@@ -47,13 +47,13 @@ For every step, the spawn prompt has this skeleton. **Fill in the four bracketed
 
 Per-role context-block values:
 
-| Sub-agent | Specific role | What leader does with output |
-|---|---|---|
-| `story-creator` | Story manager creating one specific story (id + epic). Fresh-spawn per story. | Reads the story file, validates it (leader job), then sends to developer. |
-| `story-developer` | Developer implementing one specific story. Fresh-spawn per story. | Reviews the diff (leader job), then sends to func-validator. Fix requests come back as Delegation Packets. |
-| `func-validator` | Functional tester for one story (light or full per epic-aware policy). Fresh-spawn per story. | Reads PASS/PARTIAL/FAIL and decides commit / commit-with-caveat / fix-cycle. |
-| `quick-developer` | Developer implementing one quick-flow change. One-shot. | Reviews + sends to func-validator. Fix requests come back as packets. |
-| `tech-researcher` | Researcher unblocking a stuck worker via peer collaboration. | See `references/escalation.md`. |
+| Sub-agent         | Specific role                                                                                 | What leader does with output                                                                               |
+| ----------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `story-creator`   | Story manager creating one specific story (id + epic). Fresh-spawn per story.                 | Reads the story file, validates it (leader job), then sends to developer.                                  |
+| `story-developer` | Developer implementing one specific story. Fresh-spawn per story.                             | Reviews the diff (leader job), then sends to func-validator. Fix requests come back as Delegation Packets. |
+| `func-validator`  | Functional tester for one story (light or full per epic-aware policy). Fresh-spawn per story. | Reads PASS/PARTIAL/FAIL and decides commit / commit-with-caveat / fix-cycle.                               |
+| `quick-developer` | Developer implementing one quick-flow change. One-shot.                                       | Reviews + sends to func-validator. Fix requests come back as packets.                                      |
+| `tech-researcher` | Researcher unblocking a stuck worker via peer collaboration.                                  | See `references/escalation.md`.                                                                            |
 
 Spawn skeleton (agent team mode — add `team_name: "{TEAM_NAME}"` and `run_in_background: true` to the Agent call; fall back to normal sub-agent without those fields if agent teams are unavailable):
 
@@ -108,8 +108,8 @@ The leader does code review in this conversation. If issues are found:
 
 1. Re-spawn the **`story-developer`** (it was shut down after Step 3) with a fresh prompt:
    - First message is the fix-request Delegation Packet.
-   - Include *Prior findings verbatim* (your review report, full text).
-   - Include *Specific actions* with file paths and line numbers.
+   - Include _Prior findings verbatim_ (your review report, full text).
+   - Include _Specific actions_ with file paths and line numbers.
    - Mark "Round 1/2".
 2. Developer fixes → reports back → you re-review in this conversation → shut down developer.
 3. After 2 rounds still failing → escalation ladder.

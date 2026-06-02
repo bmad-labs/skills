@@ -10,14 +10,14 @@ warn but never block commits — they surface risks for the user to evaluate.
 
 ### By Language
 
-| Language | Tool | Command |
-|----------|------|---------|
-| Node.js | npm audit | `npm audit --production` |
-| Python | pip-audit | `pip-audit` or `safety check` |
-| Rust | cargo-audit | `cargo audit` |
-| Go | govulncheck | `govulncheck ./...` |
-| Java | OWASP Dep Check | `./gradlew dependencyCheckAnalyze` |
-| Ruby | bundler-audit | `bundle audit check` |
+| Language | Tool            | Command                            |
+| -------- | --------------- | ---------------------------------- |
+| Node.js  | npm audit       | `npm audit --production`           |
+| Python   | pip-audit       | `pip-audit` or `safety check`      |
+| Rust     | cargo-audit     | `cargo audit`                      |
+| Go       | govulncheck     | `govulncheck ./...`                |
+| Java     | OWASP Dep Check | `./gradlew dependencyCheckAnalyze` |
+| Ruby     | bundler-audit   | `bundle audit check`               |
 
 ### Docker-based audit (if native tools not available)
 
@@ -61,12 +61,12 @@ semgrep scan --config=auto .
 
 ### Language-specific SAST
 
-| Language | Tool | Command |
-|----------|------|---------|
-| Python | Bandit | `bandit -r src/` |
+| Language   | Tool            | Command                             |
+| ---------- | --------------- | ----------------------------------- |
+| Python     | Bandit          | `bandit -r src/`                    |
 | JavaScript | ESLint Security | `npx eslint --plugin security src/` |
-| Go | gosec | `gosec ./...` |
-| Java | SpotBugs | `./gradlew spotbugsMain` |
+| Go         | gosec           | `gosec ./...`                       |
+| Java       | SpotBugs        | `./gradlew spotbugsMain`            |
 
 ## License Compliance
 

@@ -9,6 +9,7 @@ Vue + FastAPI, Angular + Spring Boot, etc.
 ## Detection
 
 A project is full-stack when:
+
 - `docker-compose.yml` exists with both API and frontend services, OR
 - Monorepo with `packages/`, `apps/`, or separate `frontend/`/`backend/` directories, OR
 - Framework like Next.js or Nuxt that includes both SSR and API routes
@@ -18,6 +19,7 @@ A project is full-stack when:
 ### Step 1: Start All Services
 
 **Docker Compose approach (preferred):**
+
 ```bash
 if [ -f "docker-compose.yml" ] || [ -f "compose.yml" ]; then
   docker compose up -d --build
@@ -28,6 +30,7 @@ fi
 ```
 
 **Manual approach (if no Docker Compose):**
+
 ```bash
 # Start backend
 cd backend && npm install && npm run dev &
@@ -43,6 +46,7 @@ sleep 5
 ### Step 2: Backend Validation
 
 Follow the steps in `backend-application.md`:
+
 - Build verification
 - Health check
 - API endpoint testing
@@ -50,6 +54,7 @@ Follow the steps in `backend-application.md`:
 ### Step 3: Frontend Validation
 
 Follow the steps in `ui-application.md`:
+
 - Build verification
 - Page render check (via browser automation if available)
 
@@ -71,6 +76,7 @@ npm run test:e2e
 ### Step 5: Integration Verification
 
 Test that frontend can communicate with backend:
+
 ```bash
 # Check frontend loads and makes API calls
 curl -sf http://localhost:3000 | grep -q "root\|app\|__next" && echo "Frontend: renders"

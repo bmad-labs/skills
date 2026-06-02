@@ -35,6 +35,7 @@ Same convention as the other team modes. Generate `{TEAM_NAME}` once and reuse.
 ## Effort tuning
 
 Use the same table as the corresponding pure mode:
+
 - 1M context → `team-persistent.md` table.
 - 200k context → `team-respawn.md` table.
 
@@ -57,7 +58,7 @@ Hybrid persists the developer and tester across stories, same as `team-persisten
 The leader does code review in-conversation. When fixes are needed:
 
 1. Send a fix-request Delegation Packet to the **developer** (already alive if persistent; respawn if not).
-2. *Prior findings verbatim* = your review notes, copy-paste, no compression.
+2. _Prior findings verbatim_ = your review notes, copy-paste, no compression.
 3. Developer fixes, reports back, you re-review in conversation.
 4. 2 rounds → escalation.
 

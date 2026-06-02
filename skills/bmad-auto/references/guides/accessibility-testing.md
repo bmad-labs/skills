@@ -38,9 +38,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 test('accessibility check', async ({ page }) => {
   await page.goto('http://localhost:3000');
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa'])
-    .analyze();
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(results.violations).toEqual([]);
 });
 ```

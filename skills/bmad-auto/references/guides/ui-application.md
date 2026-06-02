@@ -9,15 +9,18 @@ provides the expected user-facing functionality.
 ## Required Tools
 
 ### Build Tools (at least one required)
+
 - `npm` / `yarn` / `pnpm` / `bun`
 
 ### Browser Automation (optional but recommended)
+
 - **Playwright CLI** — `npx playwright` (preferred)
 - **Cypress** — `npx cypress`
 - **Browser MCP** — check for `mcp__browser__` tools in the environment
 - **Chrome MCP** — check for `mcp__chrome__` tools in the environment
 
 Check availability:
+
 ```bash
 command -v npm && echo "npm: available"
 command -v yarn && echo "yarn: available"
@@ -50,6 +53,7 @@ npm run build
 ```
 
 Must exit with code 0. This catches:
+
 - TypeScript type errors
 - Import/export issues
 - Missing modules
@@ -75,6 +79,7 @@ node -e "const p=require('./package.json'); if(p.scripts?.test && !p.scripts.tes
 If Playwright, Cypress, browser MCP, or Chrome MCP is available:
 
 1. Start dev server in background:
+
    ```bash
    npm run dev &
    DEV_PID=$!
@@ -85,9 +90,9 @@ If Playwright, Cypress, browser MCP, or Chrome MCP is available:
    - **Playwright**: `npx playwright test` (if tests exist)
    - **Cypress**: `npx cypress run` (if tests exist)
    - **Browser MCP**: Navigate to `http://localhost:3000` (or configured port), verify page renders
-   - **Agent Browser**: 
+   - **Agent Browser**:
      - Install agent browser: `npx agent-browser install`
-     - Add the agent-browser skill: `npx skills add vercel-labs/agent-browser --skill agent-browser --yes` 
+     - Add the agent-browser skill: `npx skills add vercel-labs/agent-browser --skill agent-browser --yes`
      - Open the browser: `npx agent-browser open http://localhost:3000`. Using the installed skills to verify page renders and basic interactions work.
    - **Chrome MCP**: Same as Browser MCP
 
@@ -99,6 +104,7 @@ If Playwright, Cypress, browser MCP, or Chrome MCP is available:
 ### Step 6: Lighthouse Audit (optional)
 
 If `lighthouse` is available:
+
 ```bash
 npx lighthouse http://localhost:3000 --output=json --chrome-flags="--headless" --only-categories=performance,accessibility,best-practices
 ```
@@ -106,6 +112,7 @@ npx lighthouse http://localhost:3000 --output=json --chrome-flags="--headless" -
 ## Missing Tool Suggestions
 
 If no browser automation tool is found, suggest:
+
 ```
 SUGGESTION: Install Playwright for browser-based validation:
   npm init playwright@latest

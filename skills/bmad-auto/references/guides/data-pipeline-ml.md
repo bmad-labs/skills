@@ -66,6 +66,7 @@ dbt compile 2>/dev/null && echo "dbt: compiles"
 ### Step 5: Model Inference Smoke Test
 
 If sample data exists:
+
 ```bash
 # Run prediction script with sample input
 python -c "
@@ -92,6 +93,7 @@ fi
 ### Using Project Dockerfile
 
 Most ML projects have a Dockerfile. Use it when native setup is problematic:
+
 ```bash
 docker build -t ml-validation .
 docker run --rm ml-validation pytest

@@ -65,9 +65,9 @@ Anything longer goes in the file, not the message. The leader reads the file.>
 
 ## When to trim
 
-- **First spawn:** *Prior findings* is empty; everything else applies.
+- **First spawn:** _Prior findings_ is empty; everything else applies.
 - **Approve / shut down:** no packet — just shut down.
-- **Simple retry on flaky step:** *Why* and *Prior findings* may collapse to a paragraph; keep *Knowledge sources*, *Success criteria*, *Report back with*.
+- **Simple retry on flaky step:** _Why_ and _Prior findings_ may collapse to a paragraph; keep _Knowledge sources_, _Success criteria_, _Report back with_.
 - **Escalation:** all slots mandatory + round count + what's been tried.
 
 When in doubt, over-include. 30 extra lines of context is trivial compared to a wasted retry round.

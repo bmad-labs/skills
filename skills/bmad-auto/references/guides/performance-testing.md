@@ -132,6 +132,7 @@ go tool pprof http://localhost:6060/debug/pprof/heap
 ## Regression Detection
 
 Compare current metrics with previous builds:
+
 ```bash
 # Save current metrics
 echo "binary_size=$(stat -f%z <binary> 2>/dev/null || stat -c%s <binary>)" > perf-metrics.txt
