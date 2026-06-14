@@ -8,6 +8,7 @@
     "description": "BMAD Skills Marketplace - Custom skills for Claude Code",
     "version": "1.0.0"
   },
+  "allowCrossMarketplaceDependenciesOn": ["agent-browser"],
   "plugins": [
     {
       "name": "bmad-skills",

@@ -91,7 +91,7 @@ If you only need specific skills, add them individually to your project's `.clau
 ```json
 {
   "skills": [
-    "github:bmad-labs/skills/skills/clean-code",
+    "github:bmad-labs/skills/skills/typescript-clean-code",
     "github:bmad-labs/skills/skills/typescript-e2e-testing",
     "github:bmad-labs/skills/skills/typescript-unit-testing"
   ]
@@ -174,7 +174,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [mcp-builder](skills/mcp-builder) | Guide for creating high-quality MCP servers for LLM integrations | Development |
 | [typescript-e2e-testing](skills/typescript-e2e-testing) | Comprehensive E2E testing for TypeScript/NestJS with Kafka, PostgreSQL, MongoDB, Redis | Development |
 | [typescript-unit-testing](skills/typescript-unit-testing) | Unit testing for TypeScript/NestJS with Jest, DeepMocked, mongodb-memory-server, pg-mem, Kafka, Redis | Development |
-| [skill-creator](skills/skill-creator) | Guide for creating effective Claude Code skills | Development |
 | [typescript-clean-code](skills/typescript-clean-code) | Clean Code principles and workflows for TypeScript development | Development |
 | [book-converter](skills/book-converter) | Convert EPUB books to formatted Markdown | Productivity |
 | [skill-from-book](skills/skill-from-book) | Convert book content into structured Claude Code skills | Development |
