@@ -1,0 +1,51 @@
+{
+  "skill_name": "architecture-viz-studio",
+  "evals": [
+    {
+      "id": 1,
+      "name": "scroll-story-from-design-doc",
+      "prompt": "I've got a small event-sourcing order service. Orders come in over Kafka, an append-only event log is the source of truth, a pure fold derives the current order state into Postgres, and a projector publishes status events out. Build me an impressive animated intro page that tells this story as the user scrolls — I want to show it to non-technical stakeholders so they 'feel' how it works. Make it look genuinely professional, not like a generic AI page. Serve it locally and tell me how to open it.",
+      "expected_output": "A working scroll-story landing page: a fixed Three.js low-poly world the camera flies through on scroll (GSAP ScrollTrigger), a hero that tilts away, a request/order travelling the scene, sections revealing over it (Kafka in -> event log -> fold -> Postgres -> projector out). Restrained, professional styling (one accent, neutral greys, real type scale, no slop). Components carry data-viz-id; edit-mode is wired. Verified in a browser with a clean console.",
+      "files": [],
+      "assertions": [
+        {"text": "Produces a runnable page (index.html + JS) that loads without errors"},
+        {"text": "Uses Three.js for a 3D scene AND GSAP ScrollTrigger for scroll-driven animation"},
+        {"text": "The 3D scene is a fixed/pinned stage the camera moves through on scroll (not a static canvas)"},
+        {"text": "Styling shows restraint: a single reserved accent colour with neutral greys, not rainbow/gradient slop"},
+        {"text": "Components carry data-viz-id attributes (the AI-tweakable convention)"},
+        {"text": "Edit-mode is wired into the page (edit-mode.js/.css included)"},
+        {"text": "The narrative maps to the described system (Kafka in -> event log -> fold -> Postgres -> projector out)"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "architecture-map-with-lenses-and-erd",
+      "prompt": "Build an interactive architecture map page for our payments platform. The pieces: an API gateway, a payments service (NestJS), a ledger service, a fraud service, a Kafka bus between them, a Postgres ledger DB, and an external acquirer we call out to. I want switchable overlay 'lenses' (at least: Systems, Data Flow, Reliability), clickable service nodes that open a component drill-down, and a clean ERD for the ledger data model (accounts, transactions, entries with proper crow's-foot relationships). Dark 'blueprint' look. Make it pan/zoomable and let me leave visual feedback on it.",
+      "expected_output": "A dark blueprint architecture map: an SVG system map with the named nodes in region lanes, an overlay-lens switcher (Systems/Data Flow/Reliability) that dims non-active aspects, clickable nodes opening a drill-down component diagram, and a separate ERD with crow's-foot notation (cardinality at endpoints, lines that don't cross tables, hub-and-spoke layout). Pan/zoom on the diagrams. Edit-mode wired. data-viz-ids present. Verified in a browser, clean console.",
+      "files": [],
+      "assertions": [
+        {"text": "Produces a runnable architecture-map page that loads without console errors"},
+        {"text": "Has an overlay-lens switcher with at least Systems / Data Flow / Reliability that changes what the map emphasises"},
+        {"text": "The named nodes (gateway, payments, ledger, fraud, Kafka, Postgres, acquirer) all appear in the map"},
+        {"text": "Service nodes are clickable and open a component drill-down view"},
+        {"text": "Includes an ERD with crow's-foot notation: cardinality shown at endpoints and lines that do not cross tables"},
+        {"text": "Diagrams are pan/zoomable (wheel/drag)"},
+        {"text": "Dark blueprint aesthetic (dark bg, thin grid, teal/amber semantic accents), data-viz-ids present, edit-mode wired"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "edit-feedback-revision-loop",
+      "prompt": "Here's a batch of visual feedback from the edit-mode tool on the architecture page you built:\n\n## 1. component: hero.title\nThis is too big and a bit shouty — make it ~25% smaller and tighten the line-height.\n\n## 2. area snip — components inside: arch.node.ledger, arch.node.fraud\nThese two nodes sit too close together, it looks cramped. Add clear horizontal space between them.\n\n## 3. object: scene.gateway\nThe gateway object in the 3D scene is too small and easy to miss — make it noticeably larger and give it the brand accent colour so it reads as the entry point.\n\nApply all three.",
+      "expected_output": "Each feedback item is resolved by mapping its stable id (hero.title / the two arch.node ids / scene.gateway) to the exact builder/CSS rule and making the change — without asking which element the user meant. The model demonstrates the one-hop id->code workflow: shrink the hero title via its data-viz-id rule, space the two named nodes, enlarge + recolor the registered 3D object by its userData.vizId. Changes verified in the browser.",
+      "files": [],
+      "assertions": [
+        {"text": "Resolves each feedback item by its stable id without asking the user which element they meant"},
+        {"text": "hero.title is made smaller with tighter line-height (mapped via its data-viz-id rule)"},
+        {"text": "The two named arch.node ids are given more horizontal spacing between them"},
+        {"text": "The 3D object scene.gateway is enlarged AND recoloured to the accent, found via userData.vizId"},
+        {"text": "Demonstrates the one-hop id->builder workflow rather than guessing or broad rewrites"}
+      ]
+    }
+  ]
+}
