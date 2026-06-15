@@ -10,6 +10,7 @@
  * DEPENDS ON
  *   - gsap + ScrollTrigger (globals, loaded before this module)
  *   - three
+ *   - lenis (smooth-scroll inertia — importmap entry; see SMOOTH SCROLL below)
  *   - scene-setup.js: state, REDUCED, scene, mat, PALETTE
  *   - primitives.js: glow textures etc. (for heads/packets)
  *   - DOM: #journey (scroll driver), #heroTilt, #heroScroll, #rail, .rail-item[data-step]
@@ -44,16 +45,54 @@
  *   4. CONVERGING FEEDER HEADS — N source curves each draw on with a staggered
  *      local progress, each carrying its own glow head until they reach the merge.
  *
+ * SMOOTH SCROLL (Lenis) — wired at the top of this file. A mouse wheel scrubs in
+ *   coarse jumps and freezes when it stops; Lenis turns that into continuous
+ *   inertial motion on GSAP's single ticker, so the journey eases in AND out.
+ *   Tune `duration` there. Off under reduced motion. (See playbook → "Smooth
+ *   scroll".)
+ *
  * REDUCED MOTION
- *   When prefers-reduced-motion, #journey height collapses to 0 and step 1 is
- *   shown statically — no scrub, no scene motion driven by scroll.
+ *   When prefers-reduced-motion, #journey height collapses to 0, Lenis is not
+ *   created (native scroll, no momentum), and step 1 is shown statically — no
+ *   scrub, no scene motion driven by scroll.
  * ========================================================================== */
 
 import * as THREE from 'three';
+import Lenis from 'lenis';
 import { state, REDUCED, scene, mat, PALETTE as C } from '../scene/scene-setup.js';
 import { brandGlowTex } from '../scene/primitives.js';
 
 gsap.registerPlugin(ScrollTrigger);
+
+/* ============================ SMOOTH SCROLL (Lenis) ====================== *
+ * WHY THIS EXISTS — without it, a mouse wheel feels broken on a scrubbed scene.
+ *   A wheel emits coarse, discrete jumps; native scroll then FREEZES the instant
+ *   the wheel stops. ScrollTrigger's `scrub` smooths the catch-up TOWARD a target,
+ *   but the target itself still leaps per tick, and when input stops the camera
+ *   dies mid-motion instead of easing to rest. The two symptoms users report are
+ *   "animation races on a fast flick" and "animation stops the moment I stop
+ *   scrolling" — both are the native-scroll discreteness, not your scrub value.
+ *
+ * THE FIX — Lenis converts wheel/key/touch input into a CONTINUOUS, inertial
+ *   scroll position, driven on GSAP's single ticker (no second rAF loop, so your
+ *   fps cap and render-pause still hold). `scrub` then rides a smooth value and
+ *   the camera eases in AND out. This is the right layer for the job; do not try
+ *   to "fix" jerk by cranking scrub alone — past ~1.5 it just feels laggy.
+ *
+ * Disabled under prefers-reduced-motion (native scroll, zero momentum).
+ * Tuning knobs are right here — `duration` is the glide length in seconds. */
+export let lenis = null;
+if (!REDUCED) {
+  lenis = new Lenis({
+    duration: 1.1,                              // inertia length (s) — ↑ floatier, ↓ snappier (try 0.8–1.5)
+    wheelMultiplier: 0.9,                       // <1 tames aggressive wheel flicks
+    easing: (t) => 1 - Math.pow(1 - t, 3),      // easeOutCubic — natural settle
+    smoothWheel: true,
+  });
+  lenis.on('scroll', ScrollTrigger.update);     // keep ScrollTrigger in sync with Lenis' position
+  gsap.ticker.add((time) => lenis.raf(time * 1000));  // ONE clock for GSAP + Lenis + the render loop
+  gsap.ticker.lagSmoothing(0);                  // don't let GSAP "skip" after a stall — keeps scroll honest
+}
 
 /* ============================ THE ROUTE + FEEDERS ========================= *
  * EXAMPLE geometry — replace control points with your own landmark path. */

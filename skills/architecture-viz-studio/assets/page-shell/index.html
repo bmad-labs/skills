@@ -54,14 +54,18 @@
   "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
-    "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.36.4/build/index.js"
+    "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.36.4/build/index.js",
+    "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.mjs"
   }
 }
 <!-- NOTE: `postprocessing` maps to the RAW build (build/index.js), which bare-imports
      `three` so the importmap unifies it to the SAME instance above. Do NOT swap in the
      `/+esm` bundle — it inlines a 2nd copy of three ("Multiple instances of Three.js")
      and bloom/selection silently break. This map powers the optional Biggest-5 #3
-     composer in scene/post-processing.js; remove this line if you don't use it. -->
+     composer in scene/post-processing.js; remove this line if you don't use it.
+     `lenis` is the smooth-scroll inertia layer wired in scroll/scroll-journey.js —
+     it makes mouse-wheel scrolling glide instead of jerk (see that file's header and
+     the playbook's "Smooth scroll" section). Free/MIT; keep it. -->
 </head>
 <body>
 
