@@ -83,7 +83,10 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
      It needs the `postprocessing` importmap entry (already in `page-shell/index.html`; **must** be the raw
      `build/index.js`, not `/+esm`, or you get two three instances and bloom breaks). This is the last 20%
      of "wow" — add it for hero scenes, skip it for lightweight pages.
-   - scroll choreography → `assets/scroll/scroll-journey.js`
+   - scroll choreography → `assets/scroll/scroll-journey.js` — ships a **Lenis smooth-scroll layer by
+     default** (the `lenis` importmap entry is already in `page-shell/index.html`). This is what makes
+     mouse-wheel scrolling glide instead of jerk/freeze — `scrub` alone does NOT fix that. Tune `duration`
+     for feel; it's off under reduced motion. See the playbook → "Smooth scroll" for the why.
    - architecture map lenses → `assets/diagrams/overlay-lens-system.js` (`initOverlays` → the `drill` flag)
    - drill-down component diagram → `assets/diagrams/component-detail-modal.js` (`initDrill` — `data-drill` nodes)
    - ERD → `assets/diagrams/erd-diagram.js` (`initErd` — `data-erd` nodes; bundles the whole open/close/

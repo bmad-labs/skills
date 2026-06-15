@@ -4,6 +4,7 @@ Operating knowledge and gotchas for building cinematic scroll-story + interactiv
 
 ## Table of contents
 - [ScrollTrigger: scrub vs toggle, pinning](#scrolltrigger-scrub-vs-toggle-pinning)
+- [Smooth scroll: the mouse-wheel jerk fix (Lenis)](#smooth-scroll)
 - [The piecewise progress→param remap (camera poses land in scroll windows)](#piecewise-remap)
 - [Camera paths with CatmullRomCurve3](#camera-paths-with-catmullromcurve3)
 - [getPointAt (arc-length) vs getPoint (raw param) — the critical distinction](#getpointat-vs-getpoint)
@@ -36,6 +37,49 @@ ScrollTrigger.create({
 **Pinning**: to hold the 3D stage fixed while content scrolls "through" it, prefer a **fixed-position canvas** (`.stage { position: fixed; inset:0; z-index:0 }`) plus a tall invisible **scroll-driver** element (`#journey { height: 760vh }`) whose progress you read in `onUpdate`. This is more robust than ScrollTrigger `pin: true`, which clones/wraps DOM and fights other layout. Reserve real `pin` for a single short pinned rail (e.g. a step list beside the scene). Never nest two pins on the same scroll axis.
 
 The scroll distance (`760vh` in the shell) *is* the pacing knob — more vh = slower, more cinematic; fewer = snappier. Set it to `0` under reduced motion (see below).
+
+**`scrub` is not the whole answer for mouse wheels.** A numeric scrub smooths the *catch-up* toward a target, but the target is still native scroll position — which a wheel moves in coarse, discrete jumps, and which stops dead the instant the wheel stops. So on a wheel you still get "races on a fast flick, freezes when I stop." The cure is a smooth-scroll inertia layer, not a bigger scrub number — see the next section.
+
+---
+
+<a id="smooth-scroll"></a>
+## Smooth scroll: the mouse-wheel jerk fix (Lenis)
+
+**Symptom (reported by basically every first scroll-story user):** with a trackpad it feels fine, but with a **mouse wheel** the animation "runs too fast on a quick flick" and "stops the moment I stop scrolling." Both are the same root cause — **native scroll is discrete**. A wheel notch is an instantaneous jump of N pixels; between notches there is no scroll event at all. `scrub: 0.8` eases the timeline *toward* `self.progress`, but `self.progress` itself leaps per notch and goes silent the moment input stops, so the camera lurches and then halts mid-move.
+
+**Do not "fix" this by raising scrub.** Past ~1.5 the page just feels laggy and disconnected — the motion floats behind your intent. The right fix is to make the *scroll position itself* continuous and inertial, then let your normal `scrub` ride on top of it.
+
+**Use [Lenis](https://github.com/darkroomengineering/lenis)** (free, MIT, the de-facto choice — `ScrollSmoother` is GSAP-Club-only, don't assume the user has it). Lenis intercepts wheel/key/touch and emits a smoothed, momentum-carrying scroll position. Drive it on **GSAP's single ticker** so you don't spin up a second `requestAnimationFrame` loop — that keeps your fps cap and render-pause logic intact.
+
+```js
+import Lenis from 'lenis';   // importmap: "lenis": ".../lenis@1.1.18/dist/lenis.mjs"
+
+let lenis = null;
+if (!REDUCED) {                                  // native scroll under reduced-motion — no momentum
+  lenis = new Lenis({
+    duration: 1.1,                               // glide length in seconds — the main feel knob
+    wheelMultiplier: 0.9,                         // <1 tames aggressive wheel flicks
+    easing: (t) => 1 - Math.pow(1 - t, 3),       // easeOutCubic — natural settle
+    smoothWheel: true,
+  });
+  lenis.on('scroll', ScrollTrigger.update);      // keep ScrollTrigger synced to Lenis' position
+  gsap.ticker.add((time) => lenis.raf(time * 1000));  // ONE clock — no 2nd rAF, fps cap still applies
+  gsap.ticker.lagSmoothing(0);                   // don't let GSAP skip-ahead after a stall
+}
+```
+
+That's the whole change — your existing `scrub`, fps cap, and render-pause are untouched and now ride a continuous value, so the camera eases in *and* eases out to rest. The bundled `assets/scroll/scroll-journey.js` ships this wired by default; the `lenis` importmap entry is already in `assets/page-shell/index.html`.
+
+**Feel tuning (one knob, mostly):**
+- `duration` — the glide length. `0.8` ≈ crisp/responsive, `1.1` ≈ default, `1.5` ≈ floaty/cinematic. This is the dial the user actually means when they say "more/less smooth."
+- `wheelMultiplier` — lower it (`0.7–0.9`) if fast flicks overshoot; raise toward `1` if scrolling feels heavy.
+- Pair with `scrub` deliberately: Lenis smooths the *input*, scrub smooths the *timeline*. Keep scrub modest (`0.6–1.0`) once Lenis is in — they compound, and too much of both feels mushy.
+
+**Gotchas:**
+- Lenis must be on the **same ticker** as your render loop. A separate `lenis.raf` rAF loop double-schedules against `gsap.ticker` and reintroduces jitter — add it via `gsap.ticker.add` as above.
+- The ESM build is `dist/lenis.mjs` (default export). The `/+esm` jsDelivr variant works too, but pin a version so a CDN bump can't silently change the feel.
+- If you anchor-scroll or jump programmatically, call `lenis.scrollTo(target)` — a raw `window.scrollTo` bypasses the smoothing and snaps.
+- Turn it **off** under `prefers-reduced-motion` (as above) — momentum scrolling is exactly what that setting asks you not to do.
 
 ---
 
@@ -313,5 +357,6 @@ A 3D page that melts the GPU has failed, no matter how good it looks. Before you
 | Spline cusps/loops on the camera path | default catmullrom param on uneven points | pass `'centripetal'` |
 | Soft "mushy" shadows | shadow frustum far larger than the world | tighten ortho frustum to just cover the scene |
 | Page pins fight / jumpy layout | nested ScrollTrigger pins or pinning the fixed canvas | fixed canvas + tall scroll-driver, pin at most one rail |
+| Mouse-wheel animation races on a flick / freezes when you stop | native scroll is discrete; `scrub` alone can't fix it | add a Lenis smooth-scroll layer on GSAP's ticker (see "Smooth scroll") — don't just raise scrub |
 | Fans/GPU keep running while reading text or in a modal | ticker never paused | apply the render-pause pattern |
 | ERD verb label upside-down on a leftward edge | tangent angle not clamped | clamp rotation to ±90° |
