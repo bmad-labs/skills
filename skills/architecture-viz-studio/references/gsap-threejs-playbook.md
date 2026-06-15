@@ -160,6 +160,31 @@ function tickRoute(p) {
 
 Gotchas: `setDrawRange` operates on the **index** count for indexed geometry (use `geo.index.count`), not vertex count. Higher tubular-segment count = smoother reveal but more geometry; 64 is plenty for short feeders, ~360 for the hero route. Stagger multiple feeder tubes by offsetting each one's local progress (`fp*1.2 - i*0.08`) so they don't all start at once.
 
+**The drawn tip is revealed by ARC LENGTH → the head MUST use `getPointAt`, never `getPoint`.**
+`setDrawRange(0, floor(total*t))` exposes the tube up to arc-length fraction `t` (TubeGeometry's rings
+follow the curve by arc length). So a glow/sphere "head" pinned to the tip uses `curve.getPointAt(t)`.
+Using `getPoint(t)` (raw spline param) puts the head **wildly off the drawn tip** on any unevenly-spaced
+curve — measured ~7–8 world units / ~85px adrift mid-journey, leaving the tube's bare cut end poking
+out in open space. This is *the* tube-head bug and it's seductive to "fix" it the wrong way twice;
+**trust `getPointAt` and verify by measuring the live gap** (see visual-verification → "reach into the
+running scene"): the drawn-tip vertex and `getPointAt(t)` should coincide within ~1px on screen.
+
+**`TubeGeometry` is single-sided and OPEN-ended — the revealed tip is a hollow flat ring.** Looking
+into the mouth shows the inner back wall (a lighter ring / "broken pipe / forked" look), and a soft glow
+sprite alone doesn't reliably mask it. Cap it with a small sphere riding the tip — but the cap radius
+**must be LARGER than the tube radius**, not equal: a same-radius sphere only touches the rim and the
+hollow interior still shows around it (the user reports "a gap between the tube and the sphere").
+~1.2× the tube radius plugs the mouth from every angle:
+```js
+const cap = new THREE.Mesh(new THREE.SphereGeometry(tubeRadius * 1.2, 16, 12), tubeMat); // NOT == tubeRadius
+function tickRoute(p) { const t = cometParam(p);
+  routeMesh.geometry.setDrawRange(0, Math.floor(routeTotal * t));
+  curve.getPointAt(t, _head); cap.position.copy(_head); head.position.copy(_head); // cap, glow, line all meet here
+}
+```
+Do **not** instead pull the draw range *back* a few segments to "tuck" the cut under the glow — that
+just opens a visible gap between the tube body and the head. Draw to the full `t`; cap the tip.
+
 ---
 
 ## InstancedMesh
@@ -347,6 +372,10 @@ A 3D page that melts the GPU has failed, no matter how good it looks. Before you
 | Symptom | Cause | Fix |
 |---|---|---|
 | Glow head floats off the tube tip | used `getPoint` (raw param) where arc-length needed | use `getPointAt` for anything on a `TubeGeometry` tip |
+| Gap / hollow "forked" ring between tube body and head | open single-sided tube mouth; cap radius == tube radius (only touches rim) | cap the tip with a sphere ~1.2× the tube radius at `getPointAt(t)`; don't tuck the draw range back |
+| Wheel scroll inside a drill/ERD modal moves the page behind it | Lenis owns the wheel globally; `lenis.stop()` doesn't release it | `data-lenis-prevent` on the modal panel (+ `overscroll-behavior:contain` on scroll panes) |
+| 3D object still selectable after scrolling to another section | `isOverCanvas` tested the canvas rect, not visible exposure | walk `elementsFromPoint`; allow 3D only if the canvas is reached before any opaque layer |
+| "I tagged/fixed it but it still shows missing" | browser served stale cached `main.js`/`styles.css` | hard reload (`navigate_page type:reload ignoreCache:true`) |
 | Camera speeds up/slows weirdly between poses | `getPointAt` (constant speed) where you wanted even easing | use `getPoint` for the camera rig + the piecewise remap |
 | Draw-on tube never appears / appears fully instantly | passed vertex count to `setDrawRange` on indexed geo, or forgot `Math.floor` | use `geo.index.count`, floor the product |
 | Container sides corrugated on wrong faces / door on top | wrong material array order | order is `[+x,-x,+y,-y,+z,-z]` |

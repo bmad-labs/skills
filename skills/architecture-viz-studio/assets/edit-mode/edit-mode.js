@@ -100,6 +100,13 @@
   // Node-safe: event targets can be `window`/`document` (not Nodes), which makes
   // root.contains() throw. Guard every "is this our own UI?" check through here.
   const inRoot = (n) => !!(root && n && n.nodeType === 1 && root.contains(n));
+  // When a drill/ERD modal is open, scope selection to it: only elements inside the
+  // open modal (and the modal itself) are selectable — the main page + 3D scene are
+  // behind the backdrop. NOTE: do NOT name this `openPopup` — that already exists for
+  // the inline comment-entry popup; a duplicate declaration breaks the whole module.
+  // Adjust the `.drill-modal.open` selector to match your modal markup.
+  const openModal = () => document.querySelector('.drill-modal.open') || null;
+  const inScope = (n) => { const m = openModal(); return !m || (n && m.contains(n)); };
   const vizIdOf = (node) => {
     const t = node && node.closest && node.closest('[data-viz-id]');
     return t ? t.getAttribute('data-viz-id') : null;
@@ -316,7 +323,7 @@
     const selIds = new Set(state.selection.map((s) => s.id));
     // DOM / SVG components
     document.querySelectorAll('[data-viz-id]').forEach((n) => {
-      if (inRoot(n)) return;
+      if (inRoot(n) || !inScope(n)) return;   // a modal is open → only its own elements
       const id = n.getAttribute('data-viz-id');
       const isHover = (n === hoverEl);
       const isSel = selIds.has(id);
@@ -333,8 +340,9 @@
       if (y + h < 0 || y > window.innerHeight || x + w < 0 || x > window.innerWidth) return;
       out.push({ id, kind: 'dom', hover: isHover, selected: isSel, rect: { x, y, w, h } });
     });
-    // 3D objects: project each viz-tagged object's bounding box to screen
-    if (state.scene && state.scene.THREE) {
+    // 3D objects: project each viz-tagged object's bounding box to screen.
+    // Suppressed while a modal is open — the scene is behind the backdrop.
+    if (state.scene && state.scene.THREE && !openModal()) {
       each3dViz((obj, id) => {
         const isHover = (id === hover3dId);
         const isSel = selIds.has(id);
@@ -444,11 +452,32 @@
     }
   }
 
+  // The 3D scene is selectable only where the canvas is actually VISIBLE — the fixed
+  // full-viewport canvas sits behind every scroll section, so a rect-only test would
+  // (wrongly) report "over canvas" even when an OPAQUE content section covers it,
+  // letting 3D objects be picked through unrelated content. Walk the hit-test stack:
+  // 3D is pickable only if the canvas is reached before any opaque layer.
   function isOverCanvas(e) {
     if (!state.scene) return false;
     const cv = state.scene.renderer.domElement;
-    const b = cv.getBoundingClientRect();
-    return e.clientX >= b.left && e.clientX <= b.right && e.clientY >= b.top && e.clientY <= b.bottom;
+    for (const el of document.elementsFromPoint(e.clientX, e.clientY)) {
+      if (el === cv) return true;       // canvas is the topmost paint here → scene shows through
+      if (inRoot(el)) continue;         // our own edit-mode UI doesn't occlude the scene
+      if (isOpaque(el)) return false;   // an opaque content layer hides the scene at this point
+    }
+    return false;
+  }
+  // Opaque enough to hide the canvas behind it: a non-transparent background, a
+  // background image, or a backdrop-filter. Transparent wrapper bands (hero/people
+  // sections that let the scene show through) return false → scene stays pickable.
+  function isOpaque(el) {
+    const cs = getComputedStyle(el);
+    if (cs.backgroundImage && cs.backgroundImage !== 'none') return true;
+    if (cs.backdropFilter && cs.backdropFilter !== 'none') return true;
+    const m = (cs.backgroundColor || '').match(/rgba?\(([^)]+)\)/);
+    if (!m) return false;
+    const p = m[1].split(',').map((s) => parseFloat(s));
+    return (p.length >= 4 ? p[3] : 1) > 0.5;
   }
 
   // A "leaf" component is concrete content the user is genuinely pointing at,
@@ -486,14 +515,20 @@
     const hits = ray.intersectObjects(scene.children, true);
     for (const h of hits) {
       let o = h.object;
-      // walk up to the nearest vizId, but skip objects that opted out of selection
+      // Walk up to the nearest vizId. If it opted out (the ground plane / water
+      // backdrop), break out of THIS hit's walk but let the for-loop CONTINUE to the
+      // next hit — otherwise the huge ground plane shadows every selectable object
+      // under the cursor and the picker returns nothing (e.g. over open ground where
+      // the scene shows through a transparent section).
       while (o) {
         if (o.userData && o.userData.vizId) { if (isSelectable(o)) return o.userData.vizId; break; }
         o = o.parent;
       }
     }
-    // proximity fallback: nearest registered object within ~14px of the cursor
-    return nearestVizIdToScreenPoint(e.clientX, e.clientY, 14);
+    // proximity fallback: nearest registered object near the cursor. ~28px (not 14)
+    // so a large building is grabbable by aiming near it when the direct ray only
+    // found the non-selectable ground.
+    return nearestVizIdToScreenPoint(e.clientX, e.clientY, 28);
   }
 
   // For every registered viz object, project a handful of its world points to the
@@ -570,8 +605,8 @@
   // overlaps the canvas. Returns { id, kind } or null.
   function resolveTarget(e) {
     const t = e.target.closest && e.target.closest('[data-viz-id]');
-    const domEl = (t && !inRoot(t)) ? t : null;
-    const threeId = isOverCanvas(e) ? pick3dId(e) : null;
+    const domEl = (t && !inRoot(t) && inScope(t)) ? t : null;   // scope to an open modal
+    const threeId = (!openModal() && isOverCanvas(e)) ? pick3dId(e) : null;  // no 3D behind a modal
     if (threeId && (!domEl || !isLeafComponent(domEl))) return { id: threeId, kind: 'object' };
     if (domEl) return { id: domEl.getAttribute('data-viz-id'), kind: 'component' };
     return null;
@@ -753,7 +788,7 @@
   function componentsInRect(r) {
     const out = [];
     document.querySelectorAll('[data-viz-id]').forEach((n) => {
-      if (inRoot(n)) return;
+      if (inRoot(n) || !inScope(n)) return;   // scope to an open modal
       const b = n.getBoundingClientRect();
       const overlap = !(b.right < r.left || b.left > r.left + r.width ||
                         b.bottom < r.top || b.top > r.top + r.height);
@@ -767,7 +802,7 @@
   function componentsNearPath(pts) {
     const out = [];
     document.querySelectorAll('[data-viz-id]').forEach((n) => {
-      if (inRoot(n)) return;
+      if (inRoot(n) || !inScope(n)) return;   // scope to an open modal
       const b = n.getBoundingClientRect();
       if (pts.some((p) => p[0] >= b.left && p[0] <= b.right && p[1] >= b.top && p[1] <= b.bottom)) {
         out.push(n.getAttribute('data-viz-id'));
@@ -780,7 +815,7 @@
     return [...new Set(out)];
   }
   function addProjected3dInRect(r, out) {
-    if (!(state.scene && state.scene.THREE)) return;
+    if (!(state.scene && state.scene.THREE) || openModal()) return;   // no 3D behind a modal
     each3dViz((obj, id) => {
       const p = projectObject(obj);
       if (!p) return;

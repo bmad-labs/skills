@@ -123,7 +123,17 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
      WebGL canvas actually rendered, and scroll **jank/CPU** (not fps — headless fps is not representative).
    - `node scripts/slop-lint.mjs <url> --json slop.json` — the mechanical AI-slop tells (see anti-slop bar).
    - `node scripts/text-audit.mjs <url>` — fails if any text element lacks its own `data-viz-id` (so the
-     user can point at every heading/paragraph/footer line, not just containers).
+     user can point at every heading/paragraph/footer line, not just containers). ⚠️ It only sees the
+     **static** page — it never opens the drill/ERD modals, so it reports their JS-rendered bodies as
+     clean when they're untagged. **Audit popups LIVE too** (open each modal, walk it for text nodes
+     without their own id; different drill tabs can have SEPARATE rail builders) — see visual-verification.
+   - **For a 3D geometry bug** (head off the tip, a gap, a cap not covering, an object mis-placed),
+     don't eyeball screenshots — **reach into the live scene and MEASURE** (capture the page's
+     `{THREE,scene,camera,renderer}` ctx, compare world/screen positions; freeze the render loop before
+     posing a custom camera). The technique is in `references/visual-verification.md` → "Reaching INTO
+     the live scene"; it's what ends the guess-and-check loop.
+   - **Re-check with a HARD reload** (cache-bypass) — the page caches `main.js`/`styles.css`, so a plain
+     reload serves the stale bundle and your just-applied fix looks like it did nothing.
    A clean run is a **floor** ("nothing mechanically broken, no slop markers"), not a ceiling. The taste
    calls — does the metaphor land, does it feel premium, is the motion tasteful — still need your eyes and
    the user's. Read `references/visual-verification.md` for the exact stack and the honest human boundary.
