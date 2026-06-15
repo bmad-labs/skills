@@ -107,3 +107,52 @@ When the user sends edit-mode feedback, each item names a stable id. Resolve it 
    scene. Use these to confirm you're editing the thing the user pointed at.
 
 See `ai-collaboration-protocol.md` for the full id convention and edit-feedback JSON contract.
+
+## Reaching INTO the live scene to *measure* a 3D bug (don't eyeball, don't guess)
+
+`window.__viz` answers "what id is here" but not "where exactly is the tube tip vs the head, in world
+and screen space." For 3D geometry bugs (head off the tip, a gap, a cap not covering), **measure the
+running scene** instead of iterating on screenshots — it's what ends the guess-and-check loop.
+
+**Get a handle to the live scene.** A devtools `import('three')` returns a SEPARATE module instance
+(its `WebGLRenderer.prototype` patch never fires) — useless. Instead capture the page's own ctx by
+intercepting `__viz.attachScene` *before the page calls it*, via the browser tool's per-navigation init
+script:
+```js
+// navigate_page initScript (runs before the page's modules):
+Object.defineProperty(window, '__viz', { configurable: true,
+  set(v){ this._v=v; const o=v.attachScene; v.attachScene=function(c){ window.__sceneCtx=c; return o.call(this,c); }; },
+  get(){ return this._v; } });
+// now window.__sceneCtx = { THREE, renderer, camera, scene } — the page's real objects.
+```
+Then measure with the page's THREE (`window.__sceneCtx.THREE`), e.g. drawn tube tip vs head:
+```js
+const {THREE,scene,camera,renderer}=window.__sceneCtx; let route,head;
+scene.traverse(o=>{ if(o.userData?.vizId==='scene.route')route=o; if(o.userData?.vizId==='scene.route-head')head=o; });
+const g=route.geometry, n=g.drawRange.count;
+const tip=new THREE.Vector3().fromBufferAttribute(g.attributes.position, g.index.array[n-1]); route.localToWorld(tip);
+// compare tip vs head in world units AND projected screen px; and check which param matches:
+const u=n/g.index.count, path=g.parameters.path;        // TubeGeometry stores its curve as .parameters.path
+// dist(path.getPointAt(u), tip) should be ~0; dist(path.getPoint(u), tip) will be large → proves arc-length.
+```
+This is how the `getPointAt`-vs-`getPoint` and cap-radius bugs were *settled* (a 0.004-unit centerline
+match ruled out a positional gap and pointed straight at the hollow open tube mouth) instead of being
+"fixed" twice in the wrong direction.
+
+**Freeze the loop before posing a custom camera.** Render-on-demand re-renders only on scroll, so a
+manual `camera.position.set(...); renderer.render(...)` you do from devtools is **overwritten by the
+next ticker frame** before your screenshot. Pause the loop first (the page exposes
+`window.__setModalRenderPause(true)` for exactly this), pose, render, screenshot, then unpause. Without
+this you'll screenshot the scroll pose and conclude "my change did nothing."
+
+## Auditing the popups (text-audit can't reach them)
+
+`scripts/text-audit.mjs` loads the static page; it never opens the drill/ERD modals, so it reports
+their JS-rendered bodies as clean when they're untagged. After tagging a popup, **audit it live**: open
+the modal in the browser, then flag any element with a direct text child and no own `data-viz-id`:
+```js
+[...modal.querySelectorAll('*')].filter(n => [...n.childNodes].some(c=>c.nodeType===3 && c.textContent.trim()) && !n.hasAttribute('data-viz-id'))
+```
+Do this for EACH drill-down view (note: different drill tabs often have separate rail builders!) AND
+the ERD — each is built by a different function, so tagging one does not tag the others. A clean
+main-page `text-audit` + a live audit of every popup = real coverage.

@@ -93,6 +93,11 @@ if (!REDUCED) {
   gsap.ticker.add((time) => lenis.raf(time * 1000));  // ONE clock for GSAP + Lenis + the render loop
   gsap.ticker.lagSmoothing(0);                  // don't let GSAP "skip" after a stall — keeps scroll honest
 }
+// MODALS: when a drill/ERD modal opens, call `lenis.stop()` (and `lenis.start()` on
+// close) so the page doesn't scroll behind it. That alone is NOT enough — Lenis still
+// owns the wheel listener, so the modal's own scrollable panes can't scroll. ALSO put
+// `data-lenis-prevent` on the modal panel (see page-shell/index.html) so Lenis ignores
+// wheel events inside it. Both together = page locked, modal scrolls natively.
 
 /* ============================ THE ROUTE + FEEDERS ========================= *
  * EXAMPLE geometry — replace control points with your own landmark path. */

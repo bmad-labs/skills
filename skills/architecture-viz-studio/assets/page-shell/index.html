@@ -218,10 +218,13 @@
       </div>
     </div>
 
-    <!-- drill-down modal: component design inside a clicked node -->
+    <!-- drill-down modal: component design inside a clicked node.
+         data-lenis-prevent: the page smooth-scroll (Lenis) owns the wheel listener;
+         without this it swallows wheel events inside the modal and the modal's own
+         scrollable panes won't scroll (lenis.stop() alone does NOT release the wheel). -->
     <div class="drill-modal" id="drillModal" aria-hidden="true">
       <div class="drill-backdrop" data-drill-close></div>
-      <div class="drill-panel" role="dialog" aria-modal="true" aria-labelledby="drillTitle">
+      <div class="drill-panel" role="dialog" aria-modal="true" aria-labelledby="drillTitle" data-lenis-prevent>
         <header class="drill-head">
           <div class="drill-tabs" id="drillTabs"></div>   <!-- tabs injected by JS -->
           <div class="drill-legend">
@@ -237,10 +240,10 @@
       </div>
     </div>
 
-    <!-- ERD modal: data model -->
+    <!-- ERD modal: data model (data-lenis-prevent — see drill modal above) -->
     <div class="drill-modal" id="erdModal" aria-hidden="true">
       <div class="drill-backdrop" data-erd-close></div>
-      <div class="drill-panel" role="dialog" aria-modal="true" aria-label="Data model">
+      <div class="drill-panel" role="dialog" aria-modal="true" aria-label="Data model" data-lenis-prevent>
         <header class="drill-head">
           <div class="erd-title">Data model <span>your store</span></div>
           <div class="drill-legend">

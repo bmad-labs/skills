@@ -68,6 +68,44 @@ Call it once per SVG (main map + each drill/ERD modal, after render). The proxy 
 `body.em-active`, so it never blocks normal clicks/pan-zoom. Both fixes together make arrows feel as
 selectable as nodes — and they then participate in multi-select like anything else.
 
+**Selection must be SCOPED to an open modal — and the scope helper must not collide with existing
+names.** When a drill/ERD modal is open, the main page sits *behind* an opaque backdrop, so offering
+its elements (and the 3D scene) for selection is wrong — the user expects "only what's in the popup,
+and the popup itself." Add a scope gate used by **every** selection path (`collectRects`, hover
+`onMouseMove`, click `resolveTarget`, snip `componentsInRect`, brush `componentsNearPath`, and the 3D
+`addProjected3dInRect`):
+```js
+const openModal = () => document.querySelector('.drill-modal.open') || null;   // your modal's open class
+const inScope  = (n) => { const m = openModal(); return !m || (n && m.contains(n)); };
+// in each collector: if (inRoot(n) || !inScope(n)) return;
+// suppress 3D entirely while a modal is open: if (... && !openModal()) { each3dViz(...) }
+```
+⚠️ **Name-collision trap that cost a full debugging round:** edit-mode already has a `function
+openPopup(...)` — the inline *comment-entry* popup. Naming the modal-scope helper `openPopup` too is a
+**duplicate `const`/`function` declaration → `SyntaxError` → the WHOLE edit-mode.js fails to load**, so
+the ✎ FAB never appears and *nothing* is selectable. Symptom: "edit mode does nothing / no toolbar."
+Name the modal helper `openModal`, grep the file for the name first, and after any edit confirm it
+parses (`node --check` on a `.mjs` copy) — a syntax error in edit-mode.js is silent in the page console
+only as "ReferenceError: EditMode is not defined" much later.
+
+**Dynamically-rendered popup content has NO ids unless the BUILDER adds them — and `text-audit.mjs`
+can't see it.** The drill/ERD bodies are built by JS (`renderBooking`/`renderEngine`/`buildErd`/
+`drawErdLines`) and injected via `innerHTML` *after* load, so: (a) they start completely untagged —
+every card, lane, table, field, relationship label, rail desc/hint/heading, pill, tab, zoom button
+needs `data-viz-id` added **in the template string**, not retrofitted; (b) `scripts/text-audit.mjs`
+loads the static page and never opens the modals, so it reports the popups as clean when they're not.
+**Audit popups live**: open each modal, then walk `modal.querySelectorAll('*')` for elements with a
+direct text node and no own `data-viz-id`. Tag at the builder. Both rail variants are separate
+(`renderBooking`'s overview vs `renderEngine`'s grouped overview) — tagging one does NOT tag the other;
+fix both. Leaf `<tspan>`/`<b>`/`<i>` *inside* one already-tagged text block are the sensible stop —
+tagging each fragment splits one sentence into overlapping ids for no gain.
+
+**The page caches `main.js`/`styles.css` — verify with a HARD reload.** During a fast edit→check loop,
+a plain reload (or chrome-devtools `navigate_page type:url`) serves the *stale* bundle, so your just-
+added ids/fixes appear missing and you "fix" them again. Always re-check with `navigate_page type:reload
+ignoreCache:true` (or append a cache-buster). A confusing "I tagged it but the audit still flags it"
+is almost always this.
+
 ---
 
 <a name="3d-selection"></a>
@@ -104,6 +142,37 @@ grounds/backdrops with it.
 spread-out child meshes projects to a large bbox full of empty space, so hovering its "centre" hits
 nothing. That's expected raycast behaviour, not a bug — but be aware when *testing* (aim at actual
 geometry, not the bbox centre). Don't "fix" it by inflating hitboxes.
+
+**"Over the canvas" must mean VISIBLE canvas, not just the canvas rect — or 3D is selectable through
+opaque content.** The 3D stage is `position:fixed; inset:0`, spanning the whole viewport *behind every
+scroll section*. A rect-only `isOverCanvas` (`clientX/Y within canvas.getBoundingClientRect()`) is
+therefore true even when an **opaque** content section (`background:#fff`, a grey/dark band, a frosted
+panel) is painted over the canvas — so hovering that section wrongly picks the 3D object behind it (a
+big object like a finale chevron highlights a box over unrelated text). Symptom: "3D still selectable
+after I scrolled to another section." Fix: walk the **hit-test stack** and only allow 3D if the canvas
+is reached before any opaque layer:
+```js
+function isOverCanvas(e) {
+  const cv = state.scene.renderer.domElement;
+  for (const el of document.elementsFromPoint(e.clientX, e.clientY)) {
+    if (el === cv) return true;          // canvas is the topmost paint here → scene shows through
+    if (inRoot(el)) continue;            // our own edit-mode UI doesn't occlude
+    if (isOpaque(el)) return false;      // an opaque section hides the scene at this point
+  }
+  return false;
+}
+// isOpaque: backgroundColor alpha > 0.5, OR a backgroundImage, OR a backdrop-filter.
+```
+This makes 3D selectable exactly where the scene is actually on screen (hero, the scroll-story journey,
+a transparent band) and *not* where opaque content covers it — without any per-section config.
+
+**A non-selectable backdrop (ground/water) shadows the real objects under the cursor.** The ground
+plane is huge and is the first raycast hit at floor level. If `pick3dId` stops at the first hit that has
+*a* vizId regardless of selectability, it resolves to `scene.ground` (opted out) and returns nothing,
+so objects behind/around it never win. Fix: when a hit's nearest vizId is **not selectable**, don't
+stop — continue to the next hit so a selectable object can win; and widen the proximity fallback
+(~28px) so a nearby building is grabbed when the direct ray only found ground. (Pairs with the
+`vizSelectable:false` opt-out above.)
 
 ---
 
