@@ -41,6 +41,8 @@ Determine the resume point from story status:
 
 In `team-persistent`, `team-respawn`, `hybrid` (if you choose to delegate creation): send a Delegation Packet to the sm/story-creator naming `Skill: "bmad-create-story"`, args `<story_id>`. In `main` (or `hybrid` electing to do creation directly): invoke the skill yourself.
 
+**Recon-first, then bake it into the creator's packet (the highest-leverage move).** Before delegating story creation, the leader does a short **scoping recon directly** — open the story's design contract AND the real target repo, and answer: what already exists that the story must NOT rebuild (prior stories often shipped half of it); what's the net-new delta; which design-doc claims drift from the installed code (Rule 31 — verify the loader/path/contract yourself); and any seam ruling the design leaves open. Then **pass that recon verbatim in the Delegation Packet's _Knowledge sources_ + _Prior findings_ slots, with the rulings pre-decided.** This session every story did this, and it was the single biggest driver of clean first-pass story files: the creator rendered the recon into the BMAD format instead of re-deriving it (and often caught a *further* drift the leader had missed — which the leader then re-verified per Rule 31). The recon costs the leader a few greps and reads; it saves a fix round-trip on the spec and a worse one in code. (Don't over-invest for a trivial story — but for anything touching real wiring, recon first.)
+
 **If the story surfaces planning ambiguity** — unclear architecture, unclear approach, library/pattern choice the PRD doesn't pin down — the sm should report it back rather than guess. The leader then runs the memory-first check (`{MEMORY_SOURCES}` → `{KNOWLEDGE_PATHS}`); if no existing answer, spawn a one-shot planning-phase researcher per `references/escalation.md` to get a recommendation before finalizing the story. Do this _before_ moving to Step 2 — fixing ambiguity in the spec is much cheaper than fixing it in code.
 
 After: re-read `sprint-status.yaml` to confirm the story file was created and status advanced.
@@ -53,6 +55,7 @@ The leader reads the story file and validates:
 - Tasks are ordered correctly and reference real files.
 - Architecture / PRD alignment is explicit.
 - No ambiguity that would force the developer to make scope decisions.
+- **The story's design-doc claims hold against the REAL codebase (Rule 31).** When a story (or its creator's recon) flags a design-vs-reality drift — a file path the loader doesn't scan, a composition mechanism the repo doesn't actually use, a contract the installed code contradicts — **verify it yourself** (grep the loader, `diff` the artifacts, read the real module), don't take the agent's word. Rule to **build the reality**; **you (leader) own correcting the planning doc** afterward (it's not the dev's to edit). Catching this at validation is far cheaper than at the next story's seam.
 
 Validation passes → Step 3. Validation fails → either fix the story directly (if the issue is a missing reference you can add) or send a Round 1 Delegation Packet back to the sm/story-creator with _Specific actions_ listing the problems. Up to 2 leader rounds → escalation ladder.
 
@@ -65,6 +68,7 @@ Send a Delegation Packet to the developer naming `Skill: "bmad-dev-story"`. The 
 - Story id and story file path.
 - _Why this matters_ — the user-facing or architectural reason for this story.
 - _Knowledge sources_ — `{KNOWLEDGE_PATHS}` + the story file + relevant architecture sections.
+- **Mandatory project skills** — list the project-mandated skills from SKILL.md § "Mandatory project-level skills" in the _Specific actions_ slot, BEFORE the `bmad-dev-story` instruction. At minimum: `typescript-clean-code` (always). Add `typescript-unit-testing` / `typescript-e2e-testing` when the story includes test work, and `design-system` for UI stories. Tell the developer to read each skill's `SKILL.md` and apply its patterns/checklists to all code.
 - _Success criteria_ — every AC met, tests pass, lint clean, sprint-status advanced to `review`.
 - _Report back with_ — task completion summary, test output, anything deferred.
 
@@ -82,6 +86,7 @@ The leader reviews the diff in this conversation. Use `Skill: "bmad-code-review"
 
 - Story ACs satisfied.
 - Project conventions followed (consult `{KNOWLEDGE_PATHS}`).
+- **typescript-clean-code patterns applied** — the leader reviews against the same `typescript-clean-code` skill the developer was told to follow. Load it yourself if you haven't already.
 - Tests cover the new behavior.
 - No regressions in touched files.
 - No security or perf foot-guns.
@@ -122,6 +127,13 @@ In team modes, send the tester a Delegation Packet specifying "light" or "full" 
 
 **Infrastructure verification is non-optional.** If the story touches Docker / DB / queue / external API, the validator must hit the real thing or report PARTIAL. Mocked tests passing while infra is broken is exactly what this step exists to prevent.
 
+**Disciplines that repeatedly catch real bugs here (see Critical Rules 23–25, 29–33):**
+- **The developer runs the full e2e (`test:e2e:docker` or equivalent) ITSELF before reporting `review`** — when the environment supports it (verify the env claim, e.g. `docker info`, rather than trusting "no Docker"). **And the leader re-runs it independently** regardless — never trust a self-reported green. Unit-green ≠ boots: `Test.createTestingModule` mocks providers and won't surface a module that fails to boot when imported standalone (Rule 25), nor a service that's wired wrong on the real path.
+- **Confirm at least one e2e drives the REAL entry point** (the pipeline / command / intake the app actually uses), not just isolated components seeded via repositories (Rule 24). An "isolated component passes" can hide a wiring defect that only the full path reveals — which then surfaces, more expensively, in the *next* story.
+- **Re-run from a CLEAN invocation, via the ATOMIC e2e command (Rules 29–30).** Strip ambient state: a fresh shell, inherited env unset where it matters (`env -u NODE_OPTIONS …`), cold infra. A dev's pass that depends on a stray shell flag or a warm/seeded broker is not reproducible — if your clean run disagrees, the dev's pass was ambient and the fix is a *self-contained* test (a script that sets its own flags), not accepting the ambient pass. Use the atomic command (owns its own infra up/down); never hand-juggle `infra:up`/`down` or overlap Docker cycles — self-induced contention produces false failures. Run the FULL suite (a subset changes which suite cold-boots first). Honor any per-repo **skip-e2e** directive in the DECISION-LOG (unit + quality only for those).
+- **A broken e2e harness / missing test infra is a PRE-EXISTING repo gap, not the story's failure (Rule 32).** Verify the breakage yourself, then rule to self-contain the new test (in-process stub + minimal `.env.test`, or enable the missing infra) so the AC's intent is met without reviving broken scaffolding; log the gap as retro tech-debt. Don't block the story on unrelated repo rot.
+- **A SHARED-code change needs a full-suite blast-radius proof the leader runs himself (Rule 33).** If a story legitimately edits shared code (a shared util bug, missing component-test config), run the *whole* existing suite after the change — only a green full-suite proves backward-compatibility; require the change be minimal + a no-op for existing consumers.
+
 #### Step 5: Commit (LEADER ONLY)
 
 1. Re-read `sprint-status.yaml` to confirm the story is `review` → about to become `done`.
@@ -130,8 +142,9 @@ In team modes, send the tester a Delegation Packet specifying "light" or "full" 
 4. **Commit policy:**
    - `auto_progression: confirm-each` → ask user for approval → commit on yes.
    - `auto_progression: auto-commit` → commit directly. Still ask if `git status` shows anything unexpected (untracked files outside the story scope, accidental .env modifications, etc.).
-5. Update `sprint-status.yaml` to mark the story `done`.
-6. Report: _"Story {N-M} complete. Moving to next story."_
+5. Update **both** status fields to `done` (Rule 28): the `sprint-status.yaml` entry AND the story file's `Status:` header line (it's set by the creator/dev earlier and goes stale — a human reading the story file sees the header, not sprint-status).
+6. Append this story's outcome to `DECISION-LOG.md` (Rule 28): the commit hash + test counts, every seam ruling you made at validation, and any latent bug the independent e2e caught. Keep it current on the fly, not at epic end.
+7. Report: _"Story {N-M} complete. Moving to next story."_
 
 ### C. Epic Completion
 
