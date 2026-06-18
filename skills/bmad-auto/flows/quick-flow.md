@@ -27,7 +27,7 @@ Send a Delegation Packet (or invoke directly in `main` mode) for `Skill: "bmad-q
 - The user's change description (verbatim).
 - _Why this matters_ — the user-visible problem the change solves.
 - _Knowledge sources_ — `{KNOWLEDGE_PATHS}` + any related prior decisions surfaced from `{MEMORY_SOURCES}` + relevant existing files.
-- _Specific actions_ — "Use `bmad-quick-dev` end-to-end: shape the implementation plan, write the code, write tests for new behavior, run self-check."
+- _Specific actions_ — "Use `bmad-quick-dev` end-to-end: shape the implementation plan, write the code, write tests for new behavior, run self-check." **Before invoking `bmad-quick-dev`, load the project-mandated skills from SKILL.md § "Mandatory project-level skills":** at minimum `typescript-clean-code` (always); add `typescript-unit-testing` / `typescript-e2e-testing` when writing tests, and `design-system` for UI work. Read each skill's `SKILL.md` and apply its patterns/checklists to all code.
 - _Where to write detailed work_ — append a Dev Notes section to a new file at `_bmad-output/implementation-artifacts/quick-{slug}.md` with the implementation summary, files touched, decisions made, test results.
 - _Manual task handling_ — investigate automation first; only report a task as truly manual after exhausting automation options.
 - _Success criteria_ — change implemented, tests pass, no regressions in touched files.
@@ -45,7 +45,7 @@ After report:
 
 ## Step 2: Code Review (LEADER ONLY)
 
-The leader reads the diff and verifies the change does what the user described and meets the project's standards. Use `Skill: "bmad-code-review"` if you want the structured workflow.
+The leader reads the diff and verifies the change does what the user described and meets the project's standards. Use `Skill: "bmad-code-review"` if you want the structured workflow. **Apply `typescript-clean-code` patterns** — the leader reviews against the same skill the developer was told to follow.
 
 Pass → Step 3. Issues → write your full review findings into `quick-{slug}.md` → **Review Notes** section, then send a fix-request Delegation Packet back to the same developer (same agent in team-persistent/hybrid; respawn quick-developer in team-respawn). The packet's _Knowledge sources_ points at the new Review Notes section; _Specific actions_ lists the numbered fixes. Up to 2 leader rounds → escalation ladder.
 
