@@ -1,0 +1,29 @@
+{
+  "skill_name": "software-research",
+  "evals": [
+    {
+      "id": 0,
+      "name": "library-eval-detection",
+      "prompt": "We're picking a schema validation library for our TypeScript backend. Should we use Zod or Yup? Research it properly.",
+      "expected_output": "Skill activates, auto-detects the 'library-eval' mode, states the mode + a one-line interpretation, identifies reader role, and runs the 5 library-eval lenses (Maintainer-Health, Production-Operator, Security, Performance, Cost-License). Primary output is an HTML briefing + scored MD. Citations carry version/date and trace to primary sources (OSV, GitHub, official docs).",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "architecture-adr-detection",
+      "prompt": "I need to write an ADR for whether our orders service should use event sourcing or a plain CRUD model. We expect ~5k orders/day, a 4-person team, and we already run Postgres.",
+      "expected_output": "Skill activates, auto-detects the 'architecture' mode, runs the 5 architecture lenses (Scalability-Perf, Reliability-Operability, Security, Cost-TCO, Team-Fit-Risk) framed on ISO 25010 + ATAM trade-off points. Primary output is a MADR-style ADR markdown (Context, Decision Drivers, Considered Options, Decision Outcome, Consequences, Pros/Cons per option, More Information) with rejected options justified; HTML secondary.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "ambiguous-mode-asks",
+      "prompt": "Research upgrading and re-architecting our GraphQL layer.",
+      "expected_output": "The query matches both 'migration' (upgrading) and 'architecture' (re-architecting) with similar confidence, so per Phase 0 the skill should ASK the user which mode rather than silently guessing, offering the matching modes with one-line descriptions.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}
