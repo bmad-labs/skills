@@ -187,6 +187,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [manual-testing](skills/manual-testing) | Plan, write, review, execute, and maintain manual test cases — API/backend, frontend, pipeline, AI/LLM, and infrastructure testing with risk-based prioritization | Development |
 | [load-docs](skills/load-docs) | Load documents (files, folders, URLs, PDFs) fully into the main agent's context for follow-up Q&A, summarization, or review | Productivity |
 | [rca-report](skills/rca-report) | Investigate and document production incidents — guides evidence collection during the investigation and produces rich, reproducible Root Cause Analysis reports with layered root cause, workaround playbook, Five Whys, and binned recommendations | Development |
+| [software-research](skills/software-research) | STORM-style, dev-specialized research: auto-detects a mode (library-eval, deep-research, architecture/ADR, spike, migration), runs expert lenses in parallel, and verifies every claim against primary sources (docs, RFCs, OSV/CVE, benchmarks) version-aware | Development |
 
 ## Recommended Skills from Other Repositories
 
