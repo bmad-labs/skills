@@ -110,21 +110,28 @@ synthesis; not a separate deliverable.
 ## Phase 3: Synthesize the output(s)
 
 Read the mode's `primary_output` and `secondary_output` from `data/modes.csv`.
+
+**Before writing any output, load `references/report-structure.md`.** It defines the
+**concreteness contract** (specific > generic: exact versions, real commands/config/
+code, real numbers, tied to THE READER's stack — and a ban list of filler phrases) and
+the **12-section deep spine**. Detail is not optional padding: a report earns its length
+by being practical and about the reader's situation, not a survey of the topic.
+
 - For `html`: clone `assets/briefing-template.html`; do not rebuild the CSS.
-  Fill every `{{TOKEN}}`. Lead with the **verdict scoreboard** (recommendation,
-  confidence, top risk, one-line why) so the answer lands in five seconds. For
-  option-comparison modes (library-eval, architecture, migration) fill the
-  **comparison table** (criteria × options). Findings ranked by reliability, each
-  with a 1-10 confidence score (set in Phase 4) and Supported-by / Challenged-by
-  chips from the contradiction map. Include the version-currency note and the
-  References list at the end.
+  Fill every `{{TOKEN}}`. It has two layers: (a) the **fast-scan layer** up top —
+  verdict scoreboard, key findings, and (for option-comparison modes) the Side-by-Side
+  table — so the answer lands in five seconds; then (b) the **12-section deep body**
+  (sections 06–16) that carries the full spine. Fill the deep sections per the
+  concreteness contract; render comparisons/numbers/flows with widgets, not prose.
+- For `md`: the full **12-section spine** from `references/report-structure.md` —
+  introduction/methodology, landscape, implementation how-to, stack, integration,
+  performance, security, recommendation, roadmap, risks, methodology, and a closing
+  References appendix. This is the detailed report; make each section concrete.
 - For `adr`: clone `assets/adr-template.md`; fill the MADR sections (Context,
   Decision Drivers, Considered Options, Decision Outcome, Consequences, Pros/Cons
   per option, More Information) and the closing **References** section. Document
-  rejected options + why.
-- For `md`: a focused report/spike summary — findings, recommendation + its
-  load-bearing claim, risks/gotchas, and a closing **References** section listing
-  every source with title, version/date, verification status, and URL.
+  rejected options + why. The ADR stays a lean decision record — no 12-section spine —
+  but the concreteness contract still applies (name versions, cite specifics).
 
 **Write for a busy engineer, not a journal.** Short sentences, plain words, lead
 with the answer. Define any unavoidable term inline. If a reader needs a
@@ -228,6 +235,12 @@ to `stepsCompleted: [0, 1, 2, 3, 4]`.
 - **Prefer official docs over Q&A.** A load-bearing claim must resolve to Tier 1–3
   (official docs/specs, security DBs, registries). Blogs, Stack Overflow, Medium,
   and model memory are signposts to find the primary — never proof on their own.
+- **Specific and practical, never generic.** Name exact versions; show real commands/
+  config/code; use real numbers; tie every recommendation to the reader's stack, team,
+  and scale. Cut any sentence that describes a category instead of stating a fact
+  ("offers robust support for…", "is widely used…", "can help improve performance…").
+  If a sentence wouldn't change what the reader does, delete it. Full contract +
+  good/bad example in `references/report-structure.md`.
 - **Scratch file.** `{topic-slug}.work.md` holds lens briefs + the contradiction
   map for resumability; it is a working artifact, not a deliverable. Leave it in
   place (a resumed or re-run pass can reuse it); the deliverables are the HTML/MD/ADR.
