@@ -1,0 +1,46 @@
+<!--
+  WIDGET: verdict-card  (zero dependencies — pure HTML/CSS, no JS)
+  Use for: the ONE "at a glance" recommendation at the top of a report — the
+  chosen option (big), a confidence meter (n of 10 filled segments), the top
+  2-3 reasons, and the single key caveat the reader must not miss.
+  How: copy this whole block into the report body. Replace the FILL markers.
+  Set confidence by filling exactly n of the 10 .vc-seg spans with the "on"
+  background (#2563eb); leave the rest #e4e9f2. Status is shown by icon+word
+  (not colour alone) so it survives grayscale printing. No CDN, no framework.
+-->
+<div class="vc" style="border:1px solid #e4e9f2;border-radius:12px;padding:26px 28px;background:#f6f8fc;max-width:640px;">
+  <div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.12em;color:#5b6677;margin-bottom:8px;">Recommendation</div>
+  <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:30px;line-height:1.1;color:#1e3a8a;margin:0 0 6px;">FILL: chosen option</div>
+  <p style="font-family:'Roboto',sans-serif;font-size:13.5px;color:#5b6677;margin:0 0 20px;">FILL: one-sentence framing of the verdict.</p>
+
+  <!-- confidence meter: fill n of 10 with #2563eb (here n = 8) -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+    <span style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;">Confidence</span>
+    <div style="display:flex;gap:3px;" role="img" aria-label="Confidence 8 of 10">
+      <span style="width:20px;height:12px;border-radius:2px;background:#2563eb;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#2563eb;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#2563eb;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#2563eb;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#2563eb;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#2563eb;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#2563eb;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#2563eb;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#e4e9f2;"></span>
+      <span style="width:20px;height:12px;border-radius:2px;background:#e4e9f2;"></span>
+    </div>
+    <span style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">8/10</span>
+  </div>
+
+  <div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;margin-bottom:8px;">Why</div>
+  <ul style="margin:0 0 20px;padding-left:18px;font-family:'Roboto',sans-serif;font-size:13.5px;color:#16203a;line-height:1.6;">
+    <li>FILL: reason 1 (strongest).</li>
+    <li>FILL: reason 2.</li>
+    <li>FILL: reason 3 (optional).</li>
+  </ul>
+
+  <!-- key caveat: icon + word carry the status, not colour alone -->
+  <div style="display:flex;gap:10px;align-items:flex-start;border-radius:8px;background:#fdf3e7;border:1px solid #f0d9b8;padding:11px 13px;">
+    <span aria-hidden="true" style="font-size:15px;line-height:1.3;">&#9888;</span>
+    <div style="font-family:'Roboto',sans-serif;font-size:13px;color:#b45309;line-height:1.5;"><strong style="font-weight:700;">Caveat:</strong> FILL: the single most important risk / condition.</div>
+  </div>
+</div>

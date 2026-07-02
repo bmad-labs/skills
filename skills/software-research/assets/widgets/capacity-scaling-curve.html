@@ -1,0 +1,80 @@
+<!--
+  WIDGET: capacity-scaling-curve  (zero dependencies — inline SVG + a little vanilla JS)
+  Use for: a metric vs load line chart that shows a knee / saturation point — e.g.
+  p99 latency (or cost, or throughput) rising as request rate climbs, then blowing up
+  past the knee. Draws axes, gridlines, one or two polylines from points arrays, and a
+  marked "knee".
+  How: copy the whole block (markup + <script>). Edit CSC config: domain (x/y min-max +
+  labels), series[] (name, color, points[] as [load, metric] in DATA units), and knee
+  (the [load, metric] to circle + annotate). JS maps data units to the SVG plot box.
+  Pairs with slider-metric.html: use this to SHOW the curve, the slider to let the reader
+  FEEL one point move along it. Give IDs a UNIQUE suffix if placing two (e.g. csc2-*).
+  Prints fine (static SVG).
+-->
+<div class="csc" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "p99 latency vs load")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 12px;">FILL: what the curve shows and where it breaks down.</p>
+  <svg id="csc-svg" viewBox="0 0 460 300" width="100%" role="img" aria-label="FILL: line chart of metric vs load with a saturation knee">
+    <title>FILL: capacity / scaling curve</title>
+  </svg>
+  <div id="csc-legend" style="display:flex;gap:18px;flex-wrap:wrap;font-family:'Roboto',sans-serif;font-size:12.5px;color:#16203a;margin-top:4px;"></div>
+</div>
+<script>
+  (function () {
+    // ---- FILL: config ----------------------------------------------------
+    var CSC = {
+      // plot box in SVG coords
+      box: { x: 56, y: 20, w: 372, h: 224 },
+      domain: { xMin: 0, xMax: 1000, yMin: 0, yMax: 800, xLabel: 'Load (req/s)', yLabel: 'p99 latency (ms)' }, // FILL
+      series: [
+        { name: 'Current', color: '#2563eb', points: [[0,40],[200,60],[400,90],[600,150],[700,260],[800,480],[900,780]] }, // FILL [load, metric]
+        { name: 'Tuned',   color: '#15803d', points: [[0,35],[200,48],[400,66],[600,95],[800,150],[900,240],[1000,430]] }  // FILL (delete for one curve)
+      ],
+      knee: { at: [700, 260], label: 'Knee ~700 req/s' } // FILL: the saturation point to mark
+    };
+    // ---------------------------------------------------------------------
+    var svg = document.getElementById('csc-svg'), SVGNS = 'http://www.w3.org/2000/svg', b = CSC.box, d = CSC.domain;
+    function el(tag, attrs, text) { var e = document.createElementNS(SVGNS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+    function sx(vx) { return b.x + (b.w * (vx - d.xMin)) / (d.xMax - d.xMin); }
+    function sy(vy) { return b.y + b.h - (b.h * (vy - d.yMin)) / (d.yMax - d.yMin); }
+
+    // gridlines + tick labels (5 steps each axis)
+    for (var g = 0; g <= 5; g++) {
+      var gy = b.y + (b.h * g) / 5, vy = d.yMax - ((d.yMax - d.yMin) * g) / 5;
+      el('line', { x1: b.x, y1: gy.toFixed(1), x2: b.x + b.w, y2: gy.toFixed(1), stroke: '#e4e9f2', 'stroke-width': 1 });
+      el('text', { x: b.x - 8, y: (gy + 3.5).toFixed(1), 'text-anchor': 'end', 'font-family': "'Roboto Mono',monospace", 'font-size': 9.5, fill: '#5b6677' }, Math.round(vy));
+      var gx = b.x + (b.w * g) / 5, vx = d.xMin + ((d.xMax - d.xMin) * g) / 5;
+      el('text', { x: gx.toFixed(1), y: b.y + b.h + 16, 'text-anchor': 'middle', 'font-family': "'Roboto Mono',monospace", 'font-size': 9.5, fill: '#5b6677' }, Math.round(vx));
+    }
+    // axes
+    el('line', { x1: b.x, y1: b.y, x2: b.x, y2: b.y + b.h, stroke: '#5b6677', 'stroke-width': 1.4 });
+    el('line', { x1: b.x, y1: b.y + b.h, x2: b.x + b.w, y2: b.y + b.h, stroke: '#5b6677', 'stroke-width': 1.4 });
+    // axis titles
+    el('text', { x: b.x + b.w / 2, y: b.y + b.h + 32, 'text-anchor': 'middle', 'font-family': "'Roboto',sans-serif", 'font-size': 11, fill: '#16203a' }, d.xLabel);
+    var yt = el('text', { x: 14, y: b.y + b.h / 2, 'text-anchor': 'middle', 'font-family': "'Roboto',sans-serif", 'font-size': 11, fill: '#16203a', transform: 'rotate(-90 14 ' + (b.y + b.h / 2).toFixed(1) + ')' }, d.yLabel);
+
+    // curves
+    CSC.series.forEach(function (s) {
+      var pts = s.points.map(function (p) { return sx(p[0]).toFixed(1) + ',' + sy(p[1]).toFixed(1); }).join(' ');
+      el('polyline', { points: pts, fill: 'none', stroke: s.color, 'stroke-width': 2.2, 'stroke-linejoin': 'round' });
+    });
+
+    // knee marker + annotation
+    if (CSC.knee) {
+      var kx = sx(CSC.knee.at[0]), ky = sy(CSC.knee.at[1]);
+      el('circle', { cx: kx.toFixed(1), cy: ky.toFixed(1), r: 5.5, fill: 'none', stroke: '#b91c1c', 'stroke-width': 2 });
+      el('circle', { cx: kx.toFixed(1), cy: ky.toFixed(1), r: 2, fill: '#b91c1c' });
+      var tx = Math.min(kx + 8, b.x + b.w - 4), anchor = kx > b.x + b.w * 0.62 ? 'end' : 'start';
+      if (anchor === 'end') tx = kx - 8;
+      el('text', { x: tx.toFixed(1), y: (ky - 10).toFixed(1), 'text-anchor': anchor, 'font-family': "'Roboto Mono',monospace", 'font-size': 10, fill: '#b91c1c', 'font-weight': 600 }, CSC.knee.label);
+    }
+
+    // legend
+    var lg = document.getElementById('csc-legend');
+    CSC.series.forEach(function (s) {
+      var chip = document.createElement('span'); chip.style.display = 'inline-flex'; chip.style.alignItems = 'center'; chip.style.gap = '6px';
+      chip.innerHTML = '<span style="display:inline-block;width:16px;height:3px;border-radius:2px;background:' + s.color + ';"></span>' + s.name;
+      lg.appendChild(chip);
+    });
+  })();
+</script>

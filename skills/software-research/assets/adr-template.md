@@ -5,10 +5,18 @@
 - **Deciders:** {{names / roles — default: tech-lead}}
 - **Mode:** software-research / {{MODE}}
 
+> **At a glance** — Decision: **{{the pick, in a few words}}**. Confidence:
+> {{N}}/10 (source-tier). Main trade-off: {{one line}}. Decide-by / next check:
+> {{the one thing to confirm, or "ready"}}.
+
+<!-- Concreteness: name exact versions, cite specifics, tie to this team's stack/scale.
+     No generic filler ("offers robust support for…"). See references/report-structure.md. -->
+
 ## Context and Problem Statement
 
-{{Value-neutral facts, forces, and constraints. What problem motivates this
-decision? Keep it factual; no recommendation yet.}}
+{{Plain facts, forces, and constraints — short sentences with real specifics (versions,
+scale numbers, the actual stack). What problem motivates this decision? Keep it factual;
+no recommendation yet.}}
 
 ## Decision Drivers
 
@@ -57,5 +65,17 @@ the load-bearing verified finding}}.
 
 ## More Information
 
-{{Related ADRs, the HTML briefing path, spikes, RFCs, and the full reference list
-with per-citation verification status + version/date.}}
+{{Related ADRs, the HTML briefing path, spikes, and any follow-up work. The full
+source list lives in References below.}}
+
+## References
+
+Every source this decision rests on, with the version/date it applies to and its
+verification status. Prefer primary sources (official docs, specs, changelogs,
+security DBs) — a claim backed only by a blog or Q&A answer is not load-bearing.
+
+<!-- one bullet per source. Status: Confirmed | Corrected | Contested | VersionStale.
+     Make the source a real clickable Markdown link: [title](url) — NOT a bare URL,
+     so it's clickable in every renderer. One link per URL (don't cram two in one). -->
+- **[Confirmed]** [{{Source title}} — {{version / date}}]({{PRIMARY_URL}}) — {{the fact it supports}}.
+- **[Corrected]** [{{Source title}} — {{version / date}}]({{PRIMARY_URL}}) — {{what changed on verification}}.

@@ -1,0 +1,59 @@
+<!--
+  WIDGET: cost-projection-lines  (zero dependencies — inline SVG, no JS needed)
+  Use for: projecting cost over time — "current trajectory" vs "after the chosen
+  option". Two polylines (one filled area under "current" to draw the eye), axis
+  ticks, and a legend.
+  How: copy the whole block. The plot area is 60..600 x, 20..200 y (y grows DOWN,
+  so higher cost = smaller y). Recompute each polyline's points to your data:
+  map month index -> x, cost -> y. Keep 6-12 points. Update the axis tick <text>
+  labels and the y-axis max caption. Coordinates are HAND-AUTHORED. Prints fine.
+  No CDN.
+-->
+<div class="cpl" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "12-month cost projection")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 12px;">FILL: framing (e.g. "Migrating to reserved instances in Q2").</p>
+
+  <svg viewBox="0 0 620 240" width="100%" role="img" aria-label="FILL: cost projection line chart, current vs chosen option">
+    <title>FILL: cost projection — current path vs after chosen option</title>
+
+    <!-- gridlines + y axis ticks (edit labels to your scale; top=max) -->
+    <g stroke="#e4e9f2" stroke-width="1">
+      <line x1="60" y1="20"  x2="600" y2="20"/>
+      <line x1="60" y1="80"  x2="600" y2="80"/>
+      <line x1="60" y1="140" x2="600" y2="140"/>
+      <line x1="60" y1="200" x2="600" y2="200"/>
+    </g>
+    <g font-family="'Roboto Mono',monospace" font-size="10" fill="#5b6677" text-anchor="end">
+      <text x="54" y="24">$80k</text>
+      <text x="54" y="84">$60k</text>
+      <text x="54" y="144">$40k</text>
+      <text x="54" y="204">$20k</text>
+    </g>
+    <!-- x axis month ticks -->
+    <g font-family="'Roboto Mono',monospace" font-size="10" fill="#5b6677" text-anchor="middle">
+      <text x="60"  y="220">M1</text>
+      <text x="195" y="220">M4</text>
+      <text x="330" y="220">M7</text>
+      <text x="465" y="220">M10</text>
+      <text x="600" y="220">M12</text>
+    </g>
+
+    <!-- CURRENT path: area fill + line (red = do nothing, cost keeps rising) -->
+    <polygon points="60,150 150,135 240,118 330,100 420,80 510,58 600,38 600,200 60,200"
+             fill="#fdecec"/>
+    <polyline points="60,150 150,135 240,118 330,100 420,80 510,58 600,38"
+              fill="none" stroke="#b91c1c" stroke-width="2.5"/>
+    <!-- CHOSEN option path: line (blue = after the decision, flatter curve) -->
+    <polyline points="60,150 150,140 240,132 330,120 420,116 510,112 600,108"
+              fill="none" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="1 0"/>
+
+    <!-- axis frame -->
+    <line x1="60" y1="20" x2="60" y2="200" stroke="#9aa6b8" stroke-width="1.5"/>
+    <line x1="60" y1="200" x2="600" y2="200" stroke="#9aa6b8" stroke-width="1.5"/>
+  </svg>
+
+  <div style="margin-top:8px;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;display:flex;gap:22px;">
+    <span><svg width="26" height="8" style="vertical-align:middle;"><line x1="0" y1="4" x2="26" y2="4" stroke="#b91c1c" stroke-width="2.5"/></svg> FILL: current path</span>
+    <span><svg width="26" height="8" style="vertical-align:middle;"><line x1="0" y1="4" x2="26" y2="4" stroke="#2563eb" stroke-width="2.5"/></svg> FILL: after chosen option</span>
+  </div>
+</div>

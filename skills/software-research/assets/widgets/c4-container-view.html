@@ -1,0 +1,75 @@
+<!--
+  WIDGET: c4-container-view  (zero dependencies — inline SVG only, no JS)
+  Use for: a C4 Context / Container diagram — Person, external System, and Containers
+  (app / API / datastore) connected by labeled directional arrows.
+  Styling by node type (distinct on purpose):
+    person    = dark ink fill (#16203a), rounded, white text (the human actor)
+    system    = blue fill (#2563eb), the system-in-focus / external system
+    container = white fill + blue outline, the deployable units inside the system
+    datastore = bg-soft fill (#f6f8fc) + blue-dark outline (a store; drawn as a box here)
+  How: copy the block. Positions are HAND-AUTHORED — set each box x/y and route each
+  arrow between box edges, then label it (verb + protocol, e.g. "Reads via JDBC").
+  For a diagram you'd rather write as text than place by hand, generate a Mermaid C4
+  or flowchart instead (auto-layout) — see widgets/README.md "Escape hatch: Mermaid".
+  Prints fine (static SVG).
+-->
+<div class="c4" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Container view — Ordering system")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 12px;">FILL: scope note (e.g. "System-in-focus dashed; externals solid").</p>
+  <svg viewBox="0 0 660 400" width="100%" role="img" aria-label="FILL: describe the container diagram for screen readers">
+    <title>FILL: C4 container / context diagram</title>
+    <defs>
+      <marker id="c4-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#5b6677"/>
+      </marker>
+    </defs>
+
+    <!-- relationships first (labeled arrows), so boxes draw on top. Route edge-to-edge. -->
+    <g stroke="#5b6677" stroke-width="1.4" fill="none">
+      <path d="M330,86 L330,120" marker-end="url(#c4-arrow)"/>       <!-- person -> web app -->
+      <path d="M330,180 L330,214" marker-end="url(#c4-arrow)"/>      <!-- web app -> api -->
+      <path d="M270,258 L150,290" marker-end="url(#c4-arrow)"/>      <!-- api -> datastore -->
+      <path d="M410,258 L520,290" marker-end="url(#c4-arrow)"/>      <!-- api -> external system -->
+    </g>
+    <g font-family="'Roboto Mono',monospace" font-size="10" fill="#5b6677">
+      <text x="340" y="107" text-anchor="start">FILL: Uses [HTTPS]</text>
+      <text x="340" y="201" text-anchor="start">FILL: Calls [JSON/HTTP]</text>
+      <text x="150" y="278" text-anchor="middle">FILL: Reads/writes [SQL]</text>
+      <text x="512" y="278" text-anchor="middle">FILL: Calls [REST]</text>
+    </g>
+
+    <!-- PERSON (dark ink) -->
+    <g>
+      <rect x="250" y="52" width="160" height="34" rx="17" fill="#16203a"/>
+      <text x="330" y="70" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12.5" font-weight="600" fill="#fff">FILL: Customer [Person]</text>
+    </g>
+
+    <!-- CONTAINER: web app (white + blue outline) -->
+    <g>
+      <rect x="230" y="120" width="200" height="60" rx="10" fill="#fff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="330" y="146" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12.5" font-weight="600" fill="#16203a">FILL: Web App</text>
+      <text x="330" y="164" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="10" fill="#5b6677">[Container: React]</text>
+    </g>
+
+    <!-- CONTAINER: API (white + blue outline) -->
+    <g>
+      <rect x="230" y="214" width="200" height="60" rx="10" fill="#fff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="330" y="240" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12.5" font-weight="600" fill="#16203a">FILL: API Service</text>
+      <text x="330" y="258" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="10" fill="#5b6677">[Container: Node]</text>
+    </g>
+
+    <!-- DATASTORE (bg-soft + blue-dark outline) -->
+    <g>
+      <rect x="60" y="290" width="180" height="58" rx="10" fill="#f6f8fc" stroke="#1e3a8a" stroke-width="1.6"/>
+      <text x="150" y="316" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12.5" font-weight="600" fill="#1e3a8a">FILL: Database</text>
+      <text x="150" y="334" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="10" fill="#5b6677">[Container: Postgres]</text>
+    </g>
+
+    <!-- EXTERNAL SYSTEM (blue fill) -->
+    <g>
+      <rect x="440" y="290" width="180" height="58" rx="10" fill="#2563eb"/>
+      <text x="530" y="316" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12.5" font-weight="600" fill="#fff">FILL: Payments</text>
+      <text x="530" y="334" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="10" fill="#dbe4fb">[External System]</text>
+    </g>
+  </svg>
+</div>

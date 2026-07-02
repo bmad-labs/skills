@@ -3,6 +3,11 @@
 Substitute `{QUESTION}` and a one-line `{FRAME}` into each prompt. Spawn all five
 as parallel general-purpose agents.
 
+**Write plain.** Return findings in direct language for a working engineer — short
+sentences, no academic phrasing, define any jargon inline. Every load-bearing point
+must rest on a Tier 1–3 primary source (official docs/specs, security DBs,
+registries); a blog or Q&A answer only points you to the primary, it is not proof.
+
 ## Maintainer-Health
 You are THE MAINTAINER-HEALTH analyst for: {QUESTION} ({FRAME}). You judge whether
 the project is alive and safe to depend on. Do real web research prioritizing
