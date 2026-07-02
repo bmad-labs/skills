@@ -2,9 +2,15 @@
 <!--
   SOFTWARE RESEARCH BRIEFING TEMPLATE
   Clone this file, fill every {{TOKEN}}, delete instructional comments, repeat the
-  repeating blocks (finding cards, refs, action items) as many times as needed.
-  Keep the <style> block verbatim. Design = clean white and professional:
-  Montserrat headings, Roboto Mono labels, blue accent. Do NOT switch to hand-drawn.
+  repeating blocks (finding cards, comparison rows, refs, action items) as needed.
+  Keep the <style> block as-is (palette/fonts are a design contract; the scoreboard
+  and comparison-table classes are part of it). Design = clean white and
+  professional: Montserrat headings, Roboto Mono labels, blue accent.
+  WRITE PLAIN: short sentences, no academic phrasing, define jargon inline. Lead
+  with the answer (scoreboard + Bottom Line), then the detail.
+  The "Side-by-Side" table (01b) is for option-comparison modes (library-eval,
+  architecture, migration); delete that section for single-subject research.
+  The References list at the end must contain every cited source.
 -->
 <html lang="en">
 <head>
@@ -114,6 +120,22 @@
   .vstat.ok { background: var(--green-bg); color: var(--green); }
   .vstat.part { background: var(--amber-bg); color: var(--amber); }
   .vstat.weak { background: var(--red-bg); color: var(--red); }
+  .scoreboard { margin-top: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .sb-cell { background: #fff; padding: 16px 18px; }
+  .sb-cell h5 { font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+  .sb-cell .val { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 17px; color: var(--ink); line-height: 1.25; }
+  .sb-cell .val.rec { color: var(--blue-dark); }
+  .sb-cell .val.risk { color: var(--amber); }
+  .sb-cell small { display: block; font-family: 'Roboto', sans-serif; font-weight: 400; font-size: 13px; color: var(--muted); margin-top: 5px; line-height: 1.4; }
+  .cmp-wrap { overflow-x: auto; margin-top: 8px; border: 1px solid var(--line); border-radius: 10px; }
+  table.cmp { border-collapse: collapse; width: 100%; font-size: 14px; }
+  table.cmp th, table.cmp td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.cmp thead th { font-family: 'Roboto Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--bg-soft); }
+  table.cmp tbody th { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  table.cmp td { color: #283449; }
+  table.cmp tr:last-child th, table.cmp tr:last-child td { border-bottom: none; }
+  table.cmp .win { color: var(--green); font-weight: 600; }
+  table.cmp .tier { font-family: 'Roboto Mono', monospace; font-size: 10px; color: var(--muted); }
   .footer { margin-top: 40px; font-family: 'Roboto Mono', monospace; font-size: 11px; color: #9aa6b8; text-align: center; }
   @media (max-width: 640px) { .page { padding: 40px 24px 56px; } h1 { font-size: 30px; } }
   @media print { body { background: #fff; } .page { box-shadow: none; max-width: 100%; padding: 0; } .connection, .oncam-col { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
@@ -135,6 +157,13 @@
       <span class="tag">Verified</span>
       <span>All {{N}} citations independently checked against primary sources on {{DATE}}. <b>Result: {{X}} corrected, {{Y}} demoted, {{Z}} version-stale.</b> Confidence = source-tier evidence quality.</span>
     </div>
+    <!-- ============ AT-A-GLANCE VERDICT SCOREBOARD (the answer in 5 seconds) ============ -->
+    <div class="scoreboard">
+      <div class="sb-cell"><h5>Recommendation</h5><div class="val rec">{{RECOMMENDATION: the pick, in 1-4 words}}</div><small>{{one-line why}}</small></div>
+      <div class="sb-cell"><h5>Confidence</h5><div class="val">{{SCORE}}/10</div><small>{{based on source tier}}</small></div>
+      <div class="sb-cell"><h5>Top risk</h5><div class="val risk">{{TOP_RISK: 1-4 words}}</div><small>{{one-line why it matters}}</small></div>
+      <div class="sb-cell"><h5>Decide by</h5><div class="val">{{THE ONE CHECK: what settles it, or "Ready"}}</div><small>{{what to test / confirm first}}</small></div>
+    </div>
     <div class="howto">
       <h4>How to read this</h4>
       <ul>
@@ -146,21 +175,38 @@
     </div>
   </header>
 
-  <!-- ============ 01 TL;DR SUMMARY ============ -->
+  <!-- ============ 01 BOTTOM LINE ============ -->
   <section class="section">
     <div class="section-num">01</div>
-    <h2><span class="bar"></span>The 60-Second Summary</h2>
+    <h2><span class="bar"></span>Bottom Line</h2>
     <div class="ceo">
-      <p style="margin-bottom:0;">{{SUMMARY: one dense paragraph for a tech-lead with 60 seconds. Lead with the recommendation + its load-bearing verified finding, then the contested trade-off, then the key risk. Bold the single most important sentence. Nuance, not headline.}}</p>
+      <p style="margin-bottom:0;">{{SUMMARY: 3-5 short sentences a busy tech-lead reads in under a minute. Plain words. Lead with the recommendation + the verified fact it rests on, then the main trade-off, then the key risk. Bold the single most important sentence.}}</p>
+    </div>
+  </section>
+
+  <!-- ============ 01b SIDE-BY-SIDE (option-comparison modes only; delete for single-subject research) ============ -->
+  <section class="section">
+    <div class="section-num">01b</div>
+    <h2><span class="bar"></span>Side-by-Side</h2>
+    <div class="cmp-wrap">
+      <table class="cmp">
+        <thead>
+          <tr><th>Criterion</th><th>{{OPTION_A}}</th><th>{{OPTION_B}}</th></tr>
+        </thead>
+        <tbody>
+          <!-- REPEAT one row per criterion (drawn from the lenses). Mark the better cell with class="win". Add a <span class="tier"> source tier where useful. -->
+          <tr><th>{{CRITERION}}</th><td>{{A verdict}} <span class="tier">{{T1-3}}</span></td><td class="win">{{B verdict}} <span class="tier">{{T1-3}}</span></td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
   <!-- ============ 02 KEY FINDINGS (ranked by reliability, highest first) ============ -->
   <section class="section">
     <div class="section-num">02</div>
-    <h2><span class="bar"></span>Five Key Findings, Ranked by Reliability</h2>
+    <h2><span class="bar"></span>Key Findings, Ranked by Reliability</h2>
 
-    <!-- REPEAT this .finding block 5x. rel class: high | medhigh | medium | low. score 1-10. -->
+    <!-- REPEAT this .finding block once per finding (4-5). rel class: high | medhigh | medium | low. score 1-10. -->
     <div class="finding">
       <div class="finding-head">
         <div class="finding-title">{{FINDING_TITLE}}</div>
@@ -170,7 +216,7 @@
         <div class="rel {{RELCLASS}}">Reliability: {{RELIABILITY_LABEL}}</div>
         <div class="score"><b>{{SCORE}}</b><span>/10</span></div>
       </div>
-      <p>{{FINDING_BODY: what it says, the evidence, and the verified caveat that caps the score. Bold any correction made during verification.}}</p>
+      <p>{{FINDING_BODY: plain and direct — what it says, the evidence, and the verified caveat that caps the score. Short sentences; define any term inline. Bold any correction made during verification.}}</p>
       <div class="chips">
         <div class="chip-row"><span class="chip-label sup">Supported by</span><span class="who">{{WHICH LENSES + the actual primary source}}</span></div>
         <div class="chip-row"><span class="chip-label chal">Challenged by</span><span class="who">{{WHICH LENSES disagree, or "No one"}}</span></div>
@@ -191,19 +237,19 @@
   <section class="section">
     <div class="connection">
       <div class="section-num">03</div>
-      <h2><span class="bar"></span>The Hidden Connection</h2>
-      <p>{{Set up the apparent contradiction between two findings.}}</p>
-      <p>{{Resolve it: the non-obvious link only visible across all five lenses.}}</p>
-      <p class="punch">{{The one-sentence payoff. If it leans on a weak finding, say so in parentheses.}}</p>
+      <h2><span class="bar"></span>Why The Findings Seem To Conflict</h2>
+      <p>{{Name the two findings that look like they clash.}}</p>
+      <p>{{Explain what actually connects them — the link only visible across all the lenses.}}</p>
+      <p class="punch">{{The one-sentence takeaway. If it leans on a weak finding, say so in parentheses.}}</p>
     </div>
   </section>
 
   <!-- ============ 03b KEY ASSUMPTION / MISSING 6TH LENS ============ -->
   <section class="section">
     <div class="assume">
-      <h3>The assumption this briefing rests on (and the missing 6th lens)</h3>
-      <p>{{What variables the five lenses froze. Name the 6th perspective that would change the conclusions, not just add nuance.}}</p>
-      <p>{{The one omission that could invert the findings. Build with this caveat in mind.}}</p>
+      <h3>What We Assumed / What We Didn't Check</h3>
+      <p>{{What the lenses took as fixed. Name the one perspective that would change the conclusions, not just add nuance.}}</p>
+      <p>{{The one gap that could flip the findings. Keep it in mind when you build.}}</p>
     </div>
   </section>
 
@@ -222,7 +268,7 @@
   <!-- ============ 04b CLAIM SAFETY GUIDE (assert / caveat / avoid) ============ -->
   <section class="section">
     <div class="section-num">04b</div>
-    <h2><span class="bar"></span>What's Safe to Assert</h2>
+    <h2><span class="bar"></span>What You Can / Can't Say Confidently</h2>
     <div class="oncam">
       <div class="oncam-col safe">
         <h4>✓ Safe — verified against primary source</h4>
@@ -242,7 +288,7 @@
   <!-- ============ 05 FRONTIER QUESTION ============ -->
   <section class="section">
     <div class="section-num">05</div>
-    <h2><span class="bar"></span>The Frontier Question</h2>
+    <h2><span class="bar"></span>The One Thing To Resolve Next</h2>
     <div class="frontier">
       <div class="q">{{The one question that would change everything if answered.}}</div>
       <p>{{Why it matters: what it threatens, why no lens addressed it, what answering it unlocks.}}</p>
@@ -251,7 +297,7 @@
 
   <!-- ============ REFERENCES with verification status ============ -->
   <div class="refs">
-    <h3>Evidence base &middot; verification status</h3>
+    <h3>References &middot; sources &amp; verification status</h3>
     <ul>
       <!-- REPEAT per citation. vstat class: ok (confirmed) | part (corrected/partial) | weak (demoted/version-stale/contested). -->
       <li><span class="vstat {{ok|part|weak}}">{{Confirmed|Corrected|Contested|VersionStale}}</span> {{Full citation: source name/title, the version/date it applies to, the key fact/figure, and any limit found during verification.}} <a href="{{PRIMARY_URL}}">{{domain}}</a></li>

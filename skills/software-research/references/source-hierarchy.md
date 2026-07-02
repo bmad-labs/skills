@@ -4,6 +4,13 @@ Software facts go stale fast (versions, deprecations, benchmarks) and
 blogs/Stack Overflow are often outdated. Cite the highest tier available, and
 verify every claim against its primary source.
 
+**Why official-first.** Primary sources (docs, specs, changelogs, security DBs)
+are versioned, normative, and maintained by the people responsible for the thing
+itself — they say what *is* true for a stated version. Blog posts, Q&A answers,
+and model memory paraphrase that truth at some past date and drift silently: the
+version moves, the answer doesn't. Treat the primary as the fact and everything
+else as a pointer to it.
+
 ## Tiers (Tier 1 = most authoritative)
 
 **Tier 1 — Primary / normative (the thing itself).** Cite over any commentary.
@@ -38,9 +45,11 @@ verify every claim against its primary source.
 - Stack Overflow Developer Survey, State of JS/CSS, GitHub Octoverse. Trend
   signal only — never a technical fact.
 
-**Tier 6 — Secondary commentary (lead, never proof).**
-- Blogs, Stack Overflow answers, Medium, DEV, tutorials, LLM memory. Use to
-  *locate* a primary source, then cite the primary.
+**Tier 6 — Secondary commentary (navigational only, never proof).**
+- Blogs, Stack Overflow answers, Medium, DEV, tutorials, LLM memory. These are
+  *signposts*: use them to find the primary source, then cite the primary. Citing
+  a Tier 5–6 source *as evidence for a fact* is a verification failure — the claim
+  is unverified until it resolves to a primary.
 
 ## Verification Rules (apply to every claim)
 
@@ -59,5 +68,11 @@ verify every claim against its primary source.
 6. **Benchmarks require reproducible methodology.** Accept performance claims
    only with disclosed hardware/versions/workload/config and a re-runnable test;
    discount vendor self-benchmarks unless independently reproduced.
+7. **Load-bearing claims must resolve to Tier 1–3.** Any claim the recommendation
+   rests on has to trace to a primary/normative source (Tier 1), an authoritative
+   security/aggregator DB (Tier 2), or a registry (Tier 3). A load-bearing claim
+   whose only support is Tier 5–6 (a survey, blog, SO answer, Medium post, or model
+   memory) is `UNVERIFIED` by definition — climb to a primary, or demote it to the
+   contested sidebar / cut it. Never present a Tier 5–6-only claim as fact.
 
 Verification banner format: `N claims checked · X corrected · Y demoted · Z version-stale`.
