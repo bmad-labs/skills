@@ -9,6 +9,9 @@
   with the row color.
   CAVEAT: ESCAPE any HTML in code — &lt; &gt; &amp; — or it renders as tags.
   All styles inline; prints fine (backgrounds are light).
+  NO syntax highlighting here by design: in a diff, the green/red line color IS the
+  meaning (added/removed), and a token highlighter would fight it. For token-colored
+  NON-diff code (side-by-side snippets), use code-compare.html instead.
 -->
 <div class="db" style="border:1px solid #e4e9f2;border-radius:12px;padding:20px 22px;background:#f6f8fc;">
   <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "config.ts — enable retries")</h4>
