@@ -1,0 +1,59 @@
+<!--
+  WIDGET: comparison-matrix  (zero dependencies — pure HTML/CSS table)
+  Use for: the universal "X vs Y across criteria" grid — options as COLUMNS,
+  criteria as ROWS. Also covers feature-support matrices.
+  Cell status: pass ✓ (green) / warn ! (amber) / fail ✗ (red) / partial ~ (blue).
+  Icon + color together (never color alone) so it survives print & colorblindness.
+  How: copy the whole block. Replace FILL markers. Add/remove <th>/<td> to match
+  your options; repeat <tr> rows per criterion. Put a caveat in title="..." (hover
+  tooltip) or wrap detail in <details> inside the cell for print-visible notes.
+  Prints fine (static). No CDN, no framework.
+-->
+<div style="border:1px solid #e4e9f2;border-radius:12px;padding:20px 22px;background:#f6f8fc;overflow-x:auto;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Framework comparison")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: one-line framing. Hover a cell for caveats.</p>
+  <table style="border-collapse:collapse;width:100%;font-family:'Roboto',sans-serif;font-size:13px;min-width:520px;">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:9px 12px;font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:#5b6677;border-bottom:2px solid #e4e9f2;">Criteria</th>
+        <th style="padding:9px 12px;font-family:'Montserrat',sans-serif;font-size:13px;color:#16203a;border-bottom:2px solid #e4e9f2;">FILL: Option A</th>
+        <th style="padding:9px 12px;font-family:'Montserrat',sans-serif;font-size:13px;color:#16203a;border-bottom:2px solid #e4e9f2;">FILL: Option B</th>
+        <th style="padding:9px 12px;font-family:'Montserrat',sans-serif;font-size:13px;color:#16203a;border-bottom:2px solid #e4e9f2;">FILL: Option C</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Repeat a <tr> per criterion. Cell recipe (swap icon + bg + color together):
+           pass    → ✓  bg #e9f6ee  color #15803d
+           warn    → !  bg #fdf3e7  color #b45309
+           fail    → ✗  bg #fdecec  color #b91c1c
+           partial → ~  bg #eef4ff  color #2563eb   -->
+      <tr>
+        <th style="text-align:left;padding:9px 12px;font-weight:600;color:#16203a;border-bottom:1px solid #e4e9f2;">FILL: criterion 1</th>
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#e9f6ee;color:#15803d;font-weight:700;" title="FILL: optional caveat for A">✓</td>
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#fdf3e7;color:#b45309;font-weight:700;" title="FILL: optional caveat for B">!</td>
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#fdecec;color:#b91c1c;font-weight:700;" title="FILL: optional caveat for C">✗</td>
+      </tr>
+      <tr>
+        <th style="text-align:left;padding:9px 12px;font-weight:600;color:#16203a;border-bottom:1px solid #e4e9f2;">FILL: criterion 2</th>
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#e9f6ee;color:#15803d;font-weight:700;">✓</td>
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#eef4ff;color:#2563eb;font-weight:700;" title="FILL: what 'partial' means here">~</td>
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#e9f6ee;color:#15803d;font-weight:700;">✓</td>
+      </tr>
+      <tr>
+        <th style="text-align:left;padding:9px 12px;font-weight:600;color:#16203a;border-bottom:1px solid #e4e9f2;">FILL: criterion 3</th>
+        <!-- Print-visible caveat via <details> instead of a hover title -->
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#fdf3e7;color:#b45309;font-weight:700;">
+          <details style="display:inline-block;text-align:left;"><summary style="cursor:pointer;list-style:none;">!</summary><span style="display:block;font-weight:400;font-size:11px;color:#5b6677;margin-top:4px;">FILL: caveat text shown in print.</span></details>
+        </td>
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#e9f6ee;color:#15803d;font-weight:700;">✓</td>
+        <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #e4e9f2;background:#fdecec;color:#b91c1c;font-weight:700;">✗</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#5b6677;">
+    <span><b style="color:#15803d;">✓</b> pass</span>
+    <span><b style="color:#b45309;">!</b> caveat</span>
+    <span><b style="color:#b91c1c;">✗</b> fail</span>
+    <span><b style="color:#2563eb;">~</b> partial</span>
+  </div>
+</div>

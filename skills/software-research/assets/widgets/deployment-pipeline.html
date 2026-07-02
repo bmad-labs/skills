@@ -1,0 +1,57 @@
+<!--
+  WIDGET: deployment-pipeline  (zero dependencies — inline HTML/CSS flex row)
+  Use for: a CI/CD pipeline read left-to-right — build → test → dev → staging → prod.
+  How: copy this whole block into the report body. Replace FILL markers.
+  Each stage = one .dp-stage box + a connector arrow after it (drop the last arrow).
+  STATUS is icon+color (not color alone): ok ✓ green / running ● blue / blocked ✕ red.
+  GATE marker below each box: "auto" (blue) or "manual ✋" (amber approval).
+  Palette matches the briefing template. Prints fine (static). No CDN, no framework.
+-->
+<div class="dp" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: pipeline title (e.g. "Release pipeline")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 18px;">FILL: one-line framing (commit → production).</p>
+
+  <div style="display:flex;align-items:stretch;flex-wrap:wrap;gap:0;">
+
+    <!-- STAGE 1 (ok) -->
+    <div class="dp-stage" style="flex:1 1 120px;min-width:120px;border:1px solid #e4e9f2;border-radius:10px;background:#fff;padding:12px 12px 10px;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Build</div>
+      <div style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:2px 9px;border-radius:999px;background:#e9f6ee;color:#15803d;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;"><span aria-hidden="true">&#10003;</span> ok</div>
+      <div style="margin-top:9px;font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.04em;color:#2563eb;">&#9881; auto</div>
+    </div>
+    <!-- connector -->
+    <div aria-hidden="true" style="align-self:center;padding:0 4px;color:#9aa6b8;font-size:18px;line-height:1;">&#8594;</div>
+
+    <!-- STAGE 2 (ok) -->
+    <div class="dp-stage" style="flex:1 1 120px;min-width:120px;border:1px solid #e4e9f2;border-radius:10px;background:#fff;padding:12px 12px 10px;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Test</div>
+      <div style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:2px 9px;border-radius:999px;background:#e9f6ee;color:#15803d;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;"><span aria-hidden="true">&#10003;</span> ok</div>
+      <div style="margin-top:9px;font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.04em;color:#2563eb;">&#9881; auto</div>
+    </div>
+    <div aria-hidden="true" style="align-self:center;padding:0 4px;color:#9aa6b8;font-size:18px;line-height:1;">&#8594;</div>
+
+    <!-- STAGE 3 (running) -->
+    <div class="dp-stage" style="flex:1 1 120px;min-width:120px;border:1px solid #2563eb;border-radius:10px;background:#fff;padding:12px 12px 10px;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Dev</div>
+      <div style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:2px 9px;border-radius:999px;background:#e7f0fe;color:#2563eb;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;"><span aria-hidden="true">&#9679;</span> running</div>
+      <div style="margin-top:9px;font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.04em;color:#2563eb;">&#9881; auto</div>
+    </div>
+    <div aria-hidden="true" style="align-self:center;padding:0 4px;color:#9aa6b8;font-size:18px;line-height:1;">&#8594;</div>
+
+    <!-- STAGE 4 (blocked, manual gate) -->
+    <div class="dp-stage" style="flex:1 1 120px;min-width:120px;border:1px solid #e4e9f2;border-radius:10px;background:#fff;padding:12px 12px 10px;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Staging</div>
+      <div style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:2px 9px;border-radius:999px;background:#fdecec;color:#b91c1c;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;"><span aria-hidden="true">&#10007;</span> blocked</div>
+      <div style="margin-top:9px;font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.04em;color:#b45309;">&#9995; manual</div>
+    </div>
+    <div aria-hidden="true" style="align-self:center;padding:0 4px;color:#9aa6b8;font-size:18px;line-height:1;">&#8594;</div>
+
+    <!-- STAGE 5 (idle / not started; manual gate) -->
+    <div class="dp-stage" style="flex:1 1 120px;min-width:120px;border:1px dashed #9aa6b8;border-radius:10px;background:#fff;padding:12px 12px 10px;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Prod</div>
+      <div style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:2px 9px;border-radius:999px;background:#f6f8fc;color:#5b6677;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;"><span aria-hidden="true">&#9675;</span> idle</div>
+      <div style="margin-top:9px;font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.04em;color:#b45309;">&#9995; manual</div>
+    </div>
+
+  </div>
+</div>

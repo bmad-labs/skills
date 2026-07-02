@@ -3,6 +3,11 @@
 Substitute `{QUESTION}` and a one-line `{FRAME}`. Spawn all four as parallel
 general-purpose agents. Output is an ADR for the upgrade/migration path.
 
+**Write plain.** Return findings in direct language for a working engineer — short
+sentences, no academic phrasing, define any jargon inline. Every load-bearing point
+must rest on a Tier 1–3 primary source; a blog or Q&A answer only points you to the
+primary, it is not proof.
+
 ## Breaking-Changes
 You are THE BREAKING-CHANGES analyst for: {QUESTION} ({FRAME}). Enumerate what
 breaks between source and target. Do real web research in official migration

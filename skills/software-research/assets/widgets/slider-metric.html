@@ -1,0 +1,47 @@
+<!--
+  WIDGET: slider-metric  (zero dependencies — inline SVG + ~30 lines vanilla JS)
+  Use for: the ONE interactive "play with it" view per report — a variable the
+  reader drags to see live-recomputed numbers (the shadow-study / sensitivity /
+  cost-vs-scale pattern). This is the closest match to the Claude-Desktop demo.
+  How: copy the whole block (markup + <script>). Give IDs a UNIQUE suffix if you
+  place more than one on a page (e.g. sm-time-2). Edit compute() to your formula.
+  SECURITY: this JS is TEMPLATE code you control — safe to inline. If instead you
+  let the model generate arbitrary widget JS, sandbox it (see widgets/README.md).
+-->
+<div class="sm" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 28px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: widget title (e.g. "Cost vs scale")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: what the slider does. Drag to explore.</p>
+
+  <div style="display:flex;gap:26px;flex-wrap:wrap;margin:6px 0 12px;">
+    <div style="min-width:96px;"><div id="sm-a" style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:26px;color:#1e3a8a;line-height:1;">—</div><div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;margin-top:5px;">FILL: metric A</div></div>
+    <div style="min-width:96px;"><div id="sm-b" style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:26px;color:#1e3a8a;line-height:1;">—</div><div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;margin-top:5px;">FILL: metric B</div></div>
+    <div style="min-width:96px;"><div id="sm-c" style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:26px;color:#b45309;line-height:1;">—</div><div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;margin-top:5px;">FILL: metric C</div></div>
+  </div>
+
+  <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:#5b6677;display:flex;justify-content:space-between;">
+    <span>FILL: min label</span><span id="sm-read">—</span><span>FILL: max label</span>
+  </div>
+  <input id="sm-input" type="range" min="1" max="100" step="1" value="20" style="width:100%;accent-color:#2563eb;margin-top:6px;" oninput="smUpdate()"/>
+</div>
+<script>
+  // The whole "runtime" — ~30 lines, no library. Edit compute() for your scenario.
+  function smCompute(x) {
+    // x is the slider value (min..max). Return { a, b, c, read }.
+    // EXAMPLE (replace): cost scales with x, efficiency drops, risk rises.
+    return {
+      a: '$' + (x * 12).toLocaleString(),   // FILL metric A
+      b: Math.max(10, 100 - x) + '%',        // FILL metric B
+      c: (x > 70 ? 'High' : x > 40 ? 'Med' : 'Low'), // FILL metric C
+      read: x + ' units'                     // FILL slider readout
+    };
+  }
+  function smUpdate() {
+    var x = parseFloat(document.getElementById('sm-input').value);
+    var r = smCompute(x);
+    document.getElementById('sm-a').textContent = r.a;
+    document.getElementById('sm-b').textContent = r.b;
+    document.getElementById('sm-c').textContent = r.c;
+    document.getElementById('sm-read').textContent = r.read;
+  }
+  smUpdate();
+</script>

@@ -1,0 +1,73 @@
+<!--
+  WIDGET: sequence-flow  (zero dependencies — inline SVG only, no JS)
+  Use for: a lightweight sequence diagram — 3-4 actors as vertical lifelines and
+  numbered horizontal messages between them at stepped y positions.
+  How: copy the block. Set each actor box x (keep them evenly spread) and give each
+  lifeline a matching x for its dashed line. For each message, hand-place x1/x2 to the
+  two lifeline x's, set y (step DOWN ~34px per message), point the arrow with the right
+  marker (arrow-r for left->right, arrow-l for right->left), and number the label.
+  This is HAND-PLACED: for many actors/messages, generate a Mermaid sequenceDiagram
+  instead (see widgets/README.md "Escape hatch: Mermaid"). Prints fine (static SVG).
+  Lifeline x's here: A1=80  A2=230  A3=380  A4=530 (edit to add/remove an actor).
+-->
+<div class="sf" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Checkout request flow")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 12px;">FILL: one-line framing of the interaction.</p>
+  <svg viewBox="0 0 620 320" width="100%" role="img" aria-label="FILL: describe the sequence for screen readers">
+    <title>FILL: sequence diagram</title>
+    <defs>
+      <marker id="sf-arrow-r" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#16203a"/>
+      </marker>
+      <marker id="sf-arrow-l" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M8,0 L0,3 L8,6 Z" fill="#16203a"/>
+      </marker>
+    </defs>
+
+    <!-- actor boxes (top) + dashed lifelines down. Keep box center == lifeline x. -->
+    <g font-family="'Roboto',sans-serif" font-size="12" font-weight="600">
+      <rect x="30" y="14" width="100" height="30" rx="8" fill="#1e3a8a"/>
+      <text x="80" y="34" text-anchor="middle" fill="#fff">FILL: Actor 1</text>
+      <line x1="80" y1="44" x2="80" y2="300" stroke="#9aa6b8" stroke-width="1.2" stroke-dasharray="4 4"/>
+
+      <rect x="180" y="14" width="100" height="30" rx="8" fill="#1e3a8a"/>
+      <text x="230" y="34" text-anchor="middle" fill="#fff">FILL: Actor 2</text>
+      <line x1="230" y1="44" x2="230" y2="300" stroke="#9aa6b8" stroke-width="1.2" stroke-dasharray="4 4"/>
+
+      <rect x="330" y="14" width="100" height="30" rx="8" fill="#1e3a8a"/>
+      <text x="380" y="34" text-anchor="middle" fill="#fff">FILL: Actor 3</text>
+      <line x1="380" y1="44" x2="380" y2="300" stroke="#9aa6b8" stroke-width="1.2" stroke-dasharray="4 4"/>
+
+      <rect x="480" y="14" width="100" height="30" rx="8" fill="#1e3a8a"/>
+      <text x="530" y="34" text-anchor="middle" fill="#fff">FILL: Actor 4</text>
+      <line x1="530" y1="44" x2="530" y2="300" stroke="#9aa6b8" stroke-width="1.2" stroke-dasharray="4 4"/>
+    </g>
+
+    <!-- messages: numbered, stepped DOWN ~34px each. arrow-r = L->R, arrow-l = R->L -->
+    <g font-family="'Roboto Mono',monospace" font-size="11" fill="#16203a">
+      <!-- 1: Actor1 -> Actor2 -->
+      <line x1="80" y1="80" x2="228" y2="80" stroke="#16203a" stroke-width="1.5" marker-end="url(#sf-arrow-r)"/>
+      <text x="154" y="74" text-anchor="middle">1. FILL: request</text>
+
+      <!-- 2: Actor2 -> Actor3 -->
+      <line x1="230" y1="114" x2="378" y2="114" stroke="#16203a" stroke-width="1.5" marker-end="url(#sf-arrow-r)"/>
+      <text x="304" y="108" text-anchor="middle">2. FILL: query</text>
+
+      <!-- 3: Actor3 -> Actor4 -->
+      <line x1="380" y1="148" x2="528" y2="148" stroke="#16203a" stroke-width="1.5" marker-end="url(#sf-arrow-r)"/>
+      <text x="454" y="142" text-anchor="middle">3. FILL: fetch</text>
+
+      <!-- 4: Actor4 -> Actor3 (reply) -->
+      <line x1="530" y1="182" x2="382" y2="182" stroke="#16203a" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sf-arrow-l)"/>
+      <text x="456" y="176" text-anchor="middle" fill="#5b6677">4. FILL: result</text>
+
+      <!-- 5: Actor3 -> Actor2 (reply) -->
+      <line x1="380" y1="216" x2="232" y2="216" stroke="#16203a" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sf-arrow-l)"/>
+      <text x="306" y="210" text-anchor="middle" fill="#5b6677">5. FILL: data</text>
+
+      <!-- 6: Actor2 -> Actor1 (reply) -->
+      <line x1="230" y1="250" x2="82" y2="250" stroke="#16203a" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sf-arrow-l)"/>
+      <text x="156" y="244" text-anchor="middle" fill="#5b6677">6. FILL: response</text>
+    </g>
+  </svg>
+</div>

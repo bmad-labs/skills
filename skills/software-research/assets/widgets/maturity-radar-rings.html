@@ -1,0 +1,69 @@
+<!--
+  WIDGET: maturity-radar-rings  (zero dependencies — inline SVG + ~30 lines vanilla JS)
+  Use for: a ThoughtWorks-Technology-Radar-style view — concentric rings
+  Adopt / Trial / Assess / Hold with technologies plotted as labeled blips.
+  (Visual convention inspired by the ThoughtWorks Technology Radar; this is an
+  independent rendering, not their artwork or data.)
+  How: copy the whole block (markup + <script>). Edit MRR_BLIPS: each blip has a
+  ring (0=Adopt innermost .. 3=Hold outermost) and an angle in degrees (0..360).
+  JS places each blip on its ring at that angle. If you place two radars on a
+  page, give ids a unique suffix (mrr2-*). Prints fine (static after first paint).
+  No CDN.
+-->
+<div class="mrr" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Tech adoption radar")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 12px;">FILL: framing. Rings inspired by ThoughtWorks Technology Radar.</p>
+
+  <svg id="mrr-svg" viewBox="0 0 360 360" width="100%" style="max-width:420px;display:block;margin:0 auto;" role="img" aria-label="FILL: describe the adoption rings and technologies for screen readers">
+    <title>FILL: maturity radar</title>
+    <!-- rings: center 180,180. radii 40/80/120/160 -->
+    <g fill="none" stroke="#e4e9f2" stroke-width="1.5">
+      <circle cx="180" cy="180" r="160"/>
+      <circle cx="180" cy="180" r="120"/>
+      <circle cx="180" cy="180" r="80"/>
+      <circle cx="180" cy="180" r="40"/>
+    </g>
+    <!-- ring labels along the top -->
+    <g font-family="'Roboto Mono',monospace" font-size="10" fill="#5b6677" text-anchor="middle">
+      <text x="180" y="24">HOLD</text>
+      <text x="180" y="64">ASSESS</text>
+      <text x="180" y="104">TRIAL</text>
+      <text x="180" y="144">ADOPT</text>
+    </g>
+    <!-- blips get injected here -->
+    <g id="mrr-blips"></g>
+  </svg>
+</div>
+<script>
+  // FILL: ring 0=Adopt (innermost) .. 3=Hold (outermost); angle in degrees 0..360.
+  var MRR_BLIPS = [
+    { name: 'TypeScript',   ring: 0, angle: 30 },
+    { name: 'OpenTelemetry',ring: 1, angle: 120 },
+    { name: 'WASM edge',    ring: 2, angle: 210 },
+    { name: 'GraphQL BFF',  ring: 1, angle: 300 },
+    { name: 'Hand-rolled ORM', ring: 3, angle: 250 }
+  ];
+  var MRR_RING_R   = [40, 80, 120, 160];             // midpoint-ish radius per ring
+  var MRR_RING_COL = ['#15803d', '#2563eb', '#b45309', '#b91c1c']; // adopt/trial/assess/hold
+
+  (function mrrRender() {
+    var g = document.getElementById('mrr-blips');
+    var CX = 180, CY = 180;
+    MRR_BLIPS.forEach(function (b) {
+      var r = (MRR_RING_R[b.ring] || 40) - 20;       // sit inside the ring band
+      var rad = (b.angle - 90) * Math.PI / 180;      // -90 so 0deg points up
+      var x = CX + r * Math.cos(rad);
+      var y = CY + r * Math.sin(rad);
+      var col = MRR_RING_COL[b.ring] || '#5b6677';
+      var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', x.toFixed(1)); dot.setAttribute('cy', y.toFixed(1));
+      dot.setAttribute('r', '5'); dot.setAttribute('fill', col);
+      var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', (x + 8).toFixed(1)); t.setAttribute('y', (y + 3).toFixed(1));
+      t.setAttribute('font-family', "'Roboto',sans-serif");
+      t.setAttribute('font-size', '10'); t.setAttribute('fill', '#16203a');
+      t.textContent = b.name;
+      g.appendChild(dot); g.appendChild(t);
+    });
+  })();
+</script>

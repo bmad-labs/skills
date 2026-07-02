@@ -1,0 +1,78 @@
+<!--
+  WIDGET: radar-scores  (zero dependencies — inline SVG + a little vanilla JS)
+  Use for: multi-attribute scoring across ONE spider/radar chart — e.g. ISO 25010
+  quality attributes (performance, reliability, security, maintainability, cost).
+  How: copy the whole block (markup + <script>). Edit the RADAR config: axes[] (labels,
+  in order, going counter-clockwise from due-east) and up to TWO options in series[]
+  (name, color, scores[] 0..max, one score per axis, SAME order & count as axes).
+  Keep to <=2 filled polygons — 3+ overlapping fills are unreadable.
+  Points are computed x=cx+r*cos(theta), y=cy-r*sin(theta) (y flipped: SVG y grows down).
+  Give IDs a UNIQUE suffix if you place two on a page (e.g. rs2-*). Prints fine.
+-->
+<div class="rs" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Quality attribute scores")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 12px;">FILL: scale note (e.g. "0-5 per ISO 25010 attribute; higher is better").</p>
+  <svg id="rs-svg" viewBox="0 0 420 380" width="100%" role="img" aria-label="FILL: radar chart of scores per attribute">
+    <title>FILL: radar / spider chart of scores</title>
+    <!-- rings, axes, spokes, labels, and polygons are drawn by JS from the config below -->
+  </svg>
+  <div id="rs-legend" style="display:flex;gap:18px;flex-wrap:wrap;font-family:'Roboto',sans-serif;font-size:12.5px;color:#16203a;margin-top:4px;"></div>
+</div>
+<script>
+  (function () {
+    // ---- FILL: config ----------------------------------------------------
+    var RS = {
+      cx: 210, cy: 175, r: 130, max: 5, rings: 5,
+      axes: ['Performance', 'Reliability', 'Security', 'Maintainability', 'Cost'], // FILL: attribute labels
+      series: [
+        { name: 'Option A', color: '#2563eb', scores: [4, 3, 5, 2, 3] }, // FILL
+        { name: 'Option B', color: '#b45309', scores: [3, 4, 2, 5, 4] }  // FILL (delete for single option)
+      ]
+    };
+    // ---------------------------------------------------------------------
+    var svg = document.getElementById('rs-svg');
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    var n = RS.axes.length;
+    function el(tag, attrs, text) {
+      var e = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      if (text != null) e.textContent = text;
+      svg.appendChild(e);
+      return e;
+    }
+    // angle for axis i (start due-north, go clockwise for a natural read)
+    function angle(i) { return Math.PI / 2 - (2 * Math.PI * i) / n; }
+    function pt(i, radius) {
+      var a = angle(i);
+      return [RS.cx + radius * Math.cos(a), RS.cy - radius * Math.sin(a)];
+    }
+    // rings
+    for (var g = 1; g <= RS.rings; g++) {
+      var rr = (RS.r * g) / RS.rings, ring = [];
+      for (var i = 0; i < n; i++) { var p = pt(i, rr); ring.push(p[0].toFixed(1) + ',' + p[1].toFixed(1)); }
+      el('polygon', { points: ring.join(' '), fill: 'none', stroke: '#e4e9f2', 'stroke-width': 1 });
+    }
+    // spokes + labels
+    for (var i = 0; i < n; i++) {
+      var end = pt(i, RS.r);
+      el('line', { x1: RS.cx, y1: RS.cy, x2: end[0].toFixed(1), y2: end[1].toFixed(1), stroke: '#e4e9f2', 'stroke-width': 1 });
+      var lp = pt(i, RS.r + 22), ax = lp[0], anchor = ax > RS.cx + 4 ? 'start' : ax < RS.cx - 4 ? 'end' : 'middle';
+      el('text', { x: ax.toFixed(1), y: (lp[1] + 4).toFixed(1), 'text-anchor': anchor, 'font-family': "'Roboto Mono',monospace", 'font-size': 10.5, fill: '#5b6677' }, RS.axes[i]);
+    }
+    // series polygons
+    RS.series.forEach(function (s) {
+      var poly = [];
+      for (var i = 0; i < n; i++) { var p = pt(i, RS.r * Math.max(0, Math.min(1, s.scores[i] / RS.max))); poly.push(p[0].toFixed(1) + ',' + p[1].toFixed(1)); }
+      el('polygon', { points: poly.join(' '), fill: s.color, 'fill-opacity': 0.18, stroke: s.color, 'stroke-width': 2 });
+      for (var j = 0; j < n; j++) { var q = pt(j, RS.r * Math.max(0, Math.min(1, s.scores[j] / RS.max))); el('circle', { cx: q[0].toFixed(1), cy: q[1].toFixed(1), r: 2.6, fill: s.color }); }
+    });
+    // legend
+    var lg = document.getElementById('rs-legend');
+    RS.series.forEach(function (s) {
+      var chip = document.createElement('span');
+      chip.style.display = 'inline-flex'; chip.style.alignItems = 'center'; chip.style.gap = '6px';
+      chip.innerHTML = '<span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:' + s.color + ';opacity:.85;"></span>' + s.name;
+      lg.appendChild(chip);
+    });
+  })();
+</script>

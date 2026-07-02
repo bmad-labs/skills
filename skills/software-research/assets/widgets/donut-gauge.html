@@ -1,0 +1,47 @@
+<!--
+  WIDGET: donut-gauge  (zero dependencies — one inline SVG <circle> arc + a big number)
+  Use for: a single circular progress/score — coverage %, confidence, error-budget
+  remaining, health score. One example shown below (78% coverage).
+  How: copy this whole block. Replace FILL markers. To set the value, change TWO
+  things by hand (or use the tiny script): the arc's stroke-dasharray, and the
+  center number. Arc math: r=52, circumference C = 2*pi*52 = 326.7. For value v%,
+  dash = (v/100 * 326.7) rounded, gap = 326.7 - dash. E.g. 78% -> "254.8 71.9".
+  COLOR THRESHOLD (FILL): pick stroke by value — green #15803d >=70, amber #b45309
+  40-69, red #b91c1c <40 (flip the direction for "lower is better" metrics).
+  Give IDs a UNIQUE suffix if you place more than one on a page (e.g. dg-arc-2).
+  Palette matches the briefing template. Prints fine (static). No CDN, no framework.
+-->
+<div class="dg" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;display:inline-block;text-align:center;min-width:210px;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 12px;color:#16203a;">FILL: title (e.g. "Test coverage")</h4>
+
+  <svg viewBox="0 0 140 140" width="150" height="150" role="img" aria-label="FILL: coverage 78 percent, above 70 percent target">
+    <title>FILL: 78% coverage</title>
+    <!-- track -->
+    <circle cx="70" cy="70" r="52" fill="none" stroke="#e4e9f2" stroke-width="14"/>
+    <!-- arc: rotated -90deg so it starts at top; dasharray = "filled gap" -->
+    <circle id="dg-arc" cx="70" cy="70" r="52" fill="none" stroke="#15803d" stroke-width="14"
+            stroke-linecap="round" stroke-dasharray="254.8 71.9"
+            transform="rotate(-90 70 70)"/>
+    <!-- center number (threshold color should match the arc) -->
+    <text id="dg-num" x="70" y="72" text-anchor="middle" font-family="'Montserrat',sans-serif" font-weight="800" font-size="30" fill="#15803d">78%</text>
+    <text x="70" y="92" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9" letter-spacing="0.08em" fill="#5b6677">FILL: LABEL</text>
+  </svg>
+
+  <div style="font-family:'Roboto Mono',monospace;font-size:11px;color:#15803d;margin-top:8px;">&#10003; FILL: above target (70%)</div>
+</div>
+<script>
+  // Optional helper — set value in ONE place. Delete for a fully static print view.
+  (function () {
+    var value = 78;                 // FILL: 0..100
+    var C = 2 * Math.PI * 52;        // circumference for r=52
+    var dash = (value / 100) * C;
+    // threshold color (flip comparisons if lower-is-better)
+    var color = value >= 70 ? '#15803d' : value >= 40 ? '#b45309' : '#b91c1c';
+    var arc = document.getElementById('dg-arc');
+    var num = document.getElementById('dg-num');
+    arc.setAttribute('stroke-dasharray', dash.toFixed(1) + ' ' + (C - dash).toFixed(1));
+    arc.setAttribute('stroke', color);
+    num.setAttribute('fill', color);
+    num.textContent = value + '%';
+  })();
+</script>

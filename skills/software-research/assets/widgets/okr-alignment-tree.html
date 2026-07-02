@@ -1,0 +1,77 @@
+<!--
+  WIDGET: okr-alignment-tree  (zero dependencies — nested divs + CSS connector borders)
+  Use for: a goal hierarchy — company Objective → team Objectives → Key Results.
+  Each node has a title and a small CSS progress bar (% to target).
+  How: copy this whole block. Replace FILL markers. Layout is HAND-PLACED (nested
+  divs, indentation + left-border "connectors"), NOT auto-layout — so edit widths /
+  indents directly. Progress bar: set the inner div width:% and pick a color by
+  status (green on-track >=70, amber 40-69, red <40). Number is printed too (not color-only).
+  Palette matches the briefing template. Prints fine (static). No CDN, no framework.
+-->
+<div class="okr" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Q3 OKR alignment")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 18px;">FILL: one-line framing (company objective cascading to KRs).</p>
+
+  <!-- COMPANY OBJECTIVE (root) -->
+  <div style="border:1px solid #1e3a8a;background:#1e3a8a;border-radius:10px;padding:12px 14px;color:#fff;">
+    <div style="font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;">Company objective</div>
+    <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;margin:2px 0 8px;">FILL: e.g. "Become the default choice for X"</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;height:8px;background:rgba(255,255,255,.25);border-radius:5px;overflow:hidden;"><div style="width:62%;height:100%;background:#fff;"></div></div>
+      <div style="font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;">62%</div>
+    </div>
+  </div>
+
+  <!-- TEAM OBJECTIVE A -->
+  <div style="margin:0 0 0 26px;border-left:2px solid #cfd8e8;padding:14px 0 0 18px;">
+    <div style="border:1px solid #e4e9f2;background:#fff;border-radius:10px;padding:11px 14px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#5b6677;">Team objective</div>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;margin:2px 0 8px;">FILL: e.g. "Ship the onboarding revamp"</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="flex:1;height:8px;background:#eef2f9;border-radius:5px;overflow:hidden;"><div style="width:75%;height:100%;background:#15803d;"></div></div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;color:#15803d;">75%</div>
+      </div>
+    </div>
+
+    <!-- KEY RESULTS under A -->
+    <div style="margin:0 0 0 22px;border-left:2px solid #e4e9f2;padding:12px 0 0 16px;">
+      <div style="border:1px solid #e4e9f2;background:#fff;border-radius:9px;padding:9px 12px;margin-bottom:10px;">
+        <div style="font-family:'Roboto',sans-serif;font-size:12px;color:#16203a;margin-bottom:6px;"><b style="font-family:'Roboto Mono',monospace;color:#2563eb;">KR1</b> FILL: e.g. "Cut time-to-first-value to &lt;5 min"</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;height:7px;background:#eef2f9;border-radius:5px;overflow:hidden;"><div style="width:88%;height:100%;background:#15803d;"></div></div>
+          <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#15803d;">88%</div>
+        </div>
+      </div>
+      <div style="border:1px solid #e4e9f2;background:#fff;border-radius:9px;padding:9px 12px;">
+        <div style="font-family:'Roboto',sans-serif;font-size:12px;color:#16203a;margin-bottom:6px;"><b style="font-family:'Roboto Mono',monospace;color:#2563eb;">KR2</b> FILL: e.g. "Activation rate 40% &rarr; 60%"</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;height:7px;background:#eef2f9;border-radius:5px;overflow:hidden;"><div style="width:55%;height:100%;background:#b45309;"></div></div>
+          <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#b45309;">55%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM OBJECTIVE B -->
+  <div style="margin:0 0 0 26px;border-left:2px solid #cfd8e8;padding:14px 0 0 18px;">
+    <div style="border:1px solid #e4e9f2;background:#fff;border-radius:10px;padding:11px 14px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#5b6677;">Team objective</div>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;margin:2px 0 8px;">FILL: e.g. "Harden reliability"</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="flex:1;height:8px;background:#eef2f9;border-radius:5px;overflow:hidden;"><div style="width:32%;height:100%;background:#b91c1c;"></div></div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;color:#b91c1c;">32%</div>
+      </div>
+    </div>
+
+    <!-- KEY RESULTS under B -->
+    <div style="margin:0 0 0 22px;border-left:2px solid #e4e9f2;padding:12px 0 0 16px;">
+      <div style="border:1px solid #e4e9f2;background:#fff;border-radius:9px;padding:9px 12px;">
+        <div style="font-family:'Roboto',sans-serif;font-size:12px;color:#16203a;margin-bottom:6px;"><b style="font-family:'Roboto Mono',monospace;color:#2563eb;">KR1</b> FILL: e.g. "p99 latency &lt;200ms"</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;height:7px;background:#eef2f9;border-radius:5px;overflow:hidden;"><div style="width:32%;height:100%;background:#b91c1c;"></div></div>
+          <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#b91c1c;">32%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,80 @@
+<!--
+  WIDGET: rice-score-table  (zero dependencies — HTML table + ~25 lines vanilla JS)
+  Use for: scoring options on RICE — Reach, Impact, Confidence, Effort — with a
+  computed score = (Reach x Impact x Confidence) / Effort, a bar per row, and the
+  top score highlighted.
+  How: copy the whole block (markup + <script>). Repeat one <tr class="rs-row"> per
+  option; fill data-r / data-i / data-c / data-e (Confidence as a 0-1 fraction,
+  e.g. 0.8). JS reads those, computes the score, draws the bar, and highlights the
+  max. Give IDs a UNIQUE suffix if you place more than one on a page.
+  All styles inline; prints fine (bars are backgrounds, score is text).
+-->
+<div class="rs" style="border:1px solid #e4e9f2;border-radius:12px;padding:20px 22px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "RICE: which feature first?")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 14px;">Score = (Reach &times; Impact &times; Confidence) &divide; Effort. Higher is better.</p>
+  <div style="overflow-x:auto;">
+    <table id="rs-table" style="border-collapse:collapse;width:100%;font-size:13px;color:#16203a;min-width:520px;">
+      <thead>
+        <tr style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:#5b6677;">
+          <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e4e9f2;">Option</th>
+          <th style="text-align:right;padding:8px 10px;border-bottom:2px solid #e4e9f2;">Reach</th>
+          <th style="text-align:right;padding:8px 10px;border-bottom:2px solid #e4e9f2;">Impact</th>
+          <th style="text-align:right;padding:8px 10px;border-bottom:2px solid #e4e9f2;">Conf</th>
+          <th style="text-align:right;padding:8px 10px;border-bottom:2px solid #e4e9f2;">Effort</th>
+          <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e4e9f2;width:38%;">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Repeat one row per option. Confidence is 0-1. -->
+        <tr class="rs-row" data-r="800" data-i="3" data-c="0.8" data-e="4" style="border-bottom:1px solid #e4e9f2;">
+          <td style="padding:9px 10px;font-weight:600;">FILL: option A</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">800</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">3</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">0.8</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">4</td>
+          <td style="padding:9px 10px;"><div class="rs-bar-wrap" style="display:flex;align-items:center;gap:8px;"><div style="flex:1;background:#e4e9f2;border-radius:4px;height:12px;overflow:hidden;"><div class="rs-bar" style="height:100%;width:0;background:#2563eb;"></div></div><span class="rs-score" style="font-family:'Roboto Mono',monospace;font-weight:700;min-width:44px;text-align:right;">—</span></div></td>
+        </tr>
+        <tr class="rs-row" data-r="500" data-i="2" data-c="0.9" data-e="2" style="border-bottom:1px solid #e4e9f2;">
+          <td style="padding:9px 10px;font-weight:600;">FILL: option B</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">500</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">2</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">0.9</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">2</td>
+          <td style="padding:9px 10px;"><div class="rs-bar-wrap" style="display:flex;align-items:center;gap:8px;"><div style="flex:1;background:#e4e9f2;border-radius:4px;height:12px;overflow:hidden;"><div class="rs-bar" style="height:100%;width:0;background:#2563eb;"></div></div><span class="rs-score" style="font-family:'Roboto Mono',monospace;font-weight:700;min-width:44px;text-align:right;">—</span></div></td>
+        </tr>
+        <tr class="rs-row" data-r="300" data-i="3" data-c="0.7" data-e="3" style="border-bottom:1px solid #e4e9f2;">
+          <td style="padding:9px 10px;font-weight:600;">FILL: option C</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">300</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">3</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">0.7</td>
+          <td style="padding:9px 10px;text-align:right;font-family:'Roboto Mono',monospace;">3</td>
+          <td style="padding:9px 10px;"><div class="rs-bar-wrap" style="display:flex;align-items:center;gap:8px;"><div style="flex:1;background:#e4e9f2;border-radius:4px;height:12px;overflow:hidden;"><div class="rs-bar" style="height:100%;width:0;background:#2563eb;"></div></div><span class="rs-score" style="font-family:'Roboto Mono',monospace;font-weight:700;min-width:44px;text-align:right;">—</span></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  // ~25 lines, no library. Computes (R x I x C) / E, draws bars, highlights the top.
+  (function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#rs-table .rs-row'));
+    var scores = rows.map(function (row) {
+      var r = parseFloat(row.getAttribute('data-r')),
+          i = parseFloat(row.getAttribute('data-i')),
+          c = parseFloat(row.getAttribute('data-c')),
+          e = parseFloat(row.getAttribute('data-e'));
+      return (e > 0) ? (r * i * c) / e : 0;
+    });
+    var max = Math.max.apply(null, scores) || 1;
+    rows.forEach(function (row, idx) {
+      var s = scores[idx];
+      row.querySelector('.rs-score').textContent = Math.round(s).toLocaleString();
+      row.querySelector('.rs-bar').style.width = (100 * s / max) + '%';
+      if (s === max) {
+        row.style.background = '#e7f0fe';
+        row.querySelector('.rs-score').style.color = '#1e3a8a';
+        row.querySelector('.rs-bar').style.background = '#1e3a8a';
+      }
+    });
+  })();
+</script>

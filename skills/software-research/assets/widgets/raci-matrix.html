@@ -1,0 +1,59 @@
+<!--
+  WIDGET: raci-matrix  (zero dependencies — plain HTML table)
+  Use for: a responsibility grid — tasks/decisions (rows) x roles (columns).
+  How: copy this whole block. Replace FILL markers. Add rows/cols to match.
+  Each cell holds an R / A / C / I badge — distinct color AND letter, so it reads
+  without color: R Responsible (blue), A Accountable (green), C Consulted (amber),
+  I Informed (grey). Leave a cell blank ("—") when a role has no part.
+  Palette matches the briefing template. Prints fine (static). No CDN, no framework.
+-->
+<div class="raci" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;overflow-x:auto;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "RACI — release decisions")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 14px;">FILL: one-line framing.</p>
+
+  <!-- legend -->
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;">
+    <span><b style="color:#2563eb;">R</b> Responsible</span>
+    <span><b style="color:#15803d;">A</b> Accountable</span>
+    <span><b style="color:#b45309;">C</b> Consulted</span>
+    <span><b style="color:#5b6677;">I</b> Informed</span>
+  </div>
+
+  <table role="table" aria-label="FILL: RACI matrix" style="border-collapse:collapse;width:100%;font-size:13px;min-width:520px;">
+    <thead>
+      <tr>
+        <th scope="col" style="text-align:left;font-family:'Montserrat',sans-serif;font-size:12px;color:#16203a;padding:8px 10px;border-bottom:2px solid #e4e9f2;">Task / decision</th>
+        <th scope="col" style="text-align:center;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;padding:8px 6px;border-bottom:2px solid #e4e9f2;">FILL: PM</th>
+        <th scope="col" style="text-align:center;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;padding:8px 6px;border-bottom:2px solid #e4e9f2;">FILL: Eng</th>
+        <th scope="col" style="text-align:center;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;padding:8px 6px;border-bottom:2px solid #e4e9f2;">FILL: QA</th>
+        <th scope="col" style="text-align:center;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;padding:8px 6px;border-bottom:2px solid #e4e9f2;">FILL: Ops</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ROW 1 -->
+      <tr>
+        <td style="padding:9px 10px;border-bottom:1px solid #e4e9f2;color:#16203a;">FILL: Scope sign-off</td>
+        <td style="text-align:center;padding:9px 6px;border-bottom:1px solid #e4e9f2;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#e9f6ee;color:#15803d;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">A</span></td>
+        <td style="text-align:center;padding:9px 6px;border-bottom:1px solid #e4e9f2;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#e7f0fe;color:#2563eb;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">R</span></td>
+        <td style="text-align:center;padding:9px 6px;border-bottom:1px solid #e4e9f2;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#fdf3e7;color:#b45309;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">C</span></td>
+        <td style="text-align:center;padding:9px 6px;border-bottom:1px solid #e4e9f2;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#f0f2f6;color:#5b6677;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">I</span></td>
+      </tr>
+      <!-- ROW 2 -->
+      <tr>
+        <td style="padding:9px 10px;border-bottom:1px solid #e4e9f2;color:#16203a;">FILL: Deploy to prod</td>
+        <td style="text-align:center;padding:9px 6px;border-bottom:1px solid #e4e9f2;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#f0f2f6;color:#5b6677;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">I</span></td>
+        <td style="text-align:center;padding:9px 6px;border-bottom:1px solid #e4e9f2;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#e7f0fe;color:#2563eb;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">R</span></td>
+        <td style="text-align:center;padding:9px 6px;border-bottom:1px solid #e4e9f2;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#fdf3e7;color:#b45309;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">C</span></td>
+        <td style="text-align:center;padding:9px 6px;border-bottom:1px solid #e4e9f2;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#e9f6ee;color:#15803d;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">A</span></td>
+      </tr>
+      <!-- ROW 3 -->
+      <tr>
+        <td style="padding:9px 10px;color:#16203a;">FILL: Incident rollback</td>
+        <td style="text-align:center;padding:9px 6px;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#f0f2f6;color:#5b6677;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">I</span></td>
+        <td style="text-align:center;padding:9px 6px;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#e7f0fe;color:#2563eb;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">R</span></td>
+        <td style="text-align:center;padding:9px 6px;"><span aria-hidden="true" style="color:#9aa6b8;">&mdash;</span></td>
+        <td style="text-align:center;padding:9px 6px;"><span style="display:inline-block;min-width:22px;padding:2px 0;border-radius:6px;background:#e9f6ee;color:#15803d;font-family:'Roboto Mono',monospace;font-weight:700;font-size:12px;">A</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
