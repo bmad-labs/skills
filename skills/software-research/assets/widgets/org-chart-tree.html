@@ -1,0 +1,76 @@
+<!--
+  WIDGET: org-chart-tree  (zero dependencies — inline SVG, HAND-PLACED coordinates)
+  Use for: a reporting hierarchy — CEO -> VPs -> managers -> ICs. Boxes carry a
+  role and an optional headcount badge; lines connect parent to child.
+  How: copy the whole block. Every box x/y and every connector <path> is
+  AUTHOR-SUPPLIED — there is no auto-layout. For large orgs run your own layout
+  pass (e.g. compute tiers, then space siblings evenly) and paste the resulting
+  coordinates here; keep the tree shallow (<~4 levels) or it stops fitting.
+  Prints fine (static SVG). No CDN.
+-->
+<div class="oct" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Engineering org")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: framing (e.g. "as of Q3, 34 FTE").</p>
+
+  <svg viewBox="0 0 720 320" width="100%" role="img" aria-label="FILL: describe the reporting hierarchy for screen readers">
+    <title>FILL: org chart</title>
+
+    <!-- connectors first (drawn under boxes). Elbow paths: parent-bottom -> child-top. -->
+    <g stroke="#9aa6b8" stroke-width="1.5" fill="none">
+      <!-- CEO -> two VPs -->
+      <path d="M360,60 L360,80 L170,80 L170,100"/>
+      <path d="M360,60 L360,80 L550,80 L550,100"/>
+      <!-- VP-left -> two managers -->
+      <path d="M170,140 L170,160 L90,160 L90,180"/>
+      <path d="M170,140 L170,160 L250,160 L250,180"/>
+      <!-- VP-right -> one manager -->
+      <path d="M550,140 L550,180"/>
+      <!-- manager -> ICs -->
+      <path d="M90,220 L90,240 L90,240"/>
+      <path d="M250,220 L250,240"/>
+      <path d="M550,220 L550,240"/>
+    </g>
+
+    <!-- LEVEL 0: CEO -->
+    <g>
+      <rect x="280" y="26" width="160" height="34" rx="8" fill="#1e3a8a"/>
+      <text x="360" y="47" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="13" fill="#fff" font-weight="600">FILL: CEO / Founder</text>
+    </g>
+
+    <!-- LEVEL 1: VPs -->
+    <g>
+      <rect x="90" y="100" width="160" height="40" rx="8" fill="#fff" stroke="#2563eb"/>
+      <text x="170" y="120" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#16203a">FILL: VP Eng</text>
+      <text x="170" y="134" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9.5" fill="#5b6677">FILL: 18 FTE</text>
+
+      <rect x="470" y="100" width="160" height="40" rx="8" fill="#fff" stroke="#2563eb"/>
+      <text x="550" y="120" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#16203a">FILL: VP Product</text>
+      <text x="550" y="134" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9.5" fill="#5b6677">FILL: 9 FTE</text>
+    </g>
+
+    <!-- LEVEL 2: Managers -->
+    <g>
+      <rect x="20" y="180" width="140" height="40" rx="8" fill="#f6f8fc" stroke="#9aa6b8"/>
+      <text x="90" y="200" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#16203a">FILL: EM Platform</text>
+      <text x="90" y="214" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9.5" fill="#5b6677">FILL: 6 FTE</text>
+
+      <rect x="180" y="180" width="140" height="40" rx="8" fill="#f6f8fc" stroke="#9aa6b8"/>
+      <text x="250" y="200" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#16203a">FILL: EM Product</text>
+      <text x="250" y="214" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9.5" fill="#5b6677">FILL: 5 FTE</text>
+
+      <rect x="480" y="180" width="140" height="40" rx="8" fill="#f6f8fc" stroke="#9aa6b8"/>
+      <text x="550" y="200" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#16203a">FILL: PM Lead</text>
+      <text x="550" y="214" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9.5" fill="#5b6677">FILL: 4 FTE</text>
+    </g>
+
+    <!-- LEVEL 3: ICs (leaf) -->
+    <g font-family="'Roboto',sans-serif" font-size="11" fill="#5b6677" text-anchor="middle">
+      <rect x="30" y="240" width="120" height="28" rx="6" fill="#fff" stroke="#e4e9f2"/>
+      <text x="90" y="258">FILL: 6 engineers</text>
+      <rect x="190" y="240" width="120" height="28" rx="6" fill="#fff" stroke="#e4e9f2"/>
+      <text x="250" y="258">FILL: 5 engineers</text>
+      <rect x="490" y="240" width="120" height="28" rx="6" fill="#fff" stroke="#e4e9f2"/>
+      <text x="550" y="258">FILL: 4 PMs</text>
+    </g>
+  </svg>
+</div>

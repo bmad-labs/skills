@@ -1,0 +1,59 @@
+<!--
+  WIDGET: severity-summary  (zero dependencies — pure HTML/CSS)
+  Use for: CVE / vulnerability roll-up. A segmented bar of Critical/High/Medium/
+  Low counts (NVD color bands) + per-CVE rows with a CVSS 0–10 chip and the
+  affected-version range.
+  NVD bands: Critical #7d0a0a (dark red) · High #b91c1c (red) · Medium #b45309
+  (amber) · Low #5b6677 (blue-gray).
+  How: copy the whole block. Replace FILL markers. Set each segment width to
+  count/total*100% (compute by hand). Set each CVSS chip's bg to its band color.
+  Count + label live on each segment (not color alone). Prints fine (static).
+-->
+<div style="border:1px solid #e4e9f2;border-radius:12px;padding:20px 24px;background:#f6f8fc;font-family:'Roboto',sans-serif;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Known vulnerabilities — pkg@1.4.2")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: source (e.g. NVD / GitHub Advisories, as of DATE) · total = FILL.</p>
+
+  <!-- Segmented bar: set each width to count/total*100%. Drop a segment if count = 0. -->
+  <div style="display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid #e4e9f2;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#fff;">
+    <div style="width:12%;background:#7d0a0a;display:flex;align-items:center;justify-content:center;" title="Critical">C 1</div>
+    <div style="width:33%;background:#b91c1c;display:flex;align-items:center;justify-content:center;" title="High">H 3</div>
+    <div style="width:33%;background:#b45309;display:flex;align-items:center;justify-content:center;" title="Medium">M 3</div>
+    <div style="width:22%;background:#5b6677;display:flex;align-items:center;justify-content:center;" title="Low">L 2</div>
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#5b6677;">
+    <span><span style="display:inline-block;width:10px;height:10px;background:#7d0a0a;border-radius:2px;vertical-align:middle;"></span> Critical</span>
+    <span><span style="display:inline-block;width:10px;height:10px;background:#b91c1c;border-radius:2px;vertical-align:middle;"></span> High</span>
+    <span><span style="display:inline-block;width:10px;height:10px;background:#b45309;border-radius:2px;vertical-align:middle;"></span> Medium</span>
+    <span><span style="display:inline-block;width:10px;height:10px;background:#5b6677;border-radius:2px;vertical-align:middle;"></span> Low</span>
+  </div>
+
+  <!-- Per-CVE rows. Repeat a row per CVE; set the chip bg to the band color. -->
+  <div style="margin-top:18px;border-top:1px solid #e4e9f2;">
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e4e9f2;">
+      <span style="flex-shrink:0;width:52px;text-align:center;padding:3px 0;border-radius:6px;background:#7d0a0a;color:#fff;font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;" title="CVSS score 0–10">9.8</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Roboto Mono',monospace;font-size:12.5px;color:#16203a;font-weight:600;">FILL: CVE-2025-0001</div>
+        <div style="font-size:12px;color:#5b6677;">FILL: one-line description.</div>
+      </div>
+      <span style="flex-shrink:0;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;">FILL: affects &lt; 1.4.3</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e4e9f2;">
+      <span style="flex-shrink:0;width:52px;text-align:center;padding:3px 0;border-radius:6px;background:#b91c1c;color:#fff;font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;" title="CVSS score 0–10">7.5</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Roboto Mono',monospace;font-size:12.5px;color:#16203a;font-weight:600;">FILL: CVE-2024-9999</div>
+        <div style="font-size:12px;color:#5b6677;">FILL: one-line description.</div>
+      </div>
+      <span style="flex-shrink:0;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;">FILL: affects 1.0–1.3</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;">
+      <span style="flex-shrink:0;width:52px;text-align:center;padding:3px 0;border-radius:6px;background:#b45309;color:#fff;font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;" title="CVSS score 0–10">5.3</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Roboto Mono',monospace;font-size:12.5px;color:#16203a;font-weight:600;">FILL: CVE-2024-1234</div>
+        <div style="font-size:12px;color:#5b6677;">FILL: one-line description.</div>
+      </div>
+      <span style="flex-shrink:0;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;">FILL: affects &lt; 1.2.0</span>
+    </div>
+  </div>
+</div>

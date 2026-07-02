@@ -1,0 +1,65 @@
+<!--
+  WIDGET: cost-treemap  (zero dependencies — absolutely-positioned divs + ~35 lines vanilla JS)
+  Use for: "where the money goes" — rectangles sized by spend, colored by
+  service/team, labeled with $ and %. Layout is a SIMPLE slice-and-dice: the
+  container is split into vertical columns (top-level groups) sized by group
+  total, then each column is split into horizontal rows sized by item spend.
+  This is deterministic and zero-dep (NOT squarified). Good up to ~15 items.
+  How: copy the whole block. Edit the CTM_DATA array (group, item, cost, color).
+  If you place two on a page, give ids a unique suffix (ctm2-*). Prints fine
+  (JS runs once on load, produces static DOM). No CDN.
+-->
+<div class="ctm" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Monthly cloud spend")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: total + framing (e.g. "$48.2k/mo across 4 services").</p>
+  <div id="ctm-canvas" style="position:relative;width:100%;height:300px;border-radius:8px;overflow:hidden;background:#fff;" role="img" aria-label="FILL: describe the cost breakdown for screen readers"></div>
+</div>
+<script>
+  // FILL: each item = { group, item, cost, color }. Group order = column order.
+  var CTM_DATA = [
+    { group: 'Compute',  item: 'EC2',        cost: 18000, color: '#1e3a8a' },
+    { group: 'Compute',  item: 'Lambda',     cost: 4200,  color: '#2563eb' },
+    { group: 'Storage',  item: 'S3',         cost: 9000,  color: '#15803d' },
+    { group: 'Storage',  item: 'EBS',        cost: 3000,  color: '#3f9d5f' },
+    { group: 'Database', item: 'RDS',        cost: 8000,  color: '#b45309' },
+    { group: 'Network',  item: 'Egress',     cost: 6000,  color: '#b91c1c' }
+  ];
+
+  (function ctmRender() {
+    var canvas = document.getElementById('ctm-canvas');
+    var W = canvas.clientWidth || 600, H = 300;
+    var grandTotal = CTM_DATA.reduce(function (s, d) { return s + d.cost; }, 0);
+
+    // group items preserving first-seen order
+    var order = [], groups = {};
+    CTM_DATA.forEach(function (d) {
+      if (!groups[d.group]) { groups[d.group] = []; order.push(d.group); }
+      groups[d.group].push(d);
+    });
+
+    var x = 0;
+    order.forEach(function (g) {
+      var items = groups[g];
+      var gTotal = items.reduce(function (s, d) { return s + d.cost; }, 0);
+      var colW = (gTotal / grandTotal) * W;
+      var y = 0;
+      items.forEach(function (d) {
+        var rowH = (d.cost / gTotal) * H;
+        var pct = ((d.cost / grandTotal) * 100).toFixed(1);
+        var cell = document.createElement('div');
+        cell.style.cssText = 'position:absolute;box-sizing:border-box;border:1.5px solid #fff;'
+          + 'left:' + x + 'px;top:' + y + 'px;width:' + colW + 'px;height:' + rowH + 'px;'
+          + 'background:' + d.color + ';padding:6px 8px;overflow:hidden;color:#fff;'
+          + "font-family:'Roboto',sans-serif;";
+        cell.innerHTML =
+          '<div style="font-size:12px;font-weight:700;line-height:1.2;">' + d.item + '</div>'
+          + '<div style="font-family:\'Roboto Mono\',monospace;font-size:11px;opacity:.9;">$'
+          + d.cost.toLocaleString() + ' &middot; ' + pct + '%</div>';
+        cell.title = g + ' / ' + d.item + ': $' + d.cost.toLocaleString() + ' (' + pct + '%)';
+        canvas.appendChild(cell);
+        y += rowH;
+      });
+      x += colW;
+    });
+  })();
+</script>

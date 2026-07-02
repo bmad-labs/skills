@@ -1,0 +1,64 @@
+<!--
+  WIDGET: region-az-topology  (zero dependencies — nested CSS grid + inline SVG connectors)
+  Use for: multi-region / multi-AZ deployment layout. Regions are columns; each
+  region holds its Availability Zones as nested boxes; a connector between regions
+  shows replication mode. Line STYLE encodes the mode:
+     solid blue  = active-active   (bidirectional, both serve traffic)
+     dashed grey = active-passive  (one-way replication to standby)
+  How: copy the whole block. Duplicate a .raz-region column per region and a
+  .raz-az box per AZ. Redraw the SVG <path>s to match your region x-positions
+  (coordinates are HAND-AUTHORED — no auto-layout). Status dot = health per AZ.
+  Prints fine. No CDN.
+-->
+<div class="raz" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Prod footprint: 2 regions")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: framing (e.g. "us-east-1 active-active with eu-west-1").</p>
+
+  <div style="position:relative;">
+    <!-- connector layer (behind the region boxes). Coordinates match the 3-column grid below. -->
+    <svg viewBox="0 0 720 60" width="100%" style="position:absolute;top:calc(50% - 30px);left:0;" role="img" aria-label="FILL: replication links between regions">
+      <title>FILL: region replication links</title>
+      <!-- active-active: solid blue, arrowheads both ends -->
+      <defs>
+        <marker id="raz-arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2563eb"/></marker>
+      </defs>
+      <line x1="10" y1="30" x2="230" y2="30" stroke="#2563eb" stroke-width="2" marker-start="url(#raz-arr)" marker-end="url(#raz-arr)"/>
+      <!-- active-passive: dashed grey, one arrow toward the standby region -->
+      <line x1="490" y1="30" x2="710" y2="30" stroke="#9aa6b8" stroke-width="2" stroke-dasharray="6 5"/>
+    </svg>
+
+    <div style="position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+      <!-- region column (duplicate me) -->
+      <div class="raz-region" style="border:1.5px solid #1e3a8a;border-radius:10px;background:#fff;padding:12px;">
+        <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#1e3a8a;margin-bottom:8px;letter-spacing:0.04em;">FILL: us-east-1 <span style="color:#15803d;">&#9679; PRIMARY</span></div>
+        <div style="display:grid;gap:8px;">
+          <div class="raz-az" style="border:1px solid #e4e9f2;border-radius:7px;background:#f6f8fc;padding:7px 9px;font-family:'Roboto',sans-serif;font-size:12px;color:#16203a;"><span style="color:#15803d;">&#9679;</span> FILL: az-1a</div>
+          <div class="raz-az" style="border:1px solid #e4e9f2;border-radius:7px;background:#f6f8fc;padding:7px 9px;font-family:'Roboto',sans-serif;font-size:12px;color:#16203a;"><span style="color:#15803d;">&#9679;</span> FILL: az-1b</div>
+          <div class="raz-az" style="border:1px solid #e4e9f2;border-radius:7px;background:#f6f8fc;padding:7px 9px;font-family:'Roboto',sans-serif;font-size:12px;color:#16203a;"><span style="color:#b45309;">&#9679;</span> FILL: az-1c (degraded)</div>
+        </div>
+      </div>
+      <!-- region column -->
+      <div class="raz-region" style="border:1.5px solid #1e3a8a;border-radius:10px;background:#fff;padding:12px;">
+        <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#1e3a8a;margin-bottom:8px;letter-spacing:0.04em;">FILL: eu-west-1 <span style="color:#15803d;">&#9679; ACTIVE</span></div>
+        <div style="display:grid;gap:8px;">
+          <div class="raz-az" style="border:1px solid #e4e9f2;border-radius:7px;background:#f6f8fc;padding:7px 9px;font-family:'Roboto',sans-serif;font-size:12px;color:#16203a;"><span style="color:#15803d;">&#9679;</span> FILL: az-1a</div>
+          <div class="raz-az" style="border:1px solid #e4e9f2;border-radius:7px;background:#f6f8fc;padding:7px 9px;font-family:'Roboto',sans-serif;font-size:12px;color:#16203a;"><span style="color:#15803d;">&#9679;</span> FILL: az-1b</div>
+        </div>
+      </div>
+      <!-- region column (standby) -->
+      <div class="raz-region" style="border:1.5px dashed #9aa6b8;border-radius:10px;background:#fff;padding:12px;">
+        <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#5b6677;margin-bottom:8px;letter-spacing:0.04em;">FILL: ap-south-1 <span style="color:#5b6677;">&#9679; STANDBY</span></div>
+        <div style="display:grid;gap:8px;">
+          <div class="raz-az" style="border:1px solid #e4e9f2;border-radius:7px;background:#f6f8fc;padding:7px 9px;font-family:'Roboto',sans-serif;font-size:12px;color:#5b6677;"><span style="color:#5b6677;">&#9679;</span> FILL: az-1a (warm)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#5b6677;display:flex;gap:20px;flex-wrap:wrap;">
+    <span><svg width="26" height="8" style="vertical-align:middle;"><line x1="0" y1="4" x2="26" y2="4" stroke="#2563eb" stroke-width="2"/></svg> active-active</span>
+    <span><svg width="26" height="8" style="vertical-align:middle;"><line x1="0" y1="4" x2="26" y2="4" stroke="#9aa6b8" stroke-width="2" stroke-dasharray="6 5"/></svg> active-passive</span>
+    <span style="color:#15803d;">&#9679; healthy</span>
+    <span style="color:#b45309;">&#9679; degraded</span>
+  </div>
+</div>

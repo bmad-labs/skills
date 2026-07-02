@@ -1,0 +1,56 @@
+<!--
+  WIDGET: rollout-bar  (zero dependencies — pure CSS bar + ~20 lines optional vanilla JS)
+  Use for: a canary / blue-green rollout — % traffic on OLD vs NEW version, with
+  phase ticks (2% → 25% → 75% → 100%) and a rollback marker.
+  How: copy this whole block. Replace FILL markers. Give IDs a UNIQUE suffix if you
+  place more than one on a page (e.g. rb-fill-2). The JS is optional (Step button):
+  delete the <script> + button and just hardcode the width for a static print view.
+  NEW = blue #2563eb (advancing), OLD = bg-soft. Rollback marker = red at last-safe %.
+  Palette matches the briefing template. Prints fine. No CDN, no framework.
+-->
+<div class="rb" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: rollout title (e.g. "Canary rollout v2.4")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 18px;">FILL: one-line framing (traffic shifted from old to new).</p>
+
+  <!-- legend -->
+  <div style="display:flex;gap:18px;margin-bottom:8px;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;">
+    <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:11px;height:11px;border-radius:3px;background:#2563eb;display:inline-block;"></span>NEW <b id="rb-new" style="color:#1e3a8a;">25%</b></span>
+    <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:11px;height:11px;border-radius:3px;background:#dfe6f2;border:1px solid #cfd8e8;display:inline-block;"></span>OLD <b id="rb-old" style="color:#5b6677;">75%</b></span>
+  </div>
+
+  <!-- segmented bar -->
+  <div style="position:relative;height:30px;border-radius:8px;overflow:hidden;background:#eef2f9;border:1px solid #e4e9f2;">
+    <div id="rb-fill" role="img" aria-label="FILL: percent of traffic on new version" style="height:100%;width:25%;background:#2563eb;transition:width .3s ease;"></div>
+    <!-- rollback marker: the last-known-safe % you'd revert to (red line) -->
+    <div id="rb-rollback" aria-hidden="true" style="position:absolute;top:0;left:2%;width:2px;height:100%;background:#b91c1c;"></div>
+  </div>
+
+  <!-- phase ticks -->
+  <div style="position:relative;height:34px;margin-top:2px;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#5b6677;">
+    <span style="position:absolute;left:2%;transform:translateX(-50%);"><span aria-hidden="true" style="display:block;text-align:center;color:#9aa6b8;">|</span>2%</span>
+    <span style="position:absolute;left:25%;transform:translateX(-50%);"><span aria-hidden="true" style="display:block;text-align:center;color:#9aa6b8;">|</span>25%</span>
+    <span style="position:absolute;left:75%;transform:translateX(-50%);"><span aria-hidden="true" style="display:block;text-align:center;color:#9aa6b8;">|</span>75%</span>
+    <span style="position:absolute;left:100%;transform:translateX(-100%);"><span aria-hidden="true" style="display:block;text-align:center;color:#9aa6b8;">|</span>100%</span>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+    <button id="rb-step" onclick="rbStep()" style="font-family:'Roboto Mono',monospace;font-size:11px;padding:5px 12px;border:1px solid #2563eb;border-radius:7px;background:#fff;color:#2563eb;cursor:pointer;">Step phase &#8594;</button>
+    <span style="font-family:'Roboto Mono',monospace;font-size:10.5px;color:#b91c1c;">&#9642; rollback to 2% (last safe)</span>
+  </div>
+</div>
+<script>
+  // Optional stepper — advances through the canary phases. Delete for a static view.
+  var rbPhases = [2, 25, 75, 100];   // FILL: your phase percentages
+  var rbIdx = 1;                     // start index into rbPhases
+  function rbApply() {
+    var pct = rbPhases[rbIdx];
+    document.getElementById('rb-fill').style.width = pct + '%';
+    document.getElementById('rb-new').textContent = pct + '%';
+    document.getElementById('rb-old').textContent = (100 - pct) + '%';
+  }
+  function rbStep() {
+    rbIdx = (rbIdx + 1) % rbPhases.length;
+    rbApply();
+  }
+  rbApply();
+</script>
