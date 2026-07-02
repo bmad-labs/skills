@@ -130,6 +130,27 @@ Read the mode's `primary_output` and `secondary_output` from `data/modes.csv`.
 with the answer. Define any unavoidable term inline. If a reader needs a
 dictionary to parse a finding, rewrite it.
 
+**Add a visualization when it earns its place.** `assets/widgets/` holds drop-in,
+zero-dependency visual blocks (inline SVG / CSS / a little vanilla JS) — see
+`assets/widgets/README.md` for the catalog and the copy-paste snippets. Pick by
+what the content is, not by novelty:
+- Comparing named options across criteria → the Side-by-Side table (already in the
+  HTML template). Don't draw a chart for a comparison.
+- A branching decision/path → `decision-tree.html`. A journey/sequence over time →
+  `timeline.html`. Explaining how parts relate → `annotated-diagram.html`.
+- One variable the reader should *feel* → `slider-metric.html` (the interactive
+  "drag it" widget). At most one per report; more is noise.
+- A standard flow/sequence/ER diagram that's easier as text → Mermaid (pinned,
+  `securityLevel:'strict'`). Real quantitative data (bar/line/scatter) → Chart.js.
+Default to the zero-dependency widgets: they render instantly, work offline, print,
+and can't be blanked by a CDN outage or a runtime handshake failing. Reach for a
+library only for diagrams-from-text and data charts, and then pin the version +
+prefer SRI/inline over a bare CDN `<script>`. **If you let the model generate
+arbitrary widget JS rather than filling a template, sandbox it** (iframe
+`sandbox="allow-scripts"` without `allow-same-origin`, CSP blocking `connect-src`) —
+generated markup is untrusted code running in the report's origin; SRI does not help
+there. Full rules in `assets/widgets/README.md`.
+
 Write outputs to `software-research-reports/` (create if needed):
 - HTML → `{topic-slug}-briefing.html`
 - MD → `{topic-slug}.md`; ADR → `ADR-{topic-slug}.md`
