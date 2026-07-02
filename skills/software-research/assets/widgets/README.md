@@ -137,6 +137,19 @@ narrowest attack surface. Same delivery rules: pin a version, prefer SRI/inline 
 CDN tag. Note Chart.js `<canvas>` is invisible to screen readers — add an `aria-label` and a
 text fallback. (Chart.js maintenance was slowing as of mid-2026; fine to use, worth watching.)
 
+## Escape hatch: highlight.js (code syntax coloring)
+
+`code-compare.html` colors its snippets with highlight.js (v11.11.1), loaded from a CDN
+pinned with Subresource Integrity — a real tokenizer is the only way to get correct
+per-language coloring, so this is the one widget that isn't zero-dependency. Set the
+language per block via `class="language-ts|js|json|bash|python|…"`. Include the highlight.js
+`<link>`+`<script>` block **once** per report even if you use several code widgets.
+
+Trade-off: a report with highlighted code is no longer fully offline. If a report must open
+offline, delete the highlight.js block — the code still renders in plain monospace, just
+uncolored. `diff-block.html` deliberately has **no** highlighter: in a diff the green/red
+line color is the meaning, and a token highlighter would fight it.
+
 ## Security: the one rule that matters
 
 If YOU fill these templates, the JS is code you control — safe to inline.

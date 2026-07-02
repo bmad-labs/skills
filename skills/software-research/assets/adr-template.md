@@ -74,6 +74,8 @@ Every source this decision rests on, with the version/date it applies to and its
 verification status. Prefer primary sources (official docs, specs, changelogs,
 security DBs) — a claim backed only by a blog or Q&A answer is not load-bearing.
 
-<!-- one bullet per source. Status: Confirmed | Corrected | Contested | VersionStale -->
-- **[Confirmed]** {{Source title}} — {{version / date}} — {{the fact it supports}}. <{{PRIMARY_URL}}>
-- **[Corrected]** {{Source title}} — {{version / date}} — {{what changed on verification}}. <{{PRIMARY_URL}}>
+<!-- one bullet per source. Status: Confirmed | Corrected | Contested | VersionStale.
+     Make the source a real clickable Markdown link: [title](url) — NOT a bare URL,
+     so it's clickable in every renderer. One link per URL (don't cram two in one). -->
+- **[Confirmed]** [{{Source title}} — {{version / date}}]({{PRIMARY_URL}}) — {{the fact it supports}}.
+- **[Corrected]** [{{Source title}} — {{version / date}}]({{PRIMARY_URL}}) — {{what changed on verification}}.

@@ -126,7 +126,9 @@ by being practical and about the reader's situation, not a survey of the topic.
 - For `md`: the full **12-section spine** from `references/report-structure.md` —
   introduction/methodology, landscape, implementation how-to, stack, integration,
   performance, security, recommendation, roadmap, risks, methodology, and a closing
-  References appendix. This is the detailed report; make each section concrete.
+  References appendix. This is the detailed report; make each section concrete. In the
+  References appendix every source is a clickable `[title — version/date](url)` Markdown
+  link (never a bare URL in a table cell — those don't reliably render as links).
 - For `adr`: clone `assets/adr-template.md`; fill the MADR sections (Context,
   Decision Drivers, Considered Options, Decision Outcome, Consequences, Pros/Cons
   per option, More Information) and the closing **References** section. Document
@@ -154,7 +156,9 @@ and can't be blanked by a CDN outage or a runtime handshake failing. For any
 tree/graph/diagram the widgets use **hand-placed coordinates** — don't auto-layout.
 Reach for a library only for what bespoke SVG is bad at: a standard flow/sequence/ER
 diagram easier written as text → Mermaid (pinned, `securityLevel:'strict'`); real
-quantitative data at scale → Chart.js. Then pin the version + prefer SRI/inline over
+quantitative data at scale → Chart.js; **code snippets that need syntax coloring →
+`code-compare` (it loads highlight.js pinned+SRI — include that block once per report,
+set `class="language-…"` per snippet)**. Then pin the version + prefer SRI/inline over
 a bare CDN `<script>`. **If you let the model generate arbitrary widget JS rather than
 filling a template, sandbox it** (iframe `sandbox="allow-scripts"` without
 `allow-same-origin`, CSP blocking `connect-src`) — generated markup is untrusted code

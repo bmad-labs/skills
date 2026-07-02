@@ -94,9 +94,12 @@ stop at the scan or read on. The MD report is the 12 sections directly.
     each; the rollback/exit path. No "there are risks" — enumerate them.
 11. **Methodology & sources** — how claims were verified; the verification tally
     (`N checked · X corrected · Y demoted · Z version-stale`); confidence by source tier.
-12. **Appendix & references** — the full source list (title, version/date, verification
-    status, URL) plus any supporting data tables. This is the References section that
-    every output must end with.
+12. **Appendix & references** — the full source list plus any supporting data tables.
+    This is the References section that every output must end with. **Make every source a
+    real clickable link:** in Markdown/ADR use `[title — version/date](url)` (not a bare
+    URL in a cell — bare URLs don't reliably link); in HTML use `<a href>`. One link per
+    URL. Each entry carries its verification status (Confirmed / Corrected / Contested /
+    VersionStale).
 
 ### Visualize the sections (use the widgets)
 
