@@ -1,0 +1,52 @@
+<!--
+  WIDGET: spotify-model-grid  (zero dependencies — static CSS grid, no JS)
+  Use for: the "Spotify model" org shape — Squads grouped into Tribes (columns),
+  with Chapters/Guilds as horizontal bands that cut ACROSS squads. (The model is
+  a well-known industry reference popularized by Spotify c.2012; note it was
+  aspirational and later partly disowned even inside Spotify — present it as a
+  lens, not gospel.)
+  Layout: outer grid = tribe columns. Inside each tribe, squads stack as cells.
+  Chapter/guild bands are separate full-width rows below, spanning all tribes.
+  How: copy the whole block. Add/remove tribe columns and squad cells; edit the
+  chapter band chips. Everything is STATIC — no auto-layout, no JS. Prints fine.
+  No CDN.
+-->
+<div class="smg" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Delivery org, Spotify model")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: framing. Squads &times; Tribes, Chapters/Guilds cut across. (Aspirational reference model.)</p>
+
+  <!-- TRIBE COLUMNS with SQUAD cells -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+    <!-- tribe (duplicate me) -->
+    <div style="border:1.5px solid #1e3a8a;border-radius:10px;background:#fff;padding:12px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#1e3a8a;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">FILL: Tribe &mdash; Growth</div>
+      <div style="display:grid;gap:8px;">
+        <div style="border:1px solid #e4e9f2;border-left:4px solid #2563eb;border-radius:6px;background:#f6f8fc;padding:8px 10px;"><div style="font-family:'Roboto',sans-serif;font-size:12px;font-weight:600;color:#16203a;">FILL: Squad Acquisition</div><div style="font-family:'Roboto Mono',monospace;font-size:9.5px;color:#5b6677;">6 people</div></div>
+        <div style="border:1px solid #e4e9f2;border-left:4px solid #2563eb;border-radius:6px;background:#f6f8fc;padding:8px 10px;"><div style="font-family:'Roboto',sans-serif;font-size:12px;font-weight:600;color:#16203a;">FILL: Squad Onboarding</div><div style="font-family:'Roboto Mono',monospace;font-size:9.5px;color:#5b6677;">7 people</div></div>
+      </div>
+    </div>
+    <!-- tribe -->
+    <div style="border:1.5px solid #1e3a8a;border-radius:10px;background:#fff;padding:12px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#1e3a8a;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">FILL: Tribe &mdash; Payments</div>
+      <div style="display:grid;gap:8px;">
+        <div style="border:1px solid #e4e9f2;border-left:4px solid #2563eb;border-radius:6px;background:#f6f8fc;padding:8px 10px;"><div style="font-family:'Roboto',sans-serif;font-size:12px;font-weight:600;color:#16203a;">FILL: Squad Checkout</div><div style="font-family:'Roboto Mono',monospace;font-size:9.5px;color:#5b6677;">8 people</div></div>
+        <div style="border:1px solid #e4e9f2;border-left:4px solid #2563eb;border-radius:6px;background:#f6f8fc;padding:8px 10px;"><div style="font-family:'Roboto',sans-serif;font-size:12px;font-weight:600;color:#16203a;">FILL: Squad Billing</div><div style="font-family:'Roboto Mono',monospace;font-size:9.5px;color:#5b6677;">5 people</div></div>
+      </div>
+    </div>
+    <!-- tribe -->
+    <div style="border:1.5px solid #1e3a8a;border-radius:10px;background:#fff;padding:12px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#1e3a8a;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">FILL: Tribe &mdash; Platform</div>
+      <div style="display:grid;gap:8px;">
+        <div style="border:1px solid #e4e9f2;border-left:4px solid #2563eb;border-radius:6px;background:#f6f8fc;padding:8px 10px;"><div style="font-family:'Roboto',sans-serif;font-size:12px;font-weight:600;color:#16203a;">FILL: Squad Infra</div><div style="font-family:'Roboto Mono',monospace;font-size:9.5px;color:#5b6677;">6 people</div></div>
+        <div style="border:1px solid #e4e9f2;border-left:4px solid #2563eb;border-radius:6px;background:#f6f8fc;padding:8px 10px;"><div style="font-family:'Roboto',sans-serif;font-size:12px;font-weight:600;color:#16203a;">FILL: Squad Data</div><div style="font-family:'Roboto Mono',monospace;font-size:9.5px;color:#5b6677;">6 people</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAPTER / GUILD BANDS: full-width, span across all tribes -->
+  <div style="margin-top:14px;display:grid;gap:8px;">
+    <div style="border:1px dashed #15803d;border-radius:8px;background:#e9f6ee;padding:8px 12px;font-family:'Roboto',sans-serif;font-size:12px;color:#15803d;"><strong style="font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:0.05em;">CHAPTER</strong> &nbsp; FILL: Backend Engineering &mdash; cuts across all squads</div>
+    <div style="border:1px dashed #15803d;border-radius:8px;background:#e9f6ee;padding:8px 12px;font-family:'Roboto',sans-serif;font-size:12px;color:#15803d;"><strong style="font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:0.05em;">CHAPTER</strong> &nbsp; FILL: Design &mdash; one designer embedded per squad</div>
+    <div style="border:1px dashed #b45309;border-radius:8px;background:#fdf3e7;padding:8px 12px;font-family:'Roboto',sans-serif;font-size:12px;color:#b45309;"><strong style="font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:0.05em;">GUILD</strong> &nbsp; FILL: Web Performance &mdash; voluntary, org-wide interest group</div>
+  </div>
+</div>

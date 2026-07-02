@@ -1,0 +1,58 @@
+<!--
+  WIDGET: risk-heatmap  (zero dependencies — pure CSS grid, no JS)
+  Use for: a 5x5 Likelihood (x) x Impact (y) risk grid with a stoplight
+  background (green low-left corner -> red high-right corner) and a few risks
+  plotted as labeled dots in the cell that matches their score.
+  How: copy this whole block. To place a risk, set its dot's grid-column =
+  likelihood (1-5) and grid-row = (6 - impact) so impact 5 sits at the TOP.
+  Duplicate a .rh-dot per risk; keep labels short. Cell colour is a visual hint;
+  the axis numbers + the dot's position + label carry the meaning (prints fine).
+  role="img" + aria-label on the grid describes it for screen readers.
+-->
+<div class="rh" style="border:1px solid #e4e9f2;border-radius:12px;padding:22px 24px;background:#f6f8fc;max-width:520px;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 14px;color:#16203a;">FILL: title (e.g. "Risk exposure")</h4>
+
+  <div style="display:flex;gap:8px;">
+    <!-- y axis label -->
+    <div style="writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;font-family:'Roboto Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#5b6677;padding:4px 0;">Impact &rarr;</div>
+
+    <div style="flex:1;">
+      <!-- 5x5 grid; row 1 = impact 5 (top), row 5 = impact 1 (bottom) -->
+      <div style="position:relative;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,52px);gap:4px;" role="img" aria-label="FILL: 5 by 5 likelihood versus impact risk grid with risks plotted">
+        <!-- Row impact=5 -->
+        <div style="background:#fdf3e7;border-radius:5px;"></div><div style="background:#fdf0e6;border-radius:5px;"></div><div style="background:#fdecec;border-radius:5px;"></div><div style="background:#fbdcdc;border-radius:5px;"></div><div style="background:#f5c6c6;border-radius:5px;"></div>
+        <!-- Row impact=4 -->
+        <div style="background:#eef7f1;border-radius:5px;"></div><div style="background:#fdf3e7;border-radius:5px;"></div><div style="background:#fdf0e6;border-radius:5px;"></div><div style="background:#fdecec;border-radius:5px;"></div><div style="background:#fbdcdc;border-radius:5px;"></div>
+        <!-- Row impact=3 -->
+        <div style="background:#e9f6ee;border-radius:5px;"></div><div style="background:#eef7f1;border-radius:5px;"></div><div style="background:#fdf3e7;border-radius:5px;"></div><div style="background:#fdf0e6;border-radius:5px;"></div><div style="background:#fdecec;border-radius:5px;"></div>
+        <!-- Row impact=2 -->
+        <div style="background:#e0f2e7;border-radius:5px;"></div><div style="background:#e9f6ee;border-radius:5px;"></div><div style="background:#eef7f1;border-radius:5px;"></div><div style="background:#fdf3e7;border-radius:5px;"></div><div style="background:#fdf0e6;border-radius:5px;"></div>
+        <!-- Row impact=1 -->
+        <div style="background:#d3edde;border-radius:5px;"></div><div style="background:#e0f2e7;border-radius:5px;"></div><div style="background:#e9f6ee;border-radius:5px;"></div><div style="background:#eef7f1;border-radius:5px;"></div><div style="background:#fdf3e7;border-radius:5px;"></div>
+
+        <!-- RISK DOTS. grid-column = likelihood(1-5); grid-row = 6 - impact. -->
+        <!-- R1: likelihood 4, impact 5 -> high risk -->
+        <div class="rh-dot" style="grid-column:4;grid-row:1;align-self:center;justify-self:center;display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <span style="width:22px;height:22px;border-radius:50%;background:#b91c1c;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;">1</span>
+        </div>
+        <!-- R2: likelihood 2, impact 3 -> medium -->
+        <div class="rh-dot" style="grid-column:2;grid-row:3;align-self:center;justify-self:center;display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <span style="width:22px;height:22px;border-radius:50%;background:#b45309;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;">2</span>
+        </div>
+        <!-- R3: likelihood 1, impact 1 -> low -->
+        <div class="rh-dot" style="grid-column:1;grid-row:5;align-self:center;justify-self:center;display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <span style="width:22px;height:22px;border-radius:50%;background:#15803d;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;">3</span>
+        </div>
+      </div>
+      <!-- x axis label -->
+      <div style="text-align:center;font-family:'Roboto Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#5b6677;margin-top:8px;">Likelihood &rarr;</div>
+    </div>
+  </div>
+
+  <!-- legend keys the numbered dots to risk names -->
+  <ul style="list-style:none;margin:16px 0 0;padding:0;font-family:'Roboto',sans-serif;font-size:12.5px;color:#16203a;">
+    <li style="display:flex;align-items:center;gap:8px;margin-bottom:5px;"><span style="width:18px;height:18px;border-radius:50%;background:#b91c1c;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span> FILL: risk 1 (high)</li>
+    <li style="display:flex;align-items:center;gap:8px;margin-bottom:5px;"><span style="width:18px;height:18px;border-radius:50%;background:#b45309;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span> FILL: risk 2 (medium)</li>
+    <li style="display:flex;align-items:center;gap:8px;"><span style="width:18px;height:18px;border-radius:50%;background:#15803d;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span> FILL: risk 3 (low)</li>
+  </ul>
+</div>

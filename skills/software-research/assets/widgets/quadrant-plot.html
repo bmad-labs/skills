@@ -1,0 +1,60 @@
+<!--
+  WIDGET: quadrant-plot  (zero dependencies — inline SVG, no JS)
+  Use for: any 2x2 scatter. This is the REUSABLE ENGINE for the named 2x2s —
+  value-vs-effort, power-vs-interest (stakeholder map), impact-vs-effort — you
+  just relabel the axes and quadrants. Two axes, four labeled quadrants, dots
+  positioned by two 0-100 values.
+  How: copy this whole block. Relabel the FILL axis titles and the four FILL
+  quadrant names for your framework. To plot a point: cx = 60 + value_x*4.6 ,
+  cy = 300 - value_y*2.5  (x,y each 0..100 within the plot box). Duplicate a
+  dot <g> per item; keep labels short. role="img" + <title> for accessibility.
+  Prints fine (static SVG). No CDN, no framework.
+-->
+<div class="qp" style="border:1px solid #e4e9f2;border-radius:12px;padding:22px 24px;background:#f6f8fc;max-width:560px;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Value vs effort")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 14px;font-family:'Roboto',sans-serif;">FILL: one-line framing. Reusable 2x2 engine — relabel axes &amp; quadrants.</p>
+
+  <svg viewBox="0 0 520 340" width="100%" role="img" aria-label="FILL: describe the 2x2 scatter and where items fall">
+    <title>FILL: 2x2 quadrant plot</title>
+
+    <!-- quadrant backgrounds (plot box 60,50 -> 520,300) -->
+    <rect x="60"  y="50"  width="200" height="125" fill="#f6f8fc"/>
+    <rect x="260" y="50"  width="200" height="125" fill="#e9f6ee"/>
+    <rect x="60"  y="175" width="200" height="125" fill="#fdecec"/>
+    <rect x="260" y="175" width="200" height="125" fill="#fdf3e7"/>
+
+    <!-- quadrant labels (top-left, top-right, bottom-left, bottom-right) -->
+    <text x="70"  y="68"  font-family="'Roboto Mono',monospace" font-size="10" letter-spacing="0.08em" fill="#5b6677" text-transform="uppercase">FILL: Q top-left</text>
+    <text x="450" y="68"  text-anchor="end" font-family="'Roboto Mono',monospace" font-size="10" letter-spacing="0.08em" fill="#15803d">FILL: Q top-right</text>
+    <text x="70"  y="292" font-family="'Roboto Mono',monospace" font-size="10" letter-spacing="0.08em" fill="#b91c1c">FILL: Q bottom-left</text>
+    <text x="450" y="292" text-anchor="end" font-family="'Roboto Mono',monospace" font-size="10" letter-spacing="0.08em" fill="#b45309">FILL: Q bottom-right</text>
+
+    <!-- axes: midlines + border -->
+    <g stroke="#9aa6b8" stroke-width="1.5">
+      <line x1="60" y1="175" x2="460" y2="175"/>
+      <line x1="260" y1="50" x2="260" y2="300"/>
+    </g>
+    <rect x="60" y="50" width="400" height="250" fill="none" stroke="#e4e9f2" stroke-width="1.5"/>
+
+    <!-- axis titles -->
+    <text x="260" y="326" text-anchor="middle" font-family="'Montserrat',sans-serif" font-size="12" font-weight="700" fill="#16203a">FILL: X axis (low &rarr; high)</text>
+    <text x="20" y="175" text-anchor="middle" font-family="'Montserrat',sans-serif" font-size="12" font-weight="700" fill="#16203a" transform="rotate(-90 20 175)">FILL: Y axis (low &rarr; high)</text>
+
+    <!-- DOTS. cx = 60 + x*4  (x 0..100 across 400px) ; cy = 300 - y*2.5 (y 0..100 across 250px) -->
+    <!-- item A: x=70, y=80 -> top-right -->
+    <g>
+      <circle cx="340" cy="100" r="7" fill="#2563eb"/>
+      <text x="352" y="104" font-family="'Roboto',sans-serif" font-size="11" fill="#16203a">FILL: item A</text>
+    </g>
+    <!-- item B: x=25, y=65 -> top-left -->
+    <g>
+      <circle cx="160" cy="138" r="7" fill="#2563eb"/>
+      <text x="172" y="142" font-family="'Roboto',sans-serif" font-size="11" fill="#16203a">FILL: item B</text>
+    </g>
+    <!-- item C: x=75, y=25 -> bottom-right -->
+    <g>
+      <circle cx="360" cy="238" r="7" fill="#2563eb"/>
+      <text x="372" y="242" font-family="'Roboto',sans-serif" font-size="11" fill="#16203a">FILL: item C</text>
+    </g>
+  </svg>
+</div>

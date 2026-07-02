@@ -1,0 +1,44 @@
+<!--
+  WIDGET: rag-status-board  (zero dependencies — pure CSS grid, no JS)
+  Use for: a grid of workstreams / criteria, each tagged Red / Amber / Green
+  (icon + color) with a one-line "road to green" note.
+  How: copy the whole block. Repeat one .rag-cell per workstream. Per cell set:
+    - GREEN:  icon ✔  color #15803d, tint #e9f6ee
+    - AMBER:  icon !  color #b45309, tint #fdf3e7
+    - RED:    icon ✕  color #b91c1c, tint #fdecec
+  Status is conveyed by BOTH icon and color (not color alone) for accessibility.
+  Cells wrap responsively (grid auto-fit); prints fine (static grid).
+-->
+<div class="rag" style="border:1px solid #e4e9f2;border-radius:12px;padding:22px 24px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Readiness status")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: framing. Each tile shows status and the road to green.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+    <!-- GREEN cell -->
+    <div class="rag-cell" style="background:#fff;border:1px solid #e4e9f2;border-left:4px solid #15803d;border-radius:9px;padding:13px 15px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <span aria-label="green" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#e9f6ee;color:#15803d;font-weight:700;font-size:12px;">&#10004;</span>
+        <span style="font-size:13.5px;font-weight:600;color:#16203a;">FILL: workstream</span>
+      </div>
+      <div style="font-size:12px;color:#5b6677;">FILL: road to green (or "on track").</div>
+    </div>
+
+    <!-- AMBER cell -->
+    <div class="rag-cell" style="background:#fff;border:1px solid #e4e9f2;border-left:4px solid #b45309;border-radius:9px;padding:13px 15px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <span aria-label="amber" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#fdf3e7;color:#b45309;font-weight:700;font-size:12px;">!</span>
+        <span style="font-size:13.5px;font-weight:600;color:#16203a;">FILL: workstream</span>
+      </div>
+      <div style="font-size:12px;color:#5b6677;">FILL: road to green — what unblocks it.</div>
+    </div>
+
+    <!-- RED cell -->
+    <div class="rag-cell" style="background:#fff;border:1px solid #e4e9f2;border-left:4px solid #b91c1c;border-radius:9px;padding:13px 15px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <span aria-label="red" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#fdecec;color:#b91c1c;font-weight:700;font-size:12px;">&#10008;</span>
+        <span style="font-size:13.5px;font-weight:600;color:#16203a;">FILL: workstream</span>
+      </div>
+      <div style="font-size:12px;color:#5b6677;">FILL: road to green — the blocker and owner.</div>
+    </div>
+  </div>
+</div>

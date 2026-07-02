@@ -1,0 +1,66 @@
+<!--
+  WIDGET: state-machine  (zero dependencies — inline SVG only, no JS)
+  Use for: a finite state machine — states as boxes, labeled transition arrows between
+  them. Example below is a circuit breaker (Closed -> Open -> Half-Open -> Closed).
+  State styling:
+    normal/start = white fill + blue outline (#2563eb)
+    active/error = amber (#fdf3e7 / #b45309) or red (#fdecec / #b91c1c) for a failure state
+    terminal     = ink fill (#16203a), white text
+  How: copy the block. All coordinates are HAND-PLACED — set each state box x/y and route
+  each transition (straight <path> or curved with a quadratic control point), then label
+  it with the trigger/guard. Self-loop = a small arc back to the same box.
+  For a dense FSM or one you'd rather write as text, generate a Mermaid stateDiagram-v2
+  (auto-layout) instead — see widgets/README.md "Escape hatch: Mermaid".
+  Prints fine (static SVG).
+-->
+<div class="stm" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Circuit breaker states")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 12px;">FILL: what the machine models; transitions are labeled with their trigger.</p>
+  <svg viewBox="0 0 620 280" width="100%" role="img" aria-label="FILL: describe the state machine for screen readers">
+    <title>FILL: state machine diagram</title>
+    <defs>
+      <marker id="stm-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#5b6677"/>
+      </marker>
+    </defs>
+
+    <!-- transitions first (so states draw on top). Route edge-to-edge; label near mid. -->
+    <g stroke="#5b6677" stroke-width="1.5" fill="none" font-family="'Roboto Mono',monospace" font-size="10.5">
+      <!-- Closed -> Open (top) -->
+      <path d="M180,86 Q310,44 440,86" marker-end="url(#stm-arrow)"/>
+      <!-- Open -> Half-Open (right down) -->
+      <path d="M500,120 Q540,180 500,214" marker-end="url(#stm-arrow)"/>
+      <!-- Half-Open -> Closed (bottom back) -->
+      <path d="M440,236 Q310,278 180,236" marker-end="url(#stm-arrow)"/>
+      <!-- Half-Open -> Open (fail again) -->
+      <path d="M460,214 Q470,170 480,124" marker-end="url(#stm-arrow)"/>
+    </g>
+    <g font-family="'Roboto Mono',monospace" font-size="10.5" fill="#5b6677">
+      <text x="310" y="44" text-anchor="middle">FILL: failures &gt; threshold</text>
+      <text x="556" y="170" text-anchor="middle">FILL: cooldown elapsed</text>
+      <text x="310" y="276" text-anchor="middle">FILL: probe succeeds</text>
+      <text x="500" y="172" text-anchor="start">FILL: probe fails</text>
+    </g>
+
+    <!-- STATE: Closed (start — white + blue outline) -->
+    <g>
+      <rect x="60" y="86" width="120" height="60" rx="12" fill="#fff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="120" y="112" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="13" font-weight="700" fill="#16203a">FILL: Closed</text>
+      <text x="120" y="130" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9.5" fill="#5b6677">requests pass</text>
+    </g>
+
+    <!-- STATE: Open (error — red) -->
+    <g>
+      <rect x="440" y="86" width="120" height="60" rx="12" fill="#fdecec" stroke="#b91c1c" stroke-width="1.8"/>
+      <text x="500" y="112" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="13" font-weight="700" fill="#b91c1c">FILL: Open</text>
+      <text x="500" y="130" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9.5" fill="#b91c1c">fail fast</text>
+    </g>
+
+    <!-- STATE: Half-Open (active — amber) -->
+    <g>
+      <rect x="380" y="214" width="120" height="56" rx="12" fill="#fdf3e7" stroke="#b45309" stroke-width="1.8"/>
+      <text x="440" y="240" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="13" font-weight="700" fill="#b45309">FILL: Half-Open</text>
+      <text x="440" y="257" text-anchor="middle" font-family="'Roboto Mono',monospace" font-size="9.5" fill="#b45309">one probe</text>
+    </g>
+  </svg>
+</div>

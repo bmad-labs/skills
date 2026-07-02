@@ -1,0 +1,37 @@
+<!--
+  WIDGET: callout  (zero dependencies — styled HTML + inline SVG icon)
+  Use for: a note / tip / important / warning / danger box (GitHub-alert style).
+  Also the home for "gotchas" — a pitfall the reader must not miss.
+  How: copy ONE of the five variants below, keep its color role, replace the FILL text.
+  Icon + color together (not color alone) so it reads for color-blind readers and in print.
+-->
+
+<!-- NOTE (neutral / informational) -->
+<div style="border-left:4px solid #2563eb;background:#f6f8fc;border-radius:6px;padding:12px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start;font-family:'Roboto',sans-serif;">
+  <span aria-hidden="true" style="flex-shrink:0;color:#2563eb;font-weight:700;font-family:'Roboto Mono',monospace;">ⓘ</span>
+  <div style="font-size:14px;color:#283449;line-height:1.55;"><b style="color:#1e3a8a;">Note.</b> FILL: neutral context the reader should have.</div>
+</div>
+
+<!-- TIP (good / recommended) -->
+<div style="border-left:4px solid #15803d;background:#e9f6ee;border-radius:6px;padding:12px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start;font-family:'Roboto',sans-serif;">
+  <span aria-hidden="true" style="flex-shrink:0;color:#15803d;font-weight:700;font-family:'Roboto Mono',monospace;">✓</span>
+  <div style="font-size:14px;color:#233;line-height:1.55;"><b style="color:#15803d;">Tip.</b> FILL: the recommended move / good-to-know shortcut.</div>
+</div>
+
+<!-- IMPORTANT (emphasis, not danger) -->
+<div style="border-left:4px solid #1e3a8a;background:#eef1f6;border-radius:6px;padding:12px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start;font-family:'Roboto',sans-serif;">
+  <span aria-hidden="true" style="flex-shrink:0;color:#1e3a8a;font-weight:700;font-family:'Roboto Mono',monospace;">★</span>
+  <div style="font-size:14px;color:#283449;line-height:1.55;"><b style="color:#1e3a8a;">Important.</b> FILL: the thing that changes the decision.</div>
+</div>
+
+<!-- WARNING / GOTCHA (caution) -->
+<div style="border-left:4px solid #b45309;background:#fdf3e7;border-radius:6px;padding:12px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start;font-family:'Roboto',sans-serif;">
+  <span aria-hidden="true" style="flex-shrink:0;color:#b45309;font-weight:700;font-family:'Roboto Mono',monospace;">⚠</span>
+  <div style="font-size:14px;color:#4a3a22;line-height:1.55;"><b style="color:#b45309;">Watch out.</b> FILL: the gotcha / footgun — why it bites and how to avoid it.</div>
+</div>
+
+<!-- DANGER (breaking / do-not) -->
+<div style="border-left:4px solid #b91c1c;background:#fdecec;border-radius:6px;padding:12px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start;font-family:'Roboto',sans-serif;">
+  <span aria-hidden="true" style="flex-shrink:0;color:#b91c1c;font-weight:700;font-family:'Roboto Mono',monospace;">✕</span>
+  <div style="font-size:14px;color:#4a1c1c;line-height:1.55;"><b style="color:#b91c1c;">Danger.</b> FILL: a breaking change / security risk / do-not-do. Be specific.</div>
+</div>

@@ -130,26 +130,28 @@ Read the mode's `primary_output` and `secondary_output` from `data/modes.csv`.
 with the answer. Define any unavoidable term inline. If a reader needs a
 dictionary to parse a finding, rewrite it.
 
-**Add a visualization when it earns its place.** `assets/widgets/` holds drop-in,
-zero-dependency visual blocks (inline SVG / CSS / a little vanilla JS) — see
-`assets/widgets/README.md` for the catalog and the copy-paste snippets. Pick by
-what the content is, not by novelty:
-- Comparing named options across criteria → the Side-by-Side table (already in the
-  HTML template). Don't draw a chart for a comparison.
-- A branching decision/path → `decision-tree.html`. A journey/sequence over time →
-  `timeline.html`. Explaining how parts relate → `annotated-diagram.html`.
-- One variable the reader should *feel* → `slider-metric.html` (the interactive
-  "drag it" widget). At most one per report; more is noise.
-- A standard flow/sequence/ER diagram that's easier as text → Mermaid (pinned,
-  `securityLevel:'strict'`). Real quantitative data (bar/line/scatter) → Chart.js.
+**Add a visualization when it earns its place.** `assets/widgets/` holds ~45 drop-in,
+zero-dependency visual blocks (inline SVG / CSS / a little vanilla JS). **Read
+`assets/widgets/README.md`** — it has the full catalog grouped by job (compare &
+decide, numbers & evidence, explain how it works, sequence over time, org &
+management, inline accents) plus a numbered "which visual to use" decision order.
+Pick by what the content is, not by novelty; copy the file, replace its `FILL:`
+markers. A few high-use anchors: `comparison-matrix` (options × criteria),
+`weighted-decision-matrix` (ADR scoring), `metric-bars` (benchmark/cost/size),
+`evidence-confidence` (per-finding trust), `callout` (gotchas/warnings),
+`verdict-card` (the recommendation), and `slider-metric` (the one interactive
+"drag it" widget — at most one per report).
+
 Default to the zero-dependency widgets: they render instantly, work offline, print,
-and can't be blanked by a CDN outage or a runtime handshake failing. Reach for a
-library only for diagrams-from-text and data charts, and then pin the version +
-prefer SRI/inline over a bare CDN `<script>`. **If you let the model generate
-arbitrary widget JS rather than filling a template, sandbox it** (iframe
-`sandbox="allow-scripts"` without `allow-same-origin`, CSP blocking `connect-src`) —
-generated markup is untrusted code running in the report's origin; SRI does not help
-there. Full rules in `assets/widgets/README.md`.
+and can't be blanked by a CDN outage or a runtime handshake failing. For any
+tree/graph/diagram the widgets use **hand-placed coordinates** — don't auto-layout.
+Reach for a library only for what bespoke SVG is bad at: a standard flow/sequence/ER
+diagram easier written as text → Mermaid (pinned, `securityLevel:'strict'`); real
+quantitative data at scale → Chart.js. Then pin the version + prefer SRI/inline over
+a bare CDN `<script>`. **If you let the model generate arbitrary widget JS rather than
+filling a template, sandbox it** (iframe `sandbox="allow-scripts"` without
+`allow-same-origin`, CSP blocking `connect-src`) — generated markup is untrusted code
+in the report's origin; SRI does not help there. Full rules in `assets/widgets/README.md`.
 
 Write outputs to `software-research-reports/` (create if needed):
 - HTML → `{topic-slug}-briefing.html`
