@@ -295,7 +295,88 @@
     </div>
   </section>
 
-  <!-- ============ REFERENCES with verification status ============ -->
+  <!-- ============================================================================
+       DEEP REPORT BODY (12-section spine). Everything ABOVE is the fast-scan layer
+       (a reader can stop there). Everything BELOW is the detailed report.
+       CONCRETENESS CONTRACT — see references/report-structure.md. For EVERY section:
+       name exact versions, show real commands/config/code, use real numbers, and tie
+       it to THE READER'S stack/team/scale. Cut any sentence that describes a category
+       instead of stating a fact (ban "offers robust support for…", "is widely used…").
+       Render comparisons/numbers/flows with a widget from assets/widgets/, not prose.
+       Delete any section that is genuinely N/A for this mode (say why in one line).
+       ============================================================================ -->
+
+  <!-- 06 Landscape & current state -->
+  <section class="section">
+    <div class="section-num">06</div>
+    <h2><span class="bar"></span>Landscape &amp; Current State</h2>
+    <p>{{The specific players / versions / patterns in play as of the research date. Name them. State what is current vs deprecated and the version where it changed. Not "the ecosystem is mature" — the actual state.}}</p>
+  </section>
+
+  <!-- 07 Implementation approach (the practical core) -->
+  <section class="section">
+    <div class="section-num">07</div>
+    <h2><span class="bar"></span>How To Actually Do It</h2>
+    <p>{{The practical core — win or lose "practical" here. Real setup steps, commands, config, minimal code, file layout, env vars. Show the actual path, not "an overview of implementation." Use a code-compare / annotated-diagram / deployment-pipeline widget where it helps.}}</p>
+  </section>
+
+  <!-- 08 Technology / stack detail -->
+  <section class="section">
+    <div class="section-num">08</div>
+    <h2><span class="bar"></span>Stack &amp; Tooling Detail</h2>
+    <p>{{Exact languages / frameworks / versions / tools, and WHY each fits the reader's case. Pin versions. A comparison-matrix widget fits here.}}</p>
+  </section>
+
+  <!-- 09 Integration & interoperability -->
+  <section class="section">
+    <div class="section-num">09</div>
+    <h2><span class="bar"></span>Integration &amp; Interoperability</h2>
+    <p>{{How it connects to what the reader ALREADY runs: APIs, protocols, data formats, compatibility windows. Cite the compat matrix / version-support window. c4-container-view or sequence-flow widget if a picture helps.}}</p>
+  </section>
+
+  <!-- 10 Performance & scalability -->
+  <section class="section">
+    <div class="section-num">10</div>
+    <h2><span class="bar"></span>Performance &amp; Scalability</h2>
+    <p>{{Real numbers with disclosed methodology; the scaling model and where it saturates; the reader's expected load vs that ceiling. Not "scales well." Use metric-bars / range-bar / capacity-scaling-curve.}}</p>
+  </section>
+
+  <!-- 11 Security & compliance -->
+  <section class="section">
+    <div class="section-num">11</div>
+    <h2><span class="bar"></span>Security &amp; Compliance</h2>
+    <p>{{Concrete: specific CVEs/GHSA + affected/patched versions, the SPDX license + obligations, the attack surface, the hardening steps. Use the severity-summary widget.}}</p>
+  </section>
+
+  <!-- 12 Recommendations (tied to the reader) -->
+  <section class="section">
+    <div class="section-num">12</div>
+    <h2><span class="bar"></span>Recommendation, For Your Situation</h2>
+    <p>{{The decision and why, referencing the reader's stack / team size / scale / constraints BY NAME. State what you'd NOT do and why. weighted-decision-matrix or verdict-card widget.}}</p>
+  </section>
+
+  <!-- 13 Implementation roadmap -->
+  <section class="section">
+    <div class="section-num">13</div>
+    <h2><span class="bar"></span>Roadmap</h2>
+    <p>{{Phased, estimable steps (effort S/M/L, sequence, what unblocks what) — concrete enough to hand to the team on Monday. phasing-roadmap or migration-checklist widget.}}</p>
+  </section>
+
+  <!-- 14 Risks & mitigations -->
+  <section class="section">
+    <div class="section-num">14</div>
+    <h2><span class="bar"></span>Risks &amp; Mitigations</h2>
+    <p>{{Named risks with likelihood/impact and a SPECIFIC mitigation each; the rollback / exit path. No "there are risks" — enumerate them. risk-heatmap widget.}}</p>
+  </section>
+
+  <!-- 15 Methodology -->
+  <section class="section">
+    <div class="section-num">15</div>
+    <h2><span class="bar"></span>How This Was Verified</h2>
+    <p>{{How claims were checked; the verification tally (N checked / X corrected / Y demoted / Z version-stale); confidence by source tier. The evidence-confidence widget fits here.}}</p>
+  </section>
+
+  <!-- ============ 16 · APPENDIX / REFERENCES with verification status ============ -->
   <div class="refs">
     <h3>References &middot; sources &amp; verification status</h3>
     <ul>

@@ -9,10 +9,14 @@
 > {{N}}/10 (source-tier). Main trade-off: {{one line}}. Decide-by / next check:
 > {{the one thing to confirm, or "ready"}}.
 
+<!-- Concreteness: name exact versions, cite specifics, tie to this team's stack/scale.
+     No generic filler ("offers robust support for…"). See references/report-structure.md. -->
+
 ## Context and Problem Statement
 
-{{Plain facts, forces, and constraints — short sentences. What problem motivates
-this decision? Keep it factual; no recommendation yet.}}
+{{Plain facts, forces, and constraints — short sentences with real specifics (versions,
+scale numbers, the actual stack). What problem motivates this decision? Keep it factual;
+no recommendation yet.}}
 
 ## Decision Drivers
 
