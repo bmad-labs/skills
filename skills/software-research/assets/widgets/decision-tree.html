@@ -1,0 +1,41 @@
+<!--
+  WIDGET: decision-tree  (zero dependencies — inline SVG + a little vanilla JS)
+  Use for: branching options, "which path", a recommendation flow.
+  How: copy this whole block into the report body. Replace the FILL markers.
+  Repeat a .dt-node per box; keep total nodes small (<~20) so it stays readable.
+  Palette matches the briefing template. role="img" + <title> for accessibility.
+  Prints fine (static SVG). No CDN, no framework — survives offline.
+-->
+<div class="dt" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Which path fits?")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: one-line framing.</p>
+  <svg viewBox="0 0 640 260" width="100%" role="img" aria-label="FILL: describe the tree for screen readers">
+    <title>FILL: decision tree</title>
+    <!-- edges first (so nodes draw on top). Update x/y to match your nodes. -->
+    <g stroke="#9aa6b8" stroke-width="1.5" fill="none">
+      <path d="M320,54 L160,120"/>
+      <path d="M320,54 L480,120"/>
+      <path d="M160,150 L160,196"/>
+      <path d="M480,150 L480,196"/>
+    </g>
+    <!-- root -->
+    <g>
+      <rect x="230" y="24" width="180" height="34" rx="8" fill="#1e3a8a"/>
+      <text x="320" y="46" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="13" fill="#fff" font-weight="600">FILL: starting question</text>
+    </g>
+    <!-- branch A -->
+    <g>
+      <rect x="70" y="120" width="180" height="30" rx="8" fill="#fff" stroke="#2563eb"/>
+      <text x="160" y="140" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#16203a">FILL: option A</text>
+      <rect x="70" y="196" width="180" height="30" rx="8" fill="#e7f0fe" stroke="#2563eb"/>
+      <text x="160" y="216" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#1e3a8a" font-weight="600">FILL: A outcome</text>
+    </g>
+    <!-- branch B -->
+    <g>
+      <rect x="390" y="120" width="180" height="30" rx="8" fill="#fff" stroke="#2563eb"/>
+      <text x="480" y="140" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#16203a">FILL: option B</text>
+      <rect x="390" y="196" width="180" height="30" rx="8" fill="#e7f0fe" stroke="#2563eb"/>
+      <text x="480" y="216" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="12" fill="#1e3a8a" font-weight="600">FILL: B outcome</text>
+    </g>
+  </svg>
+</div>
