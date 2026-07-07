@@ -1,8 +1,8 @@
 /*
   EXAMPLE / showcase slide — copy this shape for real slides.
 
-  Demonstrates the wow-guide techniques: eyebrow → title → green rule rhythm, ONE
-  hero KPI (count-up), a highlight-one-bar chart in the MTI data palette, the green
+  Demonstrates the wow-guide techniques: eyebrow → title → accent rule rhythm, ONE
+  hero KPI (count-up), a highlight-one-bar chart in the deck's data palette, the
   accent chip (the one shadow-accent element).
 
   EVERY element carries a dotted data-viz-id (s0.title, s0.kpi.value, …) so edit
@@ -23,7 +23,7 @@
 */
 import { StaggerContainer, StaggerItem, CountUp, AccentRule } from '@/components/SlideTransition';
 
-// MTI data palette — green is always series 1 (see references/tailwind-theme.md).
+// Deck data palette — the accent color is always series 1 (see references/tailwind-theme.md).
 const BARS = [
   { label: 'Q1', v: 42, hi: false },
   { label: 'Q2', v: 55, hi: false },
@@ -67,13 +67,13 @@ export default function HeroMetrics() {
             Adoption by quarter
           </div>
           <svg viewBox={`0 0 ${W} ${H + 32}`} className="w-full" role="img" aria-label="Adoption rising to 78% in Q4">
-            <line x1="0" y1={H} x2={W} y2={H} stroke="#E6E2DD" strokeWidth="1" />
+            <line x1="0" y1={H} x2={W} y2={H} stroke="var(--ink-200)" strokeWidth="1" />
             {BARS.map((b, i) => {
               const h = (b.v / max) * H, x = i * (bw + gap) + 20;
               return (
                 <g key={b.label}>
-                  <rect x={x} y={H - h} width={bw} height={h} rx="4" fill={b.hi ? '#00A73B' : '#E6E2DD'} />
-                  <text x={x + bw / 2} y={H + 20} textAnchor="middle" fill="#8C8782" style={{ fontSize: '12px' }}>{b.label}</text>
+                  <rect x={x} y={H - h} width={bw} height={h} rx="4" fill={b.hi ? 'var(--color-accent)' : 'var(--ink-200)'} />
+                  <text x={x + bw / 2} y={H + 20} textAnchor="middle" fill="var(--ink-500)" style={{ fontSize: '12px' }}>{b.label}</text>
                 </g>
               );
             })}
@@ -85,7 +85,7 @@ export default function HeroMetrics() {
       <StaggerContainer className="flex items-center justify-between mt-auto">
         <StaggerItem data-viz-id="s0.footer.brand"
           className="text-small font-bold tracking-eyebrow uppercase text-text-muted">
-          MTI Technology
+          Your Company
         </StaggerItem>
         <StaggerItem data-viz-id="s0.footer.chip"
           className="bg-primary-500 text-text-on-accent text-small font-bold rounded-pill px-5 py-2 shadow-accent">

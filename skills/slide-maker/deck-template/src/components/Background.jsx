@@ -1,4 +1,4 @@
-// MTI atmospheric background — green-blob depth in the LIGHT idiom (wow-guide §3),
+// Atmospheric background — soft accent-blob depth in the LIGHT idiom (wow-guide §3),
 // NOT dark glow orbs. Sits inside the slide canvas, behind content. Decorative, so
 // it carries no data-viz-id (not a feedback target).
 export default function Background() {

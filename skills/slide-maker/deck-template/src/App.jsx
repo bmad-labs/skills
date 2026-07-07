@@ -21,7 +21,7 @@ const SLIDES = [Slide00];
 const NAV_ITEMS = [
   { slideIndex: 0, label: 'Hero metrics', notes: '' },
 ];
-const PRESENTATION_NAME = 'MTI Presentation';
+const PRESENTATION_NAME = 'Slide Deck';
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Normal-mode chrome sizes. Single source of truth is the CSS vars in index.css

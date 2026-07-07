@@ -11,7 +11,7 @@ gsap.registerPlugin(useGSAP);
 //     count-up, the accent-rule draw, and the slide enter/exit transition (App.jsx).
 //   • GSAP (useSlideGsap / useGSAP below) — timeline-based or sequenced animation
 //     (chained reveals, draw-on paths, coordinated multi-element choreography).
-// Keep MTI's calm idiom either way: ease 'power2.out', short durations, no bounce.
+// Keep the deck's calm idiom either way: ease 'power2.out', short durations, no bounce.
 //
 // Re-exported so a slide can `import { gsap, useGSAP } from '@/components/SlideTransition'`.
 export { gsap, useGSAP };
@@ -28,7 +28,7 @@ export { gsap, useGSAP };
 //     return <div ref={ref} className="slide-page" data-viz-id="s2"> … </div>;
 //   }
 //
-// `build(tl, scope)` receives a fresh timeline (calm MTI defaults) + the scope el.
+// `build(tl, scope)` receives a fresh timeline (calm defaults) + the scope el.
 export function useSlideGsap(build, deps = []) {
   const ref = useRef(null);
   useGSAP(() => {
@@ -87,7 +87,7 @@ export function CountUp({ to, suffix = '', className, ...rest }) {
 export function AccentRule({ className, ...rest }) {
   return (
     <motion.div
-      className={`mti-rule ${className || ''}`}
+      className={`accent-rule ${className || ''}`}
       initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
       style={{ transformOrigin: 'left' }}
