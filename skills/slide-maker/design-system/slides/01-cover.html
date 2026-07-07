@@ -1,0 +1,62 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Cover slide" subtitle="Title / cover layout with logo, eyebrow, and footer capsule" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MTI — Cover Slide</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide {
+    width: var(--slide-w); height: var(--slide-h);
+    background: var(--surface-page);
+    position: relative; overflow: hidden;
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column;
+    padding: var(--slide-margin);
+  }
+  /* faint brand wave band on the right edge */
+  .slide::after {
+    content: ""; position: absolute; right: -120px; bottom: -140px;
+    width: 560px; height: 560px; border-radius: 50%;
+    background: var(--green-50);
+    z-index: 0;
+  }
+  .topbar { display: flex; align-items: center; justify-content: space-between; z-index: 1; }
+  .logo { height: 26px; }
+  .doc-kind { font-size: var(--fs-eyebrow); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--text-muted); font-weight: var(--fw-medium); }
+  .body { margin-top: auto; margin-bottom: auto; z-index: 1; max-width: 880px; }
+  .eyebrow { display: inline-block; font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--mti-green); margin-bottom: var(--space-5); }
+  h1 { font-size: var(--fs-display); line-height: var(--lh-tight); letter-spacing: var(--ls-tight);
+    font-weight: var(--fw-black); color: var(--text-primary); }
+  h1 .accent { color: var(--mti-green); }
+  .lead { margin-top: var(--space-6); font-size: var(--fs-lead); line-height: var(--lh-normal);
+    color: var(--text-secondary); font-weight: var(--fw-light); max-width: 720px; }
+  .footer { display: flex; align-items: center; justify-content: space-between; z-index: 1; }
+  .meta { font-size: var(--fs-small); color: var(--text-muted); }
+  .capsule { background: var(--mti-green); color: var(--text-on-accent);
+    font-size: var(--fs-small); font-weight: var(--fw-bold); letter-spacing: .04em;
+    padding: var(--space-2) var(--space-5); border-radius: var(--radius-pill); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="topbar">
+      <img class="logo" src="../assets/logos/mti-logo-full.svg" alt="MTI Technology">
+      <span class="doc-kind">Product Overview</span>
+    </div>
+    <div class="body">
+      <span class="eyebrow">Internal Initiative · 2025</span>
+      <h1>Presentation <span class="accent">title</span> goes here in two lines</h1>
+      <p class="lead">A one-sentence summary of what this deck covers — concise, plain, and confident in the MTI voice.</p>
+    </div>
+    <div class="footer">
+      <span class="meta">November 2025 · v0.1 · Prepared by Team Name</span>
+      <span class="capsule">MTI Ltd.</span>
+    </div>
+  </div>
+</body>
+</html>

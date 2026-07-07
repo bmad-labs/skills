@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   MTI deck — light corporate base. Slides are authored at a fixed
+   1280×720 canvas (matches the design-system/slides/*.html templates and
+   keeps export geometry exact), then scaled to fit the viewport.
+   ============================================================ */
+:root {
+  --slide-w: 1280px;
+  --slide-h: 720px;
+  --slide-margin: 72px;
+  --slide-gutter: 32px;
+  --nav-safe: 0px;
+  /* Normal-mode chrome sizes — single source of truth. App.jsx reads these (via
+     getComputedStyle) for the fit math; the rail/topbar/notes/grid reference them
+     in CSS. Change here only. */
+  --deck-rail-w: 244px;
+  --deck-topbar-h: 48px;
+  --deck-notes-h: 160px;
+  font-family: "Noto Sans JP", "Meiryo", Arial, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { background: #F2F0ED; color: #221815; }
+
+/* The deck stage holds the fixed-size slide canvas, scaled to fit. Its box
+   (position/inset) is set inline by App to inset for the Normal-mode chrome or
+   fill the viewport in Present mode. */
+.deck-stage {
+  overflow: hidden; background: #F2F0ED;
+  position: relative;            /* anchor for the absolutely-centered scaler */
+}
+/* The scaler is the fixed 1280×720 canvas. It is CENTERED via its own transform
+   (translate(-50%,-50%) pins its center on the stage center), NOT via flex — flex
+   can't center a box wider than its container, which broke at narrow widths. App
+   sets transform = translate(-50%,-50%) translate(pan) scale(fit·zoom). */
+.deck-scaler {
+  width: var(--slide-w); height: var(--slide-h);
+  position: absolute; top: 50%; left: 50%;
+  transform-origin: center center;
+}
+
+/* Presentation mode: the slide floats on a neutral dark field (cinema feel), the
+   same whether we got real OS fullscreen or the in-browser fill fallback — both
+   are just .deck-present covering the viewport with the stage at inset:0. */
+.deck-present { position: fixed; inset: 0; background: #221815; z-index: 10; }
+.deck-present .deck-stage { background: #221815; }
+/* Edit mode is an authoring tool — hide its FAB/overlay while presenting. (Its own
+   .em-root sits at body level, outside .deck-present, so target it via body state.) */
+body:has(.deck-present) .em-root { display: none !important; }
+
+/* Normal (editing) mode fills the viewport behind the chrome. */
+.deck-normal { position: fixed; inset: 0; background: #F2F0ED; }
+
+/* The mini slide thumbnails in the rail / grid are previews, never targets. */
+[data-thumb] * { pointer-events: none !important; }
+
+/* Export/print: chrome is stripped and the slide must render at a CLEAN, untransformed
+   1280×720 anchored top-left — the PPTX/PDF/screenshot geometry walkers measure raw
+   getBoundingClientRect and assume scale 1, origin 0,0. The Normal-mode harness scales
+   + centers the .deck-scaler via translate(-50%,-50%) scale(fit); that MUST be undone
+   here or every exported element is mis-scaled and shifted. The driver adds .deck-export
+   to <html>; @media print covers manual PDF prints. */
+html.deck-export .deck-stage,
+html.deck-export .deck-normal, html.deck-export .deck-present {
+  position: fixed; inset: 0 !important; background: #FFFFFF;
+}
+/* The active scaler must render raw 1280×720 at scale 1, top-left — undo the harness's
+   translate(-50%,-50%) scale(fit) centering so the geometry walker reads true pixels.
+   (The rail thumbnails also use .deck-scaler? No — they use [data-thumb]; safe to target
+   only scalers inside the stage.) */
+html.deck-export .deck-stage > .deck-scaler {
+  position: absolute !important; top: 0 !important; left: 0 !important;
+  transform: none !important;
+}
+html.deck-export [data-navigation], html.deck-export [data-thumb] { display: none !important; }
+
+/* Each slide fills the 1280×720 canvas. */
+.slide-page {
+  width: var(--slide-w); height: var(--slide-h);
+  background: #FFFFFF;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  padding: var(--slide-margin);
+  font-family: "Noto Sans JP", "Meiryo", Arial, system-ui, sans-serif;
+  color: #221815;
+}
+/* slide-content = the region under the eyebrow→title→rule header that fills remaining
+   height. It does NOT force a display mode — the slide picks its own layout via Tailwind
+   (grid / flex). (A hardcoded `display:flex` here overrode a Tailwind `grid` class due to
+   CSS source order, collapsing multi-column slides to one column on export.) */
+.slide-content { flex: 1; min-height: 0; }
+
+/* Card grids (MTI gutter). */
+.grid-auto-fit { display: grid; gap: var(--slide-gutter); }
+.grid-1x3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2x2 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+.grid-2x3 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+
+/* The green accent rule under titles. */
+.mti-rule { width: 56px; height: 4px; border-radius: 999px; background: #00A73B; }
+
+/* glass-light — ONLY for a caption plate over a photo (per tailwind-theme.md). */
+.glass-light {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(34,24,21,0.08);
+}
+
+@media print {
+  .deck-stage { position: static; }
+  [data-navigation], .em-root { display: none !important; }
+}

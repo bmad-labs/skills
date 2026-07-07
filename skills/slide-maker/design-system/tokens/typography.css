@@ -1,0 +1,39 @@
+/* ============================================================
+   MTI Technology — Typography tokens
+   ============================================================ */
+:root {
+  /* ---- Families ---- */
+  --font-sans: "Noto Sans JP", "Meiryo", "Hiragino Kaku Gothic ProN",
+               Arial, system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: "SFMono-Regular", "Consolas", ui-monospace, monospace;
+
+  /* ---- Weights ---- */
+  --fw-light:   300;
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-bold:    700;
+  --fw-black:   900;
+
+  /* ---- Slide type scale (designed for 1280×720 frames) ---- */
+  --fs-display:  64px;  /* hero / cover title        */
+  --fs-h1:       44px;  /* slide title               */
+  --fs-h2:       32px;  /* section heading           */
+  --fs-h3:       24px;  /* card / column heading     */
+  --fs-lead:     22px;  /* lead paragraph / subtitle */
+  --fs-body:     18px;  /* body copy                 */
+  --fs-small:    15px;  /* captions, table cells     */
+  --fs-eyebrow:  14px;  /* kicker / eyebrow label    */
+  --fs-footnote: 11px;  /* footer disclaimer         */
+
+  /* ---- Line heights ---- */
+  --lh-tight:   1.08;
+  --lh-snug:    1.25;
+  --lh-normal:  1.45;
+  --lh-relaxed: 1.6;
+
+  /* ---- Letter spacing ---- */
+  --ls-tight:   -0.02em;
+  --ls-normal:  0;
+  --ls-eyebrow: 0.14em;  /* uppercase kickers       */
+}

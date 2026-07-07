@@ -1,0 +1,87 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Process flow" subtitle="Numbered steps connected left-to-right — how something works" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MTI — Process Flow</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { position: relative; overflow: hidden;
+    width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  .bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .bg .blob { position: absolute; border-radius: 50%; background: var(--green-50);
+    width: 440px; height: 440px; left: -160px; bottom: -180px; }
+  .head { position: relative; z-index: 1; }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--mti-green); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); max-width: 820px; }
+  .rule { width: 56px; height: var(--rule-accent-w); background: var(--mti-green);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .flow { position: relative; z-index: 1; flex: 1; display: flex; align-items: center;
+    gap: var(--space-4); }
+  .stepcard { flex: 1; background: var(--surface-card); border: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-lg); padding: var(--space-8); box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column; min-height: 280px; }
+  .num { width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--green-50);
+    color: var(--mti-green); font-weight: var(--fw-black); font-size: var(--fs-lead);
+    display: flex; align-items: center; justify-content: center; }
+  .stepcard h3 { margin-top: var(--space-5); font-size: var(--fs-h3); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); }
+  .stepcard p { margin-top: var(--space-3); font-size: var(--fs-small); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); }
+  /* green chevron connector between cards */
+  .arrow { flex: 0 0 auto; color: var(--mti-green); display: flex; align-items: center; }
+  .arrow svg { width: 22px; height: 22px; }
+  .foot { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg"><div class="blob"></div></div>
+
+    <div class="head">
+      <span class="eyebrow">How it works</span>
+      <h1>Four steps from idea to live</h1>
+      <div class="rule"></div>
+    </div>
+
+    <div class="flow">
+      <div class="stepcard">
+        <div class="num">1</div>
+        <h3>Frame the problem</h3>
+        <p>Align on the outcome and the one metric that proves it.</p>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="stepcard">
+        <div class="num">2</div>
+        <h3>Design &amp; build</h3>
+        <p>A working slice against the core workflow, shipped early.</p>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="stepcard">
+        <div class="num">3</div>
+        <h3>Validate</h3>
+        <p>Measure against the metric and harden what works.</p>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="stepcard">
+        <div class="num">4</div>
+        <h3>Scale &amp; run</h3>
+        <p>Roll out, observe, and evolve as adoption grows.</p>
+      </div>
+    </div>
+
+    <div class="foot">
+      <img src="../assets/logos/mti-logo-full.svg" alt="MTI Technology">
+      <span class="pageno">13</span>
+    </div>
+  </div>
+</body>
+</html>

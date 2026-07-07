@@ -1,0 +1,74 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Problem → solution" subtitle="A two-panel turn: the problem (dark) gives way to the solution (light/green)" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MTI — Problem / Solution</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { position: relative; overflow: hidden;
+    width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: grid; grid-template-columns: 1fr 1fr; }
+  .panel { padding: var(--slide-margin); display: flex; flex-direction: column; }
+  /* PROBLEM — dark ink panel, the brand-weight side */
+  .problem { background: var(--ink-900); color: var(--text-inverse); position: relative; overflow: hidden; }
+  .problem .blob { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.05);
+    width: 360px; height: 360px; left: -120px; bottom: -140px; }
+  .problem .eyebrow { color: var(--ink-400); }
+  .problem h2 { color: var(--white); }
+  .problem .item { color: var(--ink-200); }
+  .problem .marker { color: var(--ink-500); }
+  /* SOLUTION — light/green panel */
+  .solution { background: var(--surface-page); position: relative; overflow: hidden; }
+  .solution .blob { position: absolute; border-radius: 50%; background: var(--green-50);
+    width: 420px; height: 420px; right: -160px; top: -160px; }
+  .solution .eyebrow { color: var(--mti-green); }
+  .solution h2 { color: var(--text-primary); }
+  .solution .item { color: var(--text-secondary); }
+  .solution .marker { color: var(--mti-green); }
+  .eyebrow { position: relative; z-index: 1; font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; }
+  h2 { position: relative; z-index: 1; margin-top: var(--space-4); font-size: var(--fs-h2);
+    font-weight: var(--fw-bold); line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+  .list { position: relative; z-index: 1; margin-top: var(--space-8); display: flex;
+    flex-direction: column; gap: var(--space-5); flex: 1; }
+  .row { display: flex; gap: var(--space-4); align-items: flex-start; }
+  .marker { flex: 0 0 auto; font-weight: var(--fw-black); font-size: var(--fs-lead); line-height: 1.1; }
+  .item { font-size: var(--fs-body); font-weight: var(--fw-light); line-height: var(--lh-normal); }
+  .item b { font-weight: var(--fw-bold); }
+  .pageno { position: relative; z-index: 1; font-size: var(--fs-small); color: var(--text-muted); align-self: flex-end; }
+  .problem .pageno { color: var(--ink-500); }
+  .solution img { position: relative; z-index: 1; height: 20px; align-self: flex-start; }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="panel problem">
+      <div class="blob"></div>
+      <span class="eyebrow">The problem</span>
+      <h2>Delivery stalls after launch</h2>
+      <div class="list">
+        <div class="row"><span class="marker">—</span><span class="item">Projects ship, then <b>drift</b> as ownership fades.</span></div>
+        <div class="row"><span class="marker">—</span><span class="item">Reliability becomes someone else's problem.</span></div>
+        <div class="row"><span class="marker">—</span><span class="item">The value plateaus instead of compounding.</span></div>
+      </div>
+      <span class="pageno">16</span>
+    </div>
+
+    <div class="panel solution">
+      <div class="blob"></div>
+      <span class="eyebrow">Our approach</span>
+      <h2>Build it, then keep it running</h2>
+      <div class="list">
+        <div class="row"><span class="marker">✓</span><span class="item">One team from <b>discovery to managed care</b>.</span></div>
+        <div class="row"><span class="marker">✓</span><span class="item">Reliability and observability built in, not bolted on.</span></div>
+        <div class="row"><span class="marker">✓</span><span class="item">Value that keeps growing after go-live.</span></div>
+      </div>
+      <img src="../assets/logos/mti-logo-full.svg" alt="MTI Technology">
+    </div>
+  </div>
+</body>
+</html>
