@@ -1,6 +1,6 @@
 /* ============================================================
-   MTI Technology — Webfonts
-   Brand face is Noto Sans JP (used throughout the reference
-   deck: "Noto Sans JP Light/Medium"). Served from Google Fonts.
+   slide-maker — Fonts (clean-light default)
+   Default uses the system stack (no network fetch). A design
+   system can override --font-* in its own theme file.
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+/* No @import: system fonts only by default. */
