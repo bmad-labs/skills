@@ -1,74 +1,54 @@
 /* ============================================================
-   MTI Technology — Color tokens
-   Derived from the brand mark (green/yellow/ink) and the
-   "Mingle" reference deck (green-forward, white slides).
+   slide-maker — Color tokens (clean-light default theme)
+   Neutral, unbranded. Swap this file (or override the aliases)
+   to re-skin every slide. Aliases at the bottom are the contract.
    ============================================================ */
 :root {
-  /* ---- Brand core ---- */
-  --mti-green:        #00A73B;  /* primary brand green (logo)        */
-  --mti-green-bright: #00B050;  /* deck accent green (charts, KPIs)  */
-  --mti-green-deep:   #007A2B;  /* pressed / dark green             */
-  --mti-yellow:       #FABE00;  /* brand yellow (logo dots, marks)  */
-  --mti-ink:          #221815;  /* logo black / primary text        */
-  --mti-blue:         #0070C0;  /* secondary data accent (deck)     */
+  /* ---- Accent (single restrained hue) ---- */
+  --accent-500: #4F46E5;   /* indigo — primary accent            */
+  --accent-600: #4338CA;   /* pressed / darker accent            */
+  --accent-050: #EEF2FF;   /* soft accent wash                   */
 
-  /* ---- Green scale ---- */
-  --green-50:  #E7F6EC;
-  --green-100: #C2E9CF;
-  --green-200: #8FD8A8;
-  --green-300: #57C57F;
-  --green-400: #21B459;
-  --green-500: #00A73B;
-  --green-600: #009434;
-  --green-700: #007A2B;
-  --green-800: #005E21;
-
-  /* ---- Yellow scale ---- */
-  --yellow-100: #FFF3CC;
-  --yellow-300: #FDD64D;
-  --yellow-500: #FABE00;
-  --yellow-700: #C99800;
-
-  /* ---- Neutral / ink scale ---- */
-  --ink-900: #221815;  /* near-black brand ink   */
-  --ink-800: #2E2A27;
-  --ink-700: #46413D;
-  --ink-600: #6B6661;
-  --ink-500: #8C8782;
-  --ink-400: #ABA6A1;
-  --ink-300: #CFCAC5;
-  --ink-200: #E6E2DD;
-  --ink-100: #F2F0ED;
-  --ink-50:  #F8F7F5;
+  /* ---- Neutral / ink scale (slate) ---- */
+  --ink-900: #0F172A;
+  --ink-800: #1E293B;
+  --ink-700: #334155;
+  --ink-600: #475569;
+  --ink-500: #64748B;
+  --ink-400: #94A3B8;
+  --ink-300: #CBD5E1;
+  --ink-200: #E2E8F0;
+  --ink-100: #F1F5F9;
+  --ink-50:  #F8FAFC;
   --white:   #FFFFFF;
 
   /* ---- Semantic data / status ---- */
-  --status-positive: #00A73B;
-  --status-info:     #0070C0;
-  --status-warning:  #FABE00;
-  --status-danger:   #D8362A;
+  --status-positive: #16A34A;
+  --status-info:     #2563EB;
+  --status-warning:  #D97706;
+  --status-danger:   #DC2626;
 
-  /* ---- Semantic aliases (use these in components/slides) ---- */
-  --color-accent:        var(--mti-green);
-  --color-accent-bright: var(--mti-green-bright);
-  --color-accent-soft:   var(--green-50);
+  /* ---- Semantic aliases (THE CONTRACT — components/slides use these) ---- */
+  --color-accent:        var(--accent-500);
+  --color-accent-bright: var(--accent-500);
+  --color-accent-soft:   var(--accent-050);
 
-  --text-primary:    var(--ink-900);
-  --text-secondary:  var(--ink-600);
-  --text-muted:      var(--ink-500);
-  --text-inverse:    var(--white);
-  --text-on-accent:  var(--white);
-  --text-accent:     var(--mti-green);
+  --text-primary:   var(--ink-900);
+  --text-secondary: var(--ink-600);
+  --text-muted:     var(--ink-500);
+  --text-inverse:   var(--white);
+  --text-on-accent: var(--white);
+  --text-accent:    var(--accent-600);
 
-  --surface-page:    var(--white);
-  --surface-card:    var(--white);
-  --surface-subtle:  var(--ink-50);
-  --surface-muted:   var(--ink-100);
-  --surface-ink:     var(--ink-900);
-  --surface-accent:  var(--mti-green);
+  --surface-page:   var(--white);
+  --surface-card:   var(--white);
+  --surface-subtle: var(--ink-50);
+  --surface-muted:  var(--ink-100);
+  --surface-ink:    var(--ink-900);
+  --surface-accent: var(--accent-500);
 
-  --border-subtle:   var(--ink-200);
-  --border-default:  var(--ink-300);
-  --border-strong:   var(--ink-900);
-  --border-accent:   var(--mti-green);
+  --border-subtle:  var(--ink-200);
+  --border-default: var(--ink-300);
+  --border-strong:  var(--ink-900);
+  --border-accent:  var(--accent-500);
 }

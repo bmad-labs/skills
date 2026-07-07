@@ -1,5 +1,5 @@
 /* ============================================================
-   MTI Technology — Spacing, radius, shadow, layout tokens
+   slide-maker — Spacing, radius, shadow, layout tokens
    ============================================================ */
 :root {
   /* ---- Spacing scale (4px base) ---- */
@@ -31,11 +31,11 @@
   /* ---- Borders ---- */
   --border-w:       1px;
   --border-w-thick: 2px;
-  --rule-accent-w:  4px;   /* green accent rule under titles */
+  --rule-accent-w:  4px;   /* accent rule under titles */
 
   /* ---- Shadows (soft, corporate, low-spread) ---- */
-  --shadow-sm: 0 1px 2px rgba(34, 24, 21, 0.06);
-  --shadow-md: 0 4px 14px rgba(34, 24, 21, 0.08);
-  --shadow-lg: 0 12px 32px rgba(34, 24, 21, 0.12);
-  --shadow-accent: 0 8px 24px rgba(0, 167, 59, 0.22);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
+  --shadow-accent: 0 8px 24px rgba(79, 70, 229, 0.22);
 }

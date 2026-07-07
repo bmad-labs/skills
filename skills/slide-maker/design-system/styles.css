@@ -1,5 +1,5 @@
 /* ============================================================
-   MTI Technology Design System — global entry point.
+   slide-maker design system — global entry point.
    Consumers link THIS file only. Imports only.
    ============================================================ */
 @import url("./tokens/fonts.css");
