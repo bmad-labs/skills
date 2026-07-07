@@ -1,0 +1,9 @@
+id,key,name,family,intent,use_when,motion,duration_ms,direction_aware,brand_weight,tags
+01,none,None (cut),instant,hard-cut-between-slides,Dense data decks or rapid step-throughs where any motion is a distraction,instant swap — no animation,0,no,minimal,"none,cut,instant,off,no-animation"
+02,fade,Fade,subtle,cross-dissolve-between-slides,The calm default — most decks; understated and on-brand,opacity crossfade (slides overlap),300,no,light,"fade,dissolve,crossfade,default,calm,subtle"
+03,slide,Slide,kinetic,carry-a-linear-sequence,A linear narrative where forward/back direction should read as motion,full-width horizontal slide in the nav direction,400,yes,medium,"slide,horizontal,carousel,sequence,linear,directional"
+04,push-up,Push up,kinetic,advance-as-a-stack,Vertical progressions — agendas, timelines, step lists,full-height vertical push in the nav direction,400,yes,medium,"push,vertical,up,stack,scroll,directional"
+05,slide-fade,Slide + fade,subtle,gentle-directional-change,A soft directional cue without a full hard slide,short slide (60px) combined with opacity fade,350,yes,light,"slide-fade,soft,directional,gentle,combo"
+06,zoom,Zoom,kinetic,punch-into-the-next-point,Reveal/showcase moments — a product, a key result, a hero,incoming scales down from 1.06 while fading in,350,no,bold,"zoom,scale,punch,reveal,showcase,in"
+07,zoom-out,Zoom out,kinetic,pull-back-to-context,Returning to an overview or wrapping a section,incoming scales up from 0.92 while fading in,350,no,bold,"zoom-out,scale,pull-back,overview,context,out"
+08,reveal,Reveal (wipe),kinetic,wipe-the-next-slide-over,A dramatic chapter change; the new slide wipes across the old,clip-path wipe from the nav-direction edge,450,yes,bold,"reveal,wipe,clip,curtain,chapter,dramatic"

@@ -1,0 +1,71 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Comparison — two columns" subtitle="Side-by-side before/after or option A/B" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MTI — Comparison</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  .head { margin-bottom: var(--space-8); }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--mti-green); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--slide-gutter); flex: 1; }
+  .col { border-radius: var(--radius-lg); padding: var(--space-8); display: flex; flex-direction: column; }
+  .col.now { background: var(--ink-50); border: var(--border-w) solid var(--border-subtle); }
+  .col.next { background: var(--green-50); border: var(--border-w) solid var(--green-100); }
+  .tag { align-self: flex-start; font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill); margin-bottom: var(--space-6); }
+  .now .tag { background: var(--ink-200); color: var(--ink-700); }
+  .next .tag { background: var(--mti-green); color: var(--text-on-accent); }
+  .col h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); margin-bottom: var(--space-5); }
+  ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-4); }
+  li { display: grid; grid-template-columns: 20px 1fr; gap: var(--space-3); align-items: start;
+    font-size: var(--fs-body); line-height: var(--lh-normal); color: var(--text-secondary); }
+  li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; margin-top: 9px; }
+  .now li::before { background: var(--ink-400); }
+  .next li::before { background: var(--mti-green); }
+  .foot { margin-top: var(--space-6); display: flex; justify-content: space-between; align-items: center; }
+  .foot img { height: 20px; } .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="head">
+      <span class="eyebrow">Comparison</span>
+      <h1>Where we are vs. where we're going</h1>
+    </div>
+    <div class="cols">
+      <div class="col now">
+        <span class="tag">Today</span>
+        <h3>The current state</h3>
+        <ul>
+          <li><span>A pain point felt by the team right now.</span></li>
+          <li><span>A second limitation worth calling out.</span></li>
+          <li><span>A third gap this work will address.</span></li>
+        </ul>
+      </div>
+      <div class="col next">
+        <span class="tag">Proposed</span>
+        <h3>The future state</h3>
+        <ul>
+          <li><span>The improvement this unlocks for users.</span></li>
+          <li><span>A second benefit, stated plainly.</span></li>
+          <li><span>The outcome that matters most.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot">
+      <img src="../assets/logos/mti-logo-full.svg" alt="MTI Technology">
+      <span class="pageno">07</span>
+    </div>
+  </div>
+</body>
+</html>

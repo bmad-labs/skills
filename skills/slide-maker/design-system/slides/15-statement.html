@@ -1,0 +1,54 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Big statement" subtitle="One bold claim at display scale — a manifesto / thesis slide" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MTI — Statement</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { position: relative; overflow: hidden;
+    width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  /* two soft green blobs for depth — one bleeds each diagonal, never behind the text */
+  .bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .bg .b1 { position: absolute; border-radius: 50%; background: var(--green-50);
+    width: 560px; height: 560px; right: -200px; top: -200px; }
+  .bg .b2 { position: absolute; border-radius: 50%; background: var(--green-100);
+    opacity: 0.4; width: 300px; height: 300px; left: -120px; bottom: -140px; }
+  .body { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column;
+    justify-content: center; max-width: 1000px; }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--mti-green); }
+  .statement { margin-top: var(--space-6); font-size: var(--fs-display); font-weight: var(--fw-black);
+    line-height: var(--lh-tight); letter-spacing: var(--ls-tight); }
+  .statement .accent { color: var(--mti-green); }
+  .rule { width: 72px; height: var(--rule-accent-w); background: var(--mti-green);
+    border-radius: var(--radius-pill); margin-top: var(--space-8); }
+  .sub { margin-top: var(--space-6); font-size: var(--fs-lead); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); max-width: 640px; }
+  .foot { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg"><div class="b1"></div><div class="b2"></div></div>
+
+    <div class="body">
+      <span class="eyebrow">Our thesis</span>
+      <div class="statement">Software that ships<br>and <span class="accent">stays shipped.</span></div>
+      <div class="rule"></div>
+      <p class="sub">Built to last, run with care — so the value you launch keeps compounding long after go-live.</p>
+    </div>
+
+    <div class="foot">
+      <img src="../assets/logos/mti-logo-full.svg" alt="MTI Technology">
+      <span class="pageno">15</span>
+    </div>
+  </div>
+</body>
+</html>

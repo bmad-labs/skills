@@ -1,0 +1,40 @@
+{
+  "skill_name": "mti-slide-maker",
+  "evals": [
+    {
+      "id": 0,
+      "name": "vague-ask-routes-to-brainstorm",
+      "prompt": "I need to put together a deck for MTI to pitch our managed-services offering to a mid-size retail customer next week. Honestly not sure how to structure it yet — can you help me figure it out and build it?",
+      "expected_output": "Agent recognizes the idea is unexamined and starts the slide-brainstorm workflow: asks clarifying questions ONE at a time (purpose/audience/takeaway/length), proposes a narrative spine, and does NOT jump straight to copying the deck-template or writing slide JSX. Honors the hard gate (no generation before an approved skeleton).",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "clear-skeleton-routes-to-generate",
+      "prompt": "I've already got the outline nailed down for our MTI company-overview deck: slide 1 cover, slide 2 three pillars (Engineering / Data & AI / Cloud), slide 3 a hero KPI '70% adopt in week one' with a quarterly bar chart, slide 4 a contact/CTA close. Go ahead and build the actual slides.",
+      "expected_output": "Agent routes to the slide-generate workflow: copies the deck-template to an output folder, writes the slide JSX with MTI tokens + data-viz-id on every element, runs check-slop AND shoot-slides as self-check gates before showing the user, and offers edit-mode for review. Does not re-run a full brainstorm (the skeleton is given).",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "editable-pptx-export",
+      "prompt": "The HTML deck in my ./slides folder looks good and the client approved it. I need to send them a PowerPoint they can actually edit — change the wording, swap a number, that kind of thing. Can you produce that and make sure it's faithful?",
+      "expected_output": "Agent routes to the export-editable-pptx workflow: runs export-pptx-jsx.mjs, then the validate-pptx.mjs quality gate, and reviews/resolves every reported issue (fix or acknowledge-with-reason) until a clean PASS. Mentions the validation/acknowledgement system, not just a bare export.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "pdf-vs-image-disambiguation",
+      "prompt": "Can you give me the MTI deck as a single file I can email to a few people and have it just open in their browser, no PowerPoint needed? It's the deck in ./slides.",
+      "expected_output": "Agent routes to the export-standalone-html workflow (single self-contained .html that opens offline), NOT pdf or pptx — 'single file, opens in browser, no PowerPoint' is the standalone-HTML signal. Runs export-deck.mjs --format html and checks it opens offline / no EditMode leak.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "brand-layer-only-not-full-deck",
+      "prompt": "I'm using a different slide-generator tool to build my deck, but I want it to come out in MTI's actual brand — the real green, the Noto Sans JP font, the right components — instead of some generic theme. How do I wire that up?",
+      "expected_output": "Agent recognizes the 'supply only the brand layer' use case (NOT the full deck-template path): points to the tailwind-theme.md theme block for React/Tailwind or design-system/styles.css for plain HTML, and notes the other generator should skip theme/style selection because the MTI theme is fixed. Does not start brainstorming or copying the deck-template.",
+      "files": []
+    }
+  ]
+}
