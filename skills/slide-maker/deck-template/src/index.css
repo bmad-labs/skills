@@ -1,9 +1,10 @@
+@import url("../../design-system/styles.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================================
-   MTI deck — light corporate base. Slides are authored at a fixed
+   slide-maker deck — light corporate base. Slides are authored at a fixed
    1280×720 canvas (matches the design-system/slides/*.html templates and
    keeps export geometry exact), then scaled to fit the viewport.
    ============================================================ */
@@ -19,18 +20,18 @@
   --deck-rail-w: 244px;
   --deck-topbar-h: 48px;
   --deck-notes-h: 160px;
-  font-family: "Noto Sans JP", "Meiryo", Arial, system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
-body { background: #F2F0ED; color: #221815; }
+body { background: var(--surface-muted); color: var(--text-primary); }
 
 /* The deck stage holds the fixed-size slide canvas, scaled to fit. Its box
    (position/inset) is set inline by App to inset for the Normal-mode chrome or
    fill the viewport in Present mode. */
 .deck-stage {
-  overflow: hidden; background: #F2F0ED;
+  overflow: hidden; background: var(--surface-muted);
   position: relative;            /* anchor for the absolutely-centered scaler */
 }
 /* The scaler is the fixed 1280×720 canvas. It is CENTERED via its own transform
@@ -46,14 +47,14 @@ body { background: #F2F0ED; color: #221815; }
 /* Presentation mode: the slide floats on a neutral dark field (cinema feel), the
    same whether we got real OS fullscreen or the in-browser fill fallback — both
    are just .deck-present covering the viewport with the stage at inset:0. */
-.deck-present { position: fixed; inset: 0; background: #221815; z-index: 10; }
-.deck-present .deck-stage { background: #221815; }
+.deck-present { position: fixed; inset: 0; background: var(--surface-ink); z-index: 10; }
+.deck-present .deck-stage { background: var(--surface-ink); }
 /* Edit mode is an authoring tool — hide its FAB/overlay while presenting. (Its own
    .em-root sits at body level, outside .deck-present, so target it via body state.) */
 body:has(.deck-present) .em-root { display: none !important; }
 
 /* Normal (editing) mode fills the viewport behind the chrome. */
-.deck-normal { position: fixed; inset: 0; background: #F2F0ED; }
+.deck-normal { position: fixed; inset: 0; background: var(--surface-muted); }
 
 /* The mini slide thumbnails in the rail / grid are previews, never targets. */
 [data-thumb] * { pointer-events: none !important; }
@@ -66,6 +67,8 @@ body:has(.deck-present) .em-root { display: none !important; }
    to <html>; @media print covers manual PDF prints. */
 html.deck-export .deck-stage,
 html.deck-export .deck-normal, html.deck-export .deck-present {
+  /* Intentional: exports always render on a clean structural white field,
+     independent of the active theme's surface tokens. */
   position: fixed; inset: 0 !important; background: #FFFFFF;
 }
 /* The active scaler must render raw 1280×720 at scale 1, top-left — undo the harness's
@@ -81,12 +84,14 @@ html.deck-export [data-navigation], html.deck-export [data-thumb] { display: non
 /* Each slide fills the 1280×720 canvas. */
 .slide-page {
   width: var(--slide-w); height: var(--slide-h);
+  /* Intentional: the slide canvas itself is always clean structural white,
+     independent of the active theme's surface tokens (matches export). */
   background: #FFFFFF;
   position: relative; overflow: hidden;
   display: flex; flex-direction: column;
   padding: var(--slide-margin);
-  font-family: "Noto Sans JP", "Meiryo", Arial, system-ui, sans-serif;
-  color: #221815;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
 }
 /* slide-content = the region under the eyebrow→title→rule header that fills remaining
    height. It does NOT force a display mode — the slide picks its own layout via Tailwind
@@ -94,20 +99,20 @@ html.deck-export [data-navigation], html.deck-export [data-thumb] { display: non
    CSS source order, collapsing multi-column slides to one column on export.) */
 .slide-content { flex: 1; min-height: 0; }
 
-/* Card grids (MTI gutter). */
+/* Card grids. */
 .grid-auto-fit { display: grid; gap: var(--slide-gutter); }
 .grid-1x3 { grid-template-columns: repeat(3, 1fr); }
 .grid-2x2 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
 .grid-2x3 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
 
-/* The green accent rule under titles. */
-.mti-rule { width: 56px; height: 4px; border-radius: 999px; background: #00A73B; }
+/* The accent rule under titles. */
+.accent-rule { width: 56px; height: var(--rule-accent-w); border-radius: 999px; background: var(--color-accent); }
 
 /* glass-light — ONLY for a caption plate over a photo (per tailwind-theme.md). */
 .glass-light {
   background: rgba(255,255,255,0.72);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(34,24,21,0.08);
+  border: 1px solid var(--border-subtle);
 }
 
 @media print {

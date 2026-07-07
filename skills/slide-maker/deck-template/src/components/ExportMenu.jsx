@@ -15,22 +15,22 @@ const FORMATS = [
   {
     key: 'pptx-editable', label: 'PowerPoint (editable)', icon: Presentation,
     desc: 'Native, editable shapes & text — best fidelity',
-    prompt: 'Export this MTI deck to an EDITABLE PowerPoint: run `node scripts/export-pptx-jsx.mjs` in the deck-template dir (measured → native PPTX textboxes + shapes + charts), then validate with `node scripts/validate-pptx.mjs` and fix any issues. Output: export/deck.pptx.',
+    prompt: 'Export this deck to an EDITABLE PowerPoint: run `node scripts/export-pptx-jsx.mjs` in the deck-template dir (measured → native PPTX textboxes + shapes + charts), then validate with `node scripts/validate-pptx.mjs` and fix any issues. Output: export/deck.pptx.',
   },
   {
     key: 'pptx-image', label: 'PowerPoint (image)', icon: Presentation,
     desc: 'Pixel-perfect screenshots, not editable',
-    prompt: 'Export this MTI deck to a pixel-perfect PowerPoint: run `node scripts/export-deck.mjs --format pptx-image` in the deck-template dir (each slide a full-bleed screenshot). Output: export/deck.pptx.',
+    prompt: 'Export this deck to a pixel-perfect PowerPoint: run `node scripts/export-deck.mjs --format pptx-image` in the deck-template dir (each slide a full-bleed screenshot). Output: export/deck.pptx.',
   },
   {
     key: 'pdf', label: 'PDF', icon: FileType2,
     desc: 'One page per slide, 1280×720',
-    prompt: 'Export this MTI deck to PDF: run `node scripts/export-deck.mjs --format pdf` in the deck-template dir (one page per slide, 1280×720). Output: export/deck.pdf.',
+    prompt: 'Export this deck to PDF: run `node scripts/export-deck.mjs --format pdf` in the deck-template dir (one page per slide, 1280×720). Output: export/deck.pdf.',
   },
   {
     key: 'html', label: 'Standalone HTML', icon: Globe,
     desc: 'One self-contained interactive file',
-    prompt: 'Export this MTI deck to a standalone HTML file: run `node scripts/export-deck.mjs --format html` in the deck-template dir (one self-contained file, fonts/CSS/JS inlined, nav works offline). Output: export/deck.html.',
+    prompt: 'Export this deck to a standalone HTML file: run `node scripts/export-deck.mjs --format html` in the deck-template dir (one self-contained file, fonts/CSS/JS inlined, nav works offline). Output: export/deck.html.',
   },
 ];
 

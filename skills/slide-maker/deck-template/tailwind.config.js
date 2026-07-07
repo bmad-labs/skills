@@ -1,56 +1,69 @@
 /** @type {import('tailwindcss').Config} */
-// MTI theme — mirrors references/tailwind-theme.md. primary = MTI green scale,
-// accent = MTI yellow, ink neutrals, light surfaces. Do not swap in generic colors.
+// slide-maker theme — reads design-system tokens (CSS vars), not fixed brand hexes.
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        'mti-green': '#00A73B', 'mti-green-bright': '#00B050', 'mti-green-deep': '#007A2B',
-        'mti-yellow': '#FABE00', 'mti-ink': '#221815', 'mti-blue': '#0070C0',
-        primary: {
-          50: '#E7F6EC', 100: '#C2E9CF', 200: '#8FD8A8', 300: '#57C57F', 400: '#21B459',
-          500: '#00A73B', 600: '#009434', 700: '#007A2B', 800: '#005E21', 900: '#005E21', 950: '#003914',
-        },
-        accent: { 50: '#FFF9E6', 100: '#FFF3CC', 300: '#FDD64D', 500: '#FABE00', 700: '#C99800', 900: '#7A5C00' },
+        accent: { DEFAULT: 'var(--color-accent)', soft: 'var(--color-accent-soft)' },
         ink: {
-          50: '#F8F7F5', 100: '#F2F0ED', 200: '#E6E2DD', 300: '#CFCAC5', 400: '#ABA6A1',
-          500: '#8C8782', 600: '#6B6661', 700: '#46413D', 800: '#2E2A27', 900: '#221815',
+          900: 'var(--ink-900)', 700: 'var(--ink-700)', 600: 'var(--ink-600)',
+          500: 'var(--ink-500)', 300: 'var(--ink-300)', 200: 'var(--ink-200)',
+          100: 'var(--ink-100)', 50: 'var(--ink-50)',
         },
-        'bg-base': '#FFFFFF', 'bg-card': '#FFFFFF', 'bg-elevated': '#F8F7F5',
-        'bg-subtle': '#F2F0ED', 'bg-ink': '#221815', 'bg-accent': '#00A73B',
-        'text-primary': '#221815', 'text-secondary': '#6B6661', 'text-muted': '#8C8782',
-        'text-inverse': '#FFFFFF', 'text-on-accent': '#FFFFFF',
-        'border-subtle': '#E6E2DD', 'border-default': '#CFCAC5', 'border-strong': '#221815', 'border-accent': '#00A73B',
-        'status-positive': '#00A73B', 'status-info': '#0070C0', 'status-warning': '#FABE00', 'status-danger': '#D8362A',
+        surface: {
+          page: 'var(--surface-page)', card: 'var(--surface-card)',
+          subtle: 'var(--surface-subtle)', muted: 'var(--surface-muted)', ink: 'var(--surface-ink)',
+        },
+        // Back-compat aliases — existing components reference these utility
+        // names (bg-primary-500, text-text-primary, border-border-subtle, …).
+        // They resolve through the same CSS-var contract as accent/ink/surface
+        // above, so swapping the active theme re-skins every consumer.
+        primary: {
+          50: 'var(--color-accent-soft)', 100: 'var(--color-accent-soft)', 200: 'var(--color-accent-soft)',
+          300: 'var(--color-accent)', 400: 'var(--color-accent)', 500: 'var(--color-accent)',
+          600: 'var(--color-accent-bright)', 700: 'var(--color-accent-bright)', 800: 'var(--color-accent-bright)',
+          900: 'var(--color-accent-bright)', 950: 'var(--color-accent-bright)',
+        },
+        'bg-base': 'var(--surface-page)', 'bg-card': 'var(--surface-card)', 'bg-elevated': 'var(--surface-subtle)',
+        'bg-subtle': 'var(--surface-muted)', 'bg-ink': 'var(--surface-ink)', 'bg-accent': 'var(--color-accent)',
+        'text-primary': 'var(--text-primary)', 'text-secondary': 'var(--text-secondary)', 'text-muted': 'var(--text-muted)',
+        'text-inverse': 'var(--text-inverse)', 'text-on-accent': 'var(--text-on-accent)',
+        'border-subtle': 'var(--border-subtle)', 'border-default': 'var(--border-default)',
+        'border-strong': 'var(--border-strong)', 'border-accent': 'var(--border-accent)',
+        'status-positive': 'var(--status-positive)', 'status-info': 'var(--status-info)',
+        'status-warning': 'var(--status-warning)', 'status-danger': 'var(--status-danger)',
       },
       fontFamily: {
-        display: ['"Noto Sans JP"', '"Meiryo"', '"Hiragino Kaku Gothic ProN"', 'Arial', 'system-ui', 'sans-serif'],
-        body: ['"Noto Sans JP"', '"Meiryo"', '"Hiragino Kaku Gothic ProN"', 'Arial', 'system-ui', 'sans-serif'],
-        sans: ['"Noto Sans JP"', '"Meiryo"', '"Hiragino Kaku Gothic ProN"', 'Arial', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)'],
+        body: ['var(--font-sans)'],
+        sans: ['var(--font-sans)'],
       },
       fontWeight: { light: '300', normal: '400', medium: '500', bold: '700', black: '900' },
       fontSize: {
-        display: ['64px', { lineHeight: '1.08', letterSpacing: '-0.02em' }],
-        h1: ['44px', { lineHeight: '1.25', letterSpacing: '-0.02em' }],
-        h2: ['32px', { lineHeight: '1.25' }],
-        h3: ['24px', { lineHeight: '1.25' }],
-        lead: ['22px', { lineHeight: '1.45' }],
-        body: ['18px', { lineHeight: '1.45' }],
-        small: ['15px', { lineHeight: '1.45' }],
-        eyebrow: ['14px', { lineHeight: '1.25', letterSpacing: '0.14em' }],
-        footnote: ['11px', { lineHeight: '1.45' }],
+        display: ['var(--fs-display)', { lineHeight: '1.08', letterSpacing: '-0.02em' }],
+        h1: ['var(--fs-h1)', { lineHeight: '1.25', letterSpacing: '-0.02em' }],
+        h2: ['var(--fs-h2)', { lineHeight: '1.25' }],
+        h3: ['var(--fs-h3)', { lineHeight: '1.25' }],
+        lead: ['var(--fs-lead)', { lineHeight: '1.45' }],
+        body: ['var(--fs-body)', { lineHeight: '1.45' }],
+        small: ['var(--fs-small)', { lineHeight: '1.45' }],
+        eyebrow: ['var(--fs-eyebrow)', { lineHeight: '1.25', letterSpacing: '0.14em' }],
+        footnote: ['var(--fs-footnote)', { lineHeight: '1.45' }],
       },
       letterSpacing: { tight: '-0.02em', eyebrow: '0.14em' },
-      borderRadius: { sm: '4px', md: '8px', lg: '14px', xl: '20px', pill: '999px' },
+      borderRadius: {
+        sm: 'var(--radius-sm)', md: 'var(--radius-md)', lg: 'var(--radius-lg)',
+        xl: 'var(--radius-xl)', pill: 'var(--radius-pill)',
+      },
       boxShadow: {
-        sm: '0 1px 2px rgba(34, 24, 21, 0.06)',
-        md: '0 4px 14px rgba(34, 24, 21, 0.08)',
-        lg: '0 12px 32px rgba(34, 24, 21, 0.12)',
-        accent: '0 8px 24px rgba(0, 167, 59, 0.22)',
+        sm: 'var(--shadow-sm)',
+        md: 'var(--shadow-md)',
+        lg: 'var(--shadow-lg)',
+        accent: 'var(--shadow-accent)',
       },
       spacing: {
-        'slide-margin': '72px', 'slide-gutter': '32px',
+        'slide-margin': 'var(--slide-margin)', 'slide-gutter': 'var(--slide-gutter)',
       },
     },
   },
