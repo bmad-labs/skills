@@ -57,23 +57,23 @@
         <text class="gl" x="55" y="114" text-anchor="end">75</text>
         <text class="gl" x="55" y="184" text-anchor="end">50</text>
         <text class="gl" x="55" y="254" text-anchor="end">25</text>
-        <!-- x axis -->
-        <line class="axis" x1="70" y1="290" x2="880" y2="290"></line>
-        <!-- bars (baseline y=290) -->
-        <rect class="bar muted" x="120" y="200" width="90" height="90"  rx="4"></rect>
-        <rect class="bar muted" x="300" y="160" width="90" height="130" rx="4"></rect>
-        <rect class="bar"       x="480" y="110" width="90" height="180" rx="4"></rect>
-        <rect class="bar"       x="660" y="60"  width="90" height="230" rx="4"></rect>
+        <!-- x axis at true value 0 (gridline scale: 2.8px/unit, 0 -> y=320) -->
+        <line class="axis" x1="70" y1="320" x2="880" y2="320"></line>
+        <!-- bars: height = value x 2.8, top = 320 - height (decode exactly to the y-axis) -->
+        <rect class="bar muted" x="120" y="230" width="90" height="90"  rx="4"></rect>
+        <rect class="bar muted" x="300" y="191" width="90" height="129" rx="4"></rect>
+        <rect class="bar"       x="480" y="141" width="90" height="179" rx="4"></rect>
+        <rect class="bar"       x="660" y="90"  width="90" height="230" rx="4"></rect>
         <!-- value labels -->
-        <text class="val" x="165" y="188" text-anchor="middle">32%</text>
-        <text class="val" x="345" y="148" text-anchor="middle">46%</text>
-        <text class="val" x="525" y="98"  text-anchor="middle">64%</text>
-        <text class="val" x="705" y="48"  text-anchor="middle">82%</text>
+        <text class="val" x="165" y="218" text-anchor="middle">32%</text>
+        <text class="val" x="345" y="179" text-anchor="middle">46%</text>
+        <text class="val" x="525" y="129" text-anchor="middle">64%</text>
+        <text class="val" x="705" y="78"  text-anchor="middle">82%</text>
         <!-- category labels -->
-        <text class="cat" x="165" y="312" text-anchor="middle">Q1</text>
-        <text class="cat" x="345" y="312" text-anchor="middle">Q2</text>
-        <text class="cat" x="525" y="312" text-anchor="middle">Q3</text>
-        <text class="cat" x="705" y="312" text-anchor="middle">Q4</text>
+        <text class="cat" x="165" y="336" text-anchor="middle">Q1</text>
+        <text class="cat" x="345" y="336" text-anchor="middle">Q2</text>
+        <text class="cat" x="525" y="336" text-anchor="middle">Q3</text>
+        <text class="cat" x="705" y="336" text-anchor="middle">Q4</text>
       </svg>
     </div>
     <div class="legend" style="margin-bottom: var(--space-6);">
