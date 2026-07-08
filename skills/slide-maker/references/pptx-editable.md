@@ -41,7 +41,7 @@ inject the pptxgenjs-jsx IIFE → measureArtifacts() → return measurements as 
 BUILD the <Deck><Slide> tree in NODE from the measurements → native Text/RoundRect/…
    │  validateDeck() → write(deck,{outputType:'base64'}) → Node writes deck.pptx
    ▼
-(optional) embed Noto Sans JP  →  VERIFY with LibreOffice (render → pixel-diff)
+(optional) embed Inter  →  VERIFY with LibreOffice (render → pixel-diff)
 ```
 
 ## Run it
@@ -58,7 +58,7 @@ node scripts/export-pptx-jsx.mjs --embed-fonts   # portable (see fonts below)
 **This is the single command that enforces export quality.** It exports, renders via
 LibreOffice, runs EVERY check per slide — nothing skipped, no class falls between tools —
 and **passes only when every issue is fixed or explicitly acknowledged.** The checks:
-text position/size · **accent-run colour** (a green word still green?) · **line-count /
+text position/size · **accent-run colour** (an accent word still the accent color?) · **line-count /
 wrap** (1-line source didn't become 2) · shape fills · **table header rule/fill** · icons
 present · graphics · SSIM · diff-regions.
 
@@ -66,7 +66,7 @@ present · graphics · SSIM · diff-regions.
 > *source render* against the *pptx render* directly — so they catch a feature the export
 > *dropped* (a flattened accent, a wrap), not just a feature the export *claims*. A gate
 > that only inspects its own output is blind to omissions; that blind spot is exactly what
-> let flattened-green and wrapped-bodies slip through before. When you add a new check,
+> let a flattened accent and wrapped bodies slip through before. When you add a new check,
 > drive it from the source, not the op.
 
 ```bash
@@ -141,9 +141,9 @@ When SSIM is below the gate, don't eyeball the heatmap — **rank the worst area
 the elements in them**:
 
 ```bash
-node scripts/inspect.mjs --slide N --all --mode clean   # → /tmp/mti-slide-inspect/geometry.json
+node scripts/inspect.mjs --slide N --all --mode clean   # → /tmp/slide-maker-inspect/geometry.json
 node scripts/diff-regions.mjs --ref review/slide-0N.png --rendered <libreoffice-render>.png \
-     --geometry /tmp/mti-slide-inspect/geometry.json --top 5
+     --geometry /tmp/slide-maker-inspect/geometry.json --top 5
 ```
 
 It clusters the **hard** diff pixels into regions, ranks them by share of the total diff,
@@ -152,7 +152,7 @@ and lists every `data-viz-id` inside each (with box + overlap). It writes a JSON
 - **one region ≫ others (≥50% share)** → *structural* — fix that element (e.g. the table's
   cells, a mis-sized icon).
 - **diff spread evenly across text regions** → *font-render noise*, not a layout defect →
-  the fix is making LibreOffice use the real Noto Sans JP, not changing the export.
+  the fix is making LibreOffice use the real Inter, not changing the export.
 
 So the loop is: **SSIM fails → `diff-regions` names the elements → fix by cause → re-verify
 the one slide → confirm SSIM rose.**
@@ -213,8 +213,8 @@ const fpt   = (id) => readFontPt(id);   // measure-contract: that element's font
 h(Text, {
   ...box(id),                    // x,y,w,h in inches, measured
   fontSize: Math.max(6, fpt(id)),// floored; readFontPt already does px*72/96
-  fontFace: 'Noto Sans JP', lang: 'ja-JP',
-  color: '221815',               // hex, NO '#'. MTI ink. green=00A73B, muted=9A938E
+  fontFace: 'Inter',
+  color: '0F172A',               // hex, NO '#'. Neutral ink. accent=4F46E5, muted=64748B
   bold: true,                    // ONLY 400/700 exist — font-light/black collapse to these
   align: 'left', valign: 'top', margin: 0,   // margin:0 kills PPT's default text inset
   wrap: false,                   // single-line label → false (keeps exact metrics)
@@ -243,7 +243,7 @@ connector makes LibreOffice export fail):
 ```js
 const r = box('s1.rule'); const hh = Math.max(r.h, 0.03);
 h(RoundRect, { x: r.x, y: r.y + (r.h-hh)/2, w: Math.max(r.w, 0.6), h: hh,
-  rectRadius: 0.5, fill: { color: '00A73B' }, line: { type: 'none' } });
+  rectRadius: 0.5, fill: { color: '4F46E5' }, line: { type: 'none' } });
 ```
 
 **Bar chart of real data** → native `BarChart` (editable, "Edit Data in Excel"):
@@ -251,8 +251,8 @@ h(RoundRect, { x: r.x, y: r.y + (r.h-hh)/2, w: Math.max(r.w, 0.6), h: hh,
 ```js
 h(BarChart, { ...box('s0.chart'),
   data: [{ name: 'Adoption', labels: ['Q1','Q2','Q3','Q4'], values: [12,18,24,30] }],
-  barDir: 'col', chartColors: ['00A73B'],
-  catAxisLabelFontFace: 'Noto Sans JP', catAxisLabelFontSize: 8,
+  barDir: 'col', chartColors: ['4F46E5'],
+  catAxisLabelFontFace: 'Inter', catAxisLabelFontSize: 8,
   valAxisHidden: true, showValue: true, dataLabelFontSize: 9 });
 ```
 Single-series gotcha: never pass one data object full of `undefined` values — PowerPoint
@@ -264,9 +264,9 @@ text + computed `fontWeight`/`color`/`backgroundColor`/`textAlign` and builds th
 at the table's measured box, columns split evenly. `<th>` → bold header cells.
 
 ```js
-h(Table, { x, y, w, h, colW: [w/4,w/4,w/4,w/4], rowH: h/nRows, fontFace: 'Noto Sans JP' },
+h(Table, { x, y, w, h, colW: [w/4,w/4,w/4,w/4], rowH: h/nRows, fontFace: 'Inter' },
   h(TableRow, null, ...cells.map((c) => h(TableCell, { text: c.text, options: {
-    fontFace: 'Noto Sans JP', fontSize: c.fontPt, bold: c.bold, color: c.color,
+    fontFace: 'Inter', fontSize: c.fontPt, bold: c.bold, color: c.color,
     fill: c.fill ? { color: c.fill } : undefined, align: c.align, valign: 'middle',
     margin: [3,6,3,6] } }))));
 ```
@@ -275,7 +275,7 @@ rendering (they're emitted; PowerPoint honours them better). Merged cells (colsp
 are not yet read.
 
 **Diagonal line / arrow** → `LineBetween` (NOT `Line` — it computes flipH/flipV so the
-arrow points the right way): `h(LineBetween, { x1, y1, x2, y2, line: { color:'221815', width:1, endArrowType:'triangle' } })`.
+arrow points the right way): `h(LineBetween, { x1, y1, x2, y2, line: { color:'0F172A', width:1, endArrowType:'triangle' } })`.
 
 **Simple SVG path** → `CustomGeometry` with a `points` array (M→`{moveTo:true}`,
 L→point, C→`{curve:{type:'cubic',x1,y1,x2,y2}}`, Q→`{curve:{type:'quadratic',x1,y1}}`,
@@ -302,9 +302,9 @@ Unicode emoji (slop — see [validation.md](validation.md)).
 tag the accent span, then emit ONE Text with two runs so the split stays editable:
 
 ```js
-h(Text, { ...box('s1.title'), fontSize: fpt('s1.title'), fontFace:'Noto Sans JP', bold:true, margin:0 },
-  h(TextRun, { text: 'Three practices, one ', options: { color: '221815' } }),
-  h(TextRun, { text: 'delivery team',         options: { color: '00A73B' } }));
+h(Text, { ...box('s1.title'), fontSize: fpt('s1.title'), fontFace:'Inter', bold:true, margin:0 },
+  h(TextRun, { text: 'Three practices, one ', options: { color: '0F172A' } }),
+  h(TextRun, { text: 'delivery team',         options: { color: '4F46E5' } }));
 ```
 (Default is a single run coloured by the title's dominant colour; do this only when the
 two-colour split matters.)
@@ -322,14 +322,14 @@ two-colour split matters.)
   must survive export (e.g. `c === 3 ? 'text-primary-500' : 'text-text-secondary'` per
   table column). It can render correctly in `npm run dev` yet flatten to the wrong colour
   in the standalone/export build (purge + CSS source-order — gotcha #13). For an
-  export-critical colour, use an inline `style={{ color: '#00A73B' }}` (the exact token
+  export-critical colour, use an inline `style={{ color: '#4F46E5' }}` (the exact token
   value) instead.
 
 ### Fonts in authored slides
 
-Stick to **Noto Sans JP** (the only brand face). Contrast comes from weight, not a
-second family — and only Regular(400)/Bold(700) embed cleanly, so avoid depending on
-`font-light`/`font-black` rendering precisely in the PPTX.
+Stick to the active theme's font (**Inter** is what the exporter embeds). Contrast comes
+from weight, not a second family — and only Regular(400)/Bold(700) embed cleanly, so avoid
+depending on `font-light`/`font-black` rendering precisely in the PPTX.
 
 ### Quick self-check before export
 
@@ -343,17 +343,17 @@ second family — and only Regular(400)/Bold(700) embed cleanly, so avoid depend
 If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then prove it with
 `verify-pptx.mjs` and read the heatmap.
 
-## Fonts (Noto Sans JP)
+## Fonts (Inter)
 
-- The deck text is Latin; if **Noto Sans JP is installed** on the opener's machine it
-  renders perfectly. The vendored TTF/OTF live in `assets/fonts/`.
+- The deck text is Latin; if **Inter is installed** on the opener's machine it renders
+  perfectly. The vendored OTF (SIL OFL) live in `assets/fonts/`.
 - **Embedding is OPT-IN (`--embed-fonts`)** via `pptx-embed-fonts`. It makes the file
   portable to machines without the font — but the embedded `.fntdata` parts make
   **LibreOffice mis-render** (garbled text), so the default-off file is what you
   verify, and an embedded file should be checked in **PowerPoint**, not LibreOffice.
 - For the LibreOffice **verify** render to match, install the font on the host
-  (`assets/fonts/*.otf` → `~/Library/Fonts` on macOS, or `fonts-noto-cjk` + `fc-cache`
-  on Linux). The family name is exactly `Noto Sans JP`.
+  (`assets/fonts/*.otf` → `~/Library/Fonts` on macOS, or copy into `~/.fonts` + `fc-cache`
+  on Linux). The family name is exactly `Inter`.
 
 ## Gotchas learned (each one cost a real debugging round — don't rediscover them)
 
@@ -362,7 +362,7 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
    (return plain JSON), *build + render* in Node (proven correct).
 2. **`write(deck,{outputType:'base64'})`** is the data-returning call — `renderPptx`
    returns a Promise<string> (the written filename), not a writable instance.
-3. **The green rule must be a filled `RoundRect`, not a `Line` with `h:0`.** A
+3. **The accent rule must be a filled `RoundRect`, not a `Line` with `h:0`.** A
    zero-height connector (`<a:ext cy="0"/>`) makes LibreOffice's PDF/PNG export fail
    with `Io … Write Code:16`.
 4. **Guard the layout size.** `readSlideLayout()` returns `{name,width,height}` — read
@@ -382,7 +382,7 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
    single `Text` (each run's `options.color` from its node's computed colour). The exporter
    does this now; the lesson: a text op carries `runs[]`, not just one `color`.
 10. **A text leaf with its OWN background is a pill/chip — centre it + inset by padding.**
-    The green "+12 pts" chip exported `align:left valign:bottom` at the full pill width, so
+    The accent "+12 pts" chip exported `align:left valign:bottom` at the full pill width, so
     the text jammed against the rounded left edge and sat low. Pills read **centred both
     ways**, inset by the element's `px-*` padding. (The big-number `valign:bottom` baseline
     logic must NOT fire on a small padded chip — gate it on `hasOwnBg`.)
@@ -397,10 +397,10 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
     it as a thin filled `RoundRect` on the header's bottom edge — same trick as the rounded
     header bar (gotcha #3: cell borders / `cy=0` lines don't export).
 13. **Standalone build ≠ dev for Tailwind classes built inside `.map()` ternaries.** A
-    conditional `text-primary-500` emitted in a loop showed green in `npm run dev` but
+    conditional `text-primary-500` emitted in a loop showed the accent in `npm run dev` but
     rendered grey in the standalone/export build (purge + CSS source-order let
     `text-text-secondary` win). For a colour that MUST survive export, use an inline
-    `style={{ color: '#00A73B' }}` (the exact token value) — it can't be purged or
+    `style={{ color: '#4F46E5' }}` (the exact token value) — it can't be purged or
     out-ordered. Sample the rendered PNG to confirm, don't trust the dev server.
 14. **Capture EVERYTHING in presentation mode — never the normal-mode editor page.**
     The deck has two modes; the rail/topbar/grid + a grey stage margin belong to NORMAL
@@ -415,7 +415,7 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
     so all content slides export as slide-2's DOM (same root id, identical object
     count). Jump straight: `gotoSlide(page, idx-1)`. Tell: the export log prints the same
     `active slide root: s2` for every slide. (Was wrong in export-pptx-jsx + inspect.)
-16. **The LibreOffice verify workdir (`/tmp/mti-validate`) MUST be wiped each run.**
+16. **The LibreOffice verify workdir (`/tmp/slide-maker-validate`) MUST be wiped each run.**
     `pdftoppm` emits both `p-1.png` (single-digit) and a later run's `p-01.png` (padded);
     the copy loop's `/^p-\d+\.png$/` matches BOTH, so a leftover `p-1.png` from an OLD
     export (even a different deck) silently overwrites the fresh `slide-01.png` — you
@@ -451,7 +451,7 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
 - `scripts/verify-pptx.mjs` — LibreOffice render + **SSIM gate** + pixel-diff heatmap + side-by-side.
 - `scripts/diff-regions.mjs` — rank the worst diff regions + list the `data-viz-id`s in each (JSON + annotated PNG); the failure-pinpoint tool.
 - `scripts/lib/svg-to-custgeom.mjs` — SVG icon → recolorable vector `CustomGeometry`.
-- `assets/fonts/NotoSansJP-{Regular,Bold}.otf` — vendored for embedding + LibreOffice.
+- `assets/fonts/Inter-{Regular,Bold}.otf` — vendored (SIL OFL) for embedding + LibreOffice.
 - Deps (devDeps): `@artifact-kit/pptxgenjs-jsx`, `pptx-embed-fonts`, `pixelmatch`, `pngjs`, `ssim.js`, `svgpath`.
 
 Grounding research (kept in the repo, not the skill): `docs/research/pptx-export-*`.

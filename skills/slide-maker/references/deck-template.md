@@ -1,7 +1,7 @@
-# Deck template — a ready-made MTI deck you just fill with slides
+# Deck template — a ready-made deck you just fill with slides
 
-`deck-template/` is a complete React + Tailwind slide deck with the MTI theme, two
-modes (**Normal/editing** and **Presentation**), keyboard control, responsive
+`deck-template/` is a complete React + Tailwind slide deck with the token-driven theme,
+two modes (**Normal/editing** and **Presentation**), keyboard control, responsive
 fit-scaling + zoom/pan, calm transitions (framer-motion + GSAP), present tools (laser
 / pen / highlighter), **edit mode**, an in-app **Export** menu, and **exporters** all
 pre-wired. You don't build the harness — you copy it and write `slides/*.jsx`.
@@ -34,7 +34,7 @@ fit** any window — the canvas is centred via its own `translate(-50%,-50%)` tr
 narrower than 1280px.
 
 It matches the `slides-generator` stack (same vite configs, `slide-page` /
-`slide-content` idiom), themed with the MTI tokens from
+`slide-content` idiom), themed with the tokens from
 [tailwind-theme.md](tailwind-theme.md). Slides render at a fixed **1280×720** canvas
 (matches the static templates and keeps export geometry exact), scaled to fit.
 
@@ -43,11 +43,11 @@ It matches the `slides-generator` stack (same vite configs, `slide-page` /
 ```
 deck-template/
   package.json  vite.config.js  vite.standalone.config.js  postcss.config.js
-  tailwind.config.js              ← the MTI theme (primary=green, accent=yellow, ink, …)
-  index.html                      ← loads Noto Sans JP (edit-mode is loaded by App.jsx, dev-only)
+  tailwind.config.js              ← the token-driven theme (maps CSS vars: accent, ink, surface, …)
+  index.html                      ← uses the system font stack (edit-mode is loaded by App.jsx, dev-only)
   public/edit-mode/                ← the feedback overlay (dev only): edit-mode.js,
                                      edit-mode.css, html-to-image.js (vendored, for snips)
-  assets/fonts/                    ← Noto Sans JP (Regular/Bold) — for PPTX font embed + LibreOffice verify
+  assets/fonts/                    ← Inter (Regular/Bold) — for PPTX font embed + LibreOffice verify
   scripts/                         ← check-slop, shoot-slides, export-deck, serve,
                                      inspect (agent element inspection),
                                      export-pptx-jsx (editable PPTX — a slim orchestrator;
@@ -66,7 +66,7 @@ deck-template/
   src/
     main.jsx
     App.jsx                       ← SLIDES + NAV_ITEMS + PRESENTATION_NAME; mode state, edit loader
-    index.css                     ← light MTI base, slide-page/slide-content/grid + mode classes
+    index.css                     ← light token-driven base, slide-page/slide-content/grid + mode classes
     components/
       TopBar.jsx                  ← Normal-mode top bar: grid/notes toggles, zoom, Export, Present
       SlideRail.jsx               ← Normal-mode left rail of live thumbnails + Edit toggle
@@ -80,7 +80,7 @@ deck-template/
       PresentBar.jsx              ← Presentation-mode bar (bottom-left, reveals on corner hover)
       PresentMode.jsx             ← laser / pen / highlighter overlay (ephemeral, like Google Slides)
       useFullscreen.js            ← OS fullscreen w/ in-browser fallback (Present)
-      Background.jsx              ← green-blob atmosphere (wow-guide §3)
+      Background.jsx              ← accent-blob atmosphere (wow-guide §3)
       SlideTransition.jsx         ← framer helpers (StaggerContainer/Item, CountUp,
                                      AccentRule) + GSAP (useSlideGsap, gsap, useGSAP)
                                      (all chrome above carries data-navigation → hidden on export)
@@ -93,7 +93,7 @@ deck-template/
 1. **Copy** `deck-template/` to your working folder. `npm install`.
 2. **Write slides** in `src/slides/`. Copy the example's shape. Rules:
    - Root is `<div className="slide-page" data-viz-id="sN">`; content in `slide-content`.
-   - Style with MTI Tailwind tokens only (`text-primary-500`, `text-h1`, `bg-bg-card`,
+   - Style with the Tailwind tokens only (`text-primary-500`, `text-h1`, `bg-bg-card`,
      `shadow-accent`, …) — never raw hex or generic Tailwind colors.
    - Follow [wow-guide.md](wow-guide.md): one hero, eyebrow→title→rule→body rhythm,
      calm motion — framer helpers (`CountUp`, `AccentRule`, `StaggerContainer`) for
@@ -129,7 +129,7 @@ deck-template/
 feedback bridge together. In **Normal mode**, the user turns on edit mode (the
 rail's **✎ Edit** button or **`e`**), selects/snips elements, clicks **"Copy
 for AI"**, and says "read the feedback" — you read
-`/tmp/mti-slide-edit/edit-feedback.json`. Edit mode is Normal-mode only; entering
+`/tmp/slide-maker-edit/edit-feedback.json`. Edit mode is Normal-mode only; entering
 Presentation mode hides it. Full guide: [edit-mode.md](edit-mode.md).
 
 ## Export — HTML, PDF, PPTX (edit mode auto-stripped)
@@ -188,4 +188,4 @@ This deck is **self-contained** — use it directly. It mirrors the slides-gener
 template's conventions, so if you prefer that skill's full requirements/research
 workflow, you can author slides there using this skill's theme
 ([tailwind-theme.md](tailwind-theme.md)) and component idioms instead. Either way,
-the brand tokens, wow-guide, and `check-slop.mjs` apply.
+the design tokens, wow-guide, and `check-slop.mjs` apply.

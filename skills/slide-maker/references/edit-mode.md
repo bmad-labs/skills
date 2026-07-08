@@ -115,7 +115,7 @@ The comment panel's **"Copy for AI"** is the one button:
 - **With the bridge running** (recommended): `node scripts/serve.mjs deck-template`
   starts the feedback-bridge on **:8930**; the deck is pre-wired to it. "Copy for
   AI" POSTs the batch + snip PNGs, and the bridge writes
-  `/tmp/mti-slide-edit/edit-feedback.json` + `snip-N.png`. The user says **"read the
+  `/tmp/slide-maker-edit/edit-feedback.json` + `snip-N.png`. The user says **"read the
   feedback"** and you read the JSON (+ images by absolute `imagePath`).
 - **Without the bridge:** "Copy for AI" copies human-readable **markdown** to the
   clipboard. When the user **dragged a snip**, the bridge wrote the PNG and the markdown
@@ -126,26 +126,26 @@ The comment panel's **"Copy for AI"** is the one button:
   `snip-N.png` and no path, the bridge wasn't running — ask them to start `serve.mjs` and
   re-copy, or to attach the image directly.)
 - **Download:** saves `edit-feedback.json` + `snip-N.png` to ~/Downloads; the user
-  runs `node scripts/receive-feedback.mjs` to land them in `/tmp/mti-slide-edit/`.
+  runs `node scripts/receive-feedback.mjs` to land them in `/tmp/slide-maker-edit/`.
 
-## The feedback payload — `mti-slide/edit-feedback@1`
+## The feedback payload — `slide-maker/edit-feedback@1`
 
 ```json
 {
-  "schema": "mti-slide/edit-feedback@1",
+  "schema": "slide-maker/edit-feedback@1",
   "page": "/",
   "capturedAt": "2026-06-19T…Z",
-  "imageDir": "/tmp/mti-slide-edit",
+  "imageDir": "/tmp/slide-maker-edit",
   "comments": [
     {
       "kind": "component | multi | area | brush",
       "targetIds": ["s3.kpi.value"],          // what was clicked/selected
       "relatedIds": ["s3.card.1", "s3.card.2"],// ids inside a snip/brush/marquee region
       "rect": { "x": 440, "y": 150, "width": 320, "height": 90, "right": 760, "bottom": 240 },
-      "comment": "make this number bigger and green",
+      "comment": "make this number bigger and the accent color",
       "hasScreenshot": true,
       "screenshotFile": "snip-1.png",
-      "imagePath": "/tmp/mti-slide-edit/snip-1.png",
+      "imagePath": "/tmp/slide-maker-edit/snip-1.png",
       "slideContext": { "index": 2, "label": "Adoption", "viewport": [1920, 1080] }
     }
   ]
@@ -161,14 +161,14 @@ by grepping the `data-viz-id` in `src/slides/*.jsx` → that's the exact JSX to 
 
 Everything a human does by clicking, the agent can do **headlessly** via the
 `window.EditMode` API — query elements, box them, author feedback comments, and emit
-the SAME `mti-slide/edit-feedback@1` batch. Useful for self-review, automated
+the SAME `slide-maker/edit-feedback@1` batch. Useful for self-review, automated
 annotation, or scripted round-trips. (Edit-mode is injected into the served deck by
 the driver; see `scripts/lib/deck-driver.mjs` `injectEditMode`.)
 
 **Inspect — query / box elements (returns geometry):** use this to learn an
 element's **position, boundary, coordinates**, or the **spatial relationship**
 between elements (gaps, alignment, overlap — all derivable from the returned rects).
-The drawn boxes are **orange** (deliberately outside the MTI green/yellow/ink
+The drawn boxes are **orange** (deliberately outside the theme's accent/ink
 palette) so an inspection box never reads as actual slide content.
 
 ```js
@@ -181,14 +181,14 @@ EditMode.inspect({ clear: true })                        // remove the overlay
 
 ```js
 // comment on element(s); captures the tight box around them as the snip
-await EditMode.addComment({ ids: ['s3.kpi.value'], text: 'make this bigger and green' });
+await EditMode.addComment({ ids: ['s3.kpi.value'], text: 'make this bigger and the accent color' });
 await EditMode.addComment({ ids: ['s3.card.1','s3.card.2'], text: '…' });          // multi
 await EditMode.addComment({ rect: {left,top,width,height}, text: '…' });           // area, no ids
 // pass screenshot:false to skip the capture (rect/ids still recorded)
 
 EditMode.listComments();        // the comments so far
 EditMode.clearComments();
-EditMode.getFeedback(true);     // → the full mti-slide/edit-feedback@1 batch + markdown
+EditMode.getFeedback(true);     // → the full slide-maker/edit-feedback@1 batch + markdown
 ```
 
 `addComment` infers `kind` (`component` / `multi` / `area`), captures the snip
@@ -214,11 +214,11 @@ node scripts/inspect.mjs --slide 1 --ids s1.card.1 --comment "tighten spacing"
 | `--all` | target every tagged element on the slide |
 | `--ids a,b,c` | target specific elements |
 | `--comment "…"` | also author a feedback comment (writes `edit-feedback.json` + `snip-N.png`) |
-| `--out <dir>` | output dir (default `/tmp/mti-slide-inspect`) |
+| `--out <dir>` | output dir (default `/tmp/slide-maker-inspect`) |
 
 Outputs: `geometry.json` (exact `{id,x,y,w,h}`), `slide-NN-highlight.png` (orange
 boxes), `slide-NN-clean.png` (clean), and — with `--comment` — the
-`mti-slide/edit-feedback@1` batch. **Read the PNGs** to judge layout; read
+`slide-maker/edit-feedback@1` batch. **Read the PNGs** to judge layout; read
 `geometry.json` for exact coordinates.
 
 ## Notes
@@ -226,9 +226,9 @@ boxes), `slide-NN-clean.png` (clean), and — with `--comment` — the
 - DOM-only — no 3D (this is the slide port of architecture-viz-studio's edit mode).
 - **Box color convention:** every box drawn ON the slide — hover, selection,
   multi-select, the snip drag box, brush, expert-view, and agent inspect — is
-  **orange** (`--em-inspect #FF6A00`), deliberately OUTSIDE the MTI green/yellow/ink
+  **orange** (`--em-inspect #FF6A00`), deliberately OUTSIDE the theme's accent/ink
   palette so a box never reads as actual slide content. The toolbar/panel chrome
-  stays MTI green — it sits on dark ink, away from the slide.
+  uses its own accent — it sits on dark ink, away from the slide.
 - The overlay uses its own `--em-*` CSS vars so it never collides with the deck.
 - It lives in `public/edit-mode/` for dev convenience; the standalone build deletes
   it from the output and removes its `<link>` (belt-and-suspenders: the export
@@ -253,5 +253,5 @@ boxes), `slide-NN-clean.png` (clean), and — with `--comment` — the
   focused textarea** — save and restore focus around the capture, or the comment box goes
   un-typeable after a snip.
 - **The copied "Copy for AI" markdown must carry the snip's ABSOLUTE path** (`screenshot
-  (Read this image): /tmp/mti-slide-edit/snip-N.png`) + a banner, so the agent actually
+  (Read this image): /tmp/slide-maker-edit/snip-N.png`) + a banner, so the agent actually
   reads the image. A bare `snip-N.png` filename is invisible to it.

@@ -1,16 +1,15 @@
-# MTI craft guide — make it wow
+# Craft guide — make it wow
 
 Companion to [house-style.md](house-style.md) (the layout catalog) and
 [tailwind-theme.md](tailwind-theme.md) (the token mapping). House-style stops you
-being **off-brand**; this guide stops you being **boring**. Everything here uses
+being **off-theme**; this guide stops you being **boring**. Everything here uses
 ONLY tokens already mapped in tailwind-theme.md — no invented colors, no new font.
 
-**MTI "wow" = refinement, not fireworks.** It is premium-corporate polish: one
-decisive focal point, a dramatic type scale, green-on-white depth, calm motion,
-and generous whitespace. It is **never** the dark-glassmorphism / neon-glow /
-Sora-DM-Sans look a generic slide generator defaults to. Keep `font-display`
-(Noto Sans JP) and light backgrounds. When a generic instinct says "add a glow,"
-the MTI answer is "remove something instead."
+**"Wow" = refinement, not fireworks.** It is premium polish: one decisive focal point, a
+dramatic type scale, accent-on-white depth, calm motion, and generous whitespace. It is
+**never** the dark-glassmorphism / neon-glow / generic-sans look a generic slide generator
+defaults to. Keep `font-display` (the active theme font) and light backgrounds. When a
+generic instinct says "add a glow," the answer is "remove something instead."
 
 Run [validation.md](validation.md)'s `check-slop.mjs` on your output before you
 ship — this guide is the ceiling, that script is the floor.
@@ -23,7 +22,7 @@ ship — this guide is the ceiling, that script is the floor.
   the eye should land on first, the slide isn't done.
 - **Whitespace is the luxury signal.** Crowding reads as cheap. Empty space reads
   as confidence.
-- **Depth comes from layered green blobs + soft shadows** — not glass, not glow.
+- **Depth comes from layered accent blobs + soft shadows** — not glass, not glow.
 - **Motion is calm and purposeful** (reveal, count, draw). It guides the eye to
   the hero, then stops. Never bouncy, never decorative-for-its-own-sake.
 
@@ -39,7 +38,7 @@ or an accent-word title. Everything else must visibly recede.
   obvious across the room.
 - **Color focus.** The hero carries `primary-500` (or one accent word in
   `primary-500`); support text stays `text-text-secondary` / `text-text-muted`.
-  Never two competing greens at hero scale.
+  Never two competing accents at hero scale.
 - **Elevation focus.** If the hero sits in a card, that card gets `shadow-accent`
   — and it is the **only** element on the slide with `shadow-accent`. Support
   cards get `shadow-sm`.
@@ -50,28 +49,28 @@ or an accent-word title. Everything else must visibly recede.
 
 ---
 
-## 2. Data visualization in the MTI brand
+## 2. Data visualization on-theme
 
 ### The ordered data palette
 
-Defined once in [tailwind-theme.md](tailwind-theme.md) as `MTI_SERIES`:
+Defined once in [tailwind-theme.md](tailwind-theme.md) as `SERIES`:
 
 ```
-['#00A73B', '#0070C0', '#FABE00', '#ABA6A1', '#8FD8A8', '#6B6661']
-  primary-500  mti-blue   yellow    ink-400   green-200  ink-600
+['#4F46E5', '#0EA5E9', '#64748B', '#94A3B8', '#334155', '#A5B4FC']
+  accent    sky        slate-500  slate-400  slate-700  indigo-300
 ```
 
-Use this order. **Green is always series 1** (the brand / "our" series). Yellow is
-only ever a 3rd series or a single highlight bar — never a dominant fill.
+Use this order. **The accent is always series 1** (the "our" / primary series). Later
+series are neutral steps — never a second bright color competing with the accent.
 
 ### Which chart (decision rules)
 
 | You have | Use |
 |----------|-----|
 | 1–3 numbers | **Not a chart** — a KPI treatment (see below). |
-| A trend over time | Line or area: single `#00A73B` line, `#E7F6EC` (green-50) area fill. |
-| Categories to compare | Vertical bars in `#00A73B`; highlight the key bar, mute the rest to `#E6E2DD`. |
-| Part-to-whole, ≤ 4 parts | Donut using `MTI_SERIES` in order. |
+| A trend over time | Line or area: single `#4F46E5` line, `#EEF2FF` (accent-soft) area fill. |
+| Categories to compare | Vertical bars in `#4F46E5`; highlight the key bar, mute the rest to `#E2E8F0`. |
+| Part-to-whole, ≤ 4 parts | Donut using `SERIES` in order. |
 | Part-to-whole, > 4 parts | Ranked horizontal bar, **not** a pie. |
 | Dense tabular facts | A table with a `primary-500` header rule — not a chart. |
 
@@ -82,25 +81,24 @@ only ever a 3rd series or a single highlight bar — never a dominant fill.
 
 ### KPI treatments (beyond a plain big number)
 
-- **Number + green top-rule** — the existing layout-04 idiom (`border-t-[3px]
-  border-primary-500`).
+- **Number + accent top-rule** — the layout-04 idiom (`border-t-[3px] border-primary-500`).
 - **Number + sparkline** — a small `primary-500` path beside the value.
-- **Number + delta chip** — `status-positive` (#00A73B) up / `status-danger`
-  (#D8362A) down.
-- **Number + radial ring** — `primary-500` stroke on an `#E6E2DD` track.
+- **Number + delta chip** — `status-positive` (#16A34A) up / `status-danger`
+  (#DC2626) down.
+- **Number + radial ring** — `primary-500` stroke on an `#E2E8F0` track.
 
 All on `bg-bg-card shadow-sm`; the single headline KPI gets `shadow-accent`.
 
 ### Chart chrome
 
-Axes & gridlines `#E6E2DD` at 1px; labels `text-text-muted` at `text-small`. No
+Axes & gridlines `#E2E8F0` at 1px; labels `text-text-muted` at `text-small`. No
 3D, no heavy gridlines, no drop shadows on bars. Let the data lead.
 
 → snippets **5B**.
 
 ---
 
-## 3. Depth & atmosphere — in MTI's LIGHT idiom
+## 3. Depth & atmosphere — in the LIGHT idiom
 
 ### The blob system
 
@@ -109,12 +107,12 @@ One or two off-canvas circles, low opacity, in the slide's background layer
 `slide-page` already uses for its bg layer).
 
 - On white slides: `bg-primary-50` blobs (optionally a fainter `bg-primary-100/40`).
-- On green/ink slides: `bg-white/[0.07]`.
+- On accent/ink slides: `bg-white/[0.07]`.
 - Always bleed a blob off an edge; **never** center one behind text.
 
 ### Gradient washes (subtle only)
 
-A `green-50 → white` vertical wash behind content, or on a dark/green slide an
+An `accent-soft → white` vertical wash behind content, or on a dark/accent slide an
 `ink-900 → ink-800` gradient for richness. Never a rainbow, never neon.
 
 ### Shadow elevation ladder — when to use which
@@ -137,7 +135,7 @@ slides. Crowding kills wow faster than any color mistake.
 
 ## 4. Motion — restrained
 
-The deck ships **two** animation libraries; pick by the job, keep MTI's calm idiom
+The deck ships **two** animation libraries; pick by the job, keep the calm idiom
 either way (short durations, `power2.out` / `easeOut`, **no bounce**).
 
 ### framer-motion — simple declarative bits
@@ -149,7 +147,7 @@ Use for the common cases via the `SlideTransition.jsx` helpers:
   KPI rows, card grids. (`<StaggerContainer>` / `<StaggerItem>`.)
 - **Count-up KPIs** — `<CountUp>` (`useSpring`, `bounce: 0`, ~0.8s). Pairs with §1.
 - **Accent-rule / line draw-in** — `<AccentRule>` (`scaleX 0→1`) or `pathLength 0→1`,
-  `duration 0.6`. For the green rule under titles and for chart lines / sparklines.
+  `duration 0.6`. For the accent rule under titles and for chart lines / sparklines.
 - **Subtle hover** — `whileHover={{ scale: 1.02 }}` on cards.
 
 ### GSAP — timeline / sequenced choreography
@@ -210,7 +208,7 @@ animate a given element with one library, not both.
 - **Full-bleed vs inset.** Full-bleed (the layout-06 right column, or a cover
   band) for atmosphere; an inset card (`rounded-lg shadow-lg`) when the image is a
   discrete artifact like a screenshot.
-- **Green-overlay duotone** keeps any stock photo on-brand: desaturate, then lay a
+- **Accent-overlay duotone** keeps any stock photo on-theme: desaturate, then lay a
   `primary-500` tint at `mix-blend-multiply`. See snippet **5E**.
 - **Seam treatment.** Where a half-bleed image meets content, an inner shadow on
   the seam (the layout-06 idiom) makes the split read as intentional.
@@ -228,10 +226,10 @@ animate a given element with one library, not both.
 Always in this order, with ~`space-3` to `space-5` between steps:
 
 ```
-eyebrow   →  text-eyebrow tracking-eyebrow uppercase font-bold text-primary-500
-title     →  text-h1 (or text-display) font-bold tracking-tight
-green rule →  h-1 w-14 rounded-pill bg-primary-500
-body      →  text-body (or text-lead) font-light text-text-secondary
+eyebrow    →  text-eyebrow tracking-eyebrow uppercase font-bold text-primary-500
+title      →  text-h1 (or text-display) font-bold tracking-tight
+accent rule →  h-1 w-14 rounded-pill bg-primary-500
+body       →  text-body (or text-lead) font-light text-text-secondary
 ```
 
 ### Display 64 vs h1 44
@@ -263,14 +261,14 @@ Before a slide is done:
 
 - [ ] ONE hero element dominates; I can name what the eye lands on first.
 - [ ] Hero→body size jump is dramatic; body is `font-light`, `text-secondary`.
-- [ ] eyebrow → title → green rule → body rhythm is present (where there's a title).
+- [ ] eyebrow → title → accent rule → body rhythm is present (where there's a title).
 - [ ] Title ≤ 8 words and states the takeaway; ≤ 5 bullets.
 - [ ] ≥ ~35% of the slide is whitespace; text blocks are measured (`max-w`).
-- [ ] Depth via a green-50 blob/wash + the shadow ladder; `shadow-accent` on the hero ONLY.
-- [ ] 1–3 numbers → KPI, not a chart. Charts use `MTI_SERIES` (green = series 1).
+- [ ] Depth via an accent-soft blob/wash + the shadow ladder; `shadow-accent` on the hero ONLY.
+- [ ] 1–3 numbers → KPI, not a chart. Charts use `SERIES` (accent = series 1).
 - [ ] Motion is calm (stagger / count-up / draw-in). No bounce, no glow.
-- [ ] Noto Sans JP + light background kept. No dark `glass`, no generic Tailwind colors.
-- [ ] Yellow appears only as a small dot/highlight, never a fill or text color.
+- [ ] Active theme font + light background kept. No dark `glass`, no generic Tailwind colors.
+- [ ] The accent appears sparingly, never as a large fill across a content slide.
 
 ### Good-vs-bad titles
 
@@ -286,8 +284,8 @@ Before a slide is done:
 - **Boring:** 6 bullets of 20 words each, every line the same size, logo + title +
   wall of text, no focal point. Technically on-brand, completely flat.
 - **Wow:** one 96px `primary-500` KPI as the hero, three muted supporting stats
-  that stagger in and count up, a green-50 blob bleeding off the corner, the green
-  accent rule drawing in under an 8-word takeaway title, 40% whitespace.
+  that stagger in and count up, an accent-soft blob bleeding off the corner, the accent
+  rule drawing in under an 8-word takeaway title, 40% whitespace.
 
 ---
 
@@ -324,7 +322,7 @@ prefix).
 This single 120px number IS the slide. If it sits inside a card, that card — and
 nothing else — gets `shadow-accent`.
 
-### 5B — MTI-brand SVG charts (no chart library)
+### 5B — On-theme SVG charts (no chart library)
 
 Bar chart, highlight one bar, mute the rest:
 
@@ -334,10 +332,10 @@ const bars = [{ label: 'Q1', v: 42 }, { label: 'Q2', v: 55 },
 const max = 80, H = 220, W = 480, bw = 64, gap = 40;
 
 <svg viewBox={`0 0 ${W} ${H + 32}`} className="w-full">
-  <line x1="0" y1={H} x2={W} y2={H} stroke="#E6E2DD" strokeWidth="1" />
+  <line x1="0" y1={H} x2={W} y2={H} stroke="#E2E8F0" strokeWidth="1" />
   {bars.map((b, i) => {
     const h = (b.v / max) * H, x = i * (bw + gap) + 20;
-    const fill = i === bars.length - 1 ? '#00A73B' : '#E6E2DD';  // highlight last
+    const fill = i === bars.length - 1 ? '#4F46E5' : '#E2E8F0';  // highlight last
     return (
       <g key={b.label}>
         <rect x={x} y={H - h} width={bw} height={h} rx="4" fill={fill} />
@@ -349,7 +347,7 @@ const max = 80, H = 220, W = 480, bw = 64, gap = 40;
 </svg>
 ```
 
-Line chart with green-50 area and draw-in:
+Line chart with accent-soft area and draw-in:
 
 ```jsx
 const pts = [12, 28, 24, 40, 52, 68];               // y-values, 0..72
@@ -358,15 +356,15 @@ const d = pts.map((v, i) => `${i ? 'L' : 'M'}${i * step},${H - (v / 72) * H}`).j
 const area = `${d} L${W},${H} L0,${H} Z`;
 
 <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
-  <path d={area} fill="#E7F6EC" />                  {/* green-50 wash */}
-  <motion.path d={d} fill="none" stroke="#00A73B" strokeWidth="3" strokeLinecap="round"
+  <path d={area} fill="#EEF2FF" />                  {/* accent-soft wash */}
+  <motion.path d={d} fill="none" stroke="#4F46E5" strokeWidth="3" strokeLinecap="round"
     initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
     transition={{ duration: 0.8, ease: 'easeOut' }} />
 </svg>
 ```
 
-A second series uses `#0070C0` (mti-blue), a third `#FABE00` — straight from
-`MTI_SERIES`.
+A second series uses `#0EA5E9` (sky), a third `#64748B` (slate) — straight from
+`SERIES`.
 
 ### 5C — Stagger + count-up metrics
 
@@ -402,7 +400,7 @@ const item = { hidden: { opacity: 0, y: 12 },
 </motion.div>
 ```
 
-### 5D — Green-blob atmospheric background layer
+### 5D — Accent-blob atmospheric background layer
 
 ```jsx
 {/* absolute bg layer — matches slide-page structure; sits behind z-10 content */}
@@ -411,26 +409,26 @@ const item = { hidden: { opacity: 0, y: 12 },
        style={{ width: 560, height: 560, right: -120, bottom: -140 }} />
   <div className="absolute rounded-full bg-primary-100/40"
        style={{ width: 320, height: 320, left: -100, top: -120 }} />
-  {/* yellow dot-trail motif (small accent only) */}
+  {/* small accent dot motif (a single small mark only) */}
   <div className="absolute" style={{ left: 72, bottom: 72 }}>
-    <div className="h-3 w-3 rounded-pill bg-mti-yellow
+    <div className="h-3 w-3 rounded-pill bg-accent
                     shadow-[22px_0_0_rgba(255,255,255,0.55),44px_0_0_rgba(255,255,255,0.3)]" />
   </div>
 </div>
 ```
 
-On a green slide, swap the blobs for white at low opacity:
+On an accent slide, swap the blobs for white at low opacity:
 `bg-white/[0.07]`.
 
-### 5E — Duotone / green-overlay image
+### 5E — Duotone / accent-overlay image
 
 ```jsx
 <div className="relative h-full overflow-hidden rounded-lg shadow-lg">
   <img src="/images/team.jpg" alt="" className="h-full w-full object-cover grayscale" />
-  {/* primary tint via multiply → on-brand duotone */}
+  {/* accent tint via multiply → on-theme duotone */}
   <div className="absolute inset-0 bg-primary-500 mix-blend-multiply opacity-45" />
   {/* seam shadow toward the content side */}
   <div className="absolute inset-0"
-       style={{ boxShadow: 'inset 14px 0 28px -18px rgba(34,24,21,0.4)' }} />
+       style={{ boxShadow: 'inset 14px 0 28px -18px rgba(15,23,42,0.4)' }} />
 </div>
 ```

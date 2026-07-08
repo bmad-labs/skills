@@ -155,7 +155,7 @@ This alone should take the visible output from "broken" to "good."
 deck-template slide components + example slide; rewrite the walker as a **role
 dispatcher**. Adds real `addTable` and bullet `addText`, and removes the last guessing.
 
-**Phase 3 — polish.** Noto Sans JP: reference by name (viewers with the font render
+**Phase 3 — polish.** Inter: reference by name (viewers with the font render
 correctly); optionally offer a font-embedded variant. Consider raw-XML injection only
 if grouped shapes are needed.
 

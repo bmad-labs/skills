@@ -12,7 +12,7 @@ import path from 'path'
 function stripEditMode() {
   let outDir = 'dist-standalone'
   return {
-    name: 'mti-strip-edit-mode',
+    name: 'strip-edit-mode',
     apply: 'build',
     configResolved(c) { outDir = c.build.outDir },
     transformIndexHtml(html) {

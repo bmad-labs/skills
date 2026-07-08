@@ -1,18 +1,18 @@
 {
-  "skill_name": "mti-slide-maker",
+  "skill_name": "slide-maker",
   "evals": [
     {
       "id": 0,
       "name": "vague-ask-routes-to-brainstorm",
-      "prompt": "I need to put together a deck for MTI to pitch our managed-services offering to a mid-size retail customer next week. Honestly not sure how to structure it yet — can you help me figure it out and build it?",
-      "expected_output": "Agent recognizes the idea is unexamined and starts the slide-brainstorm workflow: asks clarifying questions ONE at a time (purpose/audience/takeaway/length), proposes a narrative spine, and does NOT jump straight to copying the deck-template or writing slide JSX. Honors the hard gate (no generation before an approved skeleton).",
+      "prompt": "I need to put together a deck to pitch our SaaS product to a mid-size retail customer next week. Honestly not sure how to structure it yet — can you help me figure it out and build it?",
+      "expected_output": "Agent recognizes the idea is unexamined and starts the slide-brainstorm workflow: resolves the design system (asks if the user has one, else falls through to the clean-light default), asks clarifying questions ONE at a time (purpose/audience/takeaway/length), proposes a narrative spine, asks where the deck should live, and does NOT jump straight to copying the deck-template or writing slide JSX. Honors the hard gate (no generation before an approved skeleton).",
       "files": []
     },
     {
       "id": 1,
       "name": "clear-skeleton-routes-to-generate",
-      "prompt": "I've already got the outline nailed down for our MTI company-overview deck: slide 1 cover, slide 2 three pillars (Engineering / Data & AI / Cloud), slide 3 a hero KPI '70% adopt in week one' with a quarterly bar chart, slide 4 a contact/CTA close. Go ahead and build the actual slides.",
-      "expected_output": "Agent routes to the slide-generate workflow: copies the deck-template to an output folder, writes the slide JSX with MTI tokens + data-viz-id on every element, runs check-slop AND shoot-slides as self-check gates before showing the user, and offers edit-mode for review. Does not re-run a full brainstorm (the skeleton is given).",
+      "prompt": "I've already got the outline nailed down for our company-overview deck: slide 1 cover, slide 2 three pillars (Build / Integrate / Support), slide 3 a hero KPI '70% adopt in week one' with a quarterly bar chart, slide 4 a contact/CTA close. Go ahead and build the actual slides.",
+      "expected_output": "Agent routes to the slide-generate workflow: resolves the design system, confirms an output location (default ./slides/<deck-name>/), copies the deck-template there (NOT into the skill dir), writes the slide JSX with theme tokens + data-viz-id on every element, runs check-slop AND shoot-slides as self-check gates before showing the user, and offers edit-mode for review. Does not re-run a full brainstorm (the skeleton is given).",
       "files": []
     },
     {
@@ -25,15 +25,15 @@
     {
       "id": 3,
       "name": "pdf-vs-image-disambiguation",
-      "prompt": "Can you give me the MTI deck as a single file I can email to a few people and have it just open in their browser, no PowerPoint needed? It's the deck in ./slides.",
+      "prompt": "Can you give me the deck as a single file I can email to a few people and have it just open in their browser, no PowerPoint needed? It's the deck in ./slides.",
       "expected_output": "Agent routes to the export-standalone-html workflow (single self-contained .html that opens offline), NOT pdf or pptx — 'single file, opens in browser, no PowerPoint' is the standalone-HTML signal. Runs export-deck.mjs --format html and checks it opens offline / no EditMode leak.",
       "files": []
     },
     {
       "id": 4,
-      "name": "brand-layer-only-not-full-deck",
-      "prompt": "I'm using a different slide-generator tool to build my deck, but I want it to come out in MTI's actual brand — the real green, the Noto Sans JP font, the right components — instead of some generic theme. How do I wire that up?",
-      "expected_output": "Agent recognizes the 'supply only the brand layer' use case (NOT the full deck-template path): points to the tailwind-theme.md theme block for React/Tailwind or design-system/styles.css for plain HTML, and notes the other generator should skip theme/style selection because the MTI theme is fixed. Does not start brainstorming or copying the deck-template.",
+      "name": "design-layer-only-not-full-deck",
+      "prompt": "I'm using a different slide-generator tool to build my deck, but I want it to come out using a real design system — consistent tokens, the right components — instead of some generic theme. How do I wire that up?",
+      "expected_output": "Agent recognizes the 'supply only the design layer' use case (NOT the full deck-template path): points to the tailwind-theme.md theme block for React/Tailwind or design-system/styles.css for plain HTML, and notes the other generator should skip theme/style selection because the tokens come from the active design system here. Does not start brainstorming or copying the deck-template.",
       "files": []
     }
   ]
