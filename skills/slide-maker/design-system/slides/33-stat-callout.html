@@ -1,0 +1,65 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Stat callout" subtitle="A framed callout: a big accent stat beside an explanatory paragraph" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stat Callout</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  .head { margin-bottom: var(--space-10); }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); max-width: 900px; }
+  .accent-rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .callout { flex: 1; display: flex; align-items: center; }
+  .frame { width: 100%; background: var(--surface-card); border: var(--border-w) solid var(--border-subtle);
+    border-left: 8px solid var(--color-accent); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm); padding: var(--space-12);
+    display: grid; grid-template-columns: auto 1fr; align-items: center; gap: var(--space-16); }
+  .stat .big { font-size: 140px; font-weight: var(--fw-black); line-height: .9;
+    letter-spacing: var(--ls-tight); color: var(--color-accent); }
+  .stat .big span { color: var(--text-primary); font-size: 72px; }
+  .stat .cap { margin-top: var(--space-3); font-size: var(--fs-body); font-weight: var(--fw-bold);
+    color: var(--text-secondary); }
+  .explain h2 { font-size: var(--fs-h2); font-weight: var(--fw-bold); line-height: var(--lh-snug);
+    letter-spacing: var(--ls-tight); }
+  .explain p { margin-top: var(--space-4); font-size: var(--fs-lead); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); }
+  .foot { display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-10); }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="head">
+      <span class="eyebrow">The one number to remember</span>
+      <h1>What this all adds up to</h1>
+      <div class="accent-rule"></div>
+    </div>
+    <div class="callout">
+      <div class="frame">
+        <div class="stat">
+          <div class="big">92<span>%</span></div>
+          <div class="cap">of users stay active</div>
+        </div>
+        <div class="explain">
+          <h2>Retention is the story</h2>
+          <p>Nine in ten people who start keep coming back month after month — the clearest signal that the product solves a real problem, not just a novel one.</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <span class="pageno">33</span>
+    </div>
+  </div>
+</body>
+</html>

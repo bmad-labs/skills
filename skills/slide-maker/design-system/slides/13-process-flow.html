@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>MTI — Process Flow</title>
+<title>Process Flow</title>
 <link rel="stylesheet" href="../styles.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -13,29 +13,29 @@
     font-family: var(--font-sans); color: var(--text-primary);
     display: flex; flex-direction: column; padding: var(--slide-margin); }
   .bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-  .bg .blob { position: absolute; border-radius: 50%; background: var(--green-50);
+  .bg .blob { position: absolute; border-radius: 50%; background: var(--color-accent-soft);
     width: 440px; height: 440px; left: -160px; bottom: -180px; }
   .head { position: relative; z-index: 1; }
   .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
-    text-transform: uppercase; color: var(--mti-green); }
+    text-transform: uppercase; color: var(--color-accent); }
   h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
     line-height: var(--lh-snug); letter-spacing: var(--ls-tight); max-width: 820px; }
-  .rule { width: 56px; height: var(--rule-accent-w); background: var(--mti-green);
+  .rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
     border-radius: var(--radius-pill); margin-top: var(--space-5); }
   .flow { position: relative; z-index: 1; flex: 1; display: flex; align-items: center;
     gap: var(--space-4); }
   .stepcard { flex: 1; background: var(--surface-card); border: var(--border-w) solid var(--border-subtle);
     border-radius: var(--radius-lg); padding: var(--space-8); box-shadow: var(--shadow-sm);
     display: flex; flex-direction: column; min-height: 280px; }
-  .num { width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--green-50);
-    color: var(--mti-green); font-weight: var(--fw-black); font-size: var(--fs-lead);
+  .num { width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--color-accent-soft);
+    color: var(--color-accent); font-weight: var(--fw-black); font-size: var(--fs-lead);
     display: flex; align-items: center; justify-content: center; }
   .stepcard h3 { margin-top: var(--space-5); font-size: var(--fs-h3); font-weight: var(--fw-bold);
     line-height: var(--lh-snug); }
   .stepcard p { margin-top: var(--space-3); font-size: var(--fs-small); font-weight: var(--fw-light);
     color: var(--text-secondary); line-height: var(--lh-normal); }
-  /* green chevron connector between cards */
-  .arrow { flex: 0 0 auto; color: var(--mti-green); display: flex; align-items: center; }
+  /* accent chevron connector between cards */
+  .arrow { flex: 0 0 auto; color: var(--color-accent); display: flex; align-items: center; }
   .arrow svg { width: 22px; height: 22px; }
   .foot { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
   .foot img { height: 20px; }
@@ -79,7 +79,7 @@
     </div>
 
     <div class="foot">
-      <img src="../assets/logos/mti-logo-full.svg" alt="MTI Technology">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
       <span class="pageno">13</span>
     </div>
   </div>
