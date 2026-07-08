@@ -65,7 +65,7 @@ const BRAND = {                  // theme tokens (hex, no #) — must match the 
 };
 // FONT must exactly match the family name embedded in assets/fonts/*.otf (verified via
 // `fc-scan`) — pptxgenjs/PowerPoint/LibreOffice match embedded fonts by this exact string.
-const FONT = 'Noto Sans JP';
+const FONT = 'Inter';
 
 mkdirSync(dirname(outPath), { recursive: true });
 
@@ -202,8 +202,8 @@ mkdirSync(dirname(outPath), { recursive: true });
         const zip = await JSZip.loadAsync(buf);
         const ef = new PPTXEmbedFonts();
         await ef.loadZip(zip);
-        const reg = readFileSync(join(FONT_DIR, 'NotoSansJP-Regular.otf'));
-        const bold = readFileSync(join(FONT_DIR, 'NotoSansJP-Bold.otf'));
+        const reg = readFileSync(join(FONT_DIR, 'Inter-Regular.otf'));
+        const bold = readFileSync(join(FONT_DIR, 'Inter-Bold.otf'));
         await ef.addFontFromOTF(FONT, reg.buffer.slice(reg.byteOffset, reg.byteOffset + reg.byteLength));
         await ef.addFontFromOTF(FONT, bold.buffer.slice(bold.byteOffset, bold.byteOffset + bold.byteLength));
         await ef.updateFiles();

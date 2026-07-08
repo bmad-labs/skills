@@ -62,7 +62,7 @@ function buildText(op, ctx) {
   const b = op.box;
   const textProps = {
     x: b.x, y: b.y, w: b.w, h: b.h * (op.wrap ? CJK_H_BUFFER : 1),
-    fontSize: Math.max(TEXT_MIN_PT, op.fontPt || TEXT_FALLBACK_PT), fontFace: FONT, lang: 'ja-JP',
+    fontSize: Math.max(TEXT_MIN_PT, op.fontPt || TEXT_FALLBACK_PT), fontFace: FONT, lang: 'en-US',
     color: op.color || BRAND.ink, bold: !!op.bold,
     align: op.align || 'left', valign: op.valign || 'top', margin: 0,
     wrap: !!op.wrap, fit: 'none',
