@@ -1,0 +1,6 @@
+/* ============================================================
+   slide-maker — Fonts (clean-light default)
+   Default uses the system stack (no network fetch). A design
+   system can override --font-* in its own theme file.
+   ============================================================ */
+/* No @import: system fonts only by default. */

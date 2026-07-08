@@ -1,0 +1,52 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Content + image" subtitle="Split layout: bullets left, full-bleed image right" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Content + Image</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: grid; grid-template-columns: 1.05fr 0.95fr; overflow: hidden; }
+  .left { padding: var(--slide-margin); display: flex; flex-direction: column; }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+  .rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin: var(--space-5) 0 var(--space-8); }
+  ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-5); }
+  li { display: grid; grid-template-columns: 22px 1fr; gap: var(--space-3); align-items: start;
+    font-size: var(--fs-body); line-height: var(--lh-normal); color: var(--text-secondary); }
+  li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--color-accent);
+    margin-top: 9px; }
+  li strong { color: var(--text-primary); font-weight: var(--fw-bold); }
+  .logo { margin-top: auto; height: 20px; }
+  .right { position: relative; background: var(--ink-100); }
+  .right img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .right::after { content: ""; position: absolute; inset: 0;
+    box-shadow: inset 14px 0 28px -18px rgba(34,24,21,0.4); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="left">
+      <span class="eyebrow">Background</span>
+      <h1>A focused point with supporting detail</h1>
+      <div class="rule"></div>
+      <ul>
+        <li><span><strong>First takeaway.</strong> A short clause that explains the point clearly.</span></li>
+        <li><span><strong>Second takeaway.</strong> Keep each line to one idea for easy scanning.</span></li>
+        <li><span><strong>Third takeaway.</strong> Pair concise copy with a relevant image.</span></li>
+      </ul>
+      <img class="logo" src="../assets/logos/logo-full.svg" alt="Your Brand">
+    </div>
+    <div class="right">
+      <img src="../assets/deck-media/image7.jpeg" alt="">
+    </div>
+  </div>
+</body>
+</html>

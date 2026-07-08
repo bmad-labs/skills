@@ -1,0 +1,52 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Agenda / contents" subtitle="Numbered agenda list with section titles" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agenda</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: grid; grid-template-columns: 0.9fr 1.1fr; padding: 0; overflow: hidden; }
+  .left { background: var(--color-accent); color: var(--text-inverse);
+    padding: var(--slide-margin); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+  .left::after { content: ""; position: absolute; left: var(--slide-margin); bottom: 84px;
+    width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.9);
+    box-shadow: 18px 0 0 rgba(255,255,255,0.5), 36px 0 0 rgba(255,255,255,0.28); }
+  .left .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--color-accent-soft); }
+  .left h1 { margin-top: var(--space-4); font-size: 52px; font-weight: var(--fw-black);
+    line-height: var(--lh-tight); letter-spacing: var(--ls-tight); }
+  .left .logo { height: 22px; filter: brightness(0) invert(1); align-self: flex-start; }
+  .right { padding: var(--slide-margin); display: flex; flex-direction: column; justify-content: center; gap: var(--space-6); }
+  .item { display: grid; grid-template-columns: 48px 1fr; align-items: baseline; gap: var(--space-5);
+    padding-bottom: var(--space-5); border-bottom: var(--border-w) solid var(--border-subtle); }
+  .item:last-child { border-bottom: none; }
+  .item .n { font-size: var(--fs-h2); font-weight: var(--fw-black); color: var(--color-accent); line-height: 1; }
+  .item .t { font-size: var(--fs-h3); font-weight: var(--fw-medium); }
+  .item .t small { display: block; font-size: var(--fs-small); font-weight: var(--fw-light);
+    color: var(--text-secondary); margin-top: var(--space-1); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="left">
+      <img class="logo" src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <div>
+        <span class="eyebrow">Contents</span>
+        <h1>What we'll cover today</h1>
+      </div>
+      <span></span>
+    </div>
+    <div class="right">
+      <div class="item"><div class="n">01</div><div class="t">Background &amp; context<small>Why this matters now</small></div></div>
+      <div class="item"><div class="n">02</div><div class="t">Approach<small>How we're solving it</small></div></div>
+      <div class="item"><div class="n">03</div><div class="t">Scope &amp; plan<small>What's in and out</small></div></div>
+      <div class="item"><div class="n">04</div><div class="t">Outcomes<small>Metrics and next steps</small></div></div>
+    </div>
+  </div>
+</body>
+</html>

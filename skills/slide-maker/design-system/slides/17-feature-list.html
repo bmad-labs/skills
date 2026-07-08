@@ -1,0 +1,83 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Feature list" subtitle="Icon + headline + line rows — a capabilities / what's-included list" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Feature List</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { position: relative; overflow: hidden;
+    width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: grid; grid-template-columns: 5fr 7fr; gap: var(--space-16);
+    /* extra bottom padding reserves the footer band so the content centres in the
+       space ABOVE it — without it the absolutely-positioned footer makes the slide
+       read bottom-heavy with a dead band across the top. */
+    padding: var(--slide-margin) var(--slide-margin) calc(var(--slide-margin) + 56px);
+    align-items: center; }
+  .bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .bg .blob { position: absolute; border-radius: 50%; background: var(--color-accent-soft);
+    width: 420px; height: 420px; left: -170px; bottom: -160px; }
+  .head { position: relative; z-index: 1; }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+  h1 .accent { color: var(--color-accent); }
+  .rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .lead { margin-top: var(--space-6); font-size: var(--fs-body); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); max-width: 380px; }
+  .features { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--space-6); }
+  .feature { display: flex; gap: var(--space-5); align-items: flex-start; }
+  .chip { flex: 0 0 auto; width: 48px; height: 48px; border-radius: var(--radius-md);
+    background: var(--color-accent-soft); color: var(--color-accent); display: flex; align-items: center; justify-content: center; }
+  .chip svg { width: 24px; height: 24px; }
+  .feature h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); line-height: var(--lh-snug); }
+  .feature p { margin-top: var(--space-1); font-size: var(--fs-small); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); max-width: 520px; }
+  .foot { position: absolute; left: var(--slide-margin); right: var(--slide-margin); bottom: var(--slide-margin);
+    z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg"><div class="blob"></div></div>
+
+    <div class="head">
+      <span class="eyebrow">What's included</span>
+      <h1>Everything you need to <span class="accent">ship</span></h1>
+      <div class="rule"></div>
+      <p class="lead">One partner across the whole lifecycle — no hand-offs, no gaps.</p>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <div><h3>Engineering</h3><p>Web, mobile and back-end systems built to last — discovery through delivery.</p></div>
+      </div>
+      <div class="feature">
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div>
+        <div><h3>Data &amp; AI</h3><p>Pipelines, analytics and applied ML that turn data into decisions.</p></div>
+      </div>
+      <div class="feature">
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9h-1.8A7 7 0 1 0 4 15.3"/></svg></div>
+        <div><h3>Cloud &amp; DevOps</h3><p>Resilient infrastructure, automation and observability across major clouds.</p></div>
+      </div>
+      <div class="feature">
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div><h3>Managed care</h3><p>Support and evolution so what you launch keeps compounding.</p></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <span class="pageno">17</span>
+    </div>
+  </div>
+</body>
+</html>

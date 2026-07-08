@@ -1,0 +1,43 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Closing / thank you" subtitle="Sign-off slide with contact and logo" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Closing</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--color-accent);
+    font-family: var(--font-sans); color: var(--text-inverse); position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center; padding: var(--slide-margin); }
+  .slide::before { content: ""; position: absolute; right: -140px; top: -140px;
+    width: 480px; height: 480px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+  .slide::after { content: ""; position: absolute; right: 90px; bottom: 90px;
+    width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.9);
+    box-shadow: -22px 0 0 rgba(255,255,255,0.55), -44px 0 0 rgba(255,255,255,0.3); }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent-soft); }
+  h1 { margin-top: var(--space-4); font-size: 76px; font-weight: var(--fw-black);
+    line-height: var(--lh-tight); letter-spacing: var(--ls-tight); }
+  .contact { margin-top: var(--space-10); display: flex; gap: var(--space-12); z-index: 1; }
+  .contact div span { display: block; font-size: var(--fs-footnote); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: rgba(255,255,255,0.7); font-weight: var(--fw-bold); margin-bottom: 4px; }
+  .contact div { font-size: var(--fs-body); font-weight: var(--fw-medium); }
+  .logo { position: absolute; top: var(--slide-margin); left: var(--slide-margin);
+    height: 24px; filter: brightness(0) invert(1); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <img class="logo" src="../assets/logos/logo-full.svg" alt="Your Brand">
+    <span class="eyebrow">Thank you</span>
+    <h1>Let's build it<br>together.</h1>
+    <div class="contact">
+      <div><span>Email</span>hello@yourbrand.com</div>
+      <div><span>Web</span>yourbrand.com</div>
+      <div><span>Offices</span>City One · City Two</div>
+    </div>
+  </div>
+</body>
+</html>
