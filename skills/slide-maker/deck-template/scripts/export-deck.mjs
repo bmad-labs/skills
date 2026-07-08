@@ -307,7 +307,7 @@ async function exportPptxEditable(page, total) {
         text: r.text,
         // fontFace must exactly match the family name embedded in assets/fonts/*.otf
         // (verified via `fc-scan`) — PowerPoint/LibreOffice match embedded fonts by this string.
-        options: { color: r.color, bold: r.bold, fontFace: 'Noto Sans JP' },
+        options: { color: r.color, bold: r.bold, fontFace: 'Inter' },
       }));
       const opts = {
         x: IN(t.x), y: INy(t.y), w: Math.max(IN(t.w), 0.5),
