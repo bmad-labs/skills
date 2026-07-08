@@ -8,11 +8,11 @@
    to localhost. This tiny server listens on a port; when a bridge is configured,
    edit-mode's "Copy for AI" button POSTs the whole batch (comments + snip PNGs as
    base64) here, and the bridge writes `edit-feedback.json` + `snip-N.png` to
-   /tmp/mti-slide-edit/ instantly. Then the user just says "read the feedback" — the AI
+   /tmp/slide-maker-edit/ instantly. Then the user just says "read the feedback" — the AI
    reads the JSON + images by absolute path. No download, no manual move, no paste.
 
    USAGE
-     node feedback-bridge.mjs [--port 8930] [--dir /tmp/mti-slide-edit]
+     node feedback-bridge.mjs [--port 8930] [--dir /tmp/slide-maker-edit]
    Then load edit-mode with:  EditMode.init({ bridge: 'http://localhost:8930' })
    "Copy for AI" then copies the markdown AND saves the files here. If the bridge
    isn't running, "Copy for AI" silently falls back to a normal clipboard copy.
@@ -27,7 +27,7 @@ import { join } from 'node:path';
 const args = process.argv.slice(2);
 const val = (f, d) => { const i = args.indexOf(f); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 const port = +val('--port', 8930);
-const dir = val('--dir', '/tmp/mti-slide-edit');
+const dir = val('--dir', '/tmp/slide-maker-edit');
 mkdirSync(dir, { recursive: true });
 
 const server = createServer((req, res) => {
@@ -36,7 +36,7 @@ const server = createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
-  if (req.method === 'GET') { res.writeHead(200, { 'Content-Type': 'text/plain' }); return res.end('mti-slide feedback-bridge up\n'); }
+  if (req.method === 'GET') { res.writeHead(200, { 'Content-Type': 'text/plain' }); return res.end('slide-maker feedback-bridge up\n'); }
   if (req.method !== 'POST') { res.writeHead(405); return res.end(); }
 
   let body = '';
@@ -96,7 +96,7 @@ const server = createServer((req, res) => {
 process.on('uncaughtException', (e) => console.error('bridge error (kept alive):', e.message));
 
 server.listen(port, () => {
-  console.log(`mti-slide feedback-bridge listening on http://localhost:${port}  →  writes to ${dir}`);
+  console.log(`slide-maker feedback-bridge listening on http://localhost:${port}  →  writes to ${dir}`);
   console.log(`load edit-mode with:  EditMode.init({ bridge: 'http://localhost:${port}' })`);
   console.log(`then click "Copy for AI". Tell the assistant: "read ${join(dir, 'edit-feedback.json')}".`);
 });

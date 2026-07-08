@@ -20,12 +20,12 @@
                               [--mode highlight|clean|both]   (default: both)
                               [--all]                          (target every tagged el)
                               [--comment "text"]               (also author a feedback comment)
-                              [--out /tmp/mti-slide-inspect]
+                              [--out /tmp/slide-maker-inspect]
    OUTPUT (in --out)
      geometry.json                 [{id,x,y,w,h}, …] for the targeted elements
      slide-NN-highlight.png        capture WITH the id boxes drawn
      slide-NN-clean.png            capture WITHOUT overlay (the real visual)
-     edit-feedback.json + snip.png (only with --comment — the mti-slide/edit-feedback@1 batch)
+     edit-feedback.json + snip.png (only with --comment — the slide-maker/edit-feedback@1 batch)
    ============================================================================ */
 
 import { fileURLToPath } from 'node:url';
@@ -49,7 +49,7 @@ const idsArg = flag('--ids', null);
 const mode = flag('--mode', 'both');          // highlight | clean | both
 const allEls = has('--all');
 const commentText = flag('--comment', null);
-const outDir = flag('--out', '/tmp/mti-slide-inspect');
+const outDir = flag('--out', '/tmp/slide-maker-inspect');
 mkdirSync(outDir, { recursive: true });
 const { dep } = makeDeckRequire(deckDir);
 const pad = (n) => String(n).padStart(2, '0');

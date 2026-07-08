@@ -38,7 +38,7 @@
 
    FEEDBACK BACK TO THE AI — "Copy for AI":
    - With a bridge (scripts/feedback-bridge.mjs on :8930): POSTs the batch + snip
-     PNGs; the bridge writes /tmp/mti-slide-edit/edit-feedback.json + snip-N.png.
+     PNGs; the bridge writes /tmp/slide-maker-edit/edit-feedback.json + snip-N.png.
      Say "read the feedback" and the AI reads them by absolute path.
    - Without a bridge: copies human-readable markdown to the clipboard (snips not
      included). "Download" saves edit-feedback.json + snip-N.png to ~/Downloads.
@@ -56,7 +56,7 @@
   // one. The App loader also guards, but this makes the module self-protecting.
   if (global.EditMode) return;
 
-  const SCHEMA = 'mti-slide/edit-feedback@1';
+  const SCHEMA = 'slide-maker/edit-feedback@1';
 
   const state = {
     on: false,
@@ -66,7 +66,7 @@
     comments: [],               // [{ id, kind, targetIds[], relatedIds[], comment, screenshot?, rect? }]
     selection: [],              // in-progress multi-select: [{ id }]
     bridge: null,               // e.g. 'http://localhost:8930'
-    imageDir: '/tmp/mti-slide-edit',
+    imageDir: '/tmp/slide-maker-edit',
     nextId: 1,
   };
 
@@ -370,7 +370,7 @@
       if (w < MINW) { x -= (MINW - w) / 2; w = MINW; }
       if (h < MINW) { y -= (MINW - h) / 2; h = MINW; }
       if (w < 1 || h < 1) return;
-      // `is-inspect` → ORANGE styling, distinct from the MTI green palette so an
+      // `is-inspect` → ORANGE styling, distinct from the theme accent palette so an
       // agent inspection box is never confused with actual slide content.
       const rect = svgEl('rect');
       rect.setAttribute('class', 'em-rect is-inspect');
@@ -607,7 +607,7 @@
     }
     const ctx = brushCanvas.getContext('2d');
     ctx.clearRect(0, 0, brushCanvas.width, brushCanvas.height);
-    ctx.strokeStyle = '#FF6A00'; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);   // orange — off MTI palette
+    ctx.strokeStyle = '#FF6A00'; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);   // orange — off theme palette
     ctx.beginPath();
     drag.points.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
     ctx.stroke();
@@ -659,7 +659,7 @@
       root.style.visibility = 'hidden';
       let canvas;
       try {
-        // Speed: skipFonts avoids re-embedding Noto Sans JP on every snip (the bulk
+        // Speed: skipFonts avoids re-embedding the display font on every snip (the bulk
         // of the cost — the snip is a reference image, web-font fidelity isn't
         // critical); pixelRatio 1 + no cacheBust keep it light.
         canvas = await h2i.toCanvas(document.body, {
@@ -794,7 +794,7 @@
     };
   }
   function batchToMarkdown(batch) {
-    const dir = (batch.imageDir || '/tmp/mti-slide-edit').replace(/\/$/, '');
+    const dir = (batch.imageDir || '/tmp/slide-maker-edit').replace(/\/$/, '');
     const shots = batch.comments.filter((c) => c.screenshotFile);
     let md = `# Slide edit feedback\n\n${batch.comments.length} comment(s) · ${batch.capturedAt}\n\n`;
     // If any comment carries a snip, tell the agent up front to actually open the
@@ -938,7 +938,7 @@
 
     // ─── Agent comment authoring ───────────────────────────────────────────────
     // The programmatic equivalent of a human selecting + commenting. Lets an agent
-    // build the SAME mti-slide/edit-feedback@1 batch the human "Copy for AI" flow
+    // build the SAME slide-maker/edit-feedback@1 batch the human "Copy for AI" flow
     // produces, headlessly. Reuses the same capture + batch machinery.
     //
     //   await EditMode.addComment({ ids: ['s0.kpi.value'], text: 'make this bigger' })
@@ -977,7 +977,7 @@
     },
     listComments() { return state.comments.slice(); },
     clearComments() { state.comments = []; if (root) renderList(); return EditMode; },
-    // The full batch the bridge/Copy-for-AI would emit (mti-slide/edit-feedback@1).
+    // The full batch the bridge/Copy-for-AI would emit (slide-maker/edit-feedback@1).
     // includeImages=false strips the base64 dataURLs (smaller payload to read back).
     getFeedback(includeImages = true) {
       const batch = buildBatch();

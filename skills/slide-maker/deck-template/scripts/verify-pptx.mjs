@@ -37,7 +37,7 @@ mkdirSync(outDir, { recursive: true });
 // LibreOffice (homebrew on macOS) fails to WRITE into the project tree
 // (Io Write Code:16) but writes fine under /tmp — so always convert into a /tmp
 // workdir with a dedicated UserInstallation profile, then the caller copies out.
-const LO_TMP = join('/tmp', 'mti-lo-verify');
+const LO_TMP = join('/tmp', 'slide-maker-lo-verify');
 function soffice(convertTo, input) {
   mkdirSync(LO_TMP, { recursive: true });
   execFileSync(SOFFICE, [

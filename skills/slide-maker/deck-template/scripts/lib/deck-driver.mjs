@@ -1,5 +1,5 @@
 /* ============================================================================
-   deck-driver.mjs — shared headless rendering plumbing for the MTI deck.
+   deck-driver.mjs — shared headless rendering plumbing for the deck.
 
    Used by both scripts/export-deck.mjs (HTML/PDF/PPTX) and scripts/shoot-slides.mjs
    (visual-review PNGs). Built on Playwright Chromium — one launch path, no

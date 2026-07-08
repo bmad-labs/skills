@@ -46,7 +46,7 @@ const DIR = { source: join(VERIFY, 'source'), slides: join(VERIFY, 'slides'), di
 const ACK_PATH = resolve(flag('--acks', join(VERIFY, 'pptx-acknowledgements.json')));
 const OPS_PATH = join(DECK, 'export', 'ops.json');
 const REPORT_PATH = join(VERIFY, 'deck-report.json');
-const LO_TMP = '/tmp/mti-validate';
+const LO_TMP = '/tmp/slide-maker-validate';
 const pad2 = (n) => String(n).padStart(2, '0');
 const SOFFICE = ['/opt/homebrew/bin/soffice', '/usr/bin/soffice', '/Applications/LibreOffice.app/Contents/MacOS/soffice'].find((p) => existsSync(p)) || 'soffice';
 const today = flag('--date', '');   // pass a date in (no Date.now in some envs); else 'recorded'

@@ -15,7 +15,7 @@
 //
 // The brand allowlists are loaded from the skill's own source of truth at runtime
 // (design-system/tokens/colors.css for hex; references/tailwind-theme.md for the
-// MTI_SERIES chart palette), so this script never drifts from the design system.
+// chart series palette), so this script never drifts from the design system.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -43,7 +43,7 @@ function loadAllowedHex() {
     }
     if (found) break;
   }
-  // 2) clone fallback: read every hex from the deck's tailwind.config.js (the MTI theme)
+  // 2) clone fallback: read every hex from the deck's tailwind.config.js (the theme)
   if (!found) {
     try {
       const tw = readFileSync(resolve(DECK, 'tailwind.config.js'), 'utf8');
@@ -54,19 +54,21 @@ function loadAllowedHex() {
 }
 
 function loadSeries() {
-  // MTI_SERIES from tailwind-theme.md — the only hex allowed inside chart/SVG code
-  // on top of the token hexes (they overlap, but keep this explicit for clarity).
+  // the chart series palette from tailwind-theme.md — the only hex allowed inside
+  // chart/SVG code on top of the token hexes (they overlap, but keep this explicit
+  // for clarity). Match any `..._SERIES` / `SERIES` export name so this keeps working
+  // whichever naming the reference doc currently uses.
   const chrome = ['#E6E2DD', '#E7F6EC'];
   try {
     const md = readFileSync(resolve(SKILL, 'references/tailwind-theme.md'), 'utf8');
-    const m = md.match(/MTI_SERIES\s*=\s*\[([^\]]+)\]/);
+    const m = md.match(/\b\w*SERIES\s*=\s*\[([^\]]+)\]/);
     if (m) {
       const hexes = [...m[1].matchAll(/#[0-9a-fA-F]{3,8}/g)].map(x => x[0].toUpperCase());
       return new Set([...hexes, ...chrome.map(c => c.toUpperCase())]);
     }
   } catch { /* fall through */ }
   return new Set([...chrome.map(c => c.toUpperCase()),
-    '#00A73B', '#0070C0', '#FABE00', '#ABA6A1', '#8FD8A8', '#6B6661']);
+    '#4F46E5', '#0EA5E9', '#64748B', '#94A3B8', '#334155', '#A5B4FC']);
 }
 
 const ALLOWED_HEX = loadAllowedHex();
@@ -75,7 +77,7 @@ const SERIES_HEX = loadSeries();
 // ---------- helpers ----------
 
 const FORBIDDEN_FONTS = /\b(Sora|DM Sans|Inter|Roboto|Helvetica|Times New Roman|Comic Sans|Montserrat|Poppins|Lato)\b/gi;
-// Tailwind built-in color palettes — using these means the agent reached past the MTI theme.
+// Tailwind built-in color palettes — using these means the agent reached past the theme.
 const GENERIC_TW = /\b(?:text|bg|border|from|to|via|ring|fill|stroke)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-(?:50|[1-9]00|950)\b/;
 
 function lineOf(text, index) { return text.slice(0, index).split('\n').length; }
@@ -150,9 +152,9 @@ function checkFile(file) {
         // inside a chart: must be a series or chrome color
         if (SERIES_HEX.has(hex) || SERIES_HEX.has(long)) continue;
         err(lineOf(src, m.index), `off-palette chart color ${m[0]}`,
-            'use a color from MTI_SERIES (tailwind-theme.md) + #E6E2DD/#E7F6EC chrome');
+            'use a color from the chart series palette (tailwind-theme.md) + #E6E2DD/#E7F6EC chrome');
       } else {
-        err(lineOf(src, m.index), `raw hex ${m[0]} (MTI uses tokens, not literal hex)`,
+        err(lineOf(src, m.index), `raw hex ${m[0]} (use tokens, not literal hex)`,
             'replace with a var(--*) token (HTML) or a mapped class (JSX) — see tailwind-theme.md');
       }
     }
@@ -163,20 +165,20 @@ function checkFile(file) {
     const lineStart = src.lastIndexOf('\n', m.index) + 1;
     const lineEnd = src.indexOf('\n', m.index);
     const line = src.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
-    // allow it only if it's clearly a fallback inside the Noto stack — i.e. preceded
-    // by "Noto Sans JP" earlier on the same line (our --font-sans has Arial fallback).
-    if (/Noto Sans JP/i.test(line)) continue;            // fallback in the brand stack — fine
+    // allow it only if it's clearly a fallback inside the display stack — i.e. preceded
+    // by the display font name earlier on the same line (our --font-sans has its own fallback).
+    if (/the display font/i.test(line)) continue;         // fallback in the display stack — fine
     // only flag in a FONT context (a font declaration or a Google-Fonts import) — not
     // when the word merely appears in displayed copy ("Inter-service transport", "Lato
-    // America", "internal"). A real off-brand font shows up next to font/@import/fonts.google.
+    // America", "internal"). A real off-theme font shows up next to font/@import/fonts.google.
     if (!/font|@import|fonts\.google|typeface|@font-face/i.test(line)) continue;
-    err(lineOf(src, m.index), `off-brand font "${m[0]}" (MTI is Noto Sans JP only)`,
-        'use font-display / --font-sans (Noto Sans JP)');
+    err(lineOf(src, m.index), `off-theme font "${m[0]}" (use the deck's display font only)`,
+        'use font-display / --font-sans (the deck display font)');
   }
 
   // --- ERROR: generic Tailwind color utility ---
   for (const m of src.matchAll(new RegExp(GENERIC_TW, 'g'))) {
-    err(lineOf(src, m.index), `generic Tailwind color "${m[0]}" bypasses the MTI theme`,
+    err(lineOf(src, m.index), `generic Tailwind color "${m[0]}" bypasses the theme`,
         'use primary-* / accent-* / ink-* / text-text-* / bg-bg-* from tailwind-theme.md');
   }
 
@@ -186,7 +188,7 @@ function checkFile(file) {
   // class shows up as a `.glass{...}` rule, a `class="... glass ..."` attr, or backdrop-filter.
   const glassRe = /\.glass\b(?!-light)|class\s*=\s*["'][^"']*\bglass\b(?!-light)[^"']*["']|backdrop-filter\s*:/g;
   for (const m of src.matchAll(glassRe)) {
-    err(lineOf(src, m.index), 'dark `glass` class is off-brand on a light MTI deck',
+    err(lineOf(src, m.index), 'dark `glass` class is off-brand on a light deck',
         'use bg-bg-card border border-border-subtle shadow-sm; glass-light only over a photo');
   }
 
@@ -246,7 +248,7 @@ function checkFile(file) {
                   /\brounded-pill\b[\s\S]{0,40}\bbg-primary-500\b/.test(src) ||
                   /\bbg-primary-500\b[\s\S]{0,40}\brounded-pill\b/.test(src) ||
                   /class="[^"]*\brule\b/.test(src) ||
-                  /\bmti-rule\b/.test(src) || /<AccentRule\b/.test(src);   // deck-template rule component
+                  /\baccent-rule\b/.test(src) || /<AccentRule\b/.test(src);   // deck-template rule component
   // agenda carries brand via a full green rail; comparison goes title→columns by
   // design. Both are intentionally rule-less heads — exempt them.
   const exemptRhythm = /cover|closing|quote|divider|agenda|comparison/i.test(file);
@@ -256,19 +258,19 @@ function checkFile(file) {
          'add the missing element — see wow-guide.md §7');
   }
 
-  // --- WARN: yellow misuse (large fill or text color) ---
-  for (const m of src.matchAll(/\bbg-mti-yellow\b|\bbg-accent-500\b|background:\s*var\(--mti-yellow\)|background:\s*var\(--yellow-500\)/g)) {
+  // --- WARN: accent misuse (large fill or text color) ---
+  for (const m of src.matchAll(/\bbg-accent-500\b|background:\s*var\(--color-accent\)|background:\s*var\(--yellow-500\)/g)) {
     // a small dot uses width/height ~12px or rounded-pill nearby — heuristic: flag if
     // the same element looks full-bleed (inset-0 / w-full / 100%).
     const ctx = src.slice(Math.max(0, m.index - 120), m.index + 120);
     if (/inset-0|w-full|width:\s*100%|height:\s*100%/.test(ctx)) {
-      warn(lineOf(src, m.index), 'yellow used as a large fill — yellow is a dot/highlight only',
-           'use green/ink for fills; keep yellow to the small dot-trail or one highlight');
+      warn(lineOf(src, m.index), 'accent color used as a large fill — accent is a dot/highlight only',
+           'use ink/neutral for fills; keep the accent to the small dot-trail or one highlight');
     }
   }
-  for (const m of src.matchAll(/\btext-mti-yellow\b|\btext-accent-500\b|color:\s*var\(--mti-yellow\)/g)) {
-    warn(lineOf(src, m.index), 'yellow used as a text color — low contrast, off-brand',
-         'use text-primary-500 (green) or ink for text');
+  for (const m of src.matchAll(/\btext-accent-500\b|color:\s*var\(--color-accent\)/g)) {
+    warn(lineOf(src, m.index), 'accent used as a text color — low contrast, off-brand',
+         'use text-primary-500 or ink for text');
   }
 
   // --- WARN: image overload ---

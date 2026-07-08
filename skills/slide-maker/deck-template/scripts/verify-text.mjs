@@ -16,7 +16,7 @@
 
    USAGE
      node scripts/verify-text.mjs --ref source.png --rendered lo-render.png
-          --geometry /tmp/mti-slide-inspect/geometry.json
+          --geometry /tmp/slide-maker-inspect/geometry.json
           [--pos-tol 4] [--size-tol 3] [--json out.json]
    Exit non-zero if any element drifts beyond tolerance.
    ============================================================================ */
@@ -31,7 +31,7 @@ const args = process.argv.slice(2);
 const flag = (f, d) => { const i = args.indexOf(f); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 const refPath = resolve(flag('--ref', ''));
 const renPath = resolve(flag('--rendered', ''));
-const geoPath = flag('--geometry', '/tmp/mti-slide-inspect/geometry.json');
+const geoPath = flag('--geometry', '/tmp/slide-maker-inspect/geometry.json');
 const posTol = +flag('--pos-tol', '4');
 const sizeTol = +flag('--size-tol', '5');   // ±5px ink height ≈ one wrap line on a long body
 const jsonPath = flag('--json', null);

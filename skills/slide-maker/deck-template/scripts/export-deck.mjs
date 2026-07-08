@@ -110,8 +110,8 @@ async function exportPptxImage(page, total) {
   const PptxGenJS = (await dep('pptxgenjs')).default;
   const shots = await shootSlides(page, total);
   const pptx = new PptxGenJS();
-  pptx.defineLayout({ name: 'MTI16x9', width: 13.333, height: 7.5 });
-  pptx.layout = 'MTI16x9';
+  pptx.defineLayout({ name: 'SLIDE16x9', width: 13.333, height: 7.5 });
+  pptx.layout = 'SLIDE16x9';
   for (const png of shots) {
     const slide = pptx.addSlide();
     slide.addImage({ data: 'data:image/png;base64,' + png.toString('base64'), x: 0, y: 0, w: 13.333, h: 7.5 });
@@ -135,8 +135,8 @@ async function exportPptxImage(page, total) {
 async function exportPptxEditable(page, total) {
   const PptxGenJS = (await dep('pptxgenjs')).default;
   const pptx = new PptxGenJS();
-  pptx.defineLayout({ name: 'MTI16x9', width: 13.333, height: 7.5 });
-  pptx.layout = 'MTI16x9';
+  pptx.defineLayout({ name: 'SLIDE16x9', width: 13.333, height: 7.5 });
+  pptx.layout = 'SLIDE16x9';
 
   for (let i = 0; i < total; i++) {
     await gotoSlide(page, i);
@@ -256,7 +256,7 @@ async function exportPptxEditable(page, total) {
         // text: build a RUN ARRAY so an inline accent keeps ONE textbox.
         if (ownsText(n)) {
           // keep inter-word spaces (text " " between runs); drop only empty strings
-          const runs = collectRuns(n, toHex(cs.color) || '221815', +cs.fontWeight >= 600)
+          const runs = collectRuns(n, toHex(cs.color) || '0F172A', +cs.fontWeight >= 600)
             .filter((r) => r.text.length > 0);
           if (runs.length && runs.some((r) => r.text.trim())) {
             const lh = parseFloat(cs.lineHeight), fsPx = parseFloat(cs.fontSize);
@@ -305,11 +305,13 @@ async function exportPptxEditable(page, total) {
       // fresh objects per call (pptxgenjs mutates option objects in place)
       const runObjs = t.runs.map((r) => ({
         text: r.text,
+        // fontFace must exactly match the family name embedded in assets/fonts/*.otf
+        // (verified via `fc-scan`) — PowerPoint/LibreOffice match embedded fonts by this string.
         options: { color: r.color, bold: r.bold, fontFace: 'Noto Sans JP' },
       }));
       const opts = {
         x: IN(t.x), y: INy(t.y), w: Math.max(IN(t.w), 0.5),
-        // give a little vertical headroom — PPTX/LibreOffice wrap Noto Sans JP slightly
+        // give a little vertical headroom — PPTX/LibreOffice wrap the display font slightly
         // wider than Chrome, so a box sized to the exact browser height can overflow.
         h: Math.max(INy(t.h) + 0.12, 0.2),
         fontSize: Math.max(8, Math.round(t.fs * 0.75)),   // px → pt (exact at 96dpi)

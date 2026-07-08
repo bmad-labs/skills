@@ -2,7 +2,7 @@
    dom-walk.browser.js — BROWSER-SIDE slide measurement + serialization.
 
    Injected into the page (via addScriptTag) by export-pptx-jsx.mjs, this defines
-   window.__mtiWalk(): it measures the active slide's DOM and returns a typed
+   window.__slideWalk(): it measures the active slide's DOM and returns a typed
    { layout, ops } array that the Node side turns into pptxgenjs nodes. Runs in the
    browser only — no Node imports, no outer-scope closures. Mirrors the IIFE-inject
    pattern the exporter already uses for the pptxgenjs-jsx bundle.
@@ -11,7 +11,7 @@
    ============================================================================ */
 (function () {
   'use strict';
-  window.__mtiWalk = async () => {
+  window.__slideWalk = async () => {
       const AK = window.ArtifactKitPptxGenJsx;
       if (!AK) throw new Error('ArtifactKitPptxGenJsx global not found after IIFE inject');
       const { readSlideLayout } = AK;
@@ -75,7 +75,7 @@
       // ── named browser-side constants (kept in-page — can't cross the evaluate
       //    boundary, so they're declared here rather than reusing Node-side ones) ──
       const BORDER_W_FRAC = 0.75;        // CSS px border → pt (×0.75) for the line width
-      const TEXT_INK = '221815';         // default text colour when none measured
+      const TEXT_INK = '0F172A';         // default text colour when none measured
       const FONT_FALLBACK_PX = 16;       // px when fontSize can't be parsed
       const DEFAULT_LH_FRAC = 1.2;       // line-height fallback = 1.2 × font-size
       const GLYPH_W_FRAC = 0.5;          // rough average glyph width (× font-size) for wrap test
@@ -377,7 +377,7 @@
             cells.push({
               text: txt,
               bold: parseInt(ccs.fontWeight, 10) >= 600 || cell.tagName === 'TH',
-              color: rgbHex(ccs.color) || '221815',
+              color: rgbHex(ccs.color) || '0F172A',
               fill: rgbHex(ccs.backgroundColor) || trBg,  // fall back to the row's stripe colour
               align: ccs.textAlign === 'center' ? 'center' : ccs.textAlign === 'right' ? 'right' : 'left',
               fontPt: ((parseFloat(ccs.fontSize) || 14) * 72) / 96,
