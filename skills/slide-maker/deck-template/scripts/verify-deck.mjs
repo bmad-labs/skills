@@ -193,13 +193,13 @@ function topDiffRegions(A, B, pixelmatch, PNG, grid = 32) {
 
         // MULTI-RUN COLOUR check — SOURCE-DRIVEN so it catches a flattened accent even
         // when the export drops the run info from its ops. For each accent colour the op
-        // declares (the brand colours it COULD contain), measure that colour's coverage
+        // declares (the accent colours it COULD contain), measure that colour's coverage
         // in the SOURCE text box; if the source clearly has it, the render must too. This
-        // way "source is green here, render is black" fails regardless of what the ops say.
-        // Always probe the brand green (the common accent) plus any op-declared run colour.
-        const baseC = (op.color || '221815').toLowerCase();
+        // way "source is accented here, render is flat" fails regardless of what the ops say.
+        // Always probe the theme accent (the common accent) plus any op-declared run colour.
+        const baseC = (op.color || '0F172A').toLowerCase();
         const declared = (op.runs || []).map((r) => (r.color || '').toLowerCase());
-        const accents = [...new Set([...declared, '00a73b'].filter((c) => c && c !== baseC))];
+        const accents = [...new Set([...declared, '4f46e5'].filter((c) => c && c !== baseC))];
         for (const hex of accents) {
           const tgt = hex2rgb(hex);
           const srcCov = colourCoverage(A, bx - 3, by - vpad, bw + 6, bh + 2 * vpad, tgt);

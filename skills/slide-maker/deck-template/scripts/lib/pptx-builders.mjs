@@ -126,7 +126,7 @@ function buildTable(op, ctx) {
       text: c.text,
       options: {
         fontFace: FONT, fontSize: Math.max(CELL_MIN_PT, c.fontPt || CELL_FALLBACK_PT), bold: !!c.bold,
-        color: c.color || '221815', align: c.align || 'left', valign: 'middle',
+        color: c.color || '0F172A', align: c.align || 'left', valign: 'middle',
         // header cells go transparent when we draw a rounded shape behind them
         fill: (hr && r === 0) ? undefined : (c.fill ? { color: c.fill } : undefined),
         ...(c.charSpacing ? { charSpacing: c.charSpacing } : {}),

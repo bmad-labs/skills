@@ -1,23 +1,23 @@
 /* edit-mode.css — visual feedback overlay for slide decks (edit-mode.js).
-   MTI-themed (green accent, ink panels) so the authoring tool looks on-brand,
-   but kept in its own `--em-*` vars so it never collides with the deck's design.
+   Neutral-themed (indigo accent, dark ink panels) so the authoring tool reads as a
+   dev tool, but kept in its own `--em-*` vars so it never collides with the deck's design.
 
    Layout: a top TOOLBAR (view switch + tools + close), a side COMMENT PANEL, a
    full-viewport SVG OVERLAY that draws hover/expert rects + id badges, a transient
    SNIP/MARQUEE rect + BRUSH canvas, and an inline comment POPUP for ctrl/⌘+click.
    DOM-only — no 3D. */
 :root {
-  --em-accent: #00A73B;   /* MTI green */
-  --em-accent-2: #007A2B; /* deep green */
-  --em-warn: #FABE00;     /* MTI yellow */
-  --em-bg: #221815;       /* MTI ink */
-  --em-panel: #2E2A27;
-  --em-border: #46413D;
-  --em-text: #F2F0ED;
-  --em-muted: #ABA6A1;
-  --em-select: #00B050;   /* selection accent (bright green) */
+  --em-accent: #4F46E5;   /* accent */
+  --em-accent-2: #4338CA; /* deep accent */
+  --em-warn: #D97706;     /* warning */
+  --em-bg: #0F172A;       /* dark surface */
+  --em-panel: #1E293B;
+  --em-border: #334155;
+  --em-text: #F8FAFC;
+  --em-muted: #94A3B8;
+  --em-select: #6366F1;   /* selection accent */
   --em-inspect: #FF6A00;  /* agent inspection accent — ORANGE, deliberately OUTSIDE
-                             the MTI palette so inspection boxes never read as content */
+                             the theme palette so inspection boxes never read as content */
 }
 
 /* CRITICAL: our panels set `display:flex` on a class, which OVERRIDES the UA
@@ -35,7 +35,7 @@ body.em-active.em-tool-select [data-viz-id] { cursor: crosshair; }
 body.em-active.em-tool-brush,
 body.em-active.em-tool-brush [data-viz-id] { cursor: cell; }
 
-.em-root { position: fixed; z-index: 2147483000; font: 13px/1.4 -apple-system, "Noto Sans JP", Segoe UI, Roboto, sans-serif; }
+.em-root { position: fixed; z-index: 2147483000; font: 13px/1.4 -apple-system, "Segoe UI", Roboto, sans-serif; }
 
 /* -------------------------------------------------------------- floating FAB */
 .em-fab {
@@ -114,9 +114,9 @@ body.em-active.em-tool-brush [data-viz-id] { cursor: cell; }
 
 /* -------------------------------------------------------------- SVG overlay
    ALL boxes drawn ON the slide (hover, selection, multi-select, agent inspect) use
-   the OFF-PALETTE orange (--em-inspect) so they stand out from MTI green/yellow/ink
-   content and never read as part of the design. (The toolbar/panel chrome stays
-   green — it sits on dark ink, away from the slide.) */
+   the OFF-PALETTE orange (--em-inspect) so they stand out from the deck's accent/
+   warning/ink content and never read as part of the design. (The toolbar/panel
+   chrome stays accent-colored — it sits on the dark surface, away from the slide.) */
 .em-overlay { position: fixed; inset: 0; z-index: 2147482998; pointer-events: none; }
 .em-rect { fill: rgba(255,106,0,.06); stroke: var(--em-inspect); stroke-width: 1; stroke-dasharray: 4 3; }
 .em-rect.is-hover { fill: rgba(255,106,0,.12); stroke-width: 2; stroke-dasharray: none; }

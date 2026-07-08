@@ -9,12 +9,12 @@
    spawns `npm run dev` for you (in the deckDir).
 
    USAGE
-     node serve.mjs [deckDir] [--dev] [--port 8930] [--dir /tmp/mti-slide-edit]
+     node serve.mjs [deckDir] [--dev] [--port 8930] [--dir /tmp/slide-maker-edit]
 
    edit-mode is already wired in the deck to EditMode.init({ bridge:
    'http://localhost:8930' }), so once this is up, "Copy for AI" writes
    edit-feedback.json + snip-N.png to the feedback dir. Tell the assistant:
-   "read /tmp/mti-slide-edit/edit-feedback.json".
+   "read /tmp/slide-maker-edit/edit-feedback.json".
    ============================================================================ */
 
 import { spawn } from 'node:child_process';
@@ -28,7 +28,7 @@ const positional = args.find((a) => !a.startsWith('--'));
 // scripts live in <deck>/scripts/, so the deck root is the parent.
 const deckDir = resolve(positional || resolve(HERE, '..'));
 const port = flag('--port', '8930');
-const dir = flag('--dir', '/tmp/mti-slide-edit');
+const dir = flag('--dir', '/tmp/slide-maker-edit');
 const withDev = args.includes('--dev');
 
 const procs = [];
@@ -42,7 +42,7 @@ function shutdown() { procs.forEach((p) => { try { p.kill(); } catch (_) {} }); 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
-console.log(`mti-slide serve:`);
+console.log(`slide-maker serve:`);
 console.log(`  feedback-bridge → http://localhost:${port}  (writes ${dir})`);
 run('node', [resolve(HERE, 'feedback-bridge.mjs'), '--port', port, '--dir', dir]);
 

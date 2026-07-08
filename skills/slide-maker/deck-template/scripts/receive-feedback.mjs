@@ -6,7 +6,7 @@
    Edit-mode runs in the browser, which is sandboxed and CANNOT write to disk — it
    can only *download* files (to ~/Downloads by default). So the snip screenshots
    live as `snip-N.png` in Downloads, and the exported JSON/markdown references them
-   by an absolute `imagePath` (default `/tmp/mti-slide-edit/snip-N.png`). This script moves
+   by an absolute `imagePath` (default `/tmp/slide-maker-edit/snip-N.png`). This script moves
    the downloaded `edit-feedback.json` + `snip-*.png` to that `imageDir`, so the AI
    can read each image by the exact path the feedback names. Run it once after the
    user clicks "Download" in edit-mode.
@@ -14,7 +14,7 @@
    USAGE
      node receive-feedback.mjs [downloadsDir] [--json edit-feedback.json]
    - downloadsDir defaults to ~/Downloads.
-   - Reads imageDir from the JSON (falls back to /tmp/mti-slide-edit), creates it, and
+   - Reads imageDir from the JSON (falls back to /tmp/slide-maker-edit), creates it, and
      moves edit-feedback.json + every snip-*.png there. Prints the absolute paths.
 
    No dependencies beyond Node.
@@ -35,7 +35,7 @@ if (!existsSync(jsonPath)) {
 }
 
 const batch = JSON.parse(readFileSync(jsonPath, 'utf8'));
-const imageDir = batch.imageDir || '/tmp/mti-slide-edit';
+const imageDir = batch.imageDir || '/tmp/slide-maker-edit';
 mkdirSync(imageDir, { recursive: true });
 
 const move = (from, to) => { try { renameSync(from, to); } catch { copyFileSync(from, to); } };

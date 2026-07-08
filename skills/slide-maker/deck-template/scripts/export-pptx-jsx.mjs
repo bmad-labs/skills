@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* ============================================================================
    export-pptx-jsx.mjs — high-fidelity EDITABLE PPTX export via @artifact-kit/
-   pptxgenjs-jsx measure-contract + Noto Sans JP embedding.
+   pptxgenjs-jsx measure-contract + display-font embedding.
 
    Pipeline (per the research in docs/research/pptx-export-*):
      1. build standalone deck, serve, open slide N (Playwright), strip edit-mode/nav
@@ -11,7 +11,7 @@
      4. author the <Deck> tree by id-convention → native Text / RoundRect / Line /
         BarChart / Table objects, using readPptBox()/readFontPt()
      5. validateDeck() → renderPptx() → base64 → Node writes deck.pptx
-     6. post-process: embed Noto Sans JP (pptx-embed-fonts) into the .pptx zip
+     6. post-process: embed the display font (pptx-embed-fonts) into the .pptx zip
 
    SPIKE SCOPE: slide 1 (company-intro) — eyebrow/title/rule/3 cards/footer.
    Generalizes later to chart + all slides.
@@ -46,7 +46,7 @@ const outPath = resolve(flag('--out', join(deckDir, 'export', 'deck.pptx')));
 // Font embedding is OPT-IN: pptx-embed-fonts writes .fntdata parts that PowerPoint
 // honors but LibreOffice mis-renders (garbled text) — and they 10×+ the file size.
 // The deck is Latin text; rely on the installed font. Use --embed-fonts for a
-// portable file destined for machines without Noto Sans JP (verify in PowerPoint).
+// portable file destined for machines without the display font (verify in PowerPoint).
 const embedFonts = has('--embed-fonts');
 const { dep, deckRequire } = makeDeckRequire(deckDir);
 
@@ -58,11 +58,13 @@ const WALK_SRC = readFileSync(join(HERE, 'lib', 'dom-walk.browser.js'), 'utf8');
 
 const PX_PER_IN = 96;            // 1280/13.333 → standard widescreen layout
 const CJK_H_BUFFER = 1.10;       // +10% height for CJK line-box inflation
-const BRAND = {                  // MTI tokens (hex, no #) — must match the deck theme
-  green: '00A73B', greenDeep: '007A2B', ink: '221815', yellow: 'FABE00',
-  textPrimary: '221815', textSecondary: '5C5552', textMuted: '9A938E',
-  cardBg: 'FFFFFF', cardBorder: 'E7E4E1', chipBg: 'E7F6EC',
+const BRAND = {                  // theme tokens (hex, no #) — must match the deck theme
+  green: '4F46E5', greenDeep: '4338CA', ink: '0F172A', yellow: 'D97706',
+  textPrimary: '0F172A', textSecondary: '475569', textMuted: '94A3B8',
+  cardBg: 'FFFFFF', cardBorder: 'E2E8F0', chipBg: 'EEF2FF',
 };
+// FONT must exactly match the family name embedded in assets/fonts/*.otf (verified via
+// `fc-scan`) — pptxgenjs/PowerPoint/LibreOffice match embedded fonts by this exact string.
 const FONT = 'Noto Sans JP';
 
 mkdirSync(dirname(outPath), { recursive: true });
@@ -120,7 +122,7 @@ mkdirSync(dirname(outPath), { recursive: true });
     // RENDER the deck in Node — the in-page render drops children in this IIFE build.
     await page.addScriptTag({ content: readFileSync(IIFE, 'utf8') });
     await page.addScriptTag({ content: WALK_SRC });
-    const measured = await page.evaluate(() => window.__mtiWalk());
+    const measured = await page.evaluate(() => window.__slideWalk());
 
     // ── 3b. rasterise to PNG in-page: complex icons (gradient/mask) + every chart
     // <svg> graphic. Captured via html-to-image; emitted as native <Image> in PPTX. ──
@@ -182,7 +184,7 @@ mkdirSync(dirname(outPath), { recursive: true });
     // canonical 16:9 inches that match boxOf, regardless of what the layout probe says.
     const SLIDE_W_IN = 1280 / PX_PER_IN;   // 13.333
     const SLIDE_H_IN = 720 / PX_PER_IN;    // 7.5
-    const deck = h(Deck, { title: 'MTI', layout: { name: 'MTI', width: SLIDE_W_IN, height: SLIDE_H_IN } }, ...slideNodes);
+    const deck = h(Deck, { title: 'Slide Deck', layout: { name: 'Slide16x9', width: SLIDE_W_IN, height: SLIDE_H_IN } }, ...slideNodes);
     const issues = validateDeck(deck) || [];
     const errs = issues.filter((i) => i.level === 'error');
     if (errs.length) throw new Error('validateDeck errors: ' + JSON.stringify(errs, null, 2));
@@ -190,7 +192,7 @@ mkdirSync(dirname(outPath), { recursive: true });
 
     let buf = Buffer.from(await write(deck, { outputType: 'base64' }), 'base64');
 
-    // ── 6. embed Noto Sans JP into the .pptx (post-process the zip) ──
+    // ── 6. embed the display font into the .pptx (post-process the zip) ──
     if (embedFonts) {
       try {
         const efMod = await dep('pptx-embed-fonts');
@@ -207,7 +209,7 @@ mkdirSync(dirname(outPath), { recursive: true });
         await ef.updateFiles();
         const out = await ef.save();
         buf = Buffer.isBuffer(out) ? out : Buffer.from(out);
-        console.log('✓ embedded Noto Sans JP (Regular+Bold)');
+        console.log('✓ embedded display font (Regular+Bold)');
       } catch (e) {
         console.log('⚠ font embed skipped: ' + e.message);
       }
