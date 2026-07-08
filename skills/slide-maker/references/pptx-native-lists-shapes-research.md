@@ -17,7 +17,7 @@ The repo facts confirm the research: walker at the classification region (now ~l
 A PowerPoint list is **one `addText` call** whose `text` is an **array of run objects**; each run with `breakLine:true` closes the current `<a:p>` and opens the next, so one array → many list paragraphs. The `bullet` property is **paragraph-level**, so a single list item can still hold multiple colored/bold `<a:r>` runs. In this exporter's JSX layer that becomes one `<Text>` node whose children are `<TextRun>` nodes (the layer forwards `options` verbatim — already proven for `color`/`bold`).
 
 ```jsx
-h(Text, { x, y, w, h, fontFace: FONT, fontSize: 14, valign: 'top', margin: 0, wrap: true, lang: 'ja-JP' },
+h(Text, { x, y, w, h, fontFace: FONT, fontSize: 14, valign: 'top', margin: 0, wrap: true },
   h(TextRun, { text: 'Top level', options: { bullet: true, indentLevel: 0, breakLine: true } }),
   h(TextRun, { text: 'Sub item',  options: { bullet: true, indentLevel: 1, breakLine: true } }),
   h(TextRun, { text: 'Deeper',    options: { bullet: { characterCode: '25AA' }, indentLevel: 2, breakLine: true } }),
@@ -68,16 +68,16 @@ if (isList(el)) {
   const items = [];
   el.querySelectorAll('li').forEach((li) => {
     const lcs = getComputedStyle(li);
-    const runs = []; collect(li, { color: rgbHex(lcs.color) || '221815',
+    const runs = []; collect(li, { color: rgbHex(lcs.color) || '0F172A',
       bold: parseInt(lcs.fontWeight, 10) >= 600, tt: lcs.textTransform });
     const liOrdered = li.closest('ol,ul')?.tagName === 'OL' || ordered;
     items.push({ runs: runs.length ? runs : [{ text: (li.textContent||'').trim(),
-                   color: rgbHex(lcs.color) || '221815' }],
+                   color: rgbHex(lcs.color) || '0F172A' }],
                  indentLevel: depthOf(li), ordered: liOrdered,
                  fontPt: ((parseFloat(lcs.fontSize)||16) * 72) / 96 });
   });
   ops.push({ kind: 'list', id, box: boxOf(el), items,
-             color: rgbHex(getComputedStyle(el).color) || '221815' });
+             color: rgbHex(getComputedStyle(el).color) || '0F172A' });
   return;                       // STOP descending — the whole <ul>/<ol> is one op
 }
 
@@ -100,7 +100,7 @@ else if (op.kind === 'list') {
   push(h(Text, { x: op.box.x, y: op.box.y, w: op.box.w, h: op.box.h,
     fontFace: FONT, fontSize: Math.max(8, op.items[0]?.fontPt || 12),
     color: op.color, valign: 'top', align: 'left', margin: 0, wrap: true,
-    fit: 'none', lang: 'ja-JP' }, ...runNodes));                // ONE addText → native list
+    fit: 'none' }, ...runNodes));                // ONE addText → native list
 }
 ```
 
@@ -169,7 +169,7 @@ function makeGrpSp(id, name, bb, run) {
 }
 ```
 
-**Risk (HIGH — this is XML surgery):** failure mode is binary — any malformed off/ext/chOff/chExt, duplicated `cNvPr` id, or broken self-closing tag → PowerPoint "found a problem… repair". **The LibreOffice gate catches a blank/repaired render but does NOT reproduce PowerPoint's stricter repair check** — so a green LibreOffice render can still repair in real PowerPoint; require at least one manual PowerPoint open in QA. Other hazards: contiguity breaks if any future op is pushed out of order (assert `run.length === count` and every node `isSp`); ids must stay unique across the whole slide; scope groups to pure `sp`/`custGeom`/text cards first (`p:graphicFrame` tables/charts and `p:pic` need their frame nodes included). Adds `fast-xml-parser` as a real dependency (JSZip is already transitive).
+**Risk (HIGH — this is XML surgery):** failure mode is binary — any malformed off/ext/chOff/chExt, duplicated `cNvPr` id, or broken self-closing tag → PowerPoint "found a problem… repair". **The LibreOffice gate catches a blank/repaired render but does NOT reproduce PowerPoint's stricter repair check** — so a passing LibreOffice render can still repair in real PowerPoint; require at least one manual PowerPoint open in QA. Other hazards: contiguity breaks if any future op is pushed out of order (assert `run.length === count` and every node `isSp`); ids must stay unique across the whole slide; scope groups to pure `sp`/`custGeom`/text cards first (`p:graphicFrame` tables/charts and `p:pic` need their frame nodes included). Adds `fast-xml-parser` as a real dependency (JSZip is already transitive).
 
 ---
 
@@ -212,7 +212,7 @@ All phases behind the existing **LibreOffice render-back validate gate** (`scrip
 
 ## 6. Fidelity Ceiling — What Still Won't Transfer
 
-- **True groups only via fragile surgery.** Without the `--group-cards` injection, multi-element cards export as ungrouped sibling shape+text — visually pixel-identical, but a click selects one piece, not the card. With injection it's fully native but **all-or-nothing per slide** (one malformed attr → whole-file repair); LibreOffice green ≠ PowerPoint safe.
+- **True groups only via fragile surgery.** Without the `--group-cards` injection, multi-element cards export as ungrouped sibling shape+text — visually pixel-identical, but a click selects one piece, not the card. With injection it's fully native but **all-or-nothing per slide** (one malformed attr → whole-file repair); a passing LibreOffice render ≠ PowerPoint safe.
 - **Bullet indentation is a fixed ~0.36in EMU ladder**, not the source CSS `margin-left` — native and editable, but deep nests won't pixel-match the browser indent.
 - **Stray `<a:buNone/>` pPr on continuation runs** in multi-colored bulleted items — tolerated by PowerPoint and LibreOffice today, technically invalid, unfixable via public API.
 - **CSS `::marker` styling collapses** to OOXML's bullet model (one `buChar`/`buAutoNum` + `buSzPct`); independent marker color (`buClr`) and marker images don't transfer.
@@ -220,7 +220,7 @@ All phases behind the existing **LibreOffice render-back validate gate** (`scrip
 - **Charts and complex-gradient/mask icons stay rasterized PNG** (deliberate fallback, orthogonal to this work) — a group can *contain* a `<p:pic>` but the picture itself stays non-editable.
 - **A card with an icon + multiple text blocks can never be a single `<p:sp>`** — only `addText({shape})` single-text cards get one-object cohesion for free; everything richer needs the `p:grpSp` injection.
 
-Relevant files (absolute): `/Users/tannt/Work/GIT/MTI-Robot/Sources/mtv-robot-the-forge/.agents/skills/mti-slide-maker/deck-template/scripts/export-pptx-jsx.mjs`, `/Users/tannt/Work/GIT/MTI-Robot/Sources/mtv-robot-the-forge/.agents/skills/mti-slide-maker/deck-template/scripts/validate-pptx.mjs`, `/Users/tannt/Work/GIT/MTI-Robot/Sources/mtv-robot-the-forge/.agents/skills/mti-slide-maker/deck-template/package.json`, `/Users/tannt/Work/GIT/MTI-Robot/Sources/mtv-robot-the-forge/.agents/skills/mti-slide-maker/references/pptx-editable.md`, `/Users/tannt/Work/GIT/MTI-Robot/Sources/mtv-robot-the-forge/.agents/skills/mti-slide-maker/references/pptx-export-research.md`, `/Users/tannt/Work/GIT/MTI-Robot/Sources/mtv-robot-the-forge/.agents/skills/mti-slide-maker/references/validation.md`, `/Users/tannt/Work/GIT/MTI-Robot/Sources/mtv-robot-the-forge/.agents/skills/mti-slide-maker/references/workflows/export-editable-pptx.md`.
+Relevant files: deck-template/scripts/export-pptx-jsx.mjs, deck-template/scripts/validate-pptx.mjs, deck-template/package.json, references/pptx-editable.md, references/pptx-export-research.md, references/validation.md, references/workflows/export-editable-pptx.md.
 ---
 
 ## Implementation status

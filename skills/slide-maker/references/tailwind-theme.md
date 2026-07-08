@@ -1,103 +1,62 @@
-# MTI Tailwind theme
+# Tailwind theme (token-driven)
 
-Drop-in replacement for the `theme.extend` block of the slides-generator
-template's `source/tailwind.config.js`. It maps the MTI tokens
-(`<skill>/design-system/tokens/`) onto the exact token names slides-generator's
-slide JSX already uses — `primary-*`, `accent-*`, `bg-base/card/elevated`,
-`text-primary/secondary/muted`, `border-default/subtle`, `font-display`,
-`font-body` — so every layout idiom it knows renders on-brand with no per-slide
-color picking.
+Drop-in replacement for the `theme.extend` block of a slide generator's
+`tailwind.config.js`. It maps the design-system tokens
+(`<skill>/design-system/tokens/`) onto the token names slide JSX already uses —
+`primary-*`, `accent-*`, `bg-base/card/elevated`, `text-primary/secondary/muted`,
+`border-default/subtle`, `font-display`, `font-body` — so every layout idiom renders
+on the active design system with no per-slide color picking.
 
-> Hex values mirror `tokens/colors.css`. If you edit the tokens, regenerate this.
+> **This theme resolves to CSS custom properties, not fixed hex values.** Every
+> color/type/spacing utility points at a `var(--*)` token defined by the active
+> theme file (`design-system/themes/clean-light.css` by default). Swap the active
+> theme — or map a user's brand tokens into it — and every consumer re-skins with no
+> JSX change. Never hardcode a hex or a font here; edit the token/theme file instead.
 
-## `source/tailwind.config.js`
+## `tailwind.config.js`
 
 ```js
 /** @type {import('tailwindcss').Config} */
+// Reads design-system tokens (CSS vars), not fixed brand hexes.
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        // ---- Brand core ----
-        'mti-green':        '#00A73B',
-        'mti-green-bright': '#00B050',
-        'mti-green-deep':   '#007A2B',
-        'mti-yellow':       '#FABE00',
-        'mti-ink':          '#221815',
-        'mti-blue':         '#0070C0',
-
-        // ---- primary-* → MTI green scale (the brand accent) ----
-        primary: {
-          50:  '#E7F6EC',
-          100: '#C2E9CF',
-          200: '#8FD8A8',
-          300: '#57C57F',
-          400: '#21B459',
-          500: '#00A73B',
-          600: '#009434',
-          700: '#007A2B',
-          800: '#005E21',
-          900: '#005E21',
-          950: '#003914',
-        },
-
-        // ---- accent-* → MTI yellow (use sparingly: dots, small marks) ----
-        accent: {
-          50:  '#FFF9E6',
-          100: '#FFF3CC',
-          300: '#FDD64D',
-          500: '#FABE00',
-          700: '#C99800',
-          900: '#7A5C00',
-        },
-
-        // ---- ink / neutral scale ----
+        accent: { DEFAULT: 'var(--color-accent)', soft: 'var(--color-accent-soft)' },
         ink: {
-          50:  '#F8F7F5',
-          100: '#F2F0ED',
-          200: '#E6E2DD',
-          300: '#CFCAC5',
-          400: '#ABA6A1',
-          500: '#8C8782',
-          600: '#6B6661',
-          700: '#46413D',
-          800: '#2E2A27',
-          900: '#221815',
+          900: 'var(--ink-900)', 700: 'var(--ink-700)', 600: 'var(--ink-600)',
+          500: 'var(--ink-500)', 300: 'var(--ink-300)', 200: 'var(--ink-200)',
+          100: 'var(--ink-100)', 50: 'var(--ink-50)',
         },
-
-        // ---- surfaces (light, green-forward house style) ----
-        'bg-base':     '#FFFFFF',
-        'bg-card':     '#FFFFFF',
-        'bg-elevated': '#F8F7F5',
-        'bg-subtle':   '#F2F0ED',
-        'bg-ink':      '#221815',
-        'bg-accent':   '#00A73B',
-
-        // ---- text ----
-        'text-primary':    '#221815',
-        'text-secondary':  '#6B6661',
-        'text-muted':      '#8C8782',
-        'text-inverse':    '#FFFFFF',
-        'text-on-accent':  '#FFFFFF',
-
-        // ---- borders ----
-        'border-subtle':   '#E6E2DD',
-        'border-default':  '#CFCAC5',
-        'border-strong':   '#221815',
-        'border-accent':   '#00A73B',
-
-        // ---- status ----
-        'status-positive': '#00A73B',
-        'status-info':     '#0070C0',
-        'status-warning':  '#FABE00',
-        'status-danger':   '#D8362A',
+        surface: {
+          page: 'var(--surface-page)', card: 'var(--surface-card)',
+          subtle: 'var(--surface-subtle)', muted: 'var(--surface-muted)', ink: 'var(--surface-ink)',
+        },
+        // Back-compat aliases — components reference these utility names
+        // (bg-primary-500, text-text-primary, border-border-subtle, …). They resolve
+        // through the same CSS-var contract as accent/ink/surface above, so swapping
+        // the active theme re-skins every consumer.
+        primary: {
+          50: 'var(--color-accent-soft)', 100: 'var(--color-accent-soft)', 200: 'var(--color-accent-soft)',
+          300: 'var(--color-accent)', 400: 'var(--color-accent)', 500: 'var(--color-accent)',
+          600: 'var(--color-accent-bright)', 700: 'var(--color-accent-bright)', 800: 'var(--color-accent-bright)',
+          900: 'var(--color-accent-bright)', 950: 'var(--color-accent-bright)',
+        },
+        'bg-base': 'var(--surface-page)', 'bg-card': 'var(--surface-card)', 'bg-elevated': 'var(--surface-subtle)',
+        'bg-subtle': 'var(--surface-muted)', 'bg-ink': 'var(--surface-ink)', 'bg-accent': 'var(--color-accent)',
+        'text-primary': 'var(--text-primary)', 'text-secondary': 'var(--text-secondary)', 'text-muted': 'var(--text-muted)',
+        'text-inverse': 'var(--text-inverse)', 'text-on-accent': 'var(--text-on-accent)',
+        'border-subtle': 'var(--border-subtle)', 'border-default': 'var(--border-default)',
+        'border-strong': 'var(--border-strong)', 'border-accent': 'var(--border-accent)',
+        'status-positive': 'var(--status-positive)', 'status-info': 'var(--status-info)',
+        'status-warning': 'var(--status-warning)', 'status-danger': 'var(--status-danger)',
       },
 
       fontFamily: {
-        display: ['"Noto Sans JP"', '"Meiryo"', '"Hiragino Kaku Gothic ProN"', 'Arial', 'system-ui', 'sans-serif'],
-        body:    ['"Noto Sans JP"', '"Meiryo"', '"Hiragino Kaku Gothic ProN"', 'Arial', 'system-ui', 'sans-serif'],
-        sans:    ['"Noto Sans JP"', '"Meiryo"', '"Hiragino Kaku Gothic ProN"', 'Arial', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)'],
+        body:    ['var(--font-sans)'],
+        sans:    ['var(--font-sans)'],
       },
 
       fontWeight: {
@@ -106,39 +65,34 @@ export default {
 
       // Slide type scale (1280×720 frame). Use text-display, text-h1 … text-footnote.
       fontSize: {
-        display:  ['64px', { lineHeight: '1.08', letterSpacing: '-0.02em' }],
-        h1:       ['44px', { lineHeight: '1.25', letterSpacing: '-0.02em' }],
-        h2:       ['32px', { lineHeight: '1.25' }],
-        h3:       ['24px', { lineHeight: '1.25' }],
-        lead:     ['22px', { lineHeight: '1.45' }],
-        body:     ['18px', { lineHeight: '1.45' }],
-        small:    ['15px', { lineHeight: '1.45' }],
-        eyebrow:  ['14px', { lineHeight: '1.25', letterSpacing: '0.14em' }],
-        footnote: ['11px', { lineHeight: '1.45' }],
+        display:  ['var(--fs-display)', { lineHeight: '1.08', letterSpacing: '-0.02em' }],
+        h1:       ['var(--fs-h1)', { lineHeight: '1.25', letterSpacing: '-0.02em' }],
+        h2:       ['var(--fs-h2)', { lineHeight: '1.25' }],
+        h3:       ['var(--fs-h3)', { lineHeight: '1.25' }],
+        lead:     ['var(--fs-lead)', { lineHeight: '1.45' }],
+        body:     ['var(--fs-body)', { lineHeight: '1.45' }],
+        small:    ['var(--fs-small)', { lineHeight: '1.45' }],
+        eyebrow:  ['var(--fs-eyebrow)', { lineHeight: '1.25', letterSpacing: '0.14em' }],
+        footnote: ['var(--fs-footnote)', { lineHeight: '1.45' }],
       },
 
-      letterSpacing: {
-        tight:   '-0.02em',
-        eyebrow: '0.14em',
-      },
+      letterSpacing: { tight: '-0.02em', eyebrow: '0.14em' },
 
       borderRadius: {
-        sm: '4px', md: '8px', lg: '14px', xl: '20px', pill: '999px',
+        sm: 'var(--radius-sm)', md: 'var(--radius-md)', lg: 'var(--radius-lg)',
+        xl: 'var(--radius-xl)', pill: 'var(--radius-pill)',
       },
 
       boxShadow: {
-        sm:     '0 1px 2px rgba(34, 24, 21, 0.06)',
-        md:     '0 4px 14px rgba(34, 24, 21, 0.08)',
-        lg:     '0 12px 32px rgba(34, 24, 21, 0.12)',
-        accent: '0 8px 24px rgba(0, 167, 59, 0.22)',
+        sm:     'var(--shadow-sm)',
+        md:     'var(--shadow-md)',
+        lg:     'var(--shadow-lg)',
+        accent: 'var(--shadow-accent)',
       },
 
       spacing: {
-        // 4px base scale → matches tokens/spacing.css
-        '1': '4px', '2': '8px', '3': '12px', '4': '16px', '5': '20px',
-        '6': '24px', '8': '32px', '10': '40px', '12': '48px', '16': '64px', '20': '80px',
-        'slide-margin': '72px',
-        'slide-gutter': '32px',
+        'slide-margin': 'var(--slide-margin)',   // 72px
+        'slide-gutter': 'var(--slide-gutter)',   // 32px
       },
     },
   },
@@ -148,51 +102,59 @@ export default {
 
 ## Fonts
 
-Add the brand font import to the top of `source/src/index.css`:
+On-screen the deck uses a **system font stack** (`--font-sans` — no network fetch).
+Link the design system's stylesheet so the tokens (including `--font-*`) are in scope:
 
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+@import url('../design-system/styles.css');   /* pulls tokens + the active theme */
 ```
 
-or the `<link>` equivalent in `source/index.html`.
+If the active design system supplies its own webfont, add its `@import` (or `<link>`)
+and point `--font-sans` / `--font-display` at it inside the theme file — never in the
+slide JSX. The editable-PPTX exporter embeds **Inter** (SIL OFL) so the output renders
+consistently on machines that lack the deck's fonts.
 
 ## Quick usage map
 
 | Want | Class |
 |------|-------|
-| Brand green text / fill | `text-primary-500` / `bg-primary-500` |
-| Green section / closing slide | `bg-primary-500 text-text-inverse` |
+| Accent text / fill | `text-primary-500` / `bg-primary-500` |
+| Accent section / closing slide | `bg-primary-500 text-text-inverse` |
 | Dark (persona) panel | `bg-ink-900 text-text-inverse` |
 | Body copy | `text-text-secondary text-body font-light` |
 | Slide title | `text-h1 font-bold tracking-tight` |
 | Eyebrow kicker | `text-eyebrow tracking-eyebrow uppercase font-bold text-primary-500` |
 | Card | `bg-bg-card border border-border-subtle rounded-lg shadow-sm` |
-| Yellow dot motif | `bg-mti-yellow rounded-pill` (small only) |
+| Small accent dot motif | `bg-accent rounded-pill` (small only) |
 
 ## Chart & data palette
 
-Charts have no token "names" — they take raw hex. To keep every chart on-brand,
-use **one ordered series array** as the single source of truth. Series 1 is always
-MTI green (the "our" / brand series); yellow only ever appears as the 3rd series or
-a single highlight — never the dominant fill.
+Charts have no token "names" — they take raw hex. To keep every chart on-theme, use
+**one ordered series array** as the single source of truth. Series 1 is always the
+active accent (the "our" / primary series); later series are neutral steps so the data
+leads and the accent stays the highlight.
 
 ```js
-// MTI data series order — green is always series 1 ("our"/brand series).
-export const MTI_SERIES = ['#00A73B', '#0070C0', '#FABE00', '#ABA6A1', '#8FD8A8', '#6B6661'];
-// = primary-500, mti-blue, accent-500/yellow, ink-400, primary-200, ink-600
+// Data series order — accent is always series 1 ("our"/primary series).
+export const SERIES = ['#4F46E5', '#0EA5E9', '#64748B', '#94A3B8', '#334155', '#A5B4FC'];
+// = accent (indigo), sky, slate-500, slate-400, slate-700, indigo-300
 ```
 
+> These hexes mirror the clean-light theme's accent + neutral scale. If the active
+> theme changes the accent, regenerate this array from the theme's accent + neutrals.
+> `check-slop.mjs` reads this `SERIES = [...]` line as the allowed chart palette.
+
 **Chart chrome** (keep it quiet so the data leads):
-- Axes & gridlines: `#E6E2DD` (`border-subtle`), 1px, low weight. No heavy or 3D gridlines.
-- Labels / ticks: `text-muted` (`#8C8782`) at `text-small`/12px.
-- Area fill under a green line: `#E7F6EC` (`green-50`).
-- Highlight-one-bar pattern: the focus bar `#00A73B`, the rest muted `#E6E2DD`.
+- Axes & gridlines: `#E2E8F0` (`border-subtle`), 1px, low weight. No heavy or 3D gridlines.
+- Labels / ticks: `text-muted` (`#64748B`) at `text-small`/12px.
+- Area fill under an accent line: `#EEF2FF` (accent-soft).
+- Highlight-one-bar pattern: the focus bar `#4F46E5`, the rest muted `#E2E8F0`.
 
 `references/wow-guide.md` §2 has the SVG bar/line/KPI snippets that consume this.
 
 ## A note on glass
 
-MTI is **light corporate**, not dark-glass. Prefer the card recipe
+The house look is **light and clean**, not dark-glass. Prefer the card recipe
 `bg-bg-card border border-border-subtle shadow-sm` for surfaces. Do **not** use a
 generator's dark `glass` class (dark translucent panel — wrong on a light deck).
 `glass-light` is acceptable **only** as a caption plate over a photo

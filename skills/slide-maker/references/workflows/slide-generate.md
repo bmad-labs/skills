@@ -12,57 +12,66 @@ run brainstorm first** — generating from a fuzzy idea produces slides nobody a
 ## Steps
 
 ### 1. Set up the deck (once)
-Copy the ready-made deck into the output folder and install — you never hand-build the
-harness; the skill template stays immutable and the scripts travel inside the copy:
+
+**First, resolve the design system** (if brainstorm didn't already). Run this flow **in
+order**, stop at the first branch that applies:
+1. **User's own design system / brand tokens** → map colors/type/spacing into
+   `design-system/themes/clean-light.css` (or a new theme the entry point imports). Layouts
+   never change; only the theme's token *values* do.
+2. **Else, `nextlevelbuilder/ui-ux-pro-max-skill` installed** → invoke it to suggest a
+   best-fit design system, then map that into the theme file.
+3. **Else, recommend + guide a permanent install** from
+   `https://github.com/nextlevelbuilder/ui-ux-pro-max-skill` (preferred path).
+4. **Else, ASK FIRST, then** shallow-clone it into `/tmp` for **THIS TURN ONLY**, don't
+   persist it. **Never fetch without explicit consent.**
+5. **Else, use the bundled `clean-light` theme** — the guaranteed floor.
+
+The active theme file is the single source of truth for color/type — read it, write token
+values into it, never hardcode a hex/font into a layout.
+
+**Then, confirm where the deck should live.** Default output dir `./slides/<deck-name>/`
+in the user's project, exports under `.../export/`. **Copy the `deck-template/` scaffold to
+that location — NOT into the skill directory** (the skill's `deck-template/` is a pristine
+template; the working copy lives in the user's project, so decks coexist and the install
+stays clean). The scripts travel inside the copy; you never hand-build the harness.
+
 ```bash
-cp -r <skill>/deck-template ./slides && cd ./slides && npm install
+cp -r <skill>/deck-template ./slides/<deck-name> && cd ./slides/<deck-name> && npm install
 npx playwright install chromium      # once, for review + export
 ```
 Full template tour: [deck-template.md](../deck-template.md).
 
 ### 2. Author each slide (from the skeleton)
 
-**First, pick a layout from the catalog index — this is mandatory, not optional.**
-Before writing any JSX for a slide, you MUST query
-[`design-system/layouts.csv`](../../design-system/layouts.csv) (446 rows: one per
-layout × style, with `intent`, `use_when`, `content_shape`, `focal_element`, `density`,
-`brand_weight`, `tags`) and choose from it. Do **not** guess a layout from memory or by
-eyeballing PNG filenames — match the slide's actual situation against the index.
+**First, pick a layout from the catalog — this is mandatory, not optional.** Before writing
+any JSX for a slide, match the slide's situation (content shape + intent) to one of the
+**34 premade layouts** in `<skill>/design-system/slides/`. The layout table in
+[house-style.md](../house-style.md) says what each layout is for. Do **not** guess a layout
+from memory — match the slide's actual situation to the catalog.
 
 ```bash
-# Rank catalog rows against this slide's job (content shape + intent), e.g. a
-# "demo run = steps + results + verdict" slide:
-node -e '
-  const fs=require("fs"); const rows=fs.readFileSync("design-system/layouts.csv","utf8")
-    .trim().split("\n").slice(1).map(l=>l.split(","));
-  const H=["id","file","preview","name","style","family","intent","use_when",
-           "content_shape","focal_element","density","brand_weight","tags"];
-  const kw=["process","flow","step","sequence","demo","recap","kpi","result","metric","verdict"];
-  rows.map(r=>Object.fromEntries(H.map((h,i)=>[h,r[i]||""])))
-    .map(o=>({o,s:kw.filter(k=>(o.intent+o.use_when+o.tags+o.name).toLowerCase().includes(k)).length}))
-    .filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,8)
-    .forEach(x=>console.log(x.s, x.o.id, x.o.name, "—", x.o.intent, "|", x.o.use_when));
-'
+# (Re)render the 34 layout previews if you want a fresh contact sheet to eyeball:
+node scripts/shoot-layouts.mjs      # → thumbnails beside each design-system/slides/NN.html
 ```
 
-Then **review the top candidates' previews** — Read
-`design-system/slides/<preview>.png` for the 2–4 best matches — and decide:
+Then **review the top candidates' thumbnails** — Read
+`design-system/slides/<NN-name>.png` for the 2–4 best matches — and decide:
 - **Use one directly** when a catalog layout fits the slide's content shape, or
 - **Use them as reference** — combine/adapt the closest layouts into a custom layout for
   the slide's specific situation (e.g. a slide that has *both* a step sequence and a KPI
   row borrows the process-flow lane and the kpi-row treatment).
 
-State which catalog id(s) you chose or adapted, and why, before authoring. (Picking by
-`intent`/`use_when` from the CSV is how you avoid the "I grabbed a layout that doesn't
-match the content" miss — the index encodes each layout's purpose; filenames don't.)
+State which layout id(s) you chose or adapted, and why, before authoring. (Matching by
+intent against the catalog is how you avoid the "I grabbed a layout that doesn't match the
+content" miss — the table encodes each layout's purpose; filenames don't.)
 
 For every slide in the skeleton, write `src/slides/NN-name.jsx`:
 - Copy the shape of `00-EXAMPLE-hero-metrics.jsx`.
 - Root `<div className="slide-page" data-viz-id="sN">`; content in `slide-content`.
-- **MTI tokens only** (`text-primary-500`, `text-h1`, `bg-bg-card`, …) — never raw hex
+- **Theme tokens only** (`text-primary-500`, `text-h1`, `bg-bg-card`, …) — never raw hex
   or generic Tailwind colours. The skeleton already named the layout + focal point;
   realize them with the house patterns ([house-style.md](../house-style.md)).
-- Make it **wow**, not just on-brand: one hero, eyebrow→title→green-rule→body rhythm,
+- Make it **wow**, not just on-theme: one hero, eyebrow→title→accent-rule→body rhythm,
   calm motion, ≥35% whitespace. Full craft guide: [wow-guide.md](../wow-guide.md).
 - **Annotate every meaningful element with `data-viz-id`** — this one tag powers edit
   mode, visual review, AND every editable export. Tag titles, cards, chips, rules,
@@ -132,7 +141,7 @@ node scripts/serve.mjs --dev        # deck dev server + the edit-mode feedback b
 Tell them: open http://localhost:5173, arrow/number keys to navigate; press **`e`** for
 edit mode to click an element / drag a box / brush an area, attach comments, hit **"Copy
 for AI"**, then say "read the feedback." You read
-`/tmp/mti-slide-edit/edit-feedback.json` — each comment names its `data-viz-id`, so you
+`/tmp/slide-maker-edit/edit-feedback.json` — each comment names its `data-viz-id`, so you
 grep straight to the JSX. Full mechanics: [edit-mode.md](../edit-mode.md).
 
 Then **loop**: apply the feedback → re-run the two self-check gates on the touched

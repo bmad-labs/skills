@@ -1,14 +1,18 @@
-# MTI Slide Maker
+# Slide Maker
 
-Make genuinely impressive, on-brand **MTI Technology** presentation slides — from a single
-slide to a full deck — and export them to editable PowerPoint, image PowerPoint, standalone
-HTML, or PDF. The skill ships the whole kit: the MTI brand system, a "wow" craft guide, an
-anti-slop validator, a ready-made React deck, point-and-comment edit mode, and a *validated*
-editable-PPTX pipeline.
+Make genuinely impressive, on-brand presentation slides — from a single slide to a full
+deck — and export them to editable PowerPoint, image PowerPoint, standalone HTML, or PDF.
+The skill ships the whole kit: a token-driven design system, a "wow" craft guide, an
+anti-slop validator, a ready-made React deck, point-and-comment edit mode, and a
+*validated* editable-PPTX pipeline.
 
-This is a **Claude skill** — you don't run it by hand. Ask Claude (in this repo) for an MTI
-deck and it loads this skill and drives the work. This README is the quick orientation;
-[`SKILL.md`](SKILL.md) is what the agent follows.
+It is **design-system-agnostic**: it drives every slide from design tokens (never
+hardcoded colors or fonts), so it can use your own design system, a suggested one, or a
+bundled neutral default — and re-skin every layout by swapping one theme file.
+
+This is a **Claude skill** — you don't run it by hand. Ask Claude for a deck and it loads
+this skill and drives the work. This README is the quick orientation; [`SKILL.md`](SKILL.md)
+is what the agent follows.
 
 ---
 
@@ -17,10 +21,10 @@ deck and it loads this skill and drives the work. This README is the quick orien
 Just tell Claude what you want. It picks the matching workflow and runs it.
 
 ```
-1. "Help me build an MTI deck to pitch our managed-services offering"   → brainstorm + generate
-2. (answer its questions, review the slides it shows you)               → iterate
-3. "Looks good — give me an editable PowerPoint"                        → export
-4. open export/deck.pptx                                                → done
+1. "Help me build a deck to pitch our SaaS product to investors"   → brainstorm + generate
+2. (answer its questions, review the slides it shows you)          → iterate
+3. "Looks good — give me an editable PowerPoint"                   → export
+4. open export/deck.pptx                                           → done
 ```
 
 You can also jump straight in: *"export the deck in ./slides to PDF"*, or
@@ -50,6 +54,22 @@ brainstorm ──▶ generate ──▶ ┬─▶ editable PPTX
 ```
 
 Full step-by-step for each is in [`references/workflows/`](references/workflows/).
+
+---
+
+## Which design system does it use?
+
+At the start of brainstorm/generate, Claude resolves the design system in order and stops
+at the first that applies:
+
+1. **Your own design system / brand tokens**, mapped into the theme file.
+2. Else, a **`nextlevelbuilder/ui-ux-pro-max-skill`** suggestion if that skill is installed.
+3. Else, it **recommends installing** that skill (the preferred path).
+4. Else, with your explicit consent, a **one-turn-only** clone of it.
+5. Else, the bundled **`clean-light`** theme — the guaranteed floor, so the skill never blocks.
+
+Whatever the outcome, the active theme file is the single source of truth for color and
+type; layouts never change, only the theme's token values do.
 
 ---
 
@@ -87,18 +107,19 @@ So a finished deck is verified both by machine and by eye.
 ## What's in the box
 
 ```
-mti-slide-maker/
-├── SKILL.md                  ← what the agent follows (workflow router + brand rules)
+slide-maker/
+├── SKILL.md                  ← what the agent follows (workflow router + craft rules)
 ├── README.md                 ← you are here
-├── design-system/            ← the MTI brand kit (standalone source of truth)
+├── design-system/            ← the token-driven design kit (standalone source of truth)
 │   ├── tokens/               ← colours, type, spacing, fonts — THE source of truth
-│   ├── slides/*.html         ← 11 premade slide layouts (the catalog)
+│   ├── themes/clean-light.css ← the active theme (bundled neutral default; the floor)
+│   ├── slides/*.html         ← 34 premade slide layouts (the catalog)
 │   ├── styles.css            ← token entry point (for plain-HTML slides)
-│   └── assets/logos/         ← mti-logo-full.svg, mti-mark.svg
+│   └── assets/logos/         ← mark.svg, logo-full.svg (neutral placeholders)
 ├── deck-template/            ← a complete React+Tailwind deck you copy & fill
 │   └── scripts/              ← all the tooling, travels with each deck:
-│                               check-slop · shoot-slides · serve · inspect ·
-│                               export-deck · export-pptx-jsx · validate-pptx ·
+│                               check-slop · shoot-slides · shoot-layouts · serve ·
+│                               inspect · export-deck · export-pptx-jsx · validate-pptx ·
 │                               verify-* · diff-regions · clean-verify · …
 └── references/               ← the docs the workflows pull in as needed
     ├── workflows/            ← the 6 job workflows (step-by-step)
@@ -108,18 +129,19 @@ mti-slide-maker/
     └── …
 ```
 
-The brand kit ships **inside** the skill, so it's self-contained. If anything ever disagrees
-with `design-system/tokens/`, the token files win.
+The design kit ships **inside** the skill, so it's self-contained. If anything ever
+disagrees with `design-system/tokens/` (or the active theme), the token/theme files win.
 
 ---
 
-## The brand, in one breath
+## The look, in one breath
 
-Green-forward **light** slides; **Noto Sans JP** for everything; green is the accent (not big
-fills), yellow is only the small dot-trail motif, ink is text + dark surfaces. One hero per
-slide, generous whitespace, calm motion. Never a second font or an invented colour. The full
-rules live in [`references/house-style.md`](references/house-style.md) and the craft ceiling
-in [`references/wow-guide.md`](references/wow-guide.md).
+Light, clean slides driven by tokens; a single restrained **accent** hue (indigo in the
+default `clean-light` theme) used sparingly, a neutral ink scale for text and dark
+surfaces. One hero per slide, generous whitespace, calm motion. Never a second font or a
+hardcoded colour — change the theme file instead. The full rules live in
+[`references/house-style.md`](references/house-style.md) and the craft ceiling in
+[`references/wow-guide.md`](references/wow-guide.md).
 
 ---
 
@@ -127,9 +149,10 @@ in [`references/wow-guide.md`](references/wow-guide.md).
 
 - **Drive the whole deck here** (the usual path) — copy the deck template, write slides, edit,
   export. Everything above.
-- **Supply only the brand layer** to another slide generator — that tool runs its own
-  workflow but skips theme selection and pulls MTI tokens/components/patterns from here, so
-  its output is on-brand. See [`references/tailwind-theme.md`](references/tailwind-theme.md).
+- **Supply only the design layer** to another slide generator — that tool runs its own
+  workflow but skips theme selection and pulls the active tokens/components/patterns from
+  here, so its output uses a real design system. See
+  [`references/tailwind-theme.md`](references/tailwind-theme.md).
 
 ---
 

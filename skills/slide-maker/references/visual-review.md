@@ -34,7 +34,7 @@ There are **three** complementary gates, all required before a slide is done:
    when you can — the offending element's `data-viz-id`.
 4. **Localize hard-to-place defects** with the labeled render: Read
    `review/slide-NN-labeled.png` (or shoot `--inspect <ids>` for a focused box). The
-   green box + id label tells you the exact `data-viz-id`; **grep that id** in
+   orange box + id label tells you the exact `data-viz-id`; **grep that id** in
    `deck-template/src/slides/*.jsx` to jump to the JSX.
 5. **Fix** the JSX, then re-render just that slide and Read it again:
    ```bash
@@ -71,7 +71,7 @@ Full-bleed slides (cover/divider/closing with `!p-0`) are the only exception.
 
 - **`inspect.mjs` → `geometry.json`** = `[{id,x,y,w,h}]` measured at **1280×720**. ✅
   **This is the only set you reason about.** Bottom = `y + h`. Compare against 648.
-- **Edit-mode feedback** (`/tmp/mti-slide-edit/edit-feedback.json`, the `rect` field) =
+- **Edit-mode feedback** (`/tmp/slide-maker-edit/edit-feedback.json`, the `rect` field) =
   measured in the **user's browser viewport** (whatever size their window is). ❌ Do
   NOT do pixel math against these — they're for locating *which* element the user meant,
   not for measuring. Mixing the two scales is how agents "confirm" an alignment that is
@@ -85,7 +85,7 @@ delta**. Report the number, not a vibe ("Δ = 31px → FAIL", never "looks align
 ```bash
 node scripts/inspect.mjs --slide N --ids a.id,b.id,c.footer
 node -e '
-  const g = require("./review/geometry.json"); // or /tmp/mti-slide-inspect/geometry.json
+  const g = require("./review/geometry.json"); // or /tmp/slide-maker-inspect/geometry.json
   const b = id => { const e = g.find(x => x.id === id); return e ? e.y + e.h : null; };
   const bottom = b("s6.arena"), step = b("s6.step.3"), foot = b("s6.footer");
   const aligned = Math.abs(bottom - step) <= 2;          // "same height" = within 2px
@@ -143,7 +143,7 @@ the bottom edge — no matter how tall the content is. It ends the entire class 
 
   {/* FOOTER — fixed at bottom */}
   <footer className="shrink-0 mt-4 flex items-center justify-between" data-viz-id="sN.footer">
-    <span className="text-footnote …">MTV Robotics · … · Confidential v1.0</span>
+    <span className="text-footnote …">Acme Inc · … · Confidential v1.0</span>
     <span className="text-footnote …">N / total</span>
   </footer>
 </div>
@@ -207,7 +207,7 @@ score.
 - **Balance & whitespace.** Is content lopsided or clumped to one side? Are there
   dead gaps that read as "unfinished" rather than intentional breathing room? Aim
   ~35–40% empty, distributed — not a blank half + a crowded half.
-- **Rhythm renders.** Is the eyebrow → title → green rule → body sequence actually
+- **Rhythm renders.** Is the eyebrow → title → accent rule → body sequence actually
   visible and evenly spaced, or collapsed / doubled / missing a step?
 - **Hierarchy reads in actual sizes.** Title > subhead > body in *rendered* size;
   body isn't competing with the hero; the eyebrow is small and quiet.
@@ -217,10 +217,10 @@ score.
   things look like they might touch, or two elements should line up, STOP and measure
   (`y+h ≤ 648`, overlap, alignment delta) per [The geometry gate](#the-geometry-gate-measure-dont-eyeball).
   A full-slide PNG hides exactly these defects.
-- **Color on-brand in the pixels.** Green is the accent; yellow appears only as a
-  small dot/highlight (never a big fill or as text); backgrounds are light; no
-  surprise dark panel or off-palette block that the source happened to allow.
-- **Chart legible.** Bars and labels readable; the highlight bar is the green one;
+- **Color on-theme in the pixels.** The accent appears sparingly as the highlight
+  (never a big fill or wash across the slide); backgrounds are light; no surprise
+  dark panel or off-palette block that the source happened to allow.
+- **Chart legible.** Bars and labels readable; the highlight bar is the accent one;
   axis/gridlines are quiet (light grey), not loud; no overlap with the title.
 - **The slop "tells", seen not inferred** (cross-check
   [validation.md](validation.md)): everything centered, a wall of text, a second
@@ -241,7 +241,7 @@ question is positional (geometry gate):
 - Confirming a fix touched the right element → `--inspect <id>` boxes just it.
 
 It mirrors exactly what a human sees when they select an element in edit mode (same
-green box + id label) — it's the human's "point at it" turned into something you can
+orange box + id label) — it's the human's "point at it" turned into something you can
 do yourself, headlessly, and read back as an addressable id.
 
 ## Notes
