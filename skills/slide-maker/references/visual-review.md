@@ -143,7 +143,7 @@ the bottom edge — no matter how tall the content is. It ends the entire class 
 
   {/* FOOTER — fixed at bottom */}
   <footer className="shrink-0 mt-4 flex items-center justify-between" data-viz-id="sN.footer">
-    <span className="text-footnote …">Acme Inc · … · Confidential v1.0</span>
+    <span className="text-footnote …">Company Name · … · Draft v1.0</span>
     <span className="text-footnote …">N / total</span>
   </footer>
 </div>
