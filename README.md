@@ -177,6 +177,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [book-converter](skills/book-converter) | Convert EPUB books to formatted Markdown | Productivity |
 | [skill-from-book](skills/skill-from-book) | Convert book content into structured Claude Code skills | Development |
 | [slides-generator](skills/slides-generator) | Generate interactive presentation slides using React + Tailwind, export to PDF or HTML | Productivity |
+| [slide-maker](skills/slide-maker) | Design-system-agnostic slide/deck maker — brainstorm, generate, and export to editable PPTX, image PPTX, standalone HTML, or PDF; 34 token-driven layouts, bundled neutral theme, works with your design system or a suggested one | Productivity |
 | [ai-multimodal](skills/ai-multimodal) | Process and generate multimedia content using Google Gemini API (audio, images, videos, documents) | Data |
 | [atlassian-rest](skills/atlassian-rest) | Jira & Confluence integration via REST APIs — tickets, epics, pages, status reports, triage, bidirectional BMAD document sync | Productivity |
 | [multi-repo-git-ops](skills/multi-repo-git-ops) | Git operations across multi-repo systems with submodules — branching, committing, pushing, syncing across parent and service repos | Development |
