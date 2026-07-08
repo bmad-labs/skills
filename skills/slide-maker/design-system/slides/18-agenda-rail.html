@@ -1,0 +1,62 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Agenda rail" subtitle="Left accent rail of section numbers with titles down the page" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agenda Rail</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: grid; grid-template-columns: 96px 1fr; overflow: hidden; }
+  /* the narrow accent rail down the left edge */
+  .rail { background: var(--color-accent); position: relative; display: flex;
+    flex-direction: column; align-items: center; justify-content: space-between;
+    padding: var(--slide-margin) 0; }
+  .rail .mark { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.9);
+    box-shadow: 0 18px 0 rgba(255,255,255,0.5), 0 36px 0 rgba(255,255,255,0.28); }
+  .rail .vlabel { writing-mode: vertical-rl; transform: rotate(180deg);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent-soft); }
+  .main { padding: var(--slide-margin); display: flex; flex-direction: column; }
+  .head { position: relative; }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+  .accent-rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .list { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: var(--space-6); }
+  .item { display: grid; grid-template-columns: 64px 1fr; align-items: baseline; gap: var(--space-5);
+    padding-bottom: var(--space-5); border-bottom: var(--border-w) solid var(--border-subtle); }
+  .item:last-child { border-bottom: none; }
+  .item .n { font-size: var(--fs-h2); font-weight: var(--fw-black); color: var(--color-accent); line-height: 1; }
+  .item .t { font-size: var(--fs-h3); font-weight: var(--fw-medium); }
+  .item .t small { display: block; font-size: var(--fs-small); font-weight: var(--fw-light);
+    color: var(--text-secondary); margin-top: var(--space-1); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="rail">
+      <span class="vlabel">Agenda</span>
+      <div class="mark"></div>
+    </div>
+    <div class="main">
+      <div class="head">
+        <span class="eyebrow">Contents</span>
+        <h1>What we'll cover today</h1>
+        <div class="accent-rule"></div>
+      </div>
+      <div class="list">
+        <div class="item"><div class="n">01</div><div class="t">Background &amp; context<small>Why this matters now</small></div></div>
+        <div class="item"><div class="n">02</div><div class="t">Approach<small>How we're solving it</small></div></div>
+        <div class="item"><div class="n">03</div><div class="t">Scope &amp; plan<small>What's in and out</small></div></div>
+        <div class="item"><div class="n">04</div><div class="t">Outcomes<small>Metrics and next steps</small></div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

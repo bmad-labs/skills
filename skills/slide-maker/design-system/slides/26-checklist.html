@@ -1,0 +1,64 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Checklist" subtitle="A list of rows, each with a checkmark in an accent circle" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Checklist</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: grid; grid-template-columns: 5fr 7fr; gap: var(--space-16);
+    padding: var(--slide-margin); align-items: center; }
+  .head { }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+  .accent-rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .lead { margin-top: var(--space-6); font-size: var(--fs-body); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); max-width: 380px; }
+  .list { display: flex; flex-direction: column; gap: var(--space-5); }
+  .row { display: flex; gap: var(--space-5); align-items: flex-start;
+    padding-bottom: var(--space-5); border-bottom: var(--border-w) solid var(--border-subtle); }
+  .row:last-child { border-bottom: none; padding-bottom: 0; }
+  .check { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: var(--color-accent);
+    color: var(--text-inverse); display: flex; align-items: center; justify-content: center; }
+  .check svg { width: 18px; height: 18px; }
+  .txt h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); line-height: var(--lh-snug); }
+  .txt p { margin-top: var(--space-1); font-size: var(--fs-small); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="head">
+      <span class="eyebrow">Ready to go</span>
+      <h1>What's already done</h1>
+      <div class="accent-rule"></div>
+      <p class="lead">Everything below is complete and verified — no open items remain.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div class="txt"><h3>Requirements agreed</h3><p>Scope and success metric signed off with all stakeholders.</p></div>
+      </div>
+      <div class="row">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div class="txt"><h3>Design validated</h3><p>Core workflow tested with real users and refined.</p></div>
+      </div>
+      <div class="row">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div class="txt"><h3>Build shipped</h3><p>A working slice is live and in front of early adopters.</p></div>
+      </div>
+      <div class="row">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div class="txt"><h3>Metrics in place</h3><p>Dashboards track the numbers that prove it's working.</p></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
