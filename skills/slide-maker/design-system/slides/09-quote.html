@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>MTI — Quote</title>
+<title>Quote</title>
 <link rel="stylesheet" href="../styles.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,13 +11,13 @@
   .slide { width: var(--slide-w); height: var(--slide-h); background: var(--ink-50);
     font-family: var(--font-sans); color: var(--text-primary); position: relative; overflow: hidden;
     display: flex; flex-direction: column; justify-content: center; padding: var(--slide-margin) 120px; }
-  .mark { font-size: 200px; line-height: 0.7; font-weight: var(--fw-black); color: var(--green-100);
+  .mark { font-size: 200px; line-height: 0.7; font-weight: var(--fw-black); color: var(--color-accent-soft);
     height: 90px; }
   blockquote { font-size: 46px; font-weight: var(--fw-medium); line-height: 1.28;
     letter-spacing: var(--ls-tight); max-width: 980px; }
-  blockquote em { color: var(--mti-green); font-style: normal; }
+  blockquote em { color: var(--color-accent); font-style: normal; }
   .by { margin-top: var(--space-8); display: flex; align-items: center; gap: var(--space-4); }
-  .by .bar { width: 40px; height: 3px; background: var(--mti-green); border-radius: var(--radius-pill); }
+  .by .bar { width: 40px; height: 3px; background: var(--color-accent); border-radius: var(--radius-pill); }
   .by .who { font-size: var(--fs-body); }
   .by .who strong { font-weight: var(--fw-bold); }
   .by .who span { display: block; color: var(--text-muted); font-size: var(--fs-small); }
@@ -32,7 +32,7 @@
       <div class="bar"></div>
       <div class="who"><strong>Name Surname</strong><span>Title, Team</span></div>
     </div>
-    <img class="logo" src="../assets/logos/mti-logo-full.svg" alt="MTI Technology">
+    <img class="logo" src="../assets/logos/logo-full.svg" alt="Your Brand">
   </div>
 </body>
 </html>
