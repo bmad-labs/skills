@@ -58,7 +58,7 @@ function loadSeries() {
   // chart/SVG code on top of the token hexes (they overlap, but keep this explicit
   // for clarity). Match any `..._SERIES` / `SERIES` export name so this keeps working
   // whichever naming the reference doc currently uses.
-  const chrome = ['#E6E2DD', '#E7F6EC'];
+  const chrome = ['#E2E8F0', '#EEF2FF'];
   try {
     const md = readFileSync(resolve(SKILL, 'references/tailwind-theme.md'), 'utf8');
     const m = md.match(/\b\w*SERIES\s*=\s*\[([^\]]+)\]/);
@@ -152,7 +152,7 @@ function checkFile(file) {
         // inside a chart: must be a series or chrome color
         if (SERIES_HEX.has(hex) || SERIES_HEX.has(long)) continue;
         err(lineOf(src, m.index), `off-palette chart color ${m[0]}`,
-            'use a color from the chart series palette (tailwind-theme.md) + #E6E2DD/#E7F6EC chrome');
+            'use a color from the chart series palette (tailwind-theme.md) + #E2E8F0/#EEF2FF chrome');
       } else {
         err(lineOf(src, m.index), `raw hex ${m[0]} (use tokens, not literal hex)`,
             'replace with a var(--*) token (HTML) or a mapped class (JSX) — see tailwind-theme.md');
