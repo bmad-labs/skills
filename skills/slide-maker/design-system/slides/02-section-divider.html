@@ -1,36 +1,37 @@
-<!-- @dsCard group="Slides" viewport="1280x720" name="Section divider" subtitle="Full-bleed green section break with index number" -->
+<!-- @dsCard group="Slides" viewport="1280x720" name="Section divider" subtitle="Full-bleed accent section break with index number" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>MTI — Section Divider</title>
+<title>Section Divider</title>
 <link rel="stylesheet" href="../styles.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { background: var(--ink-100); }
   .slide {
     width: var(--slide-w); height: var(--slide-h);
-    background: var(--mti-green);
+    background: var(--color-accent);
     position: relative; overflow: hidden;
     font-family: var(--font-sans); color: var(--text-inverse);
     display: flex; flex-direction: column; justify-content: center;
     padding: var(--slide-margin);
   }
-  /* decorative wave dots motif, echoing the logo */
+  /* soft geometric accent orb in the corner */
   .slide::before {
     content: ""; position: absolute; right: -80px; top: -80px;
     width: 380px; height: 380px; border-radius: 50%;
     background: rgba(255,255,255,0.07);
   }
+  /* subtle dot-trail motif, driven by neutral whites */
   .slide::after {
     content: ""; position: absolute; left: var(--slide-margin); bottom: var(--slide-margin);
-    width: 12px; height: 12px; border-radius: 50%; background: var(--mti-yellow);
+    width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.9);
     box-shadow: 22px 0 0 rgba(255,255,255,0.55), 44px 0 0 rgba(255,255,255,0.3);
   }
   .index { font-size: 120px; font-weight: var(--fw-black); line-height: 1;
     color: rgba(255,255,255,0.28); letter-spacing: var(--ls-tight); }
   .eyebrow { margin-top: var(--space-4); font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
-    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--yellow-300); }
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: rgba(255,255,255,0.85); }
   h2 { margin-top: var(--space-3); font-size: 56px; font-weight: var(--fw-black);
     line-height: var(--lh-tight); letter-spacing: var(--ls-tight); max-width: 860px; }
   .sub { margin-top: var(--space-5); font-size: var(--fs-lead); font-weight: var(--fw-light);
@@ -40,7 +41,7 @@
 </head>
 <body>
   <div class="slide">
-    <img class="logo" src="../assets/logos/mti-logo-full.svg" alt="MTI Technology" style="filter: brightness(0) invert(1);">
+    <img class="logo" src="../assets/logos/logo-full.svg" alt="Your Brand" style="filter: brightness(0) invert(1);">
     <div class="index">01</div>
     <span class="eyebrow">Section</span>
     <h2>The section title for this part of the deck</h2>
