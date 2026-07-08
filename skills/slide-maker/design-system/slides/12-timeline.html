@@ -1,0 +1,104 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Timeline / roadmap" subtitle="Horizontal milestones along an accent track — a sequence over time" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Timeline</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { position: relative; overflow: hidden;
+    width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  /* atmospheric accent blob (bleeds off the corner — never behind text) */
+  .bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .bg .blob { position: absolute; border-radius: 50%; background: var(--color-accent-soft);
+    width: 460px; height: 460px; right: -150px; top: -170px; }
+  .head { position: relative; z-index: 1; }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); max-width: 820px; }
+  .rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  /* the track sits in the lower-middle; all dots ON one line, all labels below it */
+  .track { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column;
+    justify-content: center; }
+  .rail { position: relative; }
+  .line { position: absolute; left: 7%; right: 7%; top: 9px; height: 2px; background: var(--ink-200); }
+  .line .fill { position: absolute; left: 0; top: 0; height: 100%; width: 76%;
+    background: var(--color-accent); border-radius: var(--radius-pill); }
+  .dots { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .dots .cell { display: flex; justify-content: center; }
+  .dot { width: 20px; height: 20px; border-radius: var(--radius-pill);
+    background: var(--color-accent); border: 4px solid var(--surface-page);
+    box-shadow: var(--shadow-sm); }
+  .cell.muted .dot { background: var(--ink-300); }
+  /* labels under each dot, aligned to the same grid */
+  .labels { margin-top: var(--space-6); display: grid; grid-template-columns: repeat(4, 1fr); }
+  .label { text-align: center; padding: 0 var(--space-4); }
+  .label .when { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--color-accent); }
+  .label.muted .when { color: var(--text-muted); }
+  .label .what { margin-top: var(--space-2); font-size: var(--fs-h3); font-weight: var(--fw-bold);
+    color: var(--text-primary); }
+  .label .desc { margin-top: var(--space-2); font-size: var(--fs-small); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); max-width: 230px; margin-left: auto; margin-right: auto; }
+  .foot { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg"><div class="blob"></div></div>
+
+    <div class="head">
+      <span class="eyebrow">How we deliver</span>
+      <h1>From kickoff to scale in four moves</h1>
+      <div class="rule"></div>
+    </div>
+
+    <div class="track">
+      <div class="rail">
+        <div class="line"><div class="fill"></div></div>
+        <div class="dots">
+          <div class="cell"><div class="dot"></div></div>
+          <div class="cell"><div class="dot"></div></div>
+          <div class="cell"><div class="dot"></div></div>
+          <div class="cell muted"><div class="dot"></div></div>
+        </div>
+      </div>
+      <div class="labels">
+        <div class="label">
+          <div class="when">Weeks 1–2</div>
+          <div class="what">Discovery</div>
+          <div class="desc">Problem framing, scope, and the success metric.</div>
+        </div>
+        <div class="label">
+          <div class="when">Weeks 3–10</div>
+          <div class="what">MVP build</div>
+          <div class="desc">A working product against the core workflow.</div>
+        </div>
+        <div class="label">
+          <div class="when">Quarter 2</div>
+          <div class="what">Scale &amp; harden</div>
+          <div class="desc">Reliability, observability, and growth.</div>
+        </div>
+        <div class="label muted">
+          <div class="when">Ongoing</div>
+          <div class="what">Managed care</div>
+          <div class="desc">Support and evolution as the product matures.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <span class="pageno">12</span>
+    </div>
+  </div>
+</body>
+</html>
