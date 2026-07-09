@@ -1,6 +1,18 @@
 ---
 name: slide-maker
-description: Make impressive, on-brand presentation slides and decks end-to-end, for ANY design system. Use this skill whenever the user wants to brainstorm, build, design, generate, review, or export a slide, deck, presentation, pitch, or company/product/sales deck. It runs as job-specific WORKFLOWS: brainstorm a deck's structure, generate the HTML deck with a review loop, and export to editable PPTX, image PPTX, standalone HTML, or PDF. It is design-system-agnostic — it uses the user's own design system if they have one, a `nextlevelbuilder/ui-ux-pro-max-skill` suggestion if that's installed, or a bundled neutral default theme — and drives everything from design tokens (never hardcoded colors or fonts). It ships a token-driven brand kit (tokens, fonts, logos, 34 premade layouts), a "wow" craft guide, an anti-slop validator, a ready-made React deck template, point-and-comment edit mode, and a validated editable-PPTX pipeline. It can also supply just the design layer (tokens, components, patterns) to another slide generator so its output uses a real design system instead of a generic theme.
+description: >-
+  Make impressive, on-brand presentation slides and decks end-to-end, for ANY design system. Use
+  this skill whenever the user wants to brainstorm, build, design, generate, review, or export a
+  slide, deck, presentation, pitch, or company/product/sales deck. It runs as job-specific
+  WORKFLOWS: brainstorm a deck's structure, generate the HTML deck with a review loop, and export
+  to editable PPTX, image PPTX, standalone HTML, or PDF. It is design-system-agnostic — it uses
+  the user's own design system if they have one, a `nextlevelbuilder/ui-ux-pro-max-skill`
+  suggestion if that's installed, or a bundled neutral default theme — and drives everything from
+  design tokens (never hardcoded colors or fonts). It ships a token-driven brand kit (tokens,
+  fonts, logos, 34 premade layouts), a "wow" craft guide, an anti-slop validator, a ready-made
+  React deck template, point-and-comment edit mode, and a validated editable-PPTX pipeline. It can
+  also supply just the design layer (tokens, components, patterns) to another slide generator so
+  its output uses a real design system instead of a generic theme.
 ---
 
 # Slide Maker

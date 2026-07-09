@@ -10,6 +10,6 @@
   "license": "MIT",
   "dependencies": [
     { "name": "agent-browser", "marketplace": "agent-browser" },
-    { "name": "ui-ux-pro-max@ui-ux-pro-max-skill", "marketplace": "nextlevelbuilder/ui-ux-pro-max-skill" }
+    { "name": "ui-ux-pro-max", "marketplace": "ui-ux-pro-max-skill" }
   ]
 }
