@@ -1,0 +1,109 @@
+{
+  "$id": "jira-to-local/worklogs-v2",
+  "title": "Every worklog entry on a fetched issue and its subtasks",
+  "description": "Time is logged on the subtask people are working on, so a story's own time is routinely empty while its subtasks carry every hour. This file merges the parent and every subtask, and `entries` must hold `total` rows.",
+  "type": "object",
+  "required": ["$schema", "key", "url", "total", "totalSeconds", "entries", "byPerson"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "jira-to-local/worklogs-v2" },
+    "key": {
+      "type": "string",
+      "description": "The issue this file was fetched for."
+    },
+    "url": { "type": "string" },
+    "summary": { "type": ["string", "null"] },
+    "parent": {
+      "type": ["object", "null"],
+      "required": ["key", "summary", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "summary": { "type": "string" },
+        "url": { "type": "string" }
+      }
+    },
+    "readOnly": {
+      "const": true,
+      "description": "Worklog entries are created in Jira, never by editing this file."
+    },
+    "scope": {
+      "enum": ["issue", "issue-and-subtasks"],
+      "description": "Whether subtask time was merged in."
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many entries were found across every issue read. `entries` must hold this many."
+    },
+    "totalSeconds": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Time logged, in seconds. Both breakdowns below must sum to this."
+    },
+    "entries": {
+      "type": "array",
+      "description": "Oldest first, so the table reads as the history of the work.",
+      "items": {
+        "type": "object",
+        "required": ["issueKey", "author", "started", "seconds", "timeSpent"],
+        "additionalProperties": false,
+        "properties": {
+          "issueKey": {
+            "type": "string",
+            "description": "The issue the time was logged against, usually a subtask rather than the fetched issue."
+          },
+          "author": { "type": "string" },
+          "started": { "type": "string" },
+          "seconds": { "type": "integer", "minimum": 0 },
+          "timeSpent": {
+            "type": "string",
+            "description": "Jira's own duration format: 2h, 30m, 1d 4h. A day is 8 hours."
+          },
+          "comment": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "byPerson": {
+      "type": "array",
+      "description": "Totals per person. Sums to totalSeconds; a mismatch means a parse or fetch bug.",
+      "items": {
+        "type": "object",
+        "required": ["author", "seconds"],
+        "additionalProperties": false,
+        "properties": {
+          "author": { "type": "string" },
+          "seconds": { "type": "integer", "minimum": 0 },
+          "timeSpent": { "type": "string" }
+        }
+      }
+    },
+    "byIssue": {
+      "type": "array",
+      "description": "Totals per issue. Written only when more than one issue carries time. Sums to totalSeconds.",
+      "items": {
+        "type": "object",
+        "required": ["issueKey", "seconds"],
+        "additionalProperties": false,
+        "properties": {
+          "issueKey": { "type": "string" },
+          "seconds": { "type": "integer", "minimum": 0 },
+          "timeSpent": { "type": "string" }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "description": "Every issue read for this file, each with the count Jira reported, so a truncated read is provable after the fact.",
+      "items": {
+        "type": "object",
+        "required": ["issueKey", "total"],
+        "additionalProperties": false,
+        "properties": {
+          "issueKey": { "type": "string" },
+          "total": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

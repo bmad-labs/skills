@@ -1,0 +1,284 @@
+{
+  "$id": "jira-to-local/config-v1",
+  "title": "jira-to-local configuration",
+  "description": "Project settings for pulling Jira issues into a local folder. Holds no secret: the API token and email stay in the environment.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "jira",
+    "auth",
+    "project",
+    "output",
+    "issueTypes"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "const": "jira-to-local/config-v1"
+    },
+    "jira": {
+      "type": "object",
+      "required": [
+        "domain"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Atlassian site host, without a scheme. Example: mycompany.atlassian.net"
+        }
+      }
+    },
+    "auth": {
+      "type": "object",
+      "required": [
+        "source",
+        "envVars"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "const": "env",
+          "description": "Where the credentials come from. Only the environment is supported, so the token is never written to this file."
+        },
+        "envVars": {
+          "type": "object",
+          "required": [
+            "email",
+            "token"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "email": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "key"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Jira project key, uppercase. Example: PROJ"
+        },
+        "name": {
+          "type": "string"
+        },
+        "metaFields": {
+          "type": "object",
+          "description": "Which of this site's custom fields fill the fixed metadata rows of content.md. Jira gives these a different customfield_NNNNN id on every site, so they cannot be hard-coded; setup detects them by display name. A role left unmapped is written as an em dash rather than guessed, and its field, if ticked, is still written as an ordinary field.",
+          "additionalProperties": false,
+          "properties": {
+            "team": {
+              "type": "string",
+              "description": "Field id for the Team row. Example: customfield_NNNNN"
+            },
+            "sprint": {
+              "type": "string",
+              "description": "Field id for the Sprint row. On a scrum board this holds an array of sprint objects."
+            },
+            "storyPoints": {
+              "type": "string",
+              "description": "Field id for the Story Points row. Must hold a number."
+            },
+            "roughStoryPoints": {
+              "type": "string",
+              "description": "Field id for a second, coarser estimate row, where a project keeps one. Most do not \u2014 leave it out."
+            },
+            "dueDate": {
+              "type": "string",
+              "description": "Field id for a custom due date. Jira's own `duedate` is used first; this only fills the row when that is empty."
+            },
+            "development": {
+              "type": "string",
+              "description": "Field id for the development panel summary, which is split into the Git and Releases rows. Maintained by a source-control integration and read-only."
+            },
+            "epicLink": {
+              "type": "string",
+              "description": "Field id for the legacy Epic Link. Fills no row of its own \u2014 the Parent row supersedes it \u2014 but mapping it suppresses the field, so it is not written a second time."
+            }
+          }
+        },
+        "checklistFields": {
+          "type": "object",
+          "description": "The fields a Checklist app writes into, so content.md can rebuild them as one list of real checkboxes. Site-specific ids, like every custom field. Omit the block on a project with no checklist app and no section is written.",
+          "additionalProperties": false,
+          "properties": {
+            "contentYaml": {
+              "type": "string",
+              "description": "The YAML field. The only field carrying each item's checked state."
+            },
+            "text": {
+              "type": "string",
+              "description": "The rendered text field. Item names, no state."
+            },
+            "completed": {
+              "type": "string",
+              "description": "The one-word completion summary field."
+            }
+          }
+        },
+        "boards": {
+          "type": "array",
+          "description": "Optional. The boards the team actually uses, as ticked during setup. A project commonly has several; the pull does not read this, it is a note for a human.",
+          "items": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "description": "scrum or kanban, as the agile API reports it."
+              }
+            }
+          }
+        },
+        "activeSprint": {
+          "type": "string"
+        }
+      }
+    },
+    "instructions": {
+      "type": "string",
+      "description": "Free text an agent reads before it fetches anything. Local conventions, which field really holds what, anything about this project the API does not say."
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "dir",
+        "mode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "dir": {
+          "type": "string",
+          "description": "Destination folder, relative to the workspace root. One subfolder per issue key is created inside it."
+        },
+        "layout": {
+          "type": "string",
+          "description": "Documentation only. The layout is always <dir>/<KEY>/."
+        },
+        "mode": {
+          "enum": [
+            "markdown",
+            "json",
+            "both"
+          ]
+        },
+        "assets": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxMb": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Attachments at or below this size are downloaded. Larger ones are listed with their size and the reason."
+            },
+            "imagesOnly": {
+              "type": "boolean",
+              "description": "When true, only image attachments are downloaded. Videos and PDFs are listed instead."
+            }
+          }
+        }
+      }
+    },
+    "confluence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pullLinkedPages": {
+          "type": "boolean"
+        },
+        "subdir": {
+          "type": "string",
+          "description": "Folder inside the issue folder where linked pages are written."
+        },
+        "maxDepth": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "0 pulls the linked page alone. 1 adds its direct children, and so on."
+        }
+      }
+    },
+    "issueTypes": {
+      "type": "object",
+      "description": "Keyed by the Jira issue type name exactly as the API returns it. Stock names like Story, Task and Sub-task work, and so do the types a project invented for itself, whatever they are called \u2014 no code change either way.",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "fields"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "docType": {
+            "type": "string",
+            "description": "Short lowercase label for this type, used in reports."
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Appended to the top-level instructions when this type is pulled."
+          },
+          "fields": {
+            "type": "array",
+            "description": "The fields to write first, in this order, each under its own heading. Only ticked fields are written; an unticked field is not reported.",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "heading"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Jira field id. Example: customfield_NNNNN"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The field's display name in Jira, for reports and for finding it again."
+                },
+                "heading": {
+                  "type": "string",
+                  "description": "The markdown heading written into content.md. Kept separate from name so a Jira rename does not move the headings."
+                },
+                "type": {
+                  "enum": [
+                    "adf",
+                    "string",
+                    "option",
+                    "array",
+                    "number",
+                    "date",
+                    "user"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string"
+    }
+  }
+}

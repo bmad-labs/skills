@@ -1,0 +1,7 @@
+{
+  "name": "jira-to-local-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pull one Jira issue into a local folder. Node 18+, built-in fetch, no runtime dependencies."
+}
