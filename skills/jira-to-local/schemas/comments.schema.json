@@ -1,0 +1,46 @@
+{
+  "$id": "jira-to-local/comments-v2",
+  "title": "Every comment on a fetched Jira issue",
+  "description": "The whole comment thread, oldest first. `total` is what Jira reported; `comments` must hold that many. A file with fewer is a truncated fetch, not a shorter thread.",
+  "type": "object",
+  "required": ["$schema", "key", "url", "total", "comments"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "jira-to-local/comments-v2" },
+    "key": { "type": "string" },
+    "url": { "type": "string" },
+    "summary": {
+      "type": ["string", "null"],
+      "description": "The issue's summary, repeated so this file reads on its own."
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The count Jira reported. The fetch pages until it has this many, and fails rather than writing fewer."
+    },
+    "comments": {
+      "type": "array",
+      "description": "Oldest first, the order the conversation happened in.",
+      "items": {
+        "type": "object",
+        "required": ["id", "author", "created", "body"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "author": { "type": "string" },
+          "created": { "type": "string" },
+          "updated": { "type": ["string", "null"] },
+          "body": {
+            "type": "string",
+            "description": "The comment as markdown. Inline images resolve against the shared assets/ folder."
+          },
+          "images": {
+            "type": "array",
+            "description": "Images this comment references, by their path into assets/.",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

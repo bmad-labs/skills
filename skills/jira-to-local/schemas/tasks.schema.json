@@ -1,0 +1,64 @@
+{
+  "$id": "jira-to-local/tasks-v2",
+  "title": "Every subtask of a fetched Jira issue, in full",
+  "description": "One entry per subtask, in Jira's own order. A parent issue returns almost nothing about its children, so each entry costs its own request. A subtask the account cannot read is still an entry, marked unreadable, so the count always matches Jira.",
+  "type": "object",
+  "required": ["$schema", "key", "url", "total", "subtasks"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "jira-to-local/tasks-v2" },
+    "key": {
+      "type": "string",
+      "description": "The parent issue these subtasks belong to."
+    },
+    "url": { "type": "string" },
+    "summary": { "type": ["string", "null"] },
+    "parent": {
+      "type": ["object", "null"],
+      "description": "The fetched issue's own parent, when it has one, so a story names its epic.",
+      "required": ["key", "summary", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "summary": { "type": "string" },
+        "url": { "type": "string" }
+      }
+    },
+    "readOnly": {
+      "const": true,
+      "description": "Each subtask is its own Jira issue, recorded here in full."
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many subtasks Jira reports. `subtasks` must hold this many, readable or not."
+    },
+    "subtasks": {
+      "type": "array",
+      "description": "In Jira's order. Never re-sorted.",
+      "items": {
+        "type": "object",
+        "required": ["key", "url", "summary", "readable"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string" },
+          "url": { "type": "string" },
+          "summary": { "type": "string" },
+          "readable": {
+            "type": "boolean",
+            "description": "False when the account cannot read this subtask. The entry stays, so the count matches Jira."
+          },
+          "type": { "type": ["string", "null"] },
+          "status": { "type": ["string", "null"] },
+          "assignee": { "type": ["string", "null"] },
+          "originalEstimate": { "type": ["string", "null"] },
+          "timeSpent": { "type": ["string", "null"] },
+          "description": {
+            "type": ["string", "null"],
+            "description": "The subtask's own description, as markdown."
+          }
+        }
+      }
+    }
+  }
+}

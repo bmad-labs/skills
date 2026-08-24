@@ -1,0 +1,396 @@
+{
+  "$id": "jira-to-local/development-v1",
+  "title": "A fetched Jira issue's development panel",
+  "description": "The pull requests, commits, builds and deployments a repository integration has attached to one issue, grouped by repository. The JSON counterpart of development.md. Read from two undocumented places: /rest/dev-status/1.0/ for everything except deployments, where `applicationType` must be the instance key the summary itself reports; and the GraphQL query Jira's own Deployments tab uses for the deployment list, which no REST endpoint serves. Every request is soft, so a panel that could not be read produces a thinner document rather than a failed pull.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "key",
+    "url",
+    "counts",
+    "repositories"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "const": "jira-to-local/development-v1"
+    },
+    "key": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "summary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "readOnly": {
+      "const": true,
+      "description": "The panel is written by the repository integration. Nothing here can be edited in Jira, and this skill never writes anything anywhere."
+    },
+    "counts": {
+      "type": "object",
+      "description": "Counted from what was actually read, not from what the summary promised.",
+      "additionalProperties": false,
+      "properties": {
+        "pullRequests": {
+          "type": "integer"
+        },
+        "commits": {
+          "type": "integer"
+        },
+        "builds": {
+          "type": "integer"
+        },
+        "repositories": {
+          "type": "integer"
+        },
+        "environments": {
+          "type": "integer"
+        },
+        "deployments": {
+          "type": "integer"
+        }
+      }
+    },
+    "buildStates": {
+      "type": "object",
+      "description": "How many builds are in each state the endpoint reported, for example successful, failed, cancelled, in_progress.",
+      "additionalProperties": {
+        "type": "integer"
+      }
+    },
+    "summaryBuildCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "The build count Jira's own panel shows: the latest build per pipeline. It differs from counts.builds, the full history across every repository. Both are true about different things, so the document reports both and says which is which."
+    },
+    "degraded": {
+      "type": "array",
+      "description": "Each detail the summary promised and the endpoint would not return. Named in the document so a thinner panel cannot be mistaken for a complete one.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "repositories": {
+      "type": "array",
+      "description": "One entry per repository, the grouping Jira's own panel uses. A repository holds only the record types it has. An entry with a null name holds records whose repository the panel did not name; they are kept rather than dropped.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pullRequests": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sourceBranch": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "targetBranch": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reviewers": {
+                  "type": "array",
+                  "description": "A reviewer the integration could not resolve arrives named the literal \"User\"; the document leaves those out rather than printing a non-name.",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "approved": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "commentCount": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "updated": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "repository": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "commits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The short form the integration returned, not the full SHA."
+                },
+                "message": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The first line only. A full commit body is unreadable in a table cell and this is a rollup, not an archive."
+                },
+                "author": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "when": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "files": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "repository": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "builds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pipeline": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "number": {
+                  "type": [
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "state": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "when": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "repository": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "deployments": {
+      "type": "array",
+      "description": "Every deployment on the issue, newest first. Read through the GraphQL query Jira's own Deployments tab uses, because no REST endpoint serves this list: every dev-status spelling returns an empty detail, and the issue property behind the tab holds unlinked lists of distinct values rather than records. Empty when that query returned nothing, and `degraded` then says so and `environments` carries the current state instead.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The first line of the commit message that triggered the deployment, which is what Jira shows in its Deployment column."
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pipeline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "environment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "environmentType": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Production, Staging, Testing or Development, as the deployment payload itself reports it. Unlike the summary's environments, this is the API's own answer rather than a classification from the name."
+          },
+          "when": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "deploymentStates": {
+      "type": "object",
+      "description": "How many deployments are in each state the query reported.",
+      "additionalProperties": {
+        "type": "integer"
+      }
+    },
+    "environments": {
+      "type": "array",
+      "description": "One row per environment, rolled up from the deployments themselves \u2014 the summary's own topEnvironments under-reports, giving a single row on a story deployed to several environments and dating it from the newest deployment anywhere. Ordered by environment type, then most recently deployed first. Falls back to the summary rollup when the deployment query returns nothing.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Production, Staging, Testing or Development, classified from the environment name because nothing in the payload carries the type. Null when the name matches none of them, and the document then groups it under its own heading rather than guessing."
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "when": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deployments": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "How many deployments this environment received. Present when the deployment list was read; absent from the summary fallback, which has no per-environment count."
+          }
+        }
+      }
+    }
+  }
+}

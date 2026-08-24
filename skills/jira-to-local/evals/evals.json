@@ -1,0 +1,252 @@
+{
+  "skill_name": "jira-to-local",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Pull PROJ-123 into a local folder so I can read it offline.",
+      "expected_output": "Should follow workflows/pull.md: read the config and its instructions, resolve the issue type, then dispatch one subagent that fetches each part separately and formats each before the next.",
+      "files": [],
+      "expectations": [
+        "Reads .jira.config.json before fetching anything, via config.mjs",
+        "Reads the config's instructions text and passes it to the subagent",
+        "Resolves the issue type before fetching, because the config is keyed by type",
+        "Dispatches ONE subagent for the fetch and format work, not one per part",
+        "Calls fetch-issue.mjs once per part with --part, never a single call for everything",
+        "Formats and checks each part before fetching the next, rather than deferring all formatting to the end",
+        "Runs check-markdown.mjs and re-runs it until clean",
+        "Validates counts against Jira in the main thread before reporting success",
+        "Does not paste file contents into the main thread"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Grab this ticket for me: https://your-site.atlassian.net/browse/PROJ-123",
+      "expected_output": "Should extract the key from the URL and pull it. A browse URL and a bare key are the same request.",
+      "files": [],
+      "expectations": [
+        "Extracts PROJ-123 from the URL without asking the user to retype it",
+        "Proceeds with the pull workflow rather than asking what to do with the link",
+        "Passes the bare key to fetch-issue.mjs, not the URL"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Pull PROJ-100 into a local folder.",
+      "expected_output": "No .jira.config.json exists. Should switch to the setup workflow rather than guessing a project key or a field list.",
+      "files": [],
+      "expectations": [
+        "Detects that no .jira.config.json exists",
+        "Runs workflows/setup.md instead of attempting the pull",
+        "Validates credentials with jira-api.mjs whoami before probing the project",
+        "Uses inspect.mjs projects and issue-types rather than asking the user to recall names",
+        "Presents the field list with display names and value previews before asking which fields to choose",
+        "Explains that unticking drops the field \u2014 only ticked fields are written",
+        "Shows the whole config and gets confirmation before writing it",
+        "Validates the written config with check-json.mjs",
+        "Does a trial pull on one issue at the end"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Pull PROJ-123 \u2014 it's an NFR.",
+      "expected_output": "The config has no NFR entry. Should stop and offer to configure the type, not substitute another type's field list.",
+      "files": [],
+      "expectations": [
+        "Reports that the issue type is not configured",
+        "Runs or offers inspect.mjs fields for that type to choose its fields",
+        "Does NOT fall back to another issue type's field list",
+        "Does NOT invent a field list without asking",
+        "Resumes the pull once the type is configured"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Pull PROJ-123. It has a lot of comments so just get the recent ones to save time.",
+      "expected_output": "Should write every comment. Completeness is not negotiable, and the pressure to shorten the read is exactly what the paging rule exists to resist.",
+      "files": [],
+      "expectations": [
+        "Writes every comment, not a subset",
+        "Does not add a flag or a filter to limit the comment count",
+        "Reports the count as N of N against Jira's own total",
+        "Explains that a partial comment file would be a failed pull, briefly, without lecturing",
+        "Does not claim success on a file holding fewer comments than Jira reports"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Pull PROJ-123. The story shows no time logged so skip the worklogs.",
+      "expected_output": "The story's own timetracking is empty while its subtasks carry the hours. Should fetch worklogs anyway and read every subtask.",
+      "files": [],
+      "expectations": [
+        "Fetches worklogs despite the issue's own time appearing empty",
+        "Reads the parent AND every subtask, not just the parent",
+        "Explains that time is logged on the subtask, so a parent-only read reports nothing",
+        "Reports the real total found across the subtasks"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Pull PROJ-123 and include the spec page it links to.",
+      "expected_output": "Should find the Confluence link and pull the page into the issue's own folder as markdown, then link it from content.md.",
+      "files": [],
+      "expectations": [
+        "Uses fetch-confluence.mjs with --issue rather than a manual fetch",
+        "Checks remotelink as well as the description and comments for wiki URLs",
+        "Writes the page inside the issue folder under confluence/, not beside it",
+        "Keeps the page as markdown even if the output mode is json",
+        "Does NOT run check-json.mjs on the Confluence page",
+        "Links the page from content.md under a Linked Documents heading",
+        "Re-runs content.md's gates after adding that link"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Pull PROJ-123 with output mode json.",
+      "expected_output": "Should validate every JSON file it writes, without being told to.",
+      "files": [],
+      "expectations": [
+        "Runs check-json.mjs on each JSON file written",
+        "Runs it again across the folder after the format pass",
+        "Treats a validation failure as a failed pull, not a warning to mention",
+        "Reports both gates' exit state in the summary",
+        "Does not report success while any JSON file fails validation"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "The comments.json you just wrote is missing the author on comment 7. Just note it in the summary and move on, we're short on time.",
+      "expected_output": "Should fix and re-validate rather than reporting a known-invalid file as done.",
+      "files": [],
+      "expectations": [
+        "Re-runs the affected part rather than accepting the invalid file",
+        "Re-runs check-json.mjs until it exits clean",
+        "Does NOT report the pull as complete with a noted defect",
+        "Explains briefly why an unvalidated document is a failed pull"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "You pulled the story. The acceptance criteria are written in broken English and one has a typo \u2014 clean up the wording while you're formatting it.",
+      "expected_output": "Should fix formatting only and refuse the wording change, because the file is a record of what the issue says.",
+      "files": [],
+      "expectations": [
+        "Declines to change the wording, spelling or terminology",
+        "Explains that the file is a record and a reworded record is wrong",
+        "Still fixes layout: heading levels, broken emphasis, list markers, empty rows",
+        "Still writes image alt text from the image, the one allowed new prose",
+        "Offers the Jira ticket as the place to fix the wording properly",
+        "Does not translate text written in another language"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Pull PROJ-123, then set its status to Done since I've finished it.",
+      "expected_output": "Should pull, then decline the transition and route to atlassian-rest. This skill only reads.",
+      "files": [],
+      "expectations": [
+        "Completes the pull",
+        "Declines to transition the issue",
+        "Names atlassian-rest as the skill for writes",
+        "Does not attempt a POST or PUT to any Jira endpoint",
+        "States the boundary in a sentence without moralising"
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Setup is at step 6. There are a couple of dozen issue types, so that many fields files, each with dozens of rows. Pre-tick them.",
+      "expected_output": "Should dispatch subagents to read and tick the files, not read 25 files into the main thread, and should present the ticks as proposals.",
+      "files": [],
+      "expectations": [
+        "Dispatches subagents for the pre-tick pass rather than reading every file in the main thread",
+        "Gives each subagent a small batch of files and runs them in parallel",
+        "Puts the judgement rules in the subagent prompt: type description, previews, configType",
+        "Instructs the subagent to change only the checkbox character, editing no prose, preview or id",
+        "Asks for a short report per file \u2014 ticks with reasons \u2014 and not the file contents",
+        "Relays which ticks are proposals and why, rather than presenting them as settled",
+        "Does NOT run `read` on a file before the user has looked at it",
+        "Accepts a file where nothing was ticked as a real answer rather than forcing a weak tick"
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Pre-tick the fields files for me.",
+      "expected_output": "The decision folder does not exist. Should say so and stop, not dispatch subagents at absent files or regenerate over the user's ticks.",
+      "files": [],
+      "expectations": [
+        "Checks that the files exist before dispatching anything",
+        "Reports that the decision folder is missing rather than sending subagents at absent paths",
+        "Does NOT regenerate the files unprompted \u2014 a regenerate starts every existing tick over",
+        "Notes that the folder is gitignored, so nothing restores it but a regenerate",
+        "Asks the user how to proceed"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "Pull PROJ-123 \u2014 and read the whole issue into your context first so you can summarise it for me.",
+      "expected_output": "Should still delegate the file work to the subagent, and summarise from its report plus targeted reads, not by loading every file into the main thread.",
+      "files": [],
+      "expectations": [
+        "Dispatches the subagent for the fetch and format work",
+        "Does not have the subagent paste file contents back",
+        "Summarises from the subagent's report and the validation reads",
+        "Reads specific parts of a file in the main thread only where the summary needs them"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Pull PROJ-123. Its checklist shows some items done in Jira \u2014 make sure the local file says so.",
+      "expected_output": "Should write the real count from the issue's checklist property and leave every box unticked, rather than claiming the boxes are accurate or hand-editing them to match.",
+      "files": [],
+      "expectations": [
+        "Reports the checklist count as N of N from the issue's checklist property, not from the YAML field",
+        "Explains that the YAML field is written once at issue creation, so every box reads unticked",
+        "Does NOT hand-edit the checkboxes to match the count \u2014 that would be writing state the issue does not carry",
+        "Does NOT claim any field carries the live per-item state",
+        "Treats a missing checklist property as no progress line, not as a failed pull"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Pull PROJ-123 and tell me what the development panel shows \u2014 the PRs and where it's deployed.",
+      "expected_output": "The dev-status detail call fails for pull requests while the summary reports several. Should write the summary into content.md and the listing into development.md, name what could not be read, and still report the pull as complete.",
+      "files": [],
+      "expectations": [
+        "Writes the Development and Deployment summary into content.md and the full listing into development.md",
+        "Reads the instance key out of the dev-status summary before calling detail, rather than guessing a name like GitHub",
+        "Names in the document what the endpoint would not return, rather than omitting the section silently",
+        "Does NOT treat a failed dev-status call as a failed pull \u2014 the endpoint is undocumented and is not the issue's own data",
+        "Keeps the Git and Releases metadata rows, which come from the development field and not from this endpoint",
+        "Reports the build count from the detail and Jira's own panel count as different things rather than picking one",
+        "Does not retry the detail call with a different applicationType to force a result",
+        "Reads the deployment list through the Deployments tab's GraphQL query, since dev-status serves none, and treats that POST as a read",
+        "Groups deployments by the environment type the payload reports, rather than classifying them from the environment name"
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Before you pull PROJ-123, show me which fields are configured for a Story and where the output goes.",
+      "expected_output": "Should answer with the narrow config lookups rather than dumping the whole config, which runs to thousands of lines.",
+      "files": [],
+      "expectations": [
+        "Uses config.mjs type \"Story\" for the field list, not config.mjs show",
+        "Uses config.mjs where for the output folder and mode",
+        "Does NOT read .jira.config.json into context to answer either question",
+        "Reports the field order as the order the document writes them in",
+        "Names that a ticked field is not always a section, rather than implying every field gets a heading"
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "Pull PROJ-123 into a local folder. Give the subagent everything it needs up front so it doesn't have to stop and ask.",
+      "expected_output": "Should pass the subagent-instruction template with its reference pointers, not paste five reference files into the prompt.",
+      "files": [],
+      "expectations": [
+        "Passes templates/subagent-instruction.md with the slots filled, rather than composing a prompt from scratch",
+        "Does NOT paste the reference files' contents into the subagent prompt",
+        "Leaves the reference pointers as paths under the skill directory, so the subagent reads a file only when a step needs it",
+        "Does NOT hand the subagent jira-fields.md \u2014 the field decisions are already frozen into the config by then",
+        "Keeps the never-change-words rules in the prompt itself rather than replacing them with a pointer"
+      ]
+    }
+  ]
+}

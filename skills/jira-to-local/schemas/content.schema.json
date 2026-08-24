@@ -1,0 +1,607 @@
+{
+  "$id": "jira-to-local/content-v3",
+  "title": "A fetched Jira issue",
+  "description": "The issue itself: its metadata, its description, the fields chosen in the config, every other populated field, its attachments, its subtask list and its links. The JSON counterpart of content.md.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "key",
+    "url",
+    "summary",
+    "meta",
+    "fetchedAt"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "const": "jira-to-local/content-v3"
+    },
+    "key": {
+      "type": "string",
+      "description": "The issue key. Example: PROJ-123"
+    },
+    "url": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "fetchedAt": {
+      "type": "string",
+      "description": "ISO date the fetch ran, so a stale document is recognisable."
+    },
+    "meta": {
+      "type": "object",
+      "description": "The metadata block. The stock Jira rows below are always present; a field Jira has no value for is null, so an empty field is visibly empty rather than indistinguishable from one the fetch missed. The seven site-specific rows \u2014 team, sprint, storyPoints, roughStoryPoints, dueDate, git, releases \u2014 are null when project.metaFields in the config maps them, because Jira gives those a different field id on every site.",
+      "required": [
+        "type",
+        "status",
+        "priority",
+        "assignee",
+        "reporter",
+        "originalEstimate",
+        "timeTracking",
+        "parent",
+        "labels",
+        "components",
+        "fixVersions",
+        "created",
+        "updated"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "priority": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "assignee": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reporter": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "team": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sprint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "storyPoints": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "roughStoryPoints": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "dueDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "originalEstimate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timeTracking": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "parent": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "required": [
+            "key",
+            "summary",
+            "url"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fixVersions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "git": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pull request and build activity, parsed out of the Development field. Read-only in Jira."
+        },
+        "releases": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Deployment environments, from the same Development field."
+        },
+        "created": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "updated": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "description": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "heading",
+        "body"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "description": "The heading this field is written under, taken from the config."
+        },
+        "body": {
+          "type": "string"
+        }
+      }
+    },
+    "fields": {
+      "type": "array",
+      "description": "The fields named in the config for this issue type, in config order. A field with no value is omitted.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "heading",
+          "value"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "array",
+              "object",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "metaRows": {
+      "type": "array",
+      "description": "Every ticked field whose value fits on one line. These are rendered as rows of the metadata table, so a reader and a script see the same facts.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "value"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "array",
+              "object",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "checklist": {
+      "type": "array",
+      "description": "The checklist items, parsed out of the Checklist app's YAML field. A group separator carries group:true. `checked` comes from that field, which is written once at issue creation and never updated, so it reads false on every item; `checklistProgress` carries the real count.",
+      "items": {
+        "type": "object",
+        "required": [
+          "text",
+          "checked",
+          "group"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "checked": {
+            "type": "boolean"
+          },
+          "group": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "checklistProgress": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The checklist's real progress, from the issue property the Checklist app maintains. Totals only \u2014 Jira exposes no per-item state, so every item in `checklist` reads unchecked and this is the only true count. Null when the issue has no such property, which is normal on a subtask and on any project without the app.",
+      "required": [
+        "done",
+        "total"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "done": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "development": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The development panel's counts, from /rest/dev-status/1.0/, an endpoint Atlassian does not document. The full listing is development.json. `degraded` names any detail the summary promised and the endpoint would not return; the section is still written, from the counts, because this panel is not the issue's own data and an unreachable one is a thinner document rather than a partial pull. Null when the issue has no development activity.",
+      "required": [
+        "counts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pullRequests": {
+              "type": "integer"
+            },
+            "commits": {
+              "type": "integer"
+            },
+            "builds": {
+              "type": "integer"
+            },
+            "repositories": {
+              "type": "integer"
+            },
+            "environments": {
+              "type": "integer"
+            },
+            "deployments": {
+              "type": "integer"
+            }
+          }
+        },
+        "buildStates": {
+          "type": "object",
+          "description": "How many builds are in each state the endpoint reported.",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "summaryBuildCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The build count Jira's own panel shows: the latest build per pipeline. It differs from counts.builds, which is the full history across every repository. Both are true about different things."
+        },
+        "degraded": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "release": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The deployment environments and their current state, plus how many deployments sit behind them. The deployments themselves are listed in development.json. Null when the issue has no deployments.",
+      "required": [
+        "environments"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "deploymentCount": {
+          "type": "integer",
+          "description": "How many deployments the Deployments-tab query returned. Zero when that query gave nothing, and the environments below are then the only deployment facts available."
+        },
+        "deploymentStates": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Production, Staging, Testing or Development, from the deployment payload's own environment.type; classified from the name only in the summary fallback. Null when the name matches none of them, and the document then groups it under its own heading rather than guessing."
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "when": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "deployments": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "How many deployments this environment received. Present when the deployment list was read; absent from the summary fallback, which has no per-environment count."
+              }
+            }
+          },
+          "description": "One row per environment, rolled up from the deployments themselves \u2014 the summary's own topEnvironments under-reports, giving a single row on a story deployed to several environments and dating it from the newest deployment anywhere. Ordered by environment type, then most recently deployed first. Falls back to the summary rollup when the deployment query returns nothing."
+        }
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "filename",
+          "mimeType",
+          "sizeBytes",
+          "downloaded"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "downloaded": {
+            "type": "boolean"
+          },
+          "localPath": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Relative path into assets/, or null when the file was not downloaded."
+          },
+          "skippedReason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why it was not downloaded, so nothing disappears silently."
+          }
+        }
+      }
+    },
+    "subtasks": {
+      "type": "array",
+      "description": "The issue's own one-line view of its children. The full detail is in tasks.json.",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "summary",
+          "url",
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "key",
+          "summary",
+          "url"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "linkedDocuments": {
+      "type": "array",
+      "description": "Confluence pages pulled into this issue's folder. Always markdown, whatever the output mode.",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "url",
+          "localPath"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "pageId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "localPath": {
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "remotelink",
+              "description",
+              "comment"
+            ],
+            "description": "Where the link was found."
+          }
+        }
+      }
+    },
+    "commentCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many comments the issue has. The comments themselves are in comments.json."
+    }
+  }
+}
