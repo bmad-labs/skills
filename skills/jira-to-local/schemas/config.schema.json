@@ -100,7 +100,7 @@
             },
             "development": {
               "type": "string",
-              "description": "Field id for the development panel summary, which is split into the Git and Releases rows. Maintained by a source-control integration and read-only."
+              "description": "Field id for the development panel summary, which is split into the Git and Deployments rows. Maintained by a source-control integration and read-only."
             },
             "epicLink": {
               "type": "string",

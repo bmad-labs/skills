@@ -20,7 +20,7 @@ nothing to structure. Those files stay markdown in every mode.
 
 | File | `$schema` | Holds |
 |---|---|---|
-| `content.json` | `jira-to-local/content-v3` | The issue: metadata, description, the ticked prose fields, `metaRows`, `checklist` with its `checklistProgress`, attachments, subtask list, links, and the `development` and `release` summaries |
+| `content.json` | `jira-to-local/content-v3` | The issue: metadata, description, the ticked prose fields, `metaRows`, `checklist` with its `checklistProgress`, attachments, subtask list, links, and the `development` and `deployment` summaries |
 | `comments.json` | `jira-to-local/comments-v2` | Every comment, oldest first, with `total` |
 | `tasks.json` | `jira-to-local/tasks-v2` | Every subtask in full |
 | `worklogs.json` | `jira-to-local/worklogs-v2` | Every worklog entry, plus totals per person and per issue |

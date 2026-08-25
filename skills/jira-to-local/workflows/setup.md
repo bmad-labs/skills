@@ -361,7 +361,7 @@ every Jira site, so they have to be mapped or they cannot be filled:
 | Story Points | `storyPoints` | Story Points, Points, Estimate |
 | Rough Story Points | `roughStoryPoints` | A second, coarser estimate — many projects have none |
 | Due Date | `dueDate` | A custom due date, where the project keeps one instead of Jira's |
-| Git and Releases | `development` | Development |
+| Git and Deployments | `development` | Development |
 | *(no row)* | `epicLink` | Epic Link — mapping it suppresses the field, so it is not written a second time as a duplicate of the Parent row |
 
 Read the display names in the fields file from 6a and match them to these roles.

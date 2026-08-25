@@ -32,7 +32,7 @@
     },
     "meta": {
       "type": "object",
-      "description": "The metadata block. The stock Jira rows below are always present; a field Jira has no value for is null, so an empty field is visibly empty rather than indistinguishable from one the fetch missed. The seven site-specific rows \u2014 team, sprint, storyPoints, roughStoryPoints, dueDate, git, releases \u2014 are null when project.metaFields in the config maps them, because Jira gives those a different field id on every site.",
+      "description": "The metadata block. The stock Jira rows below are always present; a field Jira has no value for is null, so an empty field is visibly empty rather than indistinguishable from one the fetch missed. The seven site-specific rows \u2014 team, sprint, storyPoints, roughStoryPoints, dueDate, git, deployments \u2014 are null when project.metaFields in the config maps them, because Jira gives those a different field id on every site.",
       "required": [
         "type",
         "status",
@@ -170,12 +170,12 @@
           ],
           "description": "Pull request and build activity, parsed out of the Development field. Read-only in Jira."
         },
-        "releases": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "description": "Deployment environments, from the same Development field."
+        "deployments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Deployment environments, from the same Development field. One entry per environment \u2014 a story deploys to several, and a joined string forces every reader to split it back apart. Empty when the issue has no deployments."
         },
         "created": {
           "type": [
@@ -380,7 +380,7 @@
         }
       }
     },
-    "release": {
+    "deployment": {
       "type": [
         "object",
         "null"

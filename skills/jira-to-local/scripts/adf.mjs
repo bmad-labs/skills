@@ -248,14 +248,16 @@ export function parseDevelopment(raw) {
     git.push(`${build.count} build(s): ${build.successfulBuildCount} passed, ${build.failedBuildCount} failed`);
   }
 
-  const releases = [];
+  const deployments = [];
   for (const envInfo of summary['deployment-environment']?.overall?.topEnvironments || []) {
-    releases.push(`${envInfo.title} (${envInfo.status})`);
+    deployments.push(`${envInfo.title} (${envInfo.status})`);
   }
 
   return {
     git: git.length ? git.join('; ') : null,
-    releases: releases.length ? releases.join(', ') : null,
+    // An array, because a story deploys to several environments and a joined
+    // string forces every reader to split it back apart.
+    deployments,
   };
 }
 

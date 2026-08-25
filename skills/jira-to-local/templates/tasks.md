@@ -68,4 +68,5 @@ _Could not be read; only the parent's summary is available. Open [{SUB-KEY}]({ur
 | The count in the heading | Always matches Jira, because an unreadable subtask becomes a section that says so rather than a missing one |
 | Order | Jira's own. The board's order is information; re-sorting destroys it |
 | No commentary | `tasks.md` records what other issues say. Nothing is written here about the file itself |
+| Time in `tasks.json` | Each subtask carries both forms: `originalEstimate` / `timeSpent` as Jira's display strings, and `originalEstimateSeconds` / `timeSpentSeconds` as Jira's own second counts. The strings hide that Jira's working day is 8 hours, so `7h` and `1d` do not sum the way they read; the seconds add up correctly. `tasks.md` shows the strings, because a reader reads hours |
 | Cost | One request per subtask. A parent returns only `summary`, `status`, `priority` and `issuetype` for each child — no description, no assignee, no logged time — so the detail cannot be had any cheaper |

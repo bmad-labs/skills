@@ -51,8 +51,22 @@
           "type": { "type": ["string", "null"] },
           "status": { "type": ["string", "null"] },
           "assignee": { "type": ["string", "null"] },
-          "originalEstimate": { "type": ["string", "null"] },
-          "timeSpent": { "type": ["string", "null"] },
+          "originalEstimate": {
+            "type": ["string", "null"],
+            "description": "Jira's display string, such as \"7h\"."
+          },
+          "originalEstimateSeconds": {
+            "type": ["integer", "null"],
+            "description": "The same estimate in seconds, as Jira's API reports it. The display string hides that Jira's working day is 8 hours, so summing strings gives the wrong answer; these add up correctly."
+          },
+          "timeSpent": {
+            "type": ["string", "null"],
+            "description": "Jira's display string, such as \"8h\"."
+          },
+          "timeSpentSeconds": {
+            "type": ["integer", "null"],
+            "description": "The same time in seconds, as Jira's API reports it."
+          },
           "description": {
             "type": ["string", "null"],
             "description": "The subtask's own description, as markdown."

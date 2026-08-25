@@ -36,7 +36,7 @@ labels: {a, b}
 components: {a, b}
 fixVersions: {a, b}
 git: {N pull request(s), state OPEN; N build(s)}
-releases: {env-name (DEPLOYED)}
+deployments: {env-name (DEPLOYED)}
 created: {YYYY-MM-DD}
 updated: {YYYY-MM-DD}
 fetched: {YYYY-MM-DD}
@@ -66,7 +66,7 @@ fetched: {YYYY-MM-DD}
 | **Components** | {a, b|—} |
 | **Fix Versions** | {a, b|—} |
 | **Git** | {pull request and build activity|—} |
-| **Releases** | {deployment environments|—} |
+| **Deployments** | {deployment environments|—} |
 | **Created** | {YYYY-MM-DD} |
 | **Updated** | {YYYY-MM-DD} |
 | **{ticked field}** | {value} |
@@ -168,13 +168,13 @@ missing from it."}
 | Element | Rule |
 |---|---|
 | Metadata rows | A fixed list, always in this order. A field Jira has no value for is written `—` rather than dropped, so an empty field is visibly empty rather than indistinguishable from one the fetch missed |
-| Site-specific rows | Team, Sprint, Story Points, Rough Story Points, Due Date, Git and Releases come from custom fields whose id differs on every Jira site, so they are filled only when `project.metaFields` in the config maps them. Unmapped means `—`, and the field, if ticked, is still written as an ordinary field. `Rough Story Points` is an example of a row many projects simply have no field for |
+| Site-specific rows | Team, Sprint, Story Points, Rough Story Points, Due Date, Git and Deployments come from custom fields whose id differs on every Jira site, so they are filled only when `project.metaFields` in the config maps them. Unmapped means `—`, and the field, if ticked, is still written as an ordinary field. `Rough Story Points` is an example of a row many projects simply have no field for |
 | Description heading | Comes from the config, not a literal. A project that calls it "User Story" gets that heading. Written once — the field is skipped in the chosen-field loop so it cannot repeat |
 | Chosen field order | Config order, never Jira's order. The config decides what comes first, never what is dropped |
 | What is written | Only fields the config ticked. An unticked field is one the project saw in the decision file and passed over, so it is not reported |
 | Where a field lands | A field the config typed `adf` is prose and always gets a `##` heading, even when one ticket's value happens to be short. Everything else follows its value: multi-line gets a heading, a single line gets a metadata row and a frontmatter key |
 | Checklist | Rebuilt as one list of checkboxes; the three raw fields are never printed, one being unreadable YAML. No field carries the live state — the YAML is written once, at issue creation — so the real count comes from the issue's `checklist` property and is written as one line above the list, with every box left unticked |
-| `Git` and `Releases` | The one-line rollup, parsed out of the Development field. `## Development` and `## Deployment` are the detail, from the `dev-status` endpoint. Both are kept: the field costs no extra request and still answers when that endpoint does not. Read-only in Jira |
+| `Git` and `Deployments` | The one-line rollup, parsed out of the Development field. In `content.json`, `meta.deployments` is an array with one entry per environment; the markdown row joins them with commas, and the JSON section that holds the detail is `deployment`. `## Development` and `## Deployment` are the detail, from the `dev-status` endpoint. Both are kept: the field costs no extra request and still answers when that endpoint does not. Read-only in Jira |
 | `## Development` / `## Deployment` | One summary call to `dev-status`, then one detail call per data type that has data, plus the GraphQL query for the deployment list that REST does not serve. Every one is undocumented, and the detail call needs an instance key read back out of the summary, so a call that fails is reported inside the section rather than failing the part: a missing panel is a thinner pull, not a partial one. The full listing goes to `development.md` |
 | `## Deployment` rows | One per environment, rolled up from the deployments themselves rather than from the summary's `topEnvironments` — that reported a single row on a story deployed to more than one environment, and dated it from the newest deployment anywhere. Ordered by environment type, then most recent first |
 | Image paths | Relative into `assets/`, shared with `comments.md`, so the file renders offline the way the ticket renders in Jira |

@@ -54,6 +54,6 @@ _No comments._
 |---|---|
 | `total` and the count line | What Jira reported, not what happened to arrive. The fetch pages to this number and fails rather than writing fewer — see Rule 4 in `SKILL.md` |
 | Order | Oldest first, the order the conversation happened in. Never re-sorted |
-| Images | Inline images frequently live in a comment rather than the description. They resolve into the shared `assets/`, by the same resolver `content.md` uses |
+| Attachments | A screenshot, a spreadsheet, a PDF or a log lives in a comment as often as in the description. All of them resolve into the shared `assets/`, by the same resolver `content.md` uses — an image is embedded, any other file becomes a link. `comments.json` lists every one of them per comment in `attachments` |
 | An empty comment | Written as `_(empty)_` rather than an empty section, so the author and date still read |
 | Author names and dates | Never edited. A reworded record is a wrong record |
