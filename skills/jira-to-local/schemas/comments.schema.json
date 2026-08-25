@@ -34,9 +34,9 @@
             "type": "string",
             "description": "The comment as markdown. Inline images resolve against the shared assets/ folder."
           },
-          "images": {
+          "attachments": {
             "type": "array",
-            "description": "Images this comment references, by their path into assets/.",
+            "description": "Every asset this comment references, by its path into assets/ \u2014 embedded images and linked files alike, since a spreadsheet or a PDF is attached to a comment as often as a screenshot is. Which files reached assets/ is decided by the download filter in the config; a file that filter skipped is not referenced here.",
             "items": { "type": "string" }
           }
         }

@@ -384,7 +384,7 @@ function buildMeta(cred, issue, config, devStatus = null) {
     components: (f.components || []).map((c) => c.name),
     fixVersions: (f.fixVersions || []).map((v) => v.name),
     git: dev?.git || null,
-    releases: deployedTo.length ? deployedTo.join(', ') : dev?.releases || null,
+    deployments: deployedTo.length ? deployedTo : dev?.deployments || [],
     created: (f.created || '').slice(0, 10) || null,
     updated: (f.updated || '').slice(0, 10) || null,
   };
@@ -481,7 +481,7 @@ function buildContentMarkdown(cred, issue, meta, description, chosen, extraRows,
     'schema', 'jiraKey', 'jiraUrl', 'summary', 'type', 'status', 'priority',
     'assignee', 'reporter', 'team', 'sprint', 'storyPoints', 'roughStoryPoints',
     'dueDate', 'originalEstimate', 'timeTracking', 'parent', 'labels',
-    'components', 'fixVersions', 'git', 'releases', 'created', 'updated', 'fetched',
+    'components', 'fixVersions', 'git', 'deployments', 'created', 'updated', 'fetched',
   ]);
   const extraYaml = [];
   for (const r of extraRows) {
@@ -513,7 +513,7 @@ function buildContentMarkdown(cred, issue, meta, description, chosen, extraRows,
     `components: ${yamlValue(meta.components)}`,
     `fixVersions: ${yamlValue(meta.fixVersions)}`,
     `git: ${yamlValue(meta.git)}`,
-    `releases: ${yamlValue(meta.releases)}`,
+    `deployments: ${yamlValue(meta.deployments.length ? meta.deployments.join(', ') : null)}`,
     `created: ${yamlValue(meta.created)}`,
     `updated: ${yamlValue(meta.updated)}`,
     `fetched: ${today()}`,
@@ -536,7 +536,7 @@ function buildContentMarkdown(cred, issue, meta, description, chosen, extraRows,
     ['Original Estimate', meta.originalEstimate], ['Time Tracking', meta.timeTracking],
     ['Parent', parentCell], ['Labels', meta.labels.join(', ')],
     ['Components', meta.components.join(', ')], ['Fix Versions', meta.fixVersions.join(', ')],
-    ['Git', meta.git], ['Releases', meta.releases],
+    ['Git', meta.git], ['Deployments', meta.deployments.length ? meta.deployments.join(', ') : null],
     ['Created', meta.created], ['Updated', meta.updated],
   ];
   for (const [label, value] of rows) out.push(`| **${label}** | ${cell(value)} |`);
@@ -1381,7 +1381,7 @@ async function main() {
               degraded: devStatus.degraded,
             }
           : null,
-        release: devStatus?.environments?.length
+        deployment: devStatus?.environments?.length
           ? {
               environments: devStatus.environments,
               deploymentCount: devStatus.deployments.length,
@@ -1443,7 +1443,14 @@ async function main() {
             created: c.created || '',
             updated: c.updated || null,
             body,
-            images: [...body.matchAll(/!\[[^\]]*\]\((assets\/[^)]+)\)/g)].map((m) => m[1]),
+            // Every asset the comment references, not only the embedded images:
+            // a spreadsheet or a PDF is attached to a comment as often as a
+            // screenshot is, and it renders as a plain link rather than an
+            // embed. Both markdown forms are matched, and the same file linked
+            // twice is listed once.
+            attachments: [...new Set(
+              [...body.matchAll(/!?\[[^\]]*\]\((assets\/[^)]+)\)/g)].map((m) => m[1])
+            )],
           };
         }),
       });
@@ -1489,7 +1496,12 @@ async function main() {
           status: s.fields?.status?.name || null,
           assignee: s.fields?.assignee?.displayName || null,
           originalEstimate: s.fields?.timetracking?.originalEstimate || null,
+          // Jira's own second counts, alongside its display strings. "7h" hides
+          // that Jira's working day is 8 hours, so summing the strings gives the
+          // wrong answer; the seconds add up correctly.
+          originalEstimateSeconds: s.fields?.timetracking?.originalEstimateSeconds ?? null,
           timeSpent: s.fields?.timetracking?.timeSpent || null,
+          timeSpentSeconds: s.fields?.timetracking?.timeSpentSeconds ?? null,
           description: s.fields?.description ? adfToMarkdown(s.fields.description, null).trim() : null,
         })),
       });

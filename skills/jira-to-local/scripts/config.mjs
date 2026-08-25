@@ -241,7 +241,7 @@ function cmdMeta(config) {
     ['storyPoints', 'the Story Points row'],
     ['roughStoryPoints', 'the Rough Story Points row'],
     ['dueDate', 'the Due Date row'],
-    ['development', 'the Git and Releases rows'],
+    ['development', 'the Git and Deployments rows'],
     ['epicLink', 'nothing — mapping it only stops the field being written twice'],
   ];
   const meta = project.metaFields || {};

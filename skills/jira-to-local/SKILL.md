@@ -15,7 +15,7 @@ description: >
 # Pull a Jira issue into a local folder
 
 One job: an issue key goes in, a folder of readable files comes out. One issue,
-one folder, everything in it — fields, comments, subtasks, worklogs, images, and
+one folder, everything in it — fields, comments, subtasks, worklogs, attachments, and
 any Confluence page the issue links to.
 
 `<skill-path>` below is this skill's directory.

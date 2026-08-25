@@ -159,7 +159,7 @@ id differs on every site:
 | Story Points | `storyPoints` | Must hold a number |
 | Rough Story Points | `roughStoryPoints` | Only some projects keep a second, coarser estimate |
 | Due Date | `dueDate` | Jira's own `duedate` is preferred; this fills the row only when that is empty |
-| Git, Releases | `development` | One field, split into two rows — see below |
+| Git, Deployments | `development` | One field, split into two rows — see below |
 
 Setup records these in `project.metaFields`, matching display name to id from the
 same field list the user ticks. **A role left unmapped writes `—` in that row.** The
@@ -245,7 +245,7 @@ renders. It arrives as a Java `toString` dump with the real payload embedded as
 It answers two different questions, so it becomes two rows:
 
 - **Git** — pull request and build activity: `N build(s): N passed, N failed`
-- **Releases** — deployment environments: `<env> (DEPLOYED)`
+- **Deployments** — deployment environments: `<env> (DEPLOYED)`
 
 The field is maintained by a source-control integration. It is read-only, and this
 skill only reads anyway. Leave the role unmapped and both rows read `—`.
