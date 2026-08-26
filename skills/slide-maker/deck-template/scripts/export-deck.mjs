@@ -71,7 +71,17 @@ async function shootSlides(page, total) {
   const shots = [];
   for (let i = 0; i < total; i++) {
     await gotoSlide(page, i);
-    shots.push(await page.screenshot({ type: 'png' }));
+    // Clip to the .slide-page box. A bare page.screenshot() grabs the whole
+    // viewport, and present mode letterboxes the slide inside it — that padding
+    // got baked into every PDF page as a white band down two edges.
+    const box = await page.evaluate(() => {
+      const pages = [...document.querySelectorAll('.slide-page')];
+      const el = pages[pages.length - 1];
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, width: r.width, height: r.height };
+    });
+    shots.push(await page.screenshot(box ? { type: 'png', clip: box } : { type: 'png' }));
   }
   return shots;
 }
@@ -89,14 +99,22 @@ async function exportHtml() {
 }
 
 // ── format: pdf ──
+// Page size is in POINTS (72pt = 1in), not pixels. Using the 1280x720 pixel
+// count directly produced 17.78x10in pages — a size no printer or slide tool
+// expects. 960x540pt = 13.33x7.5in, the standard 16:9 widescreen slide page,
+// so the deck opens at the right size and the image still fills the page edge
+// to edge (same aspect ratio, no letterboxing).
+const PDF_PAGE_PT = [960, 540];
+
 async function exportPdf(page, total) {
   const { PDFDocument } = await dep('pdf-lib');
   const shots = await shootSlides(page, total);
   const pdf = await PDFDocument.create();
+  const [PW, PH] = PDF_PAGE_PT;
   for (const png of shots) {
     const img = await pdf.embedPng(png);
-    const pg = pdf.addPage([1280, 720]);
-    pg.drawImage(img, { x: 0, y: 0, width: 1280, height: 720 });
+    const pg = pdf.addPage([PW, PH]);
+    pg.drawImage(img, { x: 0, y: 0, width: PW, height: PH });
   }
   const bytes = await pdf.save();
   const dest = join(outDir, 'deck.pdf');
