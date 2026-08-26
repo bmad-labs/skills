@@ -298,13 +298,13 @@ Unicode emoji (slop — see [validation.md](validation.md)).
 
 ### Accent-word colour → two `TextRun`s in one `Text`
 
-`<h1>Three practices, one <span data-viz-id="s1.title.accent" class="text-primary-500">delivery team</span></h1>`:
+`<h1>Ships in <span data-viz-id="s1.title.accent" class="text-primary-500">half the time</span></h1>`:
 tag the accent span, then emit ONE Text with two runs so the split stays editable:
 
 ```js
 h(Text, { ...box('s1.title'), fontSize: fpt('s1.title'), fontFace:'Inter', bold:true, margin:0 },
-  h(TextRun, { text: 'Three practices, one ', options: { color: '0F172A' } }),
-  h(TextRun, { text: 'delivery team',         options: { color: '4F46E5' } }));
+  h(TextRun, { text: 'Ships in ',      options: { color: '0F172A' } }),
+  h(TextRun, { text: 'half the time',  options: { color: '4F46E5' } }));
 ```
 (Default is a single run coloured by the title's dominant colour; do this only when the
 two-colour split matters.)
@@ -454,4 +454,5 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
 - `assets/fonts/Inter-{Regular,Bold}.otf` — vendored (SIL OFL) for embedding + LibreOffice.
 - Deps (devDeps): `@artifact-kit/pptxgenjs-jsx`, `pptx-embed-fonts`, `pixelmatch`, `pngjs`, `ssim.js`, `svgpath`.
 
-Grounding research: [pptx-export-research.md](pptx-export-research.md).
+Grounding research (a **proposal**, not current behaviour):
+[../research/pptx-export-2026-06-20.md](../research/pptx-export-2026-06-20.md).

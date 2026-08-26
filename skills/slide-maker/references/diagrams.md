@@ -156,7 +156,7 @@ file; copy it and edit.
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 400"
      width="1240" height="400"
-     font-family="'Noto Sans', Arial, Helvetica, sans-serif">
+     font-family="var(--font-sans), Arial, Helvetica, sans-serif">
   <title>order_workflow</title>
   <rect width="1240" height="400" fill="var(--surface-card)"/>
 
