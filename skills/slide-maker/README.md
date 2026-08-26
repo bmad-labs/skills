@@ -1,170 +1,141 @@
 # Slide Maker
 
-Make genuinely impressive, on-brand presentation slides — from a single slide to a full
-deck — and export them to editable PowerPoint, image PowerPoint, standalone HTML, or PDF.
-The skill ships the whole kit: a token-driven design system, a "wow" craft guide, an
-anti-slop validator, a ready-made React deck, point-and-comment edit mode, and a
-*validated* editable-PPTX pipeline.
+Build presentation slides and export them to editable PowerPoint, image PowerPoint,
+standalone HTML, or PDF.
 
-It is **design-system-agnostic**: it drives every slide from design tokens (never
-hardcoded colors or fonts), so it can use your own design system, a suggested one, or a
-bundled neutral default — and re-skin every layout by swapping one theme file.
+This is a Claude skill. You don't run it by hand: ask Claude for a deck, and it loads the
+skill and does the work. This README explains what the skill contains.
+[`SKILL.md`](SKILL.md) is what the agent actually follows.
 
-This is a **Claude skill** — you don't run it by hand. Ask Claude for a deck and it loads
-this skill and drives the work. This README is the quick orientation; [`SKILL.md`](SKILL.md)
-is what the agent follows.
+Every slide is driven by design tokens rather than hardcoded colors or fonts, so the same
+34 layouts re-skin by swapping one theme file. Bring your own design system or use the
+bundled default.
 
----
+## Getting a deck
 
-## TL;DR — get a deck in 4 steps
-
-Just tell Claude what you want. It picks the matching workflow and runs it.
+Describe what you want. Claude picks the matching workflow.
 
 ```
-1. "Help me build a deck to pitch our SaaS product to investors"   → brainstorm + generate
-2. (answer its questions, review the slides it shows you)          → iterate
-3. "Looks good — give me an editable PowerPoint"                   → export
-4. open export/deck.pptx                                           → done
+"Help me build a deck to pitch our SaaS product to investors"
+"I already have the outline, just build the slides"
+"Export the deck in ./slides to PDF"
 ```
 
-You can also jump straight in: *"export the deck in ./slides to PDF"*, or
-*"I already have the outline, just build the slides."*
+A full run goes brainstorm, then generate, then export. You can start at any step.
 
----
+## Workflows
 
-## The workflows (one per job)
-
-Claude routes your request to one of these. The natural order is **brainstorm → generate →
-export**, but you can start at any step.
-
-| You want to… | Workflow |
+| Goal | Workflow |
 |---|---|
-| Figure out what the deck should say / its structure | **slide-brainstorm** — guided Q&A → an agreed slide skeleton |
-| Build the actual slides and iterate on them | **slide-generate** — HTML deck + review loop until you approve |
-| Get an **editable** PowerPoint (recipient edits text/shapes) | **export-editable-pptx** — measured, native objects, *validated* |
-| Get a **pixel-perfect, view-only** PowerPoint | **export-image-pptx** |
-| Get a single self-contained **HTML** file (opens offline) | **export-standalone-html** |
-| Get a **PDF** (print / handout) | **export-pdf** |
+| Decide what the deck says and how it's structured | `slide-brainstorm` |
+| Build the slides and iterate on them | `slide-generate` |
+| Editable PowerPoint, where the recipient can change text and shapes | `export-editable-pptx` |
+| Pixel-perfect view-only PowerPoint | `export-image-pptx` |
+| Single self-contained HTML file that opens offline | `export-standalone-html` |
+| PDF for print or handout | `export-pdf` |
 
-```
-brainstorm ──▶ generate ──▶ ┬─▶ editable PPTX
-(idea→skeleton) (HTML deck,  ├─▶ image PPTX
-                review loop) ├─▶ standalone HTML
-                             └─▶ PDF
-```
+Step-by-step detail for each: [`references/workflows/`](references/workflows/).
 
-Full step-by-step for each is in [`references/workflows/`](references/workflows/).
+## Design system resolution
 
----
+At the start of brainstorm and generate, Claude works down this list and stops at the
+first match:
 
-## Which design system does it use?
+1. Your own design system or brand tokens, mapped into the theme file.
+2. A `nextlevelbuilder/ui-ux-pro-max-skill` suggestion, if that skill is installed.
+3. A recommendation to install that skill.
+4. A one-turn-only clone of it, with your explicit consent.
+5. The bundled `clean-light` theme.
 
-At the start of brainstorm/generate, Claude resolves the design system in order and stops
-at the first that applies:
+The last option is the floor, so the skill never blocks on a missing design system. The
+active theme file is the single source of truth for color and type. Layouts never change;
+only token values do.
 
-1. **Your own design system / brand tokens**, mapped into the theme file.
-2. Else, a **`nextlevelbuilder/ui-ux-pro-max-skill`** suggestion if that skill is installed.
-3. Else, it **recommends installing** that skill (the preferred path).
-4. Else, with your explicit consent, a **one-turn-only** clone of it.
-5. Else, the bundled **`clean-light`** theme — the guaranteed floor, so the skill never blocks.
+## Review and feedback
 
-Whatever the outcome, the active theme file is the single source of truth for color and
-type; layouts never change, only the theme's token values do.
+When Claude shows you a deck, it runs a dev server with a point-and-comment overlay:
 
----
+1. Open the deck. Claude gives you the URL, usually `http://localhost:5173/`.
+2. Press `e` for edit mode. Click an element, Cmd-click several, or drag a box to snip an
+   area. Type a comment, then press "Copy for AI".
+3. Tell Claude to read the feedback. It sees which elements you meant and your snip image,
+   and edits those elements directly.
 
-## How you collaborate — edit mode
+Edit mode is a dev tool and is stripped from every export.
 
-When Claude shows you a deck, it runs a dev server with a **point-and-comment overlay**:
+## Quality gates
 
-1. Open the deck (Claude gives you the URL, usually `http://localhost:5173/`).
-2. Press **`e`** for edit mode → **click** an element, **⌘-click** several, or **drag a box**
-   to snip an area; type a comment; hit **"Copy for AI"**.
-3. Tell Claude **"read the feedback"** — it reads exactly which elements you meant (and your
-   snip image) and edits straight to them.
+A deck passes two checks before Claude hands it over:
 
-Far more precise than describing changes in words. (Edit mode is a dev tool — it's
-automatically stripped from every export.)
+- **Mechanical.** `check-slop` on the source, plus `validate-pptx.mjs` on the export:
+  text position and size, colors, fills, icons, tables, wrapping, structure. Passes only
+  when every issue is fixed or acknowledged with a written reason.
+- **Visual.** Claude renders the slides and reviews the images, catching what the checker
+  can't see: a clipped chip, an undersized hero, a flattened accent.
 
----
+## When not to use this
 
-## What "done" means — two gates, both green
+The editable PPTX export reconstructs each slide as native PowerPoint objects by measuring
+the rendered DOM. It reaches roughly 96-98% visual fidelity on the bundled layouts, and the
+validation gate exists because that last few percent needs a human decision. If you need a
+PowerPoint that matches the HTML exactly, export image PPTX instead and give up
+editability.
 
-Quality is enforced, not assumed. Before Claude hands you a deck it passes:
+Slides are React components, so changing one means editing JSX. If you want a WYSIWYG
+editor, use PowerPoint or Google Slides directly.
 
-1. **Mechanical gate** — `check-slop` (source) + the PPTX **validation gate**
-   (`validate-pptx.mjs`): text position/size, colours, fills, icons, tables, wrapping,
-   structure. It only passes when every issue is fixed or explicitly acknowledged with a
-   reason.
-2. **Eye-check** — Claude (via subagents) *looks at* the rendered slides and fixes anything
-   that looks wrong even if the gate passed (a clipped chip, a tiny hero, a flattened
-   accent). A green checker is necessary, never sufficient.
+The tooling assumes a 1280x720 canvas. Other aspect ratios need changes across the theme,
+the layouts, and the export scripts.
 
-So a finished deck is verified both by machine and by eye.
-
----
-
-## What's in the box
+## Layout
 
 ```
 slide-maker/
-├── SKILL.md                  ← what the agent follows (workflow router + craft rules)
-├── README.md                 ← you are here
-├── design-system/            ← the token-driven design kit (standalone source of truth)
-│   ├── tokens/               ← colours, type, spacing, fonts — THE source of truth
-│   ├── themes/clean-light.css ← the active theme (bundled neutral default; the floor)
-│   ├── slides/*.html         ← 34 premade slide layouts (the catalog)
-│   ├── styles.css            ← token entry point (for plain-HTML slides)
-│   └── assets/logos/         ← mark.svg, logo-full.svg (neutral placeholders)
-├── deck-template/            ← a complete React+Tailwind deck you copy & fill
-│   └── scripts/              ← all the tooling, travels with each deck:
-│                               check-slop · shoot-slides · shoot-layouts · serve ·
-│                               inspect · export-deck · export-pptx-jsx · validate-pptx ·
-│                               verify-* · diff-regions · clean-verify · …
-└── references/               ← the docs the workflows pull in as needed
-    ├── workflows/            ← the 6 job workflows (step-by-step)
-    ├── house-style.md  wow-guide.md  tailwind-theme.md
-    ├── validation.md  visual-review.md  edit-mode.md
-    ├── deck-template.md  pptx-editable.md
-    └── …
+├── SKILL.md                    workflow router and craft rules (what the agent follows)
+├── design-system/              the token-driven design kit
+│   ├── tokens/                 colors, type, spacing, fonts
+│   ├── themes/clean-light.css  bundled default theme
+│   ├── slides/                 34 premade layouts as standalone HTML
+│   ├── styles.css              token entry point for plain-HTML slides
+│   └── assets/logos/           neutral placeholder marks
+├── deck-template/              React and Tailwind deck, copied per project
+│   └── scripts/                export, validation, and review tooling
+└── references/                 docs the workflows load as needed
+    ├── workflows/              the 6 workflows above
+    ├── house-style.md          layout catalog and voice rules
+    ├── wow-guide.md            craft techniques
+    ├── tailwind-theme.md       the theme block for React decks
+    ├── validation.md           what check-slop enforces
+    ├── visual-review.md        how the visual pass works
+    └── pptx-editable.md        editable PPTX internals
 ```
 
-The design kit ships **inside** the skill, so it's self-contained. If anything ever
-disagrees with `design-system/tokens/` (or the active theme), the token/theme files win.
+If anything contradicts `design-system/tokens/` or the active theme, the token and theme
+files win.
 
----
+## House style
 
-## The look, in one breath
+Light slides on a neutral ink scale, with one restrained accent hue (indigo in
+`clean-light`) used sparingly. One focal point per slide, generous whitespace, calm
+motion. No second typeface, no hardcoded color.
 
-Light, clean slides driven by tokens; a single restrained **accent** hue (indigo in the
-default `clean-light` theme) used sparingly, a neutral ink scale for text and dark
-surfaces. One hero per slide, generous whitespace, calm motion. Never a second font or a
-hardcoded colour — change the theme file instead. The full rules live in
-[`references/house-style.md`](references/house-style.md) and the craft ceiling in
+Full rules: [`references/house-style.md`](references/house-style.md) and
 [`references/wow-guide.md`](references/wow-guide.md).
 
----
+## Using only the design layer
 
-## Two ways to use it
+Another slide generator can pull the tokens, components, and patterns from here and skip
+its own theme selection, so its output uses a real design system. See
+[`references/tailwind-theme.md`](references/tailwind-theme.md).
 
-- **Drive the whole deck here** (the usual path) — copy the deck template, write slides, edit,
-  export. Everything above.
-- **Supply only the design layer** to another slide generator — that tool runs its own
-  workflow but skips theme selection and pulls the active tokens/components/patterns from
-  here, so its output uses a real design system. See
-  [`references/tailwind-theme.md`](references/tailwind-theme.md).
+## Tooling prerequisites
 
----
-
-## First-time setup (for the export/review tooling)
-
-The deck tooling runs on Node + Playwright; the editable-PPTX **verify** render needs
-LibreOffice. From inside a copied deck:
+The deck scripts need Node and Playwright. Rendering the editable PPTX for validation also
+needs LibreOffice with `soffice` on `PATH`. From inside a copied deck:
 
 ```bash
 npm install
-npx playwright install chromium      # once — for rendering & export
-# LibreOffice (soffice) on PATH — for the editable-PPTX validation render
+npx playwright install chromium
 ```
 
-Claude handles these as part of the workflows; this is just what's under the hood.
+Claude runs these as part of the workflows.

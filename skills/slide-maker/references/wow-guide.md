@@ -274,7 +274,7 @@ Before a slide is done:
 
 | Boring (topic) | Wow (takeaway) |
 |----------------|----------------|
-| "Our Value Proposition" | "Offshore cost, onshore quality" |
+| "Our Value Proposition" | "Ships in half the time" |
 | "Key Metrics" | "70% adopt it in week one" |
 | "Introduction" | a one-line statement of the point |
 | "Q4 Results" | "Revenue up 40%, churn halved" |
