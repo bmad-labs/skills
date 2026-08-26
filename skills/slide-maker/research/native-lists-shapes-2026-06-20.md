@@ -1,7 +1,3 @@
-The repo facts confirm the research: walker at the classification region (now ~lines 270-360), `pptxgenjs ^3.12.0` and `@artifact-kit/pptxgenjs-jsx ^0.1.6` are the deps, the container branch pushes a `rect` op then recurses children (the contiguity property groups rely on), and the references dir holds the docs to update. Here is the report.
-
----
-
 # Native Bullet Lists + Grouped Shapes for the Node PPTX Exporter — Technical Research & Phased Plan
 
 ## 1. TL;DR Recommendation
@@ -206,7 +202,7 @@ All phases behind the existing **LibreOffice render-back validate gate** (`scrip
 - Numbered-list styles (`alphaLcPeriod`/`romanUcPeriod`) + `startAt` from `data-pptx-list-*`; custom bullet glyph via `characterCode` (★ 2605, ✓ 2713).
 - Deeper nested levels (3–8) and per-item indent override only if a deck needs it.
 - **Connectors/SmartArt: do NOT build** — high effort, low fidelity, breaks the geometry-faithful model. Skip unless a future deck makes them cheap and clearly worth it.
-- Update **`references/pptx-export-research.md`** to record the grpSp injection decision and the chOff/chExt invariant as the canonical recipe.
+- Update **`pptx-export-2026-06-20.md`** (in this directory) to record the grpSp injection decision and the chOff/chExt invariant as the canonical recipe.
 
 ---
 
@@ -220,7 +216,7 @@ All phases behind the existing **LibreOffice render-back validate gate** (`scrip
 - **Charts and complex-gradient/mask icons stay rasterized PNG** (deliberate fallback, orthogonal to this work) — a group can *contain* a `<p:pic>` but the picture itself stays non-editable.
 - **A card with an icon + multiple text blocks can never be a single `<p:sp>`** — only `addText({shape})` single-text cards get one-object cohesion for free; everything richer needs the `p:grpSp` injection.
 
-Relevant files: deck-template/scripts/export-pptx-jsx.mjs, deck-template/scripts/validate-pptx.mjs, deck-template/package.json, references/pptx-editable.md, references/pptx-export-research.md, references/validation.md, references/workflows/export-editable-pptx.md.
+Relevant files: deck-template/scripts/export-pptx-jsx.mjs, deck-template/scripts/validate-pptx.mjs, deck-template/package.json, references/pptx-editable.md, references/validation.md, references/workflows/export-editable-pptx.md.
 ---
 
 ## Implementation status

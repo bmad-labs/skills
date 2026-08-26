@@ -3,7 +3,7 @@
    export-pptx-jsx.mjs — high-fidelity EDITABLE PPTX export via @artifact-kit/
    pptxgenjs-jsx measure-contract + display-font embedding.
 
-   Pipeline (see references/pptx-export-research.md):
+   Pipeline (see references/pptx-editable.md):
      1. build standalone deck, serve, open slide N (Playwright), strip edit-mode/nav
      2. inject data-ak-* attributes (alias our data-viz-id → data-ak-measure;
         stamp the slide root with data-ak-slide/width/height/px-per-in)

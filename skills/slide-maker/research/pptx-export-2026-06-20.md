@@ -25,7 +25,7 @@ in our bbox-walk in `export-deck.mjs`, not fundamental limits:
 
 | Defect (seen) | Root cause | Fix | Confirmed? |
 |---|---|---|---|
-| Accent word ("week one" / "delivery team") **overlaps** the wrapped title | the accent `<span>` is emitted as a **separate textbox** at its own bbox | emit the whole heading as **ONE** `addText([run,run,…])` with per-run color | ✅ pptxgenjs `addText(runs)` emits a single `<p:sp>` with multiple `<a:r>` runs — verified in `gen-xml.ts` |
+| Accent word (an inline `<span>` inside a heading) **overlaps** the wrapped title | the accent `<span>` is emitted as a **separate textbox** at its own bbox | emit the whole heading as **ONE** `addText([run,run,…])` with per-run color | ✅ pptxgenjs `addText(runs)` emits a single `<p:sp>` with multiple `<a:r>` runs — verified in `gen-xml.ts` |
 | Icons **blown up huge**, bleeding | SVG rasterized to the **svg intrinsic box**, not the chip | size the image to the **chip container** box; screenshot the chip element | ✅ `addImage` w/h control render size independent of intrinsic SVG dims |
 | Card backgrounds **vanish**, text floats | shape added **after** text (or skipped) → wrong z-order | `addShape` (card) **before** `addText`/`addImage` for that region | ✅ `<p:spTree>` paints in insertion order; shape-first = behind |
 | Vertical **drift** / loose spacing | `fontSize = px×0.75` with **no line-height** | keep `px×0.75` (it's correct), add `lineSpacingMultiple` = CSS `line-height` | ✅ maps to `<a:lnSpc><a:spcPct>`; px×0.75 is exact at 1280px→13.333in |
