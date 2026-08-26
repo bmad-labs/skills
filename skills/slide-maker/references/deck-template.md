@@ -83,6 +83,7 @@ deck-template/
       Background.jsx              ← accent-blob atmosphere (wow-guide §3)
       SlideTransition.jsx         ← framer helpers (StaggerContainer/Item, CountUp,
                                      AccentRule) + GSAP (useSlideGsap, gsap, useGSAP)
+      Diagram.jsx                 ← a diagram + click-to-zoom lightbox (see diagrams.md)
                                      (all chrome above carries data-navigation → hidden on export)
     slides/
       00-EXAMPLE-hero-metrics.jsx ← worked exemplar — copy its shape, fully annotated
@@ -181,6 +182,68 @@ guarantees:
    PDF/PPTX.
 
 Verify on `export/deck.html`: `grep -c EditMode export/deck.html` → 0.
+
+## Tailwind Preflight clamps every image
+
+Preflight (Tailwind's reset) applies `img { max-width: 100%; height: auto }` to **every**
+image on the page. Any component that sets an intrinsic pixel size on an `<img>` must
+override both caps or the browser silently ignores the size you set:
+
+```js
+width: nat.w, height: nat.h,
+maxWidth: 'none', maxHeight: 'none',   // ← without these, Preflight wins
+```
+
+The failure is easy to misread. An image wider than the viewport is clamped to the
+viewport width **while keeping its full height**, so it renders squashed, and it happens
+*before* any CSS transform — which makes it look like a zoom bug rather than a sizing
+bug. `Diagram.jsx` carries the override with a comment; keep it there.
+
+To check it, compare the layout box against the intrinsic size — not
+`getBoundingClientRect()`, which measures after the transform and reports a healthy
+number for a clamped image:
+
+```js
+im.offsetWidth === im.naturalWidth && im.offsetHeight === im.naturalHeight
+```
+
+## Slash-opacity silently drops token colors
+
+Every theme color in `tailwind.config.js` maps to a bare `var(--*)`. Tailwind's
+slash-opacity modifier (`bg-ink-900/85`) has to rewrite a color into
+`rgb(<channels> / <alpha>)`, and it **cannot parse channels out of a `var()`** — so the
+class matches nothing and **no CSS rule is emitted at all**. The element renders with
+no background. Measured in a build:
+
+```
+bg-ink-900/85   ->  NO RULE EMITTED          ← token color: silently dropped
+bg-ink-900      ->  background-color:var(--ink-900)
+bg-white/20     ->  background-color:#fff3   ← literal color: works
+```
+
+This shipped as a real bug: the present-mode toolbar used `bg-ink-900/85`, rendered
+fully transparent, and showed as white icons on a white slide.
+
+It is easy to miss because **nothing fails** — no build error, no lint warning,
+`check-slop` is clean. The class just evaporates.
+
+**The rule:** slash-opacity works on Tailwind's own literal palette (`white`, `black`,
+`slate-500`) and never on this deck's theme tokens. For a translucent token color, use
+`color-mix` in an inline style:
+
+```jsx
+style={{ background: 'color-mix(in srgb, var(--ink-900) 88%, transparent)' }}
+```
+
+To audit a deck:
+
+```bash
+grep -rnoE "\b(bg|text|border)-(ink|primary|surface|accent)-[a-z0-9]+/[0-9]+" src/
+```
+
+Every hit is a dropped rule — except one inside a comment. `PresentBar.jsx` names the
+bad class in the comment explaining why it is gone, so it matches; check the line
+before treating a hit as a bug.
 
 ## Relationship to slides-generator
 

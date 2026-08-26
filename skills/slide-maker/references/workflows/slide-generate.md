@@ -73,6 +73,9 @@ For every slide in the skeleton, write `src/slides/NN-name.jsx`:
   realize them with the house patterns ([house-style.md](../house-style.md)).
 - Make it **wow**, not just on-theme: one hero, eyebrow→title→accent-rule→body rhythm,
   calm motion, ≥35% whitespace. Full craft guide: [wow-guide.md](../wow-guide.md).
+- Slide needs a **diagram** (a concept, an architecture, a workflow, a timeline)? Read
+  [diagrams.md](../diagrams.md) BEFORE generating one — it decides hand-written SVG vs.
+  a generator, and a wrong first choice is usually two rejections deep before it shows.
 - **Annotate every meaningful element with `data-viz-id`** — this one tag powers edit
   mode, visual review, AND every editable export. Tag titles, cards, chips, rules,
   bodies, charts. (See [edit-mode.md](../edit-mode.md).)

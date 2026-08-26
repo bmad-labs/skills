@@ -44,10 +44,16 @@ function PresentBar({
   };
 
   return (
+    // Background via inline style, NOT `bg-ink-900/85`: Tailwind's slash-opacity
+    // modifier can only split a color it can parse into channels. A token that is a
+    // bare `var(--ink-900)` cannot be split, so that class emits NO CSS rule at all —
+    // the bar rendered fully transparent, i.e. white icons on a white slide. See
+    // references/deck-template.md "Slash-opacity silently drops token colors".
     <div
       data-navigation
+      style={{ background: 'color-mix(in srgb, var(--ink-900) 88%, transparent)' }}
       className={`fixed bottom-5 left-5 z-50 flex items-center gap-1.5
-                  rounded-pill bg-ink-900/85 backdrop-blur px-3 py-2 shadow-lg
+                  rounded-pill backdrop-blur px-3 py-2 shadow-lg
                   transition-all duration-300 ${
                     visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 pointer-events-none'
                   }`}

@@ -3,8 +3,9 @@
 //
 // Catches mechanical "AI slop" in generated slides BEFORE the visual review step:
 // raw hex instead of brand tokens, off-brand fonts, generic Tailwind colors, dark
-// glass, layout-breakers (ERRORs that fail), plus craft warnings (walls of text,
-// no focal point, missing rhythm, yellow misuse, image overload) that report only.
+// glass, slash-opacity on token colors, layout-breakers (ERRORs that fail), plus
+// craft warnings (walls of text, no focal point, missing rhythm, yellow misuse,
+// image overload) that report only.
 //
 // Dependency-free (node: builtins + regex). Works on HTML and JSX.
 //
@@ -190,6 +191,27 @@ function checkFile(file) {
   for (const m of src.matchAll(glassRe)) {
     err(lineOf(src, m.index), 'dark `glass` class is off-brand on a light deck',
         'use bg-bg-card border border-border-subtle shadow-sm; glass-light only over a photo');
+  }
+
+  // --- ERROR: slash-opacity on a theme token ---
+  // Theme colors map to a bare `var(--*)`. Tailwind's slash modifier must rewrite a
+  // color into `rgb(<channels> / <alpha>)` and cannot parse channels out of a var(),
+  // so `bg-ink-900/85` emits NO CSS rule at all and the element renders with no
+  // background — silently, with no build error. (This shipped: the present-mode
+  // toolbar was white icons on a white slide.) Tailwind's own literal palette
+  // (white/black/slate-500) is fine, so only our token families are matched here.
+  const TOKEN_FAMILIES = 'ink|primary|surface|accent|bg|text|border';
+  const slashRe = new RegExp(`\\b(?:bg|text|border|from|via|to|ring|divide|outline|shadow)-(?:${TOKEN_FAMILIES})-[a-z0-9]+\\/\\d+\\b`, 'g');
+  for (const m of src.matchAll(slashRe)) {
+    // Skip a mention inside a comment — PresentBar names the bad class in the comment
+    // explaining why it is gone. Covers `//`, a `*` continuation line, and a JSX
+    // `{/* ... */}` block opened earlier on the same line.
+    const lineStart = src.lastIndexOf('\n', m.index) + 1;
+    const before = src.slice(lineStart, m.index);
+    if (/^\s*(\/\/|\*)/.test(before)) continue;
+    if (before.includes('{/*') || before.includes('/*')) continue;
+    err(lineOf(src, m.index), `${m[0]} emits no CSS — slash-opacity cannot apply to a var() token`,
+        "use color-mix in an inline style: background: 'color-mix(in srgb, var(--ink-900) 88%, transparent)'");
   }
 
   // --- ERROR: layout-breakers (JSX/Tailwind) ---
