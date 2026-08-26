@@ -166,7 +166,7 @@ native PowerPoint Table; an element with a background/border + children → a ca
 element holding an `<svg>` → an icon (vector `CustomGeometry`); a thin coloured strip →
 a rule. So **any** slide — lists, tables, complex multi-region dashboards — converts
 with no extra work, as long as it's authored as clean nested boxes. (Verified at
-~96–98% fidelity on company-intro, a 6-item list, a 4-column table, and a mixed
+~96–98% fidelity on a cover slide, a 6-item list, a 4-column table, and a mixed
 KPI+list+callout dashboard.) `data-viz-id` is still used as a stable label, but
 classification no longer depends on specific ids. Build slides export-aware and the
 editable PPTX comes out right the first time — these rules cost nothing for the live
@@ -374,10 +374,10 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
 6. **Font embedding breaks the LibreOffice verify render** (see Fonts). Keep it opt-in.
 7. **macOS LibreOffice can't write into the project tree** (`Code:16`); `verify-pptx.mjs`
    converts inside a `/tmp` workdir with its own `-env:UserInstallation` profile.
-8. **`--slide N` is 1-based by deck order.** `SLIDES=[CompanyIntro, HeroMetrics]` → slide
-   1 is CompanyIntro (`s1.*`), slide 2 is HeroMetrics (`s0.*`).
+8. **`--slide N` is 1-based by deck order.** `SLIDES=[Cover, HeroMetrics]` → slide
+   1 is Cover (`s1.*`), slide 2 is HeroMetrics (`s0.*`).
 9. **Inline-coloured words flatten to one colour unless you split runs.** A title like
-   `Pick the <span class="text-primary-500">right gear</span>` exports all-black unless the
+   `Compare the <span class="text-primary-500">options</span>` exports all-black unless the
    exporter walks the leaf's child nodes and emits one `TextRun` per coloured run inside a
    single `Text` (each run's `options.color` from its node's computed colour). The exporter
    does this now; the lesson: a text op carries `runs[]`, not just one `color`.
@@ -454,4 +454,4 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
 - `assets/fonts/Inter-{Regular,Bold}.otf` — vendored (SIL OFL) for embedding + LibreOffice.
 - Deps (devDeps): `@artifact-kit/pptxgenjs-jsx`, `pptx-embed-fonts`, `pixelmatch`, `pngjs`, `ssim.js`, `svgpath`.
 
-Grounding research (kept in the repo, not the skill): `docs/research/pptx-export-*`.
+Grounding research: [pptx-export-research.md](pptx-export-research.md).

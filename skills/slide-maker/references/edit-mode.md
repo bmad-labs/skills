@@ -223,7 +223,7 @@ boxes), `slide-NN-clean.png` (clean), and — with `--comment` — the
 
 ## Notes
 
-- DOM-only — no 3D (this is the slide port of architecture-viz-studio's edit mode).
+- DOM-only — no 3D.
 - **Box color convention:** every box drawn ON the slide — hover, selection,
   multi-select, the snip drag box, brush, expert-view, and agent inspect — is
   **orange** (`--em-inspect #FF6A00`), deliberately OUTSIDE the theme's accent/ink

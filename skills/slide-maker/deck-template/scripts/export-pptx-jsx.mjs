@@ -3,7 +3,7 @@
    export-pptx-jsx.mjs — high-fidelity EDITABLE PPTX export via @artifact-kit/
    pptxgenjs-jsx measure-contract + display-font embedding.
 
-   Pipeline (per the research in docs/research/pptx-export-*):
+   Pipeline (see references/pptx-export-research.md):
      1. build standalone deck, serve, open slide N (Playwright), strip edit-mode/nav
      2. inject data-ak-* attributes (alias our data-viz-id → data-ak-measure;
         stamp the slide root with data-ak-slide/width/height/px-per-in)
@@ -12,9 +12,6 @@
         BarChart / Table objects, using readPptBox()/readFontPt()
      5. validateDeck() → renderPptx() → base64 → Node writes deck.pptx
      6. post-process: embed the display font (pptx-embed-fonts) into the .pptx zip
-
-   SPIKE SCOPE: slide 1 (company-intro) — eyebrow/title/rule/3 cards/footer.
-   Generalizes later to chart + all slides.
 
    USAGE
      node scripts/export-pptx-jsx.mjs [deckDir] [--slide N] [--out export/deck.pptx]

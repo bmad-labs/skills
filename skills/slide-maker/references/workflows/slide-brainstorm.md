@@ -103,10 +103,10 @@ Ask only what genuinely changes the deck. Lead with the highest-leverage ones:
 Each slide is one line of intent, not prose. Example (a 3-pillar capabilities deck):
 
 ```
-1. Cover            — "Software that ships and stays shipped" · logo mark, lead line
+1. Cover            — "A bold claim in one line" · logo mark, lead line
 2. What we do       — 3-column: Build / Integrate / Support — one icon+line each (focal: the 3 cards)
 3. Proof / metrics  — hero KPI "70% adopt in week one" + a quarter bar chart (focal: the 70%)
-4. How we engage    — 4-row table: plan × duration × outcome × pricing (focal: the table)
+4. How it works     — 4-row table: option × duration × outcome × cost (focal: the table)
 5. Close            — "Let's build the next bet" · CTA + contact (focal: the CTA)
 ```
 

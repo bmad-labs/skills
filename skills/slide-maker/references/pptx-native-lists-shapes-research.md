@@ -42,7 +42,7 @@ Net per item: `<a:p><a:pPr marL="685800" lvl="1" indent="-342900"><a:buSzPct val
 
 - **`<ol>` → numbered** (`bullet:{type:'number'}`), **`<ul>` → bullet** (`bullet:true`); honor `data-pptx-list-type=bullet|number` override when present.
 - **indentLevel = nesting depth**: count `<ul>/<ol>` ancestors within the list root, minus one. (Prefer structural nesting depth over CSS `margin-left` — the OOXML hanging indent is a fixed 0.36in ladder and won't pixel-match arbitrary CSS margins anyway.)
-- **Per-`<li>` colored/bold runs**: reuse the existing run-splitter (`collect()`) so a `<li>` like "Pick the **right gear** today" yields three `<a:r>` runs in one bulleted paragraph.
+- **Per-`<li>` colored/bold runs**: reuse the existing run-splitter (`collect()`) so a `<li>` like "Compare the **options** today" yields three `<a:r>` runs in one bulleted paragraph.
 - **First run of each `<li>`** carries `bullet` + `indentLevel`; **last run** carries `breakLine:true`.
 
 ### 2.4 Authoring gotchas (honor these or the XML degrades)
