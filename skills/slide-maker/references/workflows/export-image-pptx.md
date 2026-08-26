@@ -26,6 +26,17 @@ exactly (it's the same screenshot). If a slide looks wrong, the **HTML** is wron
 in [slide-generate](slide-generate.md) and re-export; nothing to tune here (it's a
 faithful screenshot, not a reconstruction).
 
+## Before you hand it over
+
+Even a screenshot export can drift — a clipped capture or a page-size mismatch shows up
+as a uniform diff across every slide. One command:
+
+```bash
+node scripts/verify-export.mjs --pptx export/deck-image.pptx --top 2
+```
+
+Details: [visual-review.md → Reviewing an EXPORT](../visual-review.md#reviewing-an-export-is-a-different-job--diff-it-dont-browse-it).
+
 ## Done when
 `export/deck-image.pptx` opens and matches the deck. Hand the path to the user, noting
 it's **view-only** (not editable). Details: [deck-template.md](../deck-template.md).

@@ -38,6 +38,32 @@ node scripts/export-pptx-jsx.mjs --slide 1       # one slide
 node scripts/export-pptx-jsx.mjs --embed-fonts   # portable copy (verify in PowerPoint, not LibreOffice)
 ```
 
+> ### Whichever exporter you used, diff the result
+> **`node scripts/verify-export.mjs`** — one command, works on any `export/deck.pptx`:
+> renders the HTML deck and the PPTX at the same size, diffs every slide, ranks them, and
+> runs `diff-regions` on the worst. Run it after every export. If you only do one thing
+> from this file, do this.
+>
+> `validate-pptx.mjs` below is the fuller gate (per-issue IDs, acknowledgements) and is
+> still the standard for a deliverable — but read the box beneath first, because it
+> rebuilds the deck with a specific exporter.
+
+> ### Which exporter are you validating?
+> Two scripts write `export/deck.pptx` and share no code. **`validate-pptx.mjs` runs
+> `export-pptx-jsx.mjs`** — so if the deck was produced by
+> `export-deck.mjs --format pptx-editable` (the `--format` path), the gate rebuilds with
+> the *other* pipeline and **overwrites your file**. Check which one produced the deck
+> before running the gate.
+>
+> | Built with | Check with |
+> |---|---|
+> | `export-pptx-jsx.mjs` | **`validate-pptx.mjs`** (the full gate), then `verify-export.mjs` |
+> | `export-deck.mjs --format pptx-editable` | **`verify-export.mjs`** — the gate would rebuild with the *other* exporter and report its defects as yours |
+>
+> The gate saves a `.before-validate` copy first and prints a notice — restore from that
+> if you see the notice after the fact. Do not skip verification just because the gate
+> does not fit: for an `export-deck.mjs` deck, `verify-export.mjs` is the check.
+
 ### 2. Validate — THE quality gate (always run this)
 `validate-pptx.mjs` exports, renders the pptx back via LibreOffice, and runs **every**
 check — text position/size, shape fills, icons present, tables, SSIM, diff-regions —

@@ -228,6 +228,64 @@ phantom bug.
 > Related: `--mode plain` is not a valid mode. It is accepted silently and writes zero
 > images. The valid values are in the table above.
 
+## Reviewing an EXPORT is a different job — diff it, don't browse it
+
+Everything above reviews the HTML deck, where your eye is the instrument. Reviewing an
+**exported PPTX** is not that job. The export is a re-implementation of each slide in
+another renderer, and its errors are typically *uniform*: every text block a few pixels
+low, one table column narrow, one colour flattened. Uniform error is what the eye is
+worst at — each slide looks plausible on its own.
+
+```bash
+node scripts/verify-export.mjs      # HTML render vs PPTX render, every slide, ranked
+```
+
+Read it in this order:
+
+1. **The ranked table**, before opening any image. It tells you whether one slide is an
+   outlier (a real defect) or the whole deck sits at a similar number (a systematic
+   offset). Those are different bugs and the images look the same.
+2. **`nature`** — `antialiasing` means the diff collapses at a loose threshold and is
+   just glyph rendering; `REAL SHIFT` means it survives, so something actually moved.
+3. **`diff-regions` output** for the worst slides — it ranks *where* on the slide and
+   attributes regions to elements.
+4. **Then** open the two renders side by side.
+
+Two traps worth knowing:
+
+- **`diff-regions`' "structural" verdict is a hint, not a finding.** It fires whenever
+  one region dominates — which is also true when a whole text block is uniformly offset.
+- **Prove a shift is real by measuring it, not by looking.** Find the first inked row of
+  the same block in both renders; the difference is the offset in pixels.
+
+### Why this step gets skipped
+
+Tested on fresh agents: none of them *refused* the diff — it never entered consideration,
+because the manual checking they had already done felt like enough. A baseline run
+declared an export "verified and safe to send" on the strength of tracing the mechanism,
+confirming the new logic fired in the generated XML, and rendering the deck through
+LibreOffice to look at the pixels.
+
+That is careful work. It is also entirely **confirmation of the change you made**. The
+diff is the only step that looks for what you *didn't* mean to change.
+
+| Feels like verification | What it actually proves |
+|---|---|
+| "The export completed without error" | The script ran. Nothing about the output. |
+| "I inspected the XML and the new logic fired" | Your change took effect — not that it was the only effect. |
+| "I rendered it and looked at the pixels" | The slide you looked at is plausible. Uniform drift looks plausible on every slide. |
+| "I checked the other slides using that code path" | Everything you *predicted* could break didn't. |
+| "It's the fourth round today and the user is waiting" | The rounds happen *because* each one shipped unverified. One command is faster than a fifth round. |
+
+The same baseline run noticed a heading wrapping oddly, classified it "pre-existing,
+unrelated", and moved on — and never saw the deck-wide ~10px vertical offset sitting
+under it. Both are exactly what the ranked table surfaces in one command.
+
+**A known, non-actionable residual:** multi-line copy renders ~10px lower with the block
+~20% taller, because LibreOffice and PowerPoint apply `lineSpacingMultiple` more
+generously than Chromium. Expect a few percent hard diff per slide from this plus
+antialiasing. Don't chase it; do notice anything above it.
+
 ## The visual rubric
 
 These are things you can **only verify by looking** — don't just re-check what

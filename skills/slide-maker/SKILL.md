@@ -132,32 +132,30 @@ Ships **inside this skill**, so it's standalone:
 - **Make it wow, not just compliant.** On-brand ≠ impressive. Wow = restraint + ONE focal
   point + depth. The craft guide is the ceiling: [wow-guide.md](references/wow-guide.md).
   The `check-slop.mjs` validator is the floor.
-- **An automated gate is necessary, never sufficient — always LOOK.** Every checker here
-  (slop, the PPTX validation gate) is mechanical: it verifies what it was told to verify
-  and is blind to the rest. A slide can pass every check and still look wrong — a hero gone
-  tiny, a clipped chip, lost rounding, a flattened accent. So both authoring workflows end
-  with the agent **eye-checking the rendered slides** (in [slide-generate](references/workflows/slide-generate.md)
-  and [export-editable-pptx](references/workflows/export-editable-pptx.md)) and fixing what
-  the eye catches. Delegate the looking to **batched subagents** (a few slides each, in
-  parallel) so heavy images stay out of the main context. The gate passing is exactly when
-  subtle visual drift hides — that's when looking matters most.
-- **Looking is necessary, but for POSITION it is also not sufficient — MEASURE.**
-  Alignment, overlap, edge-clipping, and "does it fit the frame" are *numeric* facts, and
-  a full-slide PNG shown small hides a 10–30px miss completely. If a request says
-  **align / same height / equal / overlap / fit / edge / below / above / touching /
-  clipped / margin**, it is a geometry-gate task: run `inspect.mjs`, read
-  `geometry.json` (true 1280×720 pixels), and **assert the inequality** — content bottom
-  `y+h ≤ 648`, alignment `|A.bottom − B.bottom| ≤ 2`. Report the measured number, never a
-  vibe. If the numbers and your eyes disagree, the numbers win. Full method + the canonical
-  bounds + layout recipes (no magic-pixel heights; `items-stretch` for equal columns;
-  footer in flow with `mt-auto`, never `absolute` vs `flex:1`):
-  [visual-review.md → The geometry gate](references/visual-review.md#the-geometry-gate-measure-dont-eyeball).
 - **"Done" = the user's request restated as a passing test, shown with numbers.** Not "I'm
   fairly sure" / "looks right now." Write the acceptance criterion in the user's words
   before fixing ("align arena with last step" → `arena.bottom == step.bottom ±2px AND
   footer.bottom ≤ 648`), and only claim done when it provably passes. If two requirements
   conflict (align A to B *and* keep the footer in-frame ⇒ content too tall), say so and
   propose the trade — don't ship an overlap and call it done.
+
+### Verification — three checks, each blind to what the next one catches
+
+Run all three; doing more of one never substitutes for another.
+
+| Trigger | Do this | Catches what the others miss |
+|---|---|---|
+| You rendered slides | **LOOK** — batch subagents over the PNGs, a few slides each | A hero gone tiny, a clipped chip, lost rounding. Checkers verify only what they were told to; the gate passing is exactly when drift hides. |
+| Request says **align / same height / equal / overlap / fit / edge / below / above / touching / clipped / margin** | **MEASURE** — `inspect.mjs` → `geometry.json`, assert the inequality (`y+h ≤ 648`, `abs(A.bottom − B.bottom) ≤ 2`) | A 10–30px miss, invisible in a full-slide PNG. Numbers beat eyes; report the number, never a vibe. |
+| You produced an **export file** | **DIFF** — `node scripts/verify-export.mjs`, report mean and worst | Uniform drift (every block a few px low, one column narrow) — plausible on every slide, obvious in the ranked table. |
+
+Inspecting XML, rendering and looking, and re-checking the slides you changed all confirm
+*the change you meant to make happened*. The diff is what finds what you didn't mean to
+do. Method, canonical bounds, and layout recipes (no magic-pixel heights;
+`items-stretch` for equal columns; footer in flow with `mt-auto`):
+[visual-review.md](references/visual-review.md) — the
+[geometry gate](references/visual-review.md#the-geometry-gate-measure-dont-eyeball) and
+[reviewing an export](references/visual-review.md#reviewing-an-export-is-a-different-job--diff-it-dont-browse-it).
 
 ## Reference library (workflows link the ones they need)
 
@@ -168,9 +166,12 @@ Ships **inside this skill**, so it's standalone:
 | [tailwind-theme.md](references/tailwind-theme.md) | Drop-in `tailwind.config.js` theme block + the chart-series palette |
 | [validation.md](references/validation.md) | `check-slop.mjs`: what each check means + the AI-slop tells to self-catch |
 | [diagrams.md](references/diagrams.md) | When to hand-write an SVG diagram vs. generate it, the conventions that make one readable, a worked example |
-| [visual-review.md](references/visual-review.md) | Render slides to PNGs and self-review the pixels (the gate the linter can't be) |
+| [visual-review.md](references/visual-review.md) | LOOK, MEASURE, DIFF — self-reviewing rendered slides, the geometry gate, and reviewing an export against the HTML |
 | [deck-template.md](references/deck-template.md) | The ready-made React deck shell: structure, dev, edit mode, HTML/PDF/image export |
 | [edit-mode.md](references/edit-mode.md) | The point-and-comment feedback overlay + programmatic inspect API |
 | [pptx-editable.md](references/pptx-editable.md) | Editable-PPTX deep dive: measure→OOXML, the validation gate + acknowledgement system, fonts, gotchas |
 
 > To render the 34 layout previews for review, use `deck-template/scripts/shoot-layouts.mjs`.
+>
+> [`research/`](research/README.md) holds dated proposals that were **evaluated but not
+> built** — read one only when deciding whether to take that change on.

@@ -97,6 +97,20 @@ function run(cmd, a) { return execFileSync(cmd, a, { cwd: DECK, stdio: 'pipe', t
     // fresh slate (it keeps pptx-acknowledgements.json).
     Object.values(DIR).forEach((d) => mkdirSync(d, { recursive: true }));
 
+    // This gate REBUILDS export/deck.pptx with export-pptx-jsx.mjs. Two scripts write
+    // that filename and share no code — if the existing file came from
+    // `export-deck.mjs --format pptx-editable`, rebuilding DESTROYS it and then reports
+    // the other pipeline's defects as if they were yours. Back it up and say so.
+    const dest = join(DECK, 'export', 'deck.pptx');
+    if (existsSync(dest)) {
+      const bak = join(DECK, 'export', 'deck.pptx.before-validate');
+      cpSync(dest, bak);
+      console.log(`• NOTE: this gate rebuilds ${basename(dest)} with export-pptx-jsx.mjs.`);
+      console.log(`        Your existing file is saved as ${basename(bak)}.`);
+      console.log('        If it came from `export-deck.mjs --format pptx-editable`, this');
+      console.log('        gate validates a DIFFERENT build — use verify-export.mjs instead.');
+    }
+
     console.log('• exporting deck (--dump-ops)…');
     run('node', ['scripts/export-pptx-jsx.mjs', '--dump-ops']);
 

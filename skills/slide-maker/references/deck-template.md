@@ -54,6 +54,7 @@ deck-template/
                                        browser-side DOM measurement lives in lib/dom-walk.browser.js,
                                        node-side op→node builders in lib/pptx-builders.mjs),
                                      validate-pptx (THE quality gate: all checks + ack system),
+                                     verify-export (ranked HTML-vs-export diff — run after ANY export),
                                      verify-deck (unified per-class gate), verify-text (text pos/size),
                                      verify-pptx (LibreOffice SSIM), diff-regions (rank diff areas),
                                      lib/ (deck-driver; svg-to-custgeom — SVG icon→vector;
