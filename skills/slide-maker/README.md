@@ -65,13 +65,17 @@ Edit mode is a dev tool and is stripped from every export.
 
 ## Quality gates
 
-A deck passes two checks before Claude hands it over:
+A deck passes three checks before Claude hands it over. Each is blind to what the next
+one catches.
 
 - **Mechanical.** `check-slop` on the source, plus `validate-pptx.mjs` on the export:
   text position and size, colors, fills, icons, tables, wrapping, structure. Passes only
   when every issue is fixed or acknowledged with a written reason.
 - **Visual.** Claude renders the slides and reviews the images, catching what the checker
   can't see: a clipped chip, an undersized hero, a flattened accent.
+- **Diff.** `verify-export.mjs` renders the export back and diffs it against the HTML,
+  slide by slide, ranked. Export drift is usually uniform, so it looks plausible on every
+  slide individually and only shows up in the comparison.
 
 ## When not to use this
 
@@ -100,14 +104,15 @@ slide-maker/
 │   └── assets/logos/           neutral placeholder marks
 ├── deck-template/              React and Tailwind deck, copied per project
 │   └── scripts/                export, validation, and review tooling
-└── references/                 docs the workflows load as needed
-    ├── workflows/              the 6 workflows above
-    ├── house-style.md          layout catalog and voice rules
-    ├── wow-guide.md            craft techniques
-    ├── tailwind-theme.md       the theme block for React decks
-    ├── validation.md           what check-slop enforces
-    ├── visual-review.md        how the visual pass works
-    └── pptx-editable.md        editable PPTX internals
+├── references/                 docs the workflows load as needed
+│   ├── workflows/              the 6 workflows above
+│   ├── house-style.md          layout catalog and voice rules
+│   ├── wow-guide.md            craft techniques
+│   ├── tailwind-theme.md       the theme block for React decks
+│   ├── validation.md           what check-slop enforces
+│   ├── visual-review.md        how the visual pass works
+│   └── pptx-editable.md        editable PPTX internals
+└── research/                   dated proposals, evaluated but not built
 ```
 
 If anything contradicts `design-system/tokens/` or the active theme, the token and theme

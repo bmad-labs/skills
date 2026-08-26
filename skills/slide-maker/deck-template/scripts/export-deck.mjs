@@ -24,6 +24,18 @@
                      shapes from the tagged elements; charts/icons pre-rasterized.
                      ~88-92% fidelity, fully editable text/shapes in PowerPoint.
 
+   AFTER ANY EXPORT, THE FILE IS NOT DONE — it is unverified.
+     An export is a re-render of each slide in a different engine, so it drifts from
+     the HTML in ways that are invisible one slide at a time. Producing the file is
+     step 1 of 2. Step 2:
+
+       node scripts/verify-export.mjs        # diff every slide vs the HTML render
+
+     Run it, read its ranked output, and report the numbers. "It exported without
+     error", "I inspected the XML", "I rendered it and looked" are each step 1 with
+     extra steps — none of them compares the result against the design.
+     Full procedure: references/workflows/export-editable-pptx.md.
+
    Rendering uses Playwright Chromium (see scripts/lib/deck-driver.mjs). Needs the
    deck's devDeps installed (playwright, pdf-lib, pptxgenjs). Run `npm install`
    then `npx playwright install chromium` in the deck dir first.
@@ -31,7 +43,7 @@
 
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
-import { mkdirSync, existsSync } from 'node:fs';
+import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import {
   enterPresentMode,
   sleep, buildStandalone, serveDir, openDeck, detectSlideCount, gotoSlide,
@@ -86,16 +98,46 @@ async function shootSlides(page, total) {
   return shots;
 }
 
+// Inline every `/…` asset that lives in public/ as a data: URI.
+//
+// vite-plugin-singlefile inlines the JS/CSS the bundler produced, and
+// assetsInlineLimit covers assets IMPORTED through the bundler — but files in
+// public/ are copied verbatim and referenced by absolute path, so neither touches
+// them. The result looks self-contained and isn't: opened on its own, every
+// diagram, screenshot and logo is a broken image (requests failing to
+// file:///diagrams/…). Anything served from public/ must be folded in here or the
+// "single self-contained file" promise is false.
+const MIME = {
+  '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp',
+};
+
+function inlinePublicAssets(html, publicDir) {
+  let inlined = 0; const missing = [];
+  const out = html.replace(/(["'(])\/([^"')?#]+\.(?:svg|png|jpe?g|gif|webp))/gi, (m, q, rel) => {
+    const file = join(publicDir, rel);
+    if (!existsSync(file)) { missing.push(rel); return m; }
+    const ext = rel.slice(rel.lastIndexOf('.')).toLowerCase();
+    const b64 = readFileSync(file).toString('base64');
+    inlined++;
+    return `${q}data:${MIME[ext] || 'application/octet-stream'};base64,${b64}`;
+  });
+  return { out, inlined, missing };
+}
+
 // ── format: html ──
 async function exportHtml() {
   await buildStandalone(deckDir);
   const src = join(deckDir, 'dist-standalone', 'index.html');
   if (!existsSync(src)) throw new Error('standalone build produced no index.html');
   const dest = join(outDir, 'deck.html');
-  // edit mode is already absent (VITE_EDIT=off); copy out
-  const { copyFileSync } = await import('node:fs');
-  copyFileSync(src, dest);
-  console.log(`✓ html  → ${dest}`);
+  // edit mode is already absent (VITE_EDIT=off)
+  const raw = readFileSync(src, 'utf8');
+  const { out, inlined, missing } = inlinePublicAssets(raw, join(deckDir, 'public'));
+  writeFileSync(dest, out);
+  if (missing.length) console.warn(`  ! ${missing.length} asset(s) not found, left as links: ${missing.slice(0, 3).join(', ')}`);
+  const mb = (Buffer.byteLength(out) / 1048576).toFixed(1);
+  console.log(`✓ html  → ${dest} (${inlined} asset(s) inlined, ${mb} MB)`);
 }
 
 // ── format: pdf ──
@@ -143,7 +185,7 @@ async function exportPptxImage(page, total) {
 // ── format: pptx-editable ──
 // DOM-walk each slide into three layers — shapes (card/chip/rule backgrounds),
 // images (rasterized svg/icons), and text — and emit native pptxgenjs objects.
-// Key correctness rules (see references/pptx-export-research.md):
+// Key correctness rules (see references/pptx-editable.md):
 //   • A heading with an inline accent <span> becomes ONE textbox of colored RUNS
 //     (not separate overlapping textboxes).
 //   • px→pt is exactly ×0.75 (1280px@96dpi = 13.333in cancels the scale to 1.0);

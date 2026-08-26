@@ -51,6 +51,18 @@ page corners carry its colour. White in three corners with content in the top-le
 signature of the clip/page-size bug — and a white-background slide cannot tell you
 anything, since the page is white too.
 
+## Before you hand it over
+
+An export is a re-render of the deck, so it can drift from the HTML in ways that are
+invisible one slide at a time. Diff it:
+
+```bash
+node scripts/verify-export.mjs        # ranked per-slide diff vs the HTML render
+```
+
+Read the ranked table, then the worst slides. Details:
+[visual-review.md → Reviewing an EXPORT](../visual-review.md#reviewing-an-export-is-a-different-job--diff-it-dont-browse-it).
+
 ## Done when
 `export/deck.pdf` opens with all slides as pages. Hand the path to the user. Details:
 [deck-template.md](../deck-template.md).

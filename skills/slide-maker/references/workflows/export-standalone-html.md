@@ -25,6 +25,11 @@ node scripts/export-deck.mjs --format html      # → export/deck.html (one file
 - Open `export/deck.html` directly in a browser (double-click / `open export/deck.html`)
   — it must render fully **offline** (no dev server) with arrow/number-key navigation.
 - Confirm no authoring overlay leaked: `grep -c EditMode export/deck.html` → **0**.
+- **Confirm every image actually rendered**, not just that the page opened. Assets in
+  `public/` are referenced by absolute path, so a file that was never inlined fails
+  silently as a broken image rather than an error. The exporter reports its count
+  (`N asset(s) inlined`) and warns about any it could not find — read that line. To be
+  sure, open the file and check no image has `naturalWidth === 0`.
 
 ## Done when
 `export/deck.html` opens offline and navigates. Hand the file/path to the user. Details
