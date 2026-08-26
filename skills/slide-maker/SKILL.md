@@ -167,6 +167,7 @@ Ships **inside this skill**, so it's standalone:
 | [wow-guide.md](references/wow-guide.md) | Presentation craft: hierarchy, data-viz, depth, motion, density, typography + snippets |
 | [tailwind-theme.md](references/tailwind-theme.md) | Drop-in `tailwind.config.js` theme block + the chart-series palette |
 | [validation.md](references/validation.md) | `check-slop.mjs`: what each check means + the AI-slop tells to self-catch |
+| [diagrams.md](references/diagrams.md) | When to hand-write an SVG diagram vs. generate it, the conventions that make one readable, a worked example |
 | [visual-review.md](references/visual-review.md) | Render slides to PNGs and self-review the pixels (the gate the linter can't be) |
 | [deck-template.md](references/deck-template.md) | The ready-made React deck shell: structure, dev, edit mode, HTML/PDF/image export |
 | [edit-mode.md](references/edit-mode.md) | The point-and-comment feedback overlay + programmatic inspect API |

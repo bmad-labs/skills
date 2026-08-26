@@ -40,6 +40,7 @@ node scripts/check-slop.mjs src/slides/*.jsx
 | Generic Tailwind color (`text-blue-500`, `bg-gray-100`, …) | bypasses the theme | `primary-*` / `ink-*` / `text-text-*` / `bg-bg-*` |
 | Dark `glass` class | dark-glassmorphism is off-theme on a light deck | `bg-bg-card border border-border-subtle shadow-sm` |
 | `min-h-screen` / `h-screen`, stray `h-full` | breaks the slide frame | remove; `slide-page` sizes the slide |
+| Slash-opacity on a theme token (`bg-ink-900/85`) | theme colors are bare `var(--*)`; Tailwind cannot split one into `rgb(… / α)`, so **no CSS rule is emitted** and the element renders with no background | `color-mix` in an inline style — see [deck-template.md](deck-template.md#slash-opacity-silently-drops-token-colors) |
 | Off-palette color inside a chart | charts must use the theme series | a color from `SERIES` + `#E2E8F0`/`#EEF2FF` chrome |
 
 ### WARNs (craft — report, your judgement)

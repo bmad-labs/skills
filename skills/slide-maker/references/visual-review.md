@@ -96,8 +96,25 @@ node -e '
 ```
 
 Only when the asserts print PASS *and* the PNG looks right do you say done. If the
-numbers and your eyes disagree, **the numbers win** — re-read the PNG, you misjudged the
-scale.
+numbers and your eyes disagree, **the numbers win — but only once you have checked you
+measured the right thing.** A passing check is not evidence by itself:
+
+> **A numeric check that passes is only evidence if it would have FAILED on the broken
+> version.** Before you trust a green check, run it against the known-bad state and
+> watch it go red. If it cannot go red, it is not a test.
+
+Three ways a check passes something broken. All three are real; each one cost rework:
+
+| The check | Why it passed something broken | Assert this instead |
+|---|---|---|
+| `getBoundingClientRect().width >= 1510` on a zoomed image | it measures the **post-transform** box — a clamped image scaled up reports the same number as a correct one | `im.offsetWidth === im.naturalWidth && im.offsetHeight === im.naturalHeight` — layout box vs. intrinsic size |
+| "lowest ink is y=644, under the 648 limit → OK" | overflow and collision are different failures; two elements can both be in-bounds *and* on top of each other | compare the two boxes to each other: `a.bottom <= b.top` |
+| `inspect.mjs` reported the slide as 180×101 | it measured the rail **thumbnail**, not the 1280×720 stage | assert the element is the one you meant — `w === 1280 && h === 720` — before trusting any number derived from it |
+
+The shared shape: the first asserts the wrong **property**, the second asserts a
+property that **cannot express** the defect, the third measures the wrong **element**.
+Ask which of the three you might be doing before believing a PASS. Twice in one deck a
+pixel-reviewing subagent caught what a green numeric check had waved through.
 
 ### Define "done" as the user's words, restated as a test
 
@@ -108,7 +125,7 @@ Before fixing, write the acceptance test in the user's terms and keep it visible
 "Done" means *that test passes*, shown to the user with the measured numbers — never
 "I'm fairly sure" or "it looks right now." If you cannot satisfy both halves at once,
 that is a real layout conflict (the content is too tall): **say so explicitly** and
-propose the trade (shrink a column, drop a row) rather than shipping an overlap and
+propose the trade (shrink a column, drop a row) rather than releasing an overlap and
 calling it done.
 
 ### The 3-layer slide skeleton — the DEFAULT, and the cure for footer overlap
@@ -192,6 +209,24 @@ magic number. Say so to the user and propose the trade.
 
 The labeled/inspect renders also write a `.json` with each box's `{id,x,y,w,h}`
 geometry, if you want coordinates.
+
+### Stale builds — clear `dist-standalone/` before every shoot
+
+`shoot-slides.mjs` rebuilds the deck **only if `dist-standalone/index.html` is
+missing**. It is not the same directory as `dist/`, and nothing warns you. Edit a
+slide, re-shoot, and you review the *previous* build — then "fix" correct code against
+a stale PNG, twice, before noticing.
+
+```bash
+rm -rf dist-standalone review node_modules/.vite
+node scripts/shoot-slides.mjs --mode normal
+```
+
+Run that `rm -rf` every time. It costs one rebuild and removes a whole class of
+phantom bug.
+
+> Related: `--mode plain` is not a valid mode. It is accepted silently and writes zero
+> images. The valid values are in the table above.
 
 ## The visual rubric
 

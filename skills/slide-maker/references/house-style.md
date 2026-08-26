@@ -83,6 +83,9 @@ shape (single number, KPI row, trend, categories, part-to-whole, trade-off matri
   Font Awesome as inline `<svg>`. One set per deck, one stroke style, tinted
   `text-primary-500` or ink. **Never Unicode emoji** (🚀📊 = AI slop). Icons export as
   native recolorable PowerPoint shapes (see [pptx-editable.md](pptx-editable.md)).
+- **Diagrams** are a different thing from icons and charts — a concept, architecture or
+  workflow picture is usually hand-written SVG. See [diagrams.md](diagrams.md) for when
+  to hand-draw vs. generate, and the conventions that make one readable.
 - **Slides are light by default.** The full-bleed accent slides (02, 05/18 rail, 10) and
   the dark persona rail (08) carry the visual weight — don't make every slide accent.
 - **Eyebrow kickers:** uppercase, accent, `text-eyebrow tracking-eyebrow font-bold`,
