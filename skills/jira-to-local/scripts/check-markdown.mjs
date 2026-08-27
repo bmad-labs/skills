@@ -52,6 +52,13 @@ function checkFile(path) {
       if (inner.length && /[ \t]$/.test(inner)) {
         add(i, 'emphasis', `space before the closing ** renders literal asterisks: **${inner.trim().slice(0, 30)} **`);
       }
+      // The mirror defect: an opening ** must be left-flanking, so whitespace
+      // straight after it never opens. "now** in Production**" renders the
+      // asterisks literally, and walking pairs makes `inner` end in a word, so
+      // the closing-space test above cannot see it.
+      if (inner.length && /^[ \t]/.test(inner)) {
+        add(i, 'emphasis', `space after the opening ** renders literal asterisks: ** ${inner.trim().slice(0, 30)}**`);
+      }
     }
 
     // MD001: heading levels increment by one.
@@ -135,10 +142,20 @@ function checkFile(path) {
 
     // Each GIVEN/WHEN/THEN clause is a list item. As a bare paragraph line it
     // folds into the line above — a single newline is a softbreak, so the whole
-    // scenario renders as one wall of text.
-    const kw = line.match(/^\*\*(GIVEN|WHEN|THEN|AND|BUT)\*\*/);
+    // scenario renders as one wall of text. Case-insensitive: authors write
+    // "**Given**" as often as "**GIVEN**", and the render is equally broken.
+    const kw = line.match(/^\*\*(GIVEN|WHEN|THEN|AND|BUT)\*\*/i);
     if (kw) {
       add(i, 'gwt-not-list', `**${kw[1]}** clause should be a list item ("- **${kw[1]}** …"), or it folds into the line above`);
+    }
+
+    // The story-format triple has the same softbreak defect and the same fix,
+    // but none of the GWT keywords, so the rule above never sees it. Only the
+    // glued case is a defect: a clause with a blank line after it is already its
+    // own paragraph and renders correctly, so requiring a list there is noise.
+    const sf = line.match(/^\*\*(AS A|I WANT|SO THAT)\*\*/i);
+    if (sf && lines[i + 1] !== undefined && lines[i + 1].trim() !== '') {
+      add(i, 'story-format-not-list', `**${sf[1]}** clause folds into the line below; make it a list item ("- **${sf[1]}** …")`);
     }
   });
 
