@@ -1,10 +1,12 @@
 ---
 name: jira-to-local
 description: >
-  Use when the user wants a Jira issue pulled onto disk as local files — "pull
+  Use when the user wants Jira issues pulled onto disk as local files — "pull
   PROJ-123", "fetch this story", "get that ticket locally", "download the
   bug", "save this issue and its comments", "grab the NFR", "read this ticket
-  offline", or a pasted Jira browse URL with nothing else asked of it. Covers any
+  offline", or a pasted Jira browse URL with nothing else asked of it. Also for
+  many at once — "sync all tickets in sprint 62", "pull every bug in the sprint",
+  "fetch the whole backlog locally", "download all of team X's issues". Covers any
   issue type — story, bug, epic, subtask, or whatever types the project has
   invented for itself. Also when the issue links
   a Confluence page that should come down with it. This skill only reads: for
@@ -58,6 +60,12 @@ count is asserted before the file is written. **A file holding one page of a lon
 list is a failed pull, not a pull with a caveat.** Never read a list out of
 `fields=*all` — that response is capped, silently.
 
+The same rule decides when a pull is done: **the folder is the evidence, not the
+report.** An agent that says it finished, or that reports itself idle, has stated a
+hypothesis. Check the counts against Jira before believing it — and when many issues
+are in flight, stop the agent before reading its folder, because idle is reported
+while a write is still in flight.
+
 **5. Every document is versioned, and every JSON file is validated.** Markdown
 declares `schema:` in its frontmatter; JSON declares `$schema` as its first key. In
 `json` or `both` mode, `check-json.mjs` must exit clean on every JSON file before
@@ -89,6 +97,7 @@ lookup they cannot make. Name what a thing is, once, in a short clause.
 | The request is… | Workflow |
 |---|---|
 | "pull PROJ-123", "fetch this story", a pasted issue URL | [`workflows/pull.md`](workflows/pull.md) |
+| "sync sprint 62", "pull every bug in the backlog", any JQL or sprint | [`workflows/bulk-pull.md`](workflows/bulk-pull.md) |
 | No `.jira.config.json` exists yet, or a new issue type needs configuring | [`workflows/setup.md`](workflows/setup.md) |
 
 Setup runs once per project. Pull runs every time after that.
@@ -223,3 +232,8 @@ so it reads a file when a step names it rather than being handed all of them.
 | `yielded N of M row(s)` | A list could not be read completely | Re-run that part. Never accept the short file — see Rule 4 |
 | `only N distinct id(s)` | Pages overlapped | Re-run that part; the document would have held duplicates |
 | A part failed and left `assets/` with no document | The run stopped mid-way | Re-run the same command. Writes overwrite, so re-fetching is always safe |
+| `fetch failed` with no status code | Network, not Jira. `whoami` fails the same way | Wait, re-run the part. Distinguish it from `429` before treating it as rate limiting |
+| A page sits in `confluence/` that `content.md` never links | The subagent skipped the `## Linked Documents` edit. No gate can see this | Add the link, then re-gate `content.md` |
+| Gate reports findings on a folder that is correct | The file list swept `assets/` — those `.md` files are attachments, uploaded verbatim | Use `find <folder> -name '*.md' -not -path '*/assets/*'` |
+| Gate reports nothing at all, on every issue | A `*.md` glob matched nothing and zsh aborted the whole command | Use `find`, never a glob |
+| An agent reports idle with an incomplete folder | Idle is reported while a write is still in flight, and on failure too | Stop the agent, then read the folder. Verify counts against Jira — see Rule 4 |

@@ -177,6 +177,25 @@ text the author wrote, and `MD034` on a URL inside quoted content.
 deleting an unfilled template counts as removing boilerplate rather than removing
 content — that one stops a run dead otherwise.
 
+## Run every part yourself, to the end
+
+All five `fetch-issue.mjs` parts run, in order, before you report. A part that
+writes nothing exits 0 — that is a skip, and you still RUN it.
+
+Run every command with your own Bash tool. Do NOT dispatch a subagent for any of
+it: a delegated run leaves the folder empty and reports success anyway.
+
+Do not stop to checkpoint, summarise progress, or hand back mid-loop. If you are
+about to report with parts still unrun, keep going instead. Your report is the last
+thing you do, after part 6.
+
+| Excuse | Reality |
+|---|---|
+| "I'll report progress so far and continue" | A part-way folder reads as finished. Finish, then report. |
+| "A subagent can do the mechanical parts" | It writes nothing to your folder and you cannot see that it failed. |
+| "The remaining parts are probably skips" | A skip is a part that RAN and wrote nothing. You cannot know before running it. |
+| "Context is getting long" | Report length is the problem, not part count. Never paste file contents. |
+
 ## Write for someone who has never seen this issue
 
 The reader cannot open Jira, has not read the code, and does not know the project's
@@ -202,6 +221,13 @@ Report, in this order:
 2. Each part: the changes you made, one line each.
 3. Both gates' final exit state.
 4. Anything left unfixed because fixing it would have changed words.
+5. **Confluence — one of exactly two lines:**
+   - `No Confluence page linked.` — part 6 wrote nothing, or
+   - `Linked N page(s) from content.md under ## Linked Documents.` — naming each
+     link text you wrote.
+
+   There is no third answer. A file in `confluence/` with no link in `content.md`
+   is an unfinished pull, and no gate can see it.
 
 Never the file contents.
 ````
@@ -217,4 +243,5 @@ Never the file contents.
 | `{MODE}` | `output.mode`: `markdown`, `json`, or `both` |
 | `{SKILL_PATH}` | This skill's directory |
 | `{SCRATCHPAD}` | A temporary directory for the snapshots |
+| `{MODEL}` | The model to dispatch with. **`sonnet`** — this agent follows a fixed procedure (fetch, format, gate) rather than making open-ended judgements, and an 80-issue pull is dominated by cost and latency, not reasoning depth |
 | `{INSTRUCTIONS}` | `config.mjs instructions "<TYPE>"` — the project-wide text plus this type's. Write "Nothing recorded." when it is empty, rather than leaving the heading with nothing under it |

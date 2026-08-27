@@ -15,11 +15,11 @@ node <skill-path>/scripts/check-markdown.mjs <file.md>
 
 Exit 0 is clean. Exit 1 while any finding remains. Re-run after editing.
 
-## The 18 checker rules
+## The 19 checker rules
 
 | Rule | Defect | Fix |
 |---|---|---|
-| `emphasis` | `**GIVEN **text` — a space before the closing `**` | Move the space out: `**GIVEN** text`. CommonMark will not close an emphasis run whose closing `**` is preceded by whitespace, so the asterisks render literally |
+| `emphasis` | `**GIVEN **text` — a space before the closing `**`, or `now** in Production**` — a space after the opening one | Move the space outside the markers. CommonMark needs the closing `**` to have no whitespace before it and the opening `**` none after it; either way the run never forms and the asterisks render literally |
 | `MD001` | Heading level jumps, `##` then `####` | Renumber so each level increments by one |
 | `heading-bold` | `## **Title**` | Drop the `**`. A heading is already emphasized |
 | `heading-punct` | `## Pre-condition:` | Drop the trailing `:` or `.`. Punctuation that only ended a bold label is formatting, not wording |
@@ -36,7 +36,8 @@ Exit 0 is clean. Exit 1 while any finding remains. Re-run after editing.
 | `WCAG-1.1.1` | `![image-20260101-120000.png](…)` | Replace the filename with what the image shows. Open it and look |
 | `WCAG-2.4.4` | `[here](…)`, `[click here](…)` | Use text naming the target: `[Check the linked ticket](…)` |
 | `table-candidate` | Six or more `Label: value` bullets in a row | Convert to a two-column table |
-| `gwt-not-list` | `**GIVEN** …` as a bare paragraph line | Make every clause a list item |
+| `gwt-not-list` | `**GIVEN** …` as a bare paragraph line, in any case — `**Given**` breaks identically | Make every clause a list item |
+| `story-format-not-list` | `**AS A**` / `**I WANT**` / `**SO THAT**` glued to the line below | Make each clause a list item. Only fires when the next line is not blank: a clause with a blank line after it is already its own paragraph and renders correctly |
 
 ## Two worth understanding beyond the table
 

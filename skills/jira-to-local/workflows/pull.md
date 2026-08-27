@@ -55,9 +55,13 @@ continue.
 
 ## Step 3 [subagent]: Fetch and format, one part at a time
 
-Dispatch **one** subagent. It keeps the file contents out of the main thread,
-which is the point: a fetched issue runs to hundreds of lines and the main thread
-needs its context for the task the user actually asked about.
+Dispatch **one** subagent, on **`sonnet`**. It keeps the file contents out of the
+main thread, which is the point: a fetched issue runs to hundreds of lines and the
+main thread needs its context for the task the user actually asked about. The work
+itself is procedural — fetch, format, gate — so a larger model buys nothing.
+
+For more than one issue, use [`bulk-pull.md`](bulk-pull.md) instead: the failures
+that matter at 80 issues are not the ones that matter at one.
 
 Give it: the issue key, the output folder, the output mode, the instructions text
 from steps 1 and 2, and the whole of
@@ -182,12 +186,21 @@ node <skill-path>/scripts/jira-api.mjs get /rest/api/3/issue/<KEY>/properties/ch
   The boxes stay unticked whatever it says — only the count is checkable
 - `content.md`'s development counts equal `development.md`'s row counts, and both
   name any gap the endpoint left
+- every page in `confluence/` is linked from `content.md`. A page on disk that
+  nothing points at is invisible to the reader, and no gate can see it missing
 
 **Both gates clean, across the folder:**
 
 ```bash
-node <skill-path>/scripts/check-markdown.mjs <folder>/*.md <folder>/confluence/*.md
-node <skill-path>/scripts/check-json.mjs <folder>/*.json      # json or both mode
+# find, not a glob: zsh aborts the whole command when a glob matches nothing, so
+# the `confluence/*.md` form silently skips the check on every issue that links
+# no page — it looks like it ran.
+# -not -path '*/assets/*': those .md files are issue attachments, uploaded
+# verbatim. Gating them reports findings on a correct folder and invites an
+# agent to reformat someone else's file.
+node <skill-path>/scripts/check-markdown.mjs \
+  $(find <folder> -name '*.md' -not -path '*/assets/*')
+node <skill-path>/scripts/check-json.mjs $(find <folder> -name '*.json' -not -path '*/assets/*')
 ```
 
 Any count mismatch, or either gate non-zero, is a failed pull. Re-run that part.

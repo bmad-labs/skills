@@ -553,14 +553,20 @@ function buildContentMarkdown(cred, issue, meta, description, chosen, extraRows,
     out.push(`## ${fieldEntry.heading}`, '', String(fieldEntry.value).trim(), '');
   }
 
-  if (checklist.length) {
+  // The count alone is worth a section: the YAML field is written once at issue
+  // creation and is empty on many issues whose Checklist app still holds real
+  // progress. Writing nothing there hid a live "N of M done" on 26 of 80 issues
+  // in one bulk run, and the reader had no way to tell a checklist existed.
+  if (checklist.length || checklistProgress) {
     out.push('## Checklist', '');
     // Above the list, not below it: a caveat under a long list of boxes is read too
     // late to stop anyone trusting them.
     if (checklistProgress) {
       out.push(
         `**${checklistProgress.done} of ${checklistProgress.total} done** in Jira. `
-        + 'Jira does not expose which ones, so every box below is drawn unticked.',
+        + (checklist.length
+          ? 'Jira does not expose which ones, so every box below is drawn unticked.'
+          : 'Jira exposes only the totals, and this issue carries no item text, so no boxes are drawn.'),
         ''
       );
     }
@@ -1309,9 +1315,14 @@ async function main() {
     const checklist = parseChecklist(
       issue.fields?.[config?.project?.checklistFields?.contentYaml]
     );
-    // Gated on there being a list to describe, so a project with no checklist app
-    // pays no request for it.
-    const checklistProgress = checklist.length ? await fetchChecklistProgress(cred, key) : null;
+    // Gated on the project mapping the field at all, so a project with no
+    // checklist app pays no request for it. Not gated on the YAML parsing to
+    // items: that field is written once at creation and is empty on many issues
+    // whose Checklist app still holds real progress. Gating on it dropped the
+    // section entirely — count and all — on 26 of 80 issues in one bulk run.
+    const checklistProgress = config?.project?.checklistFields?.contentYaml
+      ? await fetchChecklistProgress(cred, key)
+      : null;
 
     // The description heading follows the config, so a project that calls it
     // "User Story" gets that heading rather than a generic one.
