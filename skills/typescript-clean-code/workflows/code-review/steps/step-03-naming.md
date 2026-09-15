@@ -4,6 +4,7 @@ description: 'Review naming conventions — intent, consistency, searchability'
 nextStepFile: './step-04-class-design.md'
 referenceFiles:
   - 'references/naming/rules.md'
+  - 'references/smells/rules.md'
 ---
 
 # Step 3: Check Naming
@@ -11,11 +12,6 @@ referenceFiles:
 ## STEP GOAL
 
 Review all names (variables, functions, classes) in the target code for intent-revealing quality, consistency, and searchability.
-
-## REFERENCE LOADING
-
-Before starting analysis, load and read:
-- `references/naming/rules.md` — naming rules and conventions
 
 Cite specific rules when reporting findings.
 
@@ -38,21 +34,28 @@ Watch for and report:
 - Names that require comments to explain
 - Different words for the same concept
 
-## PRESENT FINDINGS
+### Filter before reporting
 
-Present findings to the user in this format:
+Ask of every candidate: **would the author plausibly act on this?** Cut every no. A
+correct finding nobody acts on is a false positive — it spends the trust that makes
+the next finding land. Label what survives with the Conventional Comments vocabulary
+in `references/smells/rules.md` → Severity vocabulary.
+
+## PRESENT FINDINGS
 
 ```
 Step 3: Naming
 ==============
 
-[PASS/ISSUE] name (file:line)
+<label> (<decoration>): name (file:line)
   - Problem: description
   - Suggestion: better_name
   Rule: naming/rules.md — Rule N
 
-Summary: N names reviewed, N issues found
+Summary: N names reviewed, N reported, N cut as unlikely to be acted on
 ```
+
+**This step is done when** every name in scope has been examined, each surviving finding carries a label and a concrete fix, and the cut count is recorded.
 
 Then ask: **[C] Continue to Step 4: Class/Module Design**
 

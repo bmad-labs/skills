@@ -46,11 +46,15 @@ This workflow uses a **step-file architecture** for context-safe execution:
 
 ### Rules
 
-1. **Load one step at a time** - Read the step file, execute it, then load the next
-2. **Update frontmatter after each step** - Add the step number to `stepsCompleted`
-3. **Wait for user confirmation** - Present findings and wait for `[C]` before proceeding
-4. **Load reference files** - Each step specifies which reference files to load before analysis
-5. **Cite specific rules** - When reporting findings, cite the specific rule from the reference file
+1. **Load one step at a time** — read the step file, execute it, then load the next.
+   Each step names its own reference files and its own completion criterion
+2. **Update frontmatter after each step** — add the step number to `stepsCompleted`,
+   so a compacted context resumes via `step-01b-continue.md`
+3. **Wait for `[C]`** between steps
+
+**The review is done when** all nine steps are in `stepsCompleted`, the merge
+decision is recorded with its reason, every reported finding carries a label and a
+fix, and the report states how many findings were cut as unlikely to be acted on.
 
 ## Begin
 

@@ -1,6 +1,8 @@
 ---
 name: 'step-06-performance'
 description: 'Check for performance issues — N+1, memory, blocking'
+referenceFiles:
+  - 'references/smells/rules.md'
 nextStepFile: './step-07-run-code.md'
 ---
 
@@ -32,21 +34,28 @@ for (const user of users) {
 const orders = await db.getOrdersForUsers(userIds);
 ```
 
-## PRESENT FINDINGS
+### Filter before reporting
 
-Present findings to the user in this format:
+Ask of every candidate: **would the author plausibly act on this?** Cut every no. A
+correct finding nobody acts on is a false positive — it spends the trust that makes
+the next finding land. Label what survives with the Conventional Comments vocabulary
+in `references/smells/rules.md` → Severity vocabulary.
+
+## PRESENT FINDINGS
 
 ```
 Step 6: Performance
 ===================
 
-[PASS/ISSUE] issue_type (file:line)
+<label> (<decoration>): issue_type (file:line)
   - Impact: HIGH/MEDIUM/LOW
   - Description: what the performance issue is
   - Suggestion: how to optimize
 
-Summary: N performance issues found
+Summary: N performance findings reported, N cut as unlikely to be acted on
 ```
+
+**This step is done when** every performance finding in scope has been examined, each surviving finding carries a label and a concrete fix, and the cut count is recorded.
 
 Then ask: **[C] Continue to Step 7: Run Code**
 

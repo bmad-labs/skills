@@ -10,7 +10,7 @@ Functions are the first line of organization in any program. Well-written functi
 
 ### Small Functions
 
-**Definition**: Functions should be very small, ideally 2-5 lines, rarely exceeding 20 lines.
+**Definition**: Functions should be small enough to understand at a glance. Clean Code puts a number on it — "ideally 2-5 lines, rarely exceeding 20" — but that number is a contested position, not a measurement; see `references/functions/rules.md` Rule 1 for the counter-position and the over-extraction failure mode. The durable test is whether the sections of the function can be named separately.
 
 Small functions are easier to read, understand, and test. Each function should be "transparently obvious" and tell a story that leads to the next function.
 
@@ -82,7 +82,7 @@ Write code as a set of TO paragraphs, each describing the current level and refe
 
 | Concept | One-Line Summary |
 |---------|-----------------|
-| Small | 2-5 lines ideal, max 20 lines |
+| Small | Graspable at a glance — named-sections test, not a line count (contested; see rules.md Rule 1) |
 | Do One Thing | One level of abstraction below the function name |
 | Abstraction | All statements at same level |
 | Stepdown | Code reads top-down like TO paragraphs |

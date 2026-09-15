@@ -1,10 +1,10 @@
 ---
-name: 'step-05-run-tests'
+name: 'step-06-run-tests'
 description: 'Verify tests still pass after the change'
-nextStepFile: './step-06-commit.md'
+nextStepFile: './step-07-commit.md'
 ---
 
-# Step 5: Run Tests
+# Step 6: Run Tests
 
 ## STEP GOAL
 
@@ -34,7 +34,7 @@ npm test
 ## PRESENT RESULTS
 
 ```
-Step 5: Test Results
+Step 6: Test Results
 ====================
 
 Iteration: {{N}}
@@ -47,19 +47,19 @@ Coverage: {{percentage}} (change: +/-N%)
 Action: {{proceed / undo and retry}}
 ```
 
-If PASS, ask: **[C] Continue to Step 6: Commit**
+If PASS, ask: **[C] Continue to Step 7: Commit**
 
-If FAIL, inform the user and undo the change. Return to `step-04-make-change.md` for a smaller change.
+If FAIL, inform the user and undo the change. Return to `step-05-make-change.md` for a smaller change.
 
 ## FRONTMATTER UPDATE
 
 Update the output document:
-- Add `5` to `stepsCompleted` (or update if looping)
+- Add `6` to `stepsCompleted` (or update if looping)
 - Set `testsGreen` to `true` or `false`
 - Append test results to the log
 
 ## NEXT STEP
 
-If tests pass and user confirms `[C]`, load `step-06-commit.md`.
+If tests pass and user confirms `[C]`, load `step-07-commit.md`.
 
-If tests fail, load `step-04-make-change.md` after undoing the change.
+If tests fail, load `step-05-make-change.md` after undoing the change.

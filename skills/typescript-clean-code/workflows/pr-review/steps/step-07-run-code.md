@@ -38,8 +38,6 @@ If applicable:
 
 ## PRESENT FINDINGS
 
-Present findings to the user in this format:
-
 ```
 Step 7: Run Code
 ================

@@ -16,15 +16,6 @@ referenceFiles:
 
 Check code quality line by line across all changed files, applying the full code review checklist.
 
-## REFERENCE LOADING
-
-Before starting analysis, load and read:
-- `references/functions/rules.md` — function design rules
-- `references/naming/rules.md` — naming conventions
-- `references/error-handling/rules.md` — error handling rules
-- `references/comments/rules.md` — comment rules
-- `references/smells/rules.md` — code smell catalog
-
 Cite specific rules when reporting findings.
 
 ## ANALYSIS PROCESS
@@ -57,29 +48,36 @@ For each changed file, check:
 - No feature envy
 - No god classes
 
-## PRESENT FINDINGS
+### Filter before reporting
 
-Present findings to the user in this format:
+Ask of every candidate: **would the author plausibly act on this?** Cut every no. A
+correct finding nobody acts on is a false positive — it spends the trust that makes
+the next finding land. Label what survives with the Conventional Comments vocabulary
+in `references/smells/rules.md` → Severity vocabulary.
+
+## PRESENT FINDINGS
 
 ```
 Step 4: Code Details
 ====================
 
 File: {{filename}}
-  [PASS/ISSUE] (line N) category: description
+  <label> (<decoration>): (line N) category: description
     Rule: {{category}}/rules.md — Rule N
     Suggestion: fix
 
 File: {{filename}}
   ...
 
-Summary: N files reviewed, N issues found
+Summary: N changed files reviewed, N reported, N cut as unlikely to be acted on
   - Functions: N issues
   - Naming: N issues
   - Error Handling: N issues
   - Comments: N issues
   - Smells: N issues
 ```
+
+**This step is done when** every changed file in scope has been examined, each surviving finding carries a label and a concrete fix, and the cut count is recorded.
 
 Then ask: **[C] Continue to Step 5: Security**
 

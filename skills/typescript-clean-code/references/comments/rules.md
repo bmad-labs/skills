@@ -2,6 +2,21 @@
 
 Guidelines for when comments are acceptable and when to avoid them.
 
+> **Contested — calibrate before applying.** Clean Code treats most comments as a
+> failure to express intent in code, and that framing is a position, not a settled
+> result. The counter-position holds that self-documenting code is insufficient by
+> construction: code states *what it does*, and cannot state why this approach was
+> chosen over the obvious one, which invariant callers must preserve, which bug the
+> odd-looking line fixes, or what a name deliberately does not cover. Those belong
+> in comments and have nowhere else to live.
+>
+> The rules below are ordered accordingly — good comments first. Applied as
+> intended: delete comments that restate the code (C3), delete comments that have
+> gone false (C2), and **do not delete comments carrying rationale, invariants, or
+> non-obvious context**. Removing those is a net loss even though it reduces comment
+> count. When reviewing, "this could be a comment" and "this comment should be code"
+> are both real findings; neither is automatic.
+
 ## Good Comments
 
 ### 1. Legal Comments

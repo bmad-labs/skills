@@ -46,7 +46,7 @@ Step-by-step processes for common tasks. **Start here for known tasks.**
 | Error handling | `references/error-handling/rules.md` |
 | Test quality | `references/unit-tests/rules.md` |
 | Code formatting | `references/formatting/rules.md` |
-| General code smells | `references/smells/rules.md` |
+| General code smells | `references/smells/tooling.md` (first), then `rules.md`, `fowler.md`, `typescript.md` |
 
 ### By Task - Writing New Code
 
@@ -68,7 +68,7 @@ Step-by-step processes for common tasks. **Start here for known tasks.**
 | Bad names | `references/naming/rules.md`, `references/naming/examples.md` |
 | Poor error handling | `references/error-handling/rules.md`, `references/error-handling/examples.md` |
 | Messy tests | `references/unit-tests/rules.md`, `references/unit-tests/examples.md` |
-| Any smell | `references/smells/rules.md`, `references/smells/examples.md` |
+| Any smell | `references/smells/rules.md`, `references/smells/examples.md`; add `fowler.md` when reviewing a change and `typescript.md` for TS |
 
 ### By Code Element
 
@@ -86,17 +86,27 @@ Step-by-step processes for common tasks. **Start here for known tasks.**
 
 | If you notice... | Load these files |
 |------------------|------------------|
-| Function > 20 lines | `references/functions/rules.md` |
-| Too many arguments (> 3) | `references/functions/rules.md` |
+| A function with nameable sections | `references/functions/rules.md` (Rule 1 — read the contested note; length alone is not a finding) |
+| Arguments unreadable at the call site | `references/functions/rules.md`, `references/smells/fowler.md` (Long Parameter List) |
 | Unclear variable name | `references/naming/rules.md` |
-| Class doing too much | `references/classes/rules.md` (SRP) |
-| Duplicate code blocks | `references/smells/rules.md` (G5) |
+| Class doing too much | `references/classes/rules.md` (SRP), `references/smells/fowler.md` (Large Class) |
+| Duplicate code blocks | `references/smells/rules.md` (G5) — check the "when NOT to fix" first |
 | Commented-out code | `references/smells/rules.md` (C5) |
 | Null checks everywhere | `references/error-handling/rules.md` |
 | Hard-to-read tests | `references/unit-tests/rules.md` |
 | Inconsistent formatting | `references/formatting/rules.md` |
-| Feature envy | `references/smells/rules.md` (G14) |
-| God class | `references/classes/rules.md`, `references/smells/rules.md` |
+| Feature envy | `references/smells/rules.md` (G14), `references/smells/fowler.md` |
+| God class | `references/classes/rules.md`, `references/smells/fowler.md` (Large Class) |
+| **One change touching many files** | `references/smells/fowler.md` (Shotgun Surgery) |
+| **One file changing for unrelated reasons** | `references/smells/fowler.md` (Divergent Change) |
+| **Fields that always travel together** | `references/smells/fowler.md` (Data Clumps) |
+| **Ids and codes typed as bare `string`** | `references/smells/typescript.md` (TS4), `references/smells/fowler.md` (Primitive Obsession) |
+| **Abstraction with one implementation** | `references/smells/fowler.md` (Speculative Generality), `references/smells/typescript.md` (TS10) |
+| **`any`, `as`, or `!` in the diff** | `references/smells/typescript.md` (TS1, TS2, TS3) |
+| **A `switch` over a union** | `references/smells/typescript.md` (TS5 and "The G23 tension") — an exhaustive one is not a smell |
+| **Interface with many optional fields** | `references/smells/typescript.md` (TS8) |
+| **Unused exports / dead code** | `references/smells/tooling.md` — run `knip`, do not hand-check |
+| **About to claim "the project is strict"** | `references/smells/typescript.md` (TS7) — read `tsconfig.json` first; `noUncheckedIndexedAccess` is not in `strict` |
 
 ---
 
@@ -175,7 +185,8 @@ What do you need to do?
 │   │   ├─► Functions → references/functions/rules.md
 │   │   ├─► Classes → references/classes/rules.md
 │   │   ├─► Tests → references/unit-tests/rules.md
-│   │   └─► Smells → references/smells/rules.md
+│   │   └─► Smells → references/smells/tooling.md (first)
+│   │                 then rules.md + fowler.md + typescript.md
 │   │
 │   └─► Professional
 │       ├─► Saying no → references/saying-no/rules.md
@@ -215,7 +226,7 @@ What do you need to do?
 | error-handling | 3 | Exception handling |
 | unit-tests | 3 | Clean test principles |
 | formatting | 3 | Code layout |
-| smells | 3 | Code smell catalog |
+| smells | 6 | Four-layer smell catalog: `rules.md` (per line), `fowler.md` (change shape), `typescript.md` (types), `tooling.md` (what a linter decides) |
 
 ### Professional Practice References (36 files)
 
@@ -240,7 +251,7 @@ What do you need to do?
 
 | Scenario | Files |
 |----------|-------|
-| Full code review | `workflows/code-review/workflow.md` or `references/functions/checklist.md` + `references/smells/rules.md` |
+| Full code review | `workflows/code-review/workflow.md`, or `references/functions/checklist.md` + all four `references/smells/*` layers |
 | Writing a new feature | `workflows/new-feature.md` |
 | Starting TDD | `workflows/tdd.md` |
 | Test strategy planning | `workflows/test-strategy.md` |
