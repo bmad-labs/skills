@@ -1,0 +1,272 @@
+{
+  "scene.stage": {
+    "file": "index.html",
+    "line": 12,
+    "kind": "dom"
+  },
+  "nav": {
+    "file": "index.html",
+    "line": 15,
+    "kind": "dom",
+    "cssRule": "styles.css:25 .nav"
+  },
+  "nav.brand": {
+    "file": "index.html",
+    "line": 16,
+    "kind": "dom",
+    "cssRule": "styles.css:30 .brand"
+  },
+  "nav.link.how": {
+    "file": "index.html",
+    "line": 18,
+    "kind": "dom"
+  },
+  "nav.link.cdn": {
+    "file": "index.html",
+    "line": 19,
+    "kind": "dom"
+  },
+  "hero": {
+    "file": "index.html",
+    "line": 23,
+    "kind": "dom",
+    "cssRule": "styles.css:39 .hero"
+  },
+  "hero.eyebrow": {
+    "file": "index.html",
+    "line": 25,
+    "kind": "dom",
+    "cssRule": "styles.css:42 .eyebrow"
+  },
+  "hero.title": {
+    "file": "index.html",
+    "line": 26,
+    "kind": "dom",
+    "cssRule": "styles.css:43 .hero-title"
+  },
+  "hero.subtitle": {
+    "file": "index.html",
+    "line": 27,
+    "kind": "dom"
+  },
+  "hero.scroll-cue": {
+    "file": "index.html",
+    "line": 28,
+    "kind": "dom"
+  },
+  "beat.ingest": {
+    "file": "index.html",
+    "line": 35,
+    "kind": "dom"
+  },
+  "beat.ingest.no": {
+    "file": "index.html",
+    "line": 36,
+    "kind": "dom"
+  },
+  "beat.ingest.title": {
+    "file": "index.html",
+    "line": 37,
+    "kind": "dom"
+  },
+  "beat.ingest.body": {
+    "file": "index.html",
+    "line": 38,
+    "kind": "dom"
+  },
+  "beat.encode": {
+    "file": "index.html",
+    "line": 43,
+    "kind": "dom"
+  },
+  "beat.encode.no": {
+    "file": "index.html",
+    "line": 44,
+    "kind": "dom"
+  },
+  "beat.encode.title": {
+    "file": "index.html",
+    "line": 45,
+    "kind": "dom"
+  },
+  "beat.encode.body": {
+    "file": "index.html",
+    "line": 46,
+    "kind": "dom"
+  },
+  "beat.fill": {
+    "file": "index.html",
+    "line": 51,
+    "kind": "dom"
+  },
+  "beat.fill.no": {
+    "file": "index.html",
+    "line": 52,
+    "kind": "dom"
+  },
+  "beat.fill.title": {
+    "file": "index.html",
+    "line": 53,
+    "kind": "dom"
+  },
+  "beat.fill.body": {
+    "file": "index.html",
+    "line": 54,
+    "kind": "dom"
+  },
+  "beat.edge": {
+    "file": "index.html",
+    "line": 59,
+    "kind": "dom"
+  },
+  "beat.edge.no": {
+    "file": "index.html",
+    "line": 60,
+    "kind": "dom"
+  },
+  "beat.edge.title": {
+    "file": "index.html",
+    "line": 61,
+    "kind": "dom"
+  },
+  "beat.edge.body": {
+    "file": "index.html",
+    "line": 62,
+    "kind": "dom"
+  },
+  "beat.play": {
+    "file": "index.html",
+    "line": 67,
+    "kind": "dom"
+  },
+  "beat.play.no": {
+    "file": "index.html",
+    "line": 68,
+    "kind": "dom"
+  },
+  "beat.play.title": {
+    "file": "index.html",
+    "line": 69,
+    "kind": "dom"
+  },
+  "beat.play.body": {
+    "file": "index.html",
+    "line": 70,
+    "kind": "dom"
+  },
+  "section.cards": {
+    "file": "index.html",
+    "line": 74,
+    "kind": "dom",
+    "cssRule": "styles.css:58 .cards"
+  },
+  "card.encodeonce": {
+    "file": "index.html",
+    "line": 75,
+    "kind": "dom"
+  },
+  "card.encodeonce.title": {
+    "file": "index.html",
+    "line": 75,
+    "kind": "dom"
+  },
+  "card.encodeonce.body": {
+    "file": "index.html",
+    "line": 75,
+    "kind": "dom"
+  },
+  "card.preposition": {
+    "file": "index.html",
+    "line": 76,
+    "kind": "dom"
+  },
+  "card.preposition.title": {
+    "file": "index.html",
+    "line": 76,
+    "kind": "dom"
+  },
+  "card.preposition.body": {
+    "file": "index.html",
+    "line": 76,
+    "kind": "dom"
+  },
+  "card.closetoyou": {
+    "file": "index.html",
+    "line": 77,
+    "kind": "dom"
+  },
+  "card.closetoyou.title": {
+    "file": "index.html",
+    "line": 77,
+    "kind": "dom"
+  },
+  "card.closetoyou.body": {
+    "file": "index.html",
+    "line": 77,
+    "kind": "dom"
+  },
+  "footer": {
+    "file": "index.html",
+    "line": 80,
+    "kind": "dom"
+  },
+  "footer.text": {
+    "file": "index.html",
+    "line": 80,
+    "kind": "dom"
+  },
+  "scene.city": {
+    "file": "main.js",
+    "line": 149,
+    "kind": "three",
+    "builderFn": "rnd"
+  },
+  "scene.grid": {
+    "file": "main.js",
+    "line": 170,
+    "kind": "three",
+    "builderFn": "buildGrid"
+  },
+  "scene.studio": {
+    "file": "main.js",
+    "line": 213,
+    "kind": "three",
+    "builderFn": "buildStudio"
+  },
+  "scene.encode-farm": {
+    "file": "main.js",
+    "line": 226,
+    "kind": "three",
+    "builderFn": "buildEncodeFarm"
+  },
+  "scene.origin": {
+    "file": "main.js",
+    "line": 240,
+    "kind": "three",
+    "builderFn": "buildOrigin"
+  },
+  "scene.edge": {
+    "file": "main.js",
+    "line": 260,
+    "kind": "three",
+    "builderFn": "buildEdge"
+  },
+  "scene.tv": {
+    "file": "main.js",
+    "line": 274,
+    "kind": "three",
+    "builderFn": "buildTV"
+  },
+  "scene.route": {
+    "file": "main.js",
+    "line": 285,
+    "kind": "three",
+    "builderFn": "buildRoute"
+  },
+  "scene.flow": {
+    "file": "main.js",
+    "line": 304,
+    "kind": "three",
+    "builderFn": "buildParticles"
+  }
+}

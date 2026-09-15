@@ -22,34 +22,35 @@ command -v emulator && echo "Android Emulator: available"
 
 ### Step 1: Install Dependencies
 
-| Framework | Command |
-|-----------|---------|
-| React Native | `npm ci` or `yarn install` |
-| Flutter | `flutter pub get` |
-| Native Android | `./gradlew dependencies` |
-| Native iOS | `pod install` (in ios/ directory) |
+| Framework      | Command                           |
+| -------------- | --------------------------------- |
+| React Native   | `npm ci` or `yarn install`        |
+| Flutter        | `flutter pub get`                 |
+| Native Android | `./gradlew dependencies`          |
+| Native iOS     | `pod install` (in ios/ directory) |
 
 ### Step 2: Build
 
-| Framework | Android | iOS (macOS only) |
-|-----------|---------|-------------------|
-| React Native | `npx react-native build-android --mode=debug` | `npx react-native build-ios --mode=Debug` |
-| Flutter | `flutter build apk --debug` | `flutter build ios --debug --no-codesign` |
-| Native Android | `./gradlew assembleDebug` | N/A |
-| Native iOS | N/A | `xcodebuild -workspace *.xcworkspace -scheme <scheme> -sdk iphonesimulator build` |
+| Framework      | Android                                       | iOS (macOS only)                                                                  |
+| -------------- | --------------------------------------------- | --------------------------------------------------------------------------------- |
+| React Native   | `npx react-native build-android --mode=debug` | `npx react-native build-ios --mode=Debug`                                         |
+| Flutter        | `flutter build apk --debug`                   | `flutter build ios --debug --no-codesign`                                         |
+| Native Android | `./gradlew assembleDebug`                     | N/A                                                                               |
+| Native iOS     | N/A                                           | `xcodebuild -workspace *.xcworkspace -scheme <scheme> -sdk iphonesimulator build` |
 
 ### Step 3: Run Tests
 
-| Framework | Command |
-|-----------|---------|
-| React Native | `npm test` (Jest) |
-| Flutter | `flutter test` |
-| Native Android | `./gradlew test` |
-| Native iOS | `xcodebuild test -workspace *.xcworkspace -scheme <scheme> -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15'` |
+| Framework      | Command                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| React Native   | `npm test` (Jest)                                                                                                                     |
+| Flutter        | `flutter test`                                                                                                                        |
+| Native Android | `./gradlew test`                                                                                                                      |
+| Native iOS     | `xcodebuild test -workspace *.xcworkspace -scheme <scheme> -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15'` |
 
 ### Step 4: Emulator/Simulator Testing (if available)
 
 **Android Emulator:**
+
 ```bash
 # List available AVDs
 emulator -list-avds
@@ -64,6 +65,7 @@ adb shell am start -n <package>/<activity>
 ```
 
 **iOS Simulator (macOS only):**
+
 ```bash
 # List available simulators
 xcrun simctl list devices available
@@ -78,11 +80,11 @@ xcrun simctl launch <device_id> <bundle_id>
 
 ### Step 5: Automation Testing (if available)
 
-| Tool | Check | Run |
-|------|-------|-----|
-| Detox | `npx detox --version` | `npx detox test -c <config>` |
-| Maestro | `command -v maestro` | `maestro test <flow.yaml>` |
-| Appium | `command -v appium` | `appium &` then run test suite |
+| Tool    | Check                 | Run                            |
+| ------- | --------------------- | ------------------------------ |
+| Detox   | `npx detox --version` | `npx detox test -c <config>`   |
+| Maestro | `command -v maestro`  | `maestro test <flow.yaml>`     |
+| Appium  | `command -v appium`   | `appium &` then run test suite |
 
 ## Docker Fallback (Android — if native SDK not installed)
 

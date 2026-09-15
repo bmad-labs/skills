@@ -1,0 +1,50 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Numbered list" subtitle="A vertical list with big accent numerals down the left" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Numbered List</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: grid; grid-template-columns: 5fr 7fr; gap: var(--space-16);
+    padding: var(--slide-margin); align-items: center; }
+  .head { }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+  .accent-rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .lead { margin-top: var(--space-6); font-size: var(--fs-body); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); max-width: 380px; }
+  .list { display: flex; flex-direction: column; gap: var(--space-6); }
+  .row { display: grid; grid-template-columns: 72px 1fr; align-items: baseline; gap: var(--space-5); }
+  .row .n { font-size: 48px; font-weight: var(--fw-black); color: var(--color-accent); line-height: 1;
+    letter-spacing: var(--ls-tight); }
+  .row h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); line-height: var(--lh-snug); }
+  .row p { margin-top: var(--space-2); font-size: var(--fs-small); font-weight: var(--fw-light);
+    color: var(--text-secondary); line-height: var(--lh-normal); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="head">
+      <span class="eyebrow">The plan</span>
+      <h1>Five steps to get there</h1>
+      <div class="accent-rule"></div>
+      <p class="lead">A simple sequence anyone on the team can follow, start to finish.</p>
+    </div>
+    <div class="list">
+      <div class="row"><div class="n">01</div><div><h3>Align on the goal</h3><p>Name the outcome and the metric that proves it.</p></div></div>
+      <div class="row"><div class="n">02</div><div><h3>Map the workflow</h3><p>Trace how work actually moves today, end to end.</p></div></div>
+      <div class="row"><div class="n">03</div><div><h3>Build the first slice</h3><p>Ship something real against the core path early.</p></div></div>
+      <div class="row"><div class="n">04</div><div><h3>Measure and adjust</h3><p>Let evidence, not opinion, guide the next move.</p></div></div>
+      <div class="row"><div class="n">05</div><div><h3>Scale what works</h3><p>Roll out steadily and keep it running with care.</p></div></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Comparison table" subtitle="Rows × columns with an accent header rule — compare options or tiers" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Comparison Table</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { position: relative; overflow: hidden;
+    width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  .head { margin-bottom: var(--space-10); }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); max-width: 820px; }
+  h1 .accent { color: var(--color-accent); }
+  .rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .wrap { flex: 1; display: flex; align-items: center; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); padding: 0 var(--space-5) var(--space-3);
+    border-bottom: var(--border-w-thick) solid var(--color-accent); }
+  td { font-size: var(--fs-body); padding: var(--space-5); border-bottom: var(--border-w) solid var(--border-subtle);
+    color: var(--text-secondary); font-weight: var(--fw-light); }
+  tr:nth-child(even) td { background: var(--surface-subtle); }
+  td.name { font-weight: var(--fw-bold); color: var(--text-primary); font-size: var(--fs-h3); }
+  td.price { font-weight: var(--fw-bold); color: var(--color-accent); }
+  .foot { display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-8); }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="head">
+      <span class="eyebrow">Comparison</span>
+      <h1>Compare the <span class="accent">options</span></h1>
+      <div class="rule"></div>
+    </div>
+
+    <div class="wrap">
+      <table>
+        <thead>
+          <tr><th>Option</th><th>Column two</th><th>Column three</th><th>Column four</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name">Option one</td><td>Row value</td><td>Row value</td><td class="price">Value</td></tr>
+          <tr><td class="name">Option two</td><td>Row value</td><td>Row value</td><td class="price">Value</td></tr>
+          <tr><td class="name">Option three</td><td>Row value</td><td>Row value</td><td class="price">Value</td></tr>
+          <tr><td class="name">Option four</td><td>Row value</td><td>Row value</td><td class="price">Value</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="foot">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <span class="pageno">14</span>
+    </div>
+  </div>
+</body>
+</html>

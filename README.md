@@ -91,7 +91,7 @@ If you only need specific skills, add them individually to your project's `.clau
 ```json
 {
   "skills": [
-    "github:bmad-labs/skills/skills/clean-code",
+    "github:bmad-labs/skills/skills/typescript-clean-code",
     "github:bmad-labs/skills/skills/typescript-e2e-testing",
     "github:bmad-labs/skills/skills/typescript-unit-testing"
   ]
@@ -106,7 +106,6 @@ If you only need specific skills, add them individually to your project's `.clau
 - `github:bmad-labs/skills/skills/typescript-clean-code`
 - `github:bmad-labs/skills/skills/book-converter`
 - `github:bmad-labs/skills/skills/skill-from-book`
-- `github:bmad-labs/skills/skills/ui-ux-pro-max`
 - `github:bmad-labs/skills/skills/slides-generator`
 - `github:bmad-labs/skills/skills/ai-multimodal`
 - `github:bmad-labs/skills/skills/atlassian-rest`
@@ -114,6 +113,8 @@ If you only need specific skills, add them individually to your project's `.clau
 - `github:bmad-labs/skills/skills/trade-off-analysis`
 - `github:bmad-labs/skills/skills/manual-testing`
 - `github:bmad-labs/skills/skills/load-docs`
+- `github:bmad-labs/skills/skills/rca-report`
+- `github:bmad-labs/skills/skills/jira-to-local`
 
 ### Troubleshooting
 
@@ -173,12 +174,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [mcp-builder](skills/mcp-builder) | Guide for creating high-quality MCP servers for LLM integrations | Development |
 | [typescript-e2e-testing](skills/typescript-e2e-testing) | Comprehensive E2E testing for TypeScript/NestJS with Kafka, PostgreSQL, MongoDB, Redis | Development |
 | [typescript-unit-testing](skills/typescript-unit-testing) | Unit testing for TypeScript/NestJS with Jest, DeepMocked, mongodb-memory-server, pg-mem, Kafka, Redis | Development |
-| [skill-creator](skills/skill-creator) | Guide for creating effective Claude Code skills | Development |
 | [typescript-clean-code](skills/typescript-clean-code) | Clean Code principles and workflows for TypeScript development | Development |
 | [book-converter](skills/book-converter) | Convert EPUB books to formatted Markdown | Productivity |
 | [skill-from-book](skills/skill-from-book) | Convert book content into structured Claude Code skills | Development |
-| [ui-ux-pro-max](skills/ui-ux-pro-max) | UI/UX design intelligence with 50 styles, 21 palettes, multiple frameworks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter) | Creative |
 | [slides-generator](skills/slides-generator) | Generate interactive presentation slides using React + Tailwind, export to PDF or HTML | Productivity |
+| [slide-maker](skills/slide-maker) | Design-system-agnostic slide/deck maker — brainstorm, generate, and export to editable PPTX, image PPTX, standalone HTML, or PDF; 34 token-driven layouts, bundled neutral theme, works with your design system or a suggested one | Productivity |
 | [ai-multimodal](skills/ai-multimodal) | Process and generate multimedia content using Google Gemini API (audio, images, videos, documents) | Data |
 | [atlassian-rest](skills/atlassian-rest) | Jira & Confluence integration via REST APIs — tickets, epics, pages, status reports, triage, bidirectional BMAD document sync | Productivity |
 | [multi-repo-git-ops](skills/multi-repo-git-ops) | Git operations across multi-repo systems with submodules — branching, committing, pushing, syncing across parent and service repos | Development |
@@ -186,6 +186,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [trade-off-analysis](skills/trade-off-analysis) | Structured technology trade-off analysis with scored comparison matrices for architecture decisions, build-vs-buy, and technology selection | Productivity |
 | [manual-testing](skills/manual-testing) | Plan, write, review, execute, and maintain manual test cases — API/backend, frontend, pipeline, AI/LLM, and infrastructure testing with risk-based prioritization | Development |
 | [load-docs](skills/load-docs) | Load documents (files, folders, URLs, PDFs) fully into the main agent's context for follow-up Q&A, summarization, or review | Productivity |
+| [rca-report](skills/rca-report) | Investigate and document production incidents — guides evidence collection during the investigation and produces rich, reproducible Root Cause Analysis reports with layered root cause, workaround playbook, Five Whys, and binned recommendations | Development |
+| [software-research](skills/software-research) | STORM-style, dev-specialized research: auto-detects a mode (library-eval, deep-research, architecture/ADR, spike, migration), runs expert lenses in parallel, and verifies every claim against primary sources (docs, RFCs, OSV/CVE, benchmarks) version-aware | Development |
+| [jira-to-local](skills/jira-to-local) | Pull a Jira issue onto disk as readable local files — fields, comments, subtasks, worklogs, images, dev panel, and any linked Confluence page; read-only, markdown or JSON output | Productivity |
 
 ## Recommended Skills from Other Repositories
 

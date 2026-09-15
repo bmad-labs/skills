@@ -1,0 +1,57 @@
+<!--
+  WIDGET: range-bar  (zero dependencies — pure CSS, one inline SVG tick)
+  Use for: min–median–max (or p50/p95/p99) distribution per option — a track
+  with a filled min→max segment and a median/p95 tick. Latency, cost spread, etc.
+  How: copy the whole block. Replace FILL markers. All positions are % of the
+  shared scale (0 = scale min, 100 = scale max) — compute by hand:
+    left  = (min    - scaleMin) / (scaleMax - scaleMin) * 100
+    width = (max    - min)      / (scaleMax - scaleMin) * 100
+    tick  = (median - scaleMin) / (scaleMax - scaleMin) * 100   (left:  of the tick)
+  Keep ALL options on ONE scale so bars are comparable. The tick + labelled
+  numbers carry the meaning (not color alone). Prints fine (static).
+-->
+<div style="border:1px solid #e4e9f2;border-radius:12px;padding:20px 24px;background:#f6f8fc;font-family:'Roboto',sans-serif;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Latency distribution — ms")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 18px;">FILL: scale 0–FILL ms · bar = min→max · tick = median (lower is better).</p>
+
+  <!-- Repeat a block per option. Set the three % values noted above. -->
+  <div style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#16203a;font-weight:600;margin-bottom:4px;">
+      <span>FILL: Option A</span>
+      <span style="font-family:'Roboto Mono',monospace;color:#5b6677;font-weight:400;">FILL: min 12 · med 40 · max 95</span>
+    </div>
+    <div style="position:relative;height:16px;background:#fff;border:1px solid #e4e9f2;border-radius:8px;">
+      <!-- filled min→max segment: left = min%, width = (max-min)% -->
+      <div style="position:absolute;top:0;bottom:0;left:8%;width:55%;background:#dbe6fb;border-radius:8px;"></div>
+      <!-- median tick: left = median% (minus ~1px) -->
+      <div style="position:absolute;top:-2px;bottom:-2px;left:27%;width:3px;background:#1e3a8a;border-radius:2px;"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#16203a;font-weight:600;margin-bottom:4px;">
+      <span>FILL: Option B</span>
+      <span style="font-family:'Roboto Mono',monospace;color:#5b6677;font-weight:400;">FILL: min 20 · med 60 · max 140</span>
+    </div>
+    <div style="position:relative;height:16px;background:#fff;border:1px solid #e4e9f2;border-radius:8px;">
+      <div style="position:absolute;top:0;bottom:0;left:13%;width:80%;background:#dbe6fb;border-radius:8px;"></div>
+      <div style="position:absolute;top:-2px;bottom:-2px;left:40%;width:3px;background:#1e3a8a;border-radius:2px;"></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#16203a;font-weight:600;margin-bottom:4px;">
+      <span>FILL: Option C</span>
+      <span style="font-family:'Roboto Mono',monospace;color:#5b6677;font-weight:400;">FILL: min 8 · med 22 · max 50</span>
+    </div>
+    <div style="position:relative;height:16px;background:#fff;border:1px solid #e4e9f2;border-radius:8px;">
+      <div style="position:absolute;top:0;bottom:0;left:5%;width:28%;background:#dbe6fb;border-radius:8px;"></div>
+      <div style="position:absolute;top:-2px;bottom:-2px;left:15%;width:3px;background:#1e3a8a;border-radius:2px;"></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#5b6677;">
+    <span><span style="display:inline-block;width:22px;height:8px;background:#dbe6fb;border-radius:4px;vertical-align:middle;"></span> min–max range</span>
+    <span><span style="display:inline-block;width:3px;height:12px;background:#1e3a8a;border-radius:2px;vertical-align:middle;"></span> median</span>
+  </div>
+</div>
