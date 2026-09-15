@@ -1,9 +1,9 @@
 ---
-name: 'step-07-repeat'
-description: 'Check if smell is eliminated — loop back to step-04 or mark complete'
+name: 'step-08-repeat'
+description: 'Check if smell is eliminated — loop back to step-05 or mark complete'
 ---
 
-# Step 7: Repeat or Complete
+# Step 8: Repeat or Complete
 
 ## STEP GOAL
 
@@ -36,24 +36,24 @@ Continue until:
 Present to user:
 
 ```
-Step 7: Repeat
+Step 8: Repeat
 ==============
 
 Iteration {{N}} complete.
 Smell status: STILL PRESENT / PARTIALLY FIXED
 Remaining: {{what's left to do}}
 
-Looping back to Step 4 for next change.
+Looping back to Step 5 for next change.
 ```
 
-**Action**: Update `iterations` in frontmatter, then load `step-04-make-change.md`.
+**Action**: Update `iterations` in frontmatter, then load `step-05-make-change.md`.
 
 ### If Done (smell eliminated)
 
 Present to user:
 
 ```
-Step 7: Complete
+Step 8: Complete
 ================
 
 Refactoring complete after {{N}} iterations.
@@ -77,15 +77,16 @@ Safety Checklist:
 
 ### If looping:
 - Add current iteration number to `iterations` array
-- Reset `stepsCompleted` to remove 4, 5, 6, 7 (they'll be re-added in the next loop)
-- Keep 1, 2, 3 in `stepsCompleted`
+- Reset `stepsCompleted` to remove 5, 6, 7, 8 (they'll be re-added in the next loop)
+- Keep 1, 2, 3, 4 in `stepsCompleted` — the sweep holds for the whole session, so
+  re-running it each iteration would re-litigate a settled choice of target
 
 ### If complete:
-- Add `7` to `stepsCompleted`
+- Add `8` to `stepsCompleted`
 - Set `status` to `'complete'`
 
 ## NEXT STEP
 
-If **looping**: Load `step-04-make-change.md`.
+If **looping**: Load `step-05-make-change.md`.
 
 If **complete**: Workflow is finished. The full refactoring log is saved at the output path.

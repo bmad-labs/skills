@@ -7,6 +7,8 @@ outputPath: ''
 date: ''
 status: 'in-progress'
 smell: ''
+sweepPresent: []
+sweepDeferred: []
 iterations: []
 testsGreen: false
 ---

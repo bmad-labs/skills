@@ -4,6 +4,7 @@ description: 'Review class/module design — SRP, cohesion, dependencies'
 nextStepFile: './step-05-error-handling.md'
 referenceFiles:
   - 'references/classes/rules.md'
+  - 'references/smells/rules.md'
 ---
 
 # Step 4: Check Class/Module Design
@@ -11,11 +12,6 @@ referenceFiles:
 ## STEP GOAL
 
 Review classes and modules in the target code for single responsibility, cohesion, size, and proper dependency management.
-
-## REFERENCE LOADING
-
-Before starting analysis, load and read:
-- `references/classes/rules.md` — class design rules
 
 Cite specific rules when reporting findings.
 
@@ -35,22 +31,29 @@ Watch for and report:
 - Low cohesion (methods don't use shared state)
 - Concrete dependencies that should be injected
 
-## PRESENT FINDINGS
+### Filter before reporting
 
-Present findings to the user in this format:
+Ask of every candidate: **would the author plausibly act on this?** Cut every no. A
+correct finding nobody acts on is a false positive — it spends the trust that makes
+the next finding land. Label what survives with the Conventional Comments vocabulary
+in `references/smells/rules.md` → Severity vocabulary.
+
+## PRESENT FINDINGS
 
 ```
 Step 4: Class/Module Design
 ============================
 
-[PASS/ISSUE] ClassName (file:line)
+<label> (<decoration>): ClassName (file:line)
   - SRP: OK / MULTIPLE RESPONSIBILITIES: list
   - Cohesion: HIGH / LOW — reason
   - Dependencies: OK / CONCRETE: list
   Rule: classes/rules.md — Rule N
 
-Summary: N classes reviewed, N issues found
+Summary: N class or modules reviewed, N reported, N cut as unlikely to be acted on
 ```
+
+**This step is done when** every class or module in scope has been examined, each surviving finding carries a label and a concrete fix, and the cut count is recorded.
 
 Then ask: **[C] Continue to Step 5: Error Handling**
 

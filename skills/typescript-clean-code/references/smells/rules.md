@@ -1,6 +1,99 @@
 # Code Smells Reference
 
-Complete catalog of code smells organized by category. Use for code review and refactoring.
+Catalog of code smells organized by category. Use for code review and refactoring.
+
+**Read the three sections below before using the catalog.** They decide what you
+report, not just what you look for. A catalog used without them produces correct
+findings nobody acts on, which is the failure mode this reference is shaped to
+avoid.
+
+This file is the **per-line** layer: names, sizes, arguments, conditionals. A diff
+can pass every rule here and still be badly shaped — that blind spot is `fowler.md`.
+`typescript.md` covers type honesty, and `tooling.md` says which entries below a
+tool already decides. `SKILL.md` lists all four and when each loads.
+
+---
+
+## Review posture — apply before reporting anything
+
+**Approve when the change improves code health.** The standard is not perfection.
+Per Google's published review standard: reviewers should favor approving a change
+once it is in a state where it definitely improves the overall code health of the
+system, even if the change is not perfect. There is no such thing as perfect code —
+only better code.
+
+Two consequences for how this catalog is used:
+
+1. **Do not block on this catalog.** Almost nothing here is blocking on its own.
+   Correctness, security, and data-loss risks block. Smells are argued, not enforced.
+2. **On disputed design questions, weigh principles — do not impose a preference.**
+   Where the author can demonstrate through data or engineering principles that
+   several approaches are valid, prefer the author's. Aspects of software design are
+   almost never pure style, but they are also not settled by your threshold.
+
+## The false-positive economics — why restraint is the rule
+
+Google's Tricorder static-analysis platform requires an analyzer to produce **less
+than 10% effective false positives** to be surfaced to developers at all; the
+platform's achieved rate is just below 5%. The definition is what matters here:
+
+> An issue is an "effective false positive" if developers did not take some positive
+> action after seeing the issue.
+
+**A technically correct finding that nobody acts on is a false positive.** By that
+definition, reporting all 60+ entries below against a diff makes this catalog a
+false-positive generator — every unactioned correct finding spends reader trust, and
+trust is what determines whether the next finding gets read at all.
+
+So: find broadly, **report selectively**. A review that names three things worth
+doing beats one that names twenty things that are true.
+
+## Severity vocabulary
+
+Use the Conventional Comments labels rather than inventing a scheme. Every finding
+carries a label, and a blocking decoration where it is not obvious.
+
+| Label | Meaning |
+|---|---|
+| `issue` | A specific problem. Must be paired with a suggested fix — an `issue` without a suggestion is a complaint |
+| `suggestion` | A concrete improvement worth making |
+| `nitpick` | Trivial preference. **Always non-blocking** |
+| `question` | You do not understand something. Ask before asserting |
+| `thought` | A non-blocking idea, explicitly not a request |
+| `praise` | Something done well. Costs nothing and is not filler |
+| `todo` / `chore` / `note` | Small necessary change / process task / non-blocking information |
+
+Decorations, orthogonal to the label: `(blocking)`, `(non-blocking)`, `(if-minor)` —
+the last meaning "resolve only if the fix is trivial."
+
+Format: `label (decoration): short subject` then the body.
+
+```
+suggestion (non-blocking): extract the retry policy
+
+`fetchOrder` mixes transport retry with order parsing. Splitting them makes the
+parse testable without a network mock.
+Rule: smells/rules.md G30 — Functions Should Do One Thing
+```
+
+Marking polish as ignorable is the point. Two independent sources — Google's
+engineering practices and Conventional Comments — converge on it, and Google's own
+convention is the `Nit:` prefix for exactly this. An author who cannot tell which
+comments are optional treats all of them as mandatory, or none of them.
+
+## Entry schema
+
+Full entries in this catalog carry these fields. Older entries below are terse;
+when citing one, supply the missing fields from judgment.
+
+| Field | Why it is there |
+|---|---|
+| **What it is** | Identification |
+| **Why it hurts** | A finding that explains only *what* is wrong and not *why* is harder to act on. Message quality is the difference between an acted-on finding and an ignored one |
+| **How to fix** | An `issue` without a fix is a complaint |
+| **Severity** | The load-bearing axis — blocking vs. nit decides what the author does today |
+| **When NOT to fix** | Unactionable findings are false positives by the definition above. typescript-eslint ships this field per rule; so does this catalog |
+| **Mechanically detected by** | Do not spend reasoning where a linter is deterministic. See `tooling.md` |
 
 ---
 
@@ -110,7 +203,19 @@ npm install && npm run build
 
 **What it is**: Functions that are never called
 
-**How to fix**: Delete them. Source control remembers.
+**Why it hurts**: Every reader has to work out whether it matters, and every
+refactor has to keep it compiling. Dead code makes the codebase look larger than the
+system is.
+
+**How to fix**: Delete it. Source control remembers.
+
+**Severity**: `suggestion (non-blocking)`. Report the missing tool, not the instance.
+
+**When NOT to fix**: Public API surface of a published library; code reached by
+reflection, dynamic import, or framework convention.
+
+**Mechanically detected by**: `knip`. **Do not hand-check this** — see `tooling.md`.
+`ts-prune` is archived; do not recommend it.
 
 ---
 
@@ -152,10 +257,29 @@ npm install && npm run build
 
 **What it is**: Repeated code, similar switch statements, parallel algorithms
 
+**Why it hurts**: One piece of knowledge lives in several places, so a change has to
+find all of them. The cost is paid at modification time, by whoever forgets one.
+
 **How to fix**:
 - Identical code: Extract to function
-- Similar conditionals: Use polymorphism
-- Similar algorithms: Template Method or Strategy pattern
+- Similar conditionals: Replace with polymorphism or a lookup keyed by the discriminant
+- Similar algorithms: Template Method or Strategy
+
+**Severity**: `suggestion (non-blocking)`. Escalates to `issue` where the duplicated
+knowledge is a business rule that must not drift.
+
+**When NOT to fix** — **read this before de-duplicating anything**: coincidental
+duplication, where two blocks look identical today but answer to different owners
+and will diverge. De-duplicating them couples two things that should be free to
+change apart, and that coupling costs more to undo than the duplication did. The
+test is *"if this rule changed, would both copies change?"* — if no, leave them.
+Prefer duplication over the wrong abstraction. Test code tolerates duplication more
+readily than production code; explicit repetition in a test is often clearer than a
+shared fixture helper.
+
+**Mechanically detected by**: `jscpd` for literal and near-literal clones — the
+mechanical half only. Duplicated *knowledge* in different shapes is judgment. See
+`tooling.md` and Fowler **Duplicated Code** in `fowler.md`.
 
 ---
 
@@ -187,7 +311,19 @@ npm install && npm run build
 
 **What it is**: Unreachable code, unused variables, uncalled functions
 
-**How to fix**: Delete it. Dead code rots and misleads.
+**Why it hurts**: It rots — nothing exercises it, so it drifts out of sync with the
+code around it while still reading as if it were live.
+
+**How to fix**: Delete it.
+
+**Severity**: `suggestion (non-blocking)`.
+
+**When NOT to fix**: See F4.
+
+**Mechanically detected by**: `knip` for unused files and exports;
+`noUnusedLocals` / `noUnusedParameters` in `tsconfig.json` for locals; ESLint for
+unreachable branches. See `tooling.md`. If the repo has none of these wired into CI,
+report *that* once rather than listing instances.
 
 ---
 
@@ -295,11 +431,42 @@ npm install && npm run build
 
 ---
 
-### G23: Prefer Polymorphism to If/Else or Switch/Case
+### G23: Scattered Type Dispatch
 
-**What it is**: Type-checking conditionals repeated throughout code
+*(Restated for TypeScript. The original rule — "Prefer Polymorphism to If/Else or
+Switch/Case", the ONE SWITCH rule — assumed a language without discriminated unions,
+and applied literally it flags idiomatic TypeScript. See `typescript.md` → "The G23
+tension" for the full argument.)*
 
-**How to fix**: ONE SWITCH rule - one switch creates polymorphic objects, no others.
+**What it is**: The same type tag switched on in **many different modules**. One new
+member of the type means hunting down every site.
+
+Not this smell: a single exhaustive `switch` over a discriminated union with a
+`never` default, owned by the module that owns the union. That is the correct
+TypeScript pattern — the compiler proves every case is handled and breaks the build
+at each site that must change when a member is added. A class hierarchy gives up
+that proof and scatters the behavior. **Do not flag it, and do not refactor it into
+classes.**
+
+**Why it hurts**: When dispatch is spread across modules, adding a variant is a
+multi-file edit with no single place that owns the concept. That is Shotgun Surgery
+wearing a `switch`.
+
+**How to fix**: Co-locate the union with its behavior — one module exporting the
+type together with a `Record<Kind, Handler>` map or a single exhaustive switch.
+Reach for class polymorphism only when each variant carries its own state and
+identity, not merely its own branch.
+
+**Severity**: `suggestion (non-blocking)`; `issue` when the diff under review is
+itself the multi-file edit.
+
+**When NOT to fix**: One switch, one owner — fine. Switches in a presentation layer
+that legitimately renders each variant differently. Unions from a third-party
+package, where co-location is not available to you.
+
+**Mechanically detected by**: `@typescript-eslint/switch-exhaustiveness-check`
+catches the non-exhaustive half. The scatter itself is judgment;
+`dependency-cruiser` can show the coupling as a proxy. See `tooling.md`.
 
 ---
 
@@ -503,12 +670,25 @@ if (shouldBeDeleted(timer))
 
 ## Quick Detection Table
 
-| ID | Smell | Key Indicator |
-|----|-------|---------------|
-| C5 | Commented-Out Code | `//` or `/* */` around functional code |
-| G5 | Duplication | Copy-pasted blocks, similar switches |
-| G9 | Dead Code | Unreachable branches, uncalled functions |
-| G14 | Feature Envy | Method uses other class more than own |
-| G23 | Overuse of Switch | Multiple switches on same type |
-| G30 | Does Too Much | Function has multiple sections |
-| G36 | Law of Demeter | Chain of getters: `a.b().c().d()` |
+| ID | Smell | Key Indicator | Tool decides it? |
+|----|-------|---------------|---|
+| C5 | Commented-Out Code | `//` or `/* */` around functional code | partly (ESLint) |
+| G5 | Duplication | Copy-pasted blocks, similar switches | partly (`jscpd`) |
+| G9 | Dead Code | Unreachable branches, uncalled functions | **yes — `knip`** |
+| G14 | Feature Envy | Method uses other class more than own | no |
+| G23 | Scattered Type Dispatch | Same union switched on in several modules | partly |
+| G30 | Does Too Much | Function has multiple nameable sections | no |
+| G36 | Law of Demeter | Chain of getters: `a.b().c().d()` | no |
+
+For anything marked **yes**, report the missing tool once instead of listing
+instances. See `tooling.md`.
+
+## Before you finish a review
+
+- [ ] Checked `tooling.md` — did not hand-report anything a linter decides
+- [ ] Ran the twelve change-shape questions in `fowler.md` against the *change*
+- [ ] Ran `typescript.md` if the code is TypeScript — especially TS1, TS3, TS7
+- [ ] Every finding has a label and, where it is an `issue`, a suggested fix
+- [ ] Polish is labelled `nitpick` or `(non-blocking)` so the author can skip it
+- [ ] Asked of each finding: *would the author plausibly act on this?* If no, cut it
+- [ ] Verdict reflects "does this improve code health", not "is this perfect"

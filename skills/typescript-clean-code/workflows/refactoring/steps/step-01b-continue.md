@@ -32,14 +32,15 @@ Iterations: {{iterations.length}} change-test-commit cycles
 
 Step Map:
   [1] Initialize & Verify Tests   {{done/pending}}
-  [2] Identify Smell               {{done/pending}}
-  [3] Plan Steps                   {{done/pending}}
-  [4] Make ONE Change              {{done/pending}}
-  [5] Run Tests                    {{done/pending}}
-  [6] Commit                       {{done/pending}}
-  [7] Repeat / Complete            {{done/pending}}
+  [2] Identify Smell              {{done/pending}}
+  [3] Fowler Sweep                {{done/pending}}
+  [4] Plan Steps                  {{done/pending}}
+  [5] Make ONE Change             {{done/pending}}
+  [6] Run Tests                   {{done/pending}}
+  [7] Commit                      {{done/pending}}
+  [8] Repeat / Complete           {{done/pending}}
 
-Note: Steps 4-7 may repeat multiple times (loop).
+Note: Steps 5-8 may repeat multiple times (loop).
 Last iteration: {{last iteration details if any}}
 ```
 
@@ -54,21 +55,22 @@ Present:
 
 On **[R]** or after **[O]**:
 
-Determine the next step. For the refactoring workflow, steps 4-7 loop, so:
+Determine the next step. For the refactoring workflow, steps 5-8 loop, so:
 
-- If `stepsCompleted` contains `7` (repeat step was reached and decided to loop):
-  - Check the last entry — if it says "loop back", load `step-04-make-change.md`
+- If `stepsCompleted` contains `8` (repeat step was reached and decided to loop):
+  - Check the last entry — if it says "loop back", load `step-05-make-change.md`
   - If it says "complete", the workflow is done
-- Otherwise, determine from `max(stepsCompleted) + 1`:
+- Otherwise load the file for `max(stepsCompleted) + 1`:
 
 | Next Step | File |
 |-----------|------|
 | 2 | `step-02-identify-smell.md` |
-| 3 | `step-03-plan-steps.md` |
-| 4 | `step-04-make-change.md` |
-| 5 | `step-05-run-tests.md` |
-| 6 | `step-06-commit.md` |
-| 7 | `step-07-repeat.md` |
+| 3 | `step-03-fowler-sweep.md` |
+| 4 | `step-04-plan-steps.md` |
+| 5 | `step-05-make-change.md` |
+| 6 | `step-06-run-tests.md` |
+| 7 | `step-07-commit.md` |
+| 8 | `step-08-repeat.md` |
 
 On **[X]**: Go back to `step-01-init.md` fresh workflow setup (section 3).
 

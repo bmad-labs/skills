@@ -6,11 +6,39 @@ Guidelines for writing clean, readable, and maintainable functions.
 
 ### 1. Keep Functions Small
 
-Functions should be very small, ideally 2-5 lines, rarely exceeding 20.
+Functions should be small enough to understand at a glance.
 
-- Blocks in `if`/`else`/`while` should be one line (a function call)
-- Maximum indent level of one or two
+- Blocks in `if`/`else`/`while` are usually one line (a function call)
+- Shallow indentation — one or two levels
 - Each function should be transparently obvious
+
+**Detect by naming, not by counting.** The reliable test is: *can I name each
+section of this function?* If yes, those names are the functions that want to exist.
+If no — the body is one linear idea — length alone is not a reason to split it.
+
+> **Contested — do not apply a line count as law.**
+>
+> Clean Code's "2-5 lines ideal, rarely exceeding 20" is a **position**, not a
+> measurement, and following the number literally produces a specific, common
+> failure: logic scattered across many tiny functions, none of which mean anything
+> alone, where understanding any one behavior requires jumping through six files.
+> The reader's cost moved rather than shrank.
+>
+> The counter-position is John Ousterhout's, in *A Philosophy of Software Design*:
+> modules should be **deep** — a simple interface hiding substantial implementation.
+> On that view excessive decomposition is itself a design smell, because shallow
+> functions add interface cost without hiding anything. Ousterhout and Martin have
+> published a written debate on exactly this.
+>
+> Neither position is settled by evidence. So treat length as a **trigger to look**,
+> never as a finding on its own. A 40-line function that does one linear thing with
+> good names is fine. A 12-line function doing three things is not. Report
+> *"this function does three things"*, citing Rule 2 — never *"this function is 40
+> lines"*.
+>
+> Per `references/smells/rules.md` → Review posture: on disputed design questions,
+> weigh principles rather than imposing a threshold, and where the author shows a
+> valid alternative, prefer the author's.
 
 **Example**:
 ```typescript
@@ -172,7 +200,7 @@ Long descriptive names are better than short cryptic ones.
 
 | Rule | Guideline |
 |------|-----------|
-| Size | 2-5 lines ideal, max 20 |
+| Size | Small enough to grasp at a glance — detect by "can I name each section?", not by a line count (Rule 1 is contested; see the note there) |
 | Arguments | 0-2 preferred, max 3 |
 | Flag args | Never use |
 | Side effects | Make explicit or eliminate |

@@ -4,6 +4,7 @@ description: 'Compile feedback — categorize, format, prepare for decision'
 nextStepFile: './step-09-decision.md'
 referenceFiles:
   - 'references/collaboration/rules.md'
+  - 'references/smells/rules.md'
 ---
 
 # Step 8: Provide Feedback
@@ -12,73 +13,75 @@ referenceFiles:
 
 Compile all findings from steps 2-7 into categorized, constructive, actionable feedback.
 
-## REFERENCE LOADING
-
-Before compiling feedback, load and read:
-- `references/collaboration/rules.md` — feedback and communication rules
-
 ## COMPILATION PROCESS
 
 ### 1. Gather All Findings
 
 Read through the output document and collect all issues found in steps 2-7.
 
-### 2. Categorize Feedback
+### 2. Cut before categorizing
 
-Use these categories:
+**A finding the author will not act on is a false positive even when it is
+correct** — it spends the trust that makes the rest of the review land. For each
+candidate ask: would a reasonable author act on this today? If no, cut it, and count
+what you cut.
 
-| Prefix | Meaning | Action Required |
-|--------|---------|-----------------|
-| `[BLOCKING]` | Must fix before merge | Yes |
-| `[SUGGESTION]` | Nice to have | No |
-| `[QUESTION]` | Need clarification | Depends |
-| `[NIT]` | Minor style issue | No |
-| `[PRAISE]` | Something good | No |
+Merge rather than repeat: anything a linter decides becomes one "wire this into CI"
+item (see `references/smells/tooling.md`); a smell appearing ten times becomes one
+finding with the worst example.
 
-### 3. Format Each Item
+### 3. Label Each Item
+
+Conventional Comments labels — the table is in `references/smells/rules.md` →
+Severity vocabulary. Add an explicit `(blocking)` / `(non-blocking)` decoration to
+every item.
+
+What actually blocks a merge: correctness, security, data loss, a design decision
+expensive to reverse. Catalog smells are argued, not enforced.
+
+### 4. Format Each Item
 
 ```
-[BLOCKING] src/services/userExporter.ts:45
+issue (blocking): src/services/userExporter.ts:45 — exporter does four things
 
-This function is doing too many things. It validates, fetches, formats,
-and saves in one place.
+It validates, fetches, formats, and saves in one function, so none of the four
+can be tested without the other three.
 
-Reference: functions/rules.md - "Do One Thing"
+Reference: functions/rules.md — "Do One Thing"
 
-Suggestion: Extract into separate functions:
-- validateExportRequest()
-- fetchUser()
-- formatUser()
-- saveExport()
+Fix: extract validateExportRequest(), fetchUser(), formatUser(), saveExport()
 ```
 
-### 4. Include Praise
+An `issue` with no fix is a complaint — supply one or downgrade to `question`.
 
-Don't forget to call out what's done well — clean patterns, good test coverage, clever solutions.
+### 5. Include Praise
+
+Call out what is done well — clean patterns, good test coverage, a hard problem
+solved simply. It is not filler; it tells the author which instincts to repeat.
 
 ## PRESENT FINDINGS
-
-Present the categorized feedback to the user:
 
 ```
 Step 8: Feedback Summary
 ========================
 
-[BLOCKING] (N items)
+issue (blocking) — N items
   1. ...
   2. ...
 
-[SUGGESTION] (N items)
+suggestion (non-blocking) — N items
   1. ...
 
-[QUESTION] (N items)
+question — N items
   1. ...
 
-[NIT] (N items)
+nitpick (non-blocking) — N items
   1. ...
 
-[PRAISE] (N items)
+praise — N items
   1. ...
+
+Filtered: N findings considered and not reported as unlikely to be acted on
 ```
 
 Then ask: **[C] Continue to Step 9: Decision**

@@ -1,10 +1,10 @@
 ---
-name: 'step-06-commit'
+name: 'step-07-commit'
 description: 'Commit the successful change'
-nextStepFile: './step-07-repeat.md'
+nextStepFile: './step-08-repeat.md'
 ---
 
-# Step 6: Commit
+# Step 7: Commit
 
 ## STEP GOAL
 
@@ -28,7 +28,7 @@ git commit -m "refactor: {{one-sentence description of the change}}"
 ## PRESENT RESULT
 
 ```
-Step 6: Commit
+Step 7: Commit
 ==============
 
 Iteration: {{N}}
@@ -42,9 +42,9 @@ Then ask: **[C] Continue to Step 7: Check if Done**
 ## FRONTMATTER UPDATE
 
 Update the output document:
-- Add `6` to `stepsCompleted` (or update if looping)
+- Add `7` to `stepsCompleted` (or update if looping)
 - Append commit details to the log
 
 ## NEXT STEP
 
-After user confirms `[C]`, load `step-07-repeat.md`.
+After user confirms `[C]`, load `step-08-repeat.md`.

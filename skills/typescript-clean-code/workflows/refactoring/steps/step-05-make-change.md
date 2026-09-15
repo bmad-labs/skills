@@ -1,23 +1,17 @@
 ---
-name: 'step-04-make-change'
+name: 'step-05-make-change'
 description: 'Make ONE structural change — no behavior change'
-nextStepFile: './step-05-run-tests.md'
+nextStepFile: './step-06-run-tests.md'
 referenceFiles:
   - 'references/functions/rules.md'
   - 'references/classes/rules.md'
 ---
 
-# Step 4: Make ONE Change
+# Step 5: Make ONE Change
 
 ## STEP GOAL
 
 Execute one small refactoring step. The change must be purely structural with no behavior change.
-
-## REFERENCE LOADING
-
-Before making changes, load the relevant reference files:
-- `references/functions/rules.md` — if refactoring functions
-- `references/classes/rules.md` — if refactoring classes
 
 Apply the rules to guide the structural change.
 
@@ -73,7 +67,7 @@ function validateOrder(order: Order) {
 ## PRESENT CHANGE
 
 ```
-Step 4: Change Made
+Step 5: Change Made
 ===================
 
 Iteration: {{N}}
@@ -84,14 +78,14 @@ Before: {{brief summary}}
 After: {{brief summary}}
 ```
 
-Then ask: **[C] Continue to Step 5: Run Tests**
+Then ask: **[C] Continue to Step 6: Run Tests**
 
 ## FRONTMATTER UPDATE
 
 Update the output document:
-- Add `4` to `stepsCompleted` (or update if looping)
+- Add `5` to `stepsCompleted` (or update if looping)
 - Append the change description to the log
 
 ## NEXT STEP
 
-After user confirms `[C]`, load `step-05-run-tests.md`.
+After user confirms `[C]`, load `step-06-run-tests.md`.

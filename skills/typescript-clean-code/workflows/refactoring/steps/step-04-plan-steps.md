@@ -1,10 +1,10 @@
 ---
-name: 'step-03-plan-steps'
+name: 'step-04-plan-steps'
 description: 'Plan small, safe refactoring steps'
-nextStepFile: './step-04-make-change.md'
+nextStepFile: './step-05-make-change.md'
 ---
 
-# Step 3: Plan Small Steps
+# Step 4: Plan Small Steps
 
 ## STEP GOAL
 
@@ -25,7 +25,7 @@ For extracting a long function:
 ```
 Step 1: Identify code block to extract
 Step 2: Create new function with extracted code
-Step 3: Replace original code with function call
+Step 4: Replace original code with function call
 Step 4: Run tests
 Step 5: Rename function for clarity
 Step 6: Run tests
@@ -44,7 +44,7 @@ Step 8: Run tests
 ## PRESENT PLAN
 
 ```
-Step 3: Refactoring Plan
+Step 4: Refactoring Plan
 ========================
 
 Target Smell: {{smell}}
@@ -58,14 +58,14 @@ Each step: < 5 min, tests stay green, one change only.
 Estimated total: {{N}} micro-changes
 ```
 
-Then ask: **[C] Continue to Step 4: Make ONE Change**
+Then ask: **[C] Continue to Step 5: Make ONE Change**
 
 ## FRONTMATTER UPDATE
 
 Update the output document:
-- Add `3` to `stepsCompleted`
+- Add `4` to `stepsCompleted`
 - Append the plan to the log
 
 ## NEXT STEP
 
-After user confirms `[C]`, load `step-04-make-change.md`.
+After user confirms `[C]`, load `step-05-make-change.md`.

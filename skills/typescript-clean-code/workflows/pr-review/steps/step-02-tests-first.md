@@ -5,6 +5,7 @@ nextStepFile: './step-03-high-level.md'
 referenceFiles:
   - 'references/unit-tests/rules.md'
   - 'references/tdd/rules.md'
+  - 'references/smells/rules.md'
 ---
 
 # Step 2: Review the Tests First
@@ -12,12 +13,6 @@ referenceFiles:
 ## STEP GOAL
 
 Understand what the code should do by reading the tests first. Verify test coverage, meaningfulness, and edge case handling.
-
-## REFERENCE LOADING
-
-Before starting analysis, load and read:
-- `references/unit-tests/rules.md` — test quality rules
-- `references/tdd/rules.md` — TDD rules
 
 Cite specific rules when reporting findings.
 
@@ -42,9 +37,14 @@ Watch for and report:
 - Tests that don't actually assert anything
 - Tests that test implementation, not behavior
 
-## PRESENT FINDINGS
+### Filter before reporting
 
-Present findings to the user in this format:
+Ask of every candidate: **would the author plausibly act on this?** Cut every no. A
+correct finding nobody acts on is a false positive — it spends the trust that makes
+the next finding land. Label what survives with the Conventional Comments vocabulary
+in `references/smells/rules.md` → Severity vocabulary.
+
+## PRESENT FINDINGS
 
 ```
 Step 2: Tests First
@@ -55,12 +55,14 @@ Test Coverage:
   - Edge cases: covered/missing: [list]
   - Error cases: covered/missing: [list]
 
-[PASS/ISSUE] test_name (file:line)
+<label> (<decoration>): test_name (file:line)
   - Problem: description
   Rule: unit-tests/rules.md — Rule N
 
-Summary: N tests reviewed, N issues found, N missing test cases
+Summary: N tests reviewed, N reported, N cut as unlikely to be acted on
 ```
+
+**This step is done when** every test in scope has been examined, each surviving finding carries a label and a concrete fix, and the cut count is recorded.
 
 Then ask: **[C] Continue to Step 3: High-Level Review**
 

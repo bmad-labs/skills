@@ -31,8 +31,6 @@ Understand the overall approach, architecture decisions, and whether the solutio
 
 ## PRESENT FINDINGS
 
-Present findings to the user in this format:
-
 ```
 Step 3: High-Level Review
 =========================

@@ -31,7 +31,14 @@ The smells in this chapter are heuristics - they guide decision-making but don't
 
 Duplication is the root of many smells. When you find duplication, you've found an opportunity for abstraction.
 
-## Smell Categories
+## Change shape vs. per-line
+
+The distinction worth internalizing: Martin's catalog (`rules.md`) asks *"is this
+code well written?"*; Fowler's (`fowler.md`) asks *"what will hurt when I change
+it?"* The second is answered by counting files, not by reading lines. Neither
+subsumes the other. `SKILL.md` lists all four catalog layers and when each loads.
+
+## Smell Categories (rules.md)
 
 | Category | Focus Area | Count |
 |----------|------------|-------|
@@ -80,6 +87,21 @@ Tests should be comprehensive, fast, and easy to run. They are the safety net th
 - **Error Handling**: G3 (boundary conditions), G4 (overridden safeties) relate to robustness
 - **Testing**: T1-T9 connect to TDD and test-first development
 
+## Reporting economics — the part most reviews get wrong
+
+Finding smells is cheap. Reporting them is not.
+
+Google's Tricorder platform holds analyzers to **under 10% effective false
+positives**, on this definition: an issue is an effective false positive *if
+developers did not take some positive action after seeing it*. Correctness is not
+the test — action is. A catalog that emits sixty correct-but-unactioned findings is a
+false-positive generator by that standard, and each unactioned finding spends the
+reader trust that decides whether the next one gets read.
+
+So the discipline is: **scan broadly, report selectively.** Three actionable findings
+beat twenty true ones. This is why every full catalog entry carries a "when NOT to
+fix" field — an entry without one will be applied where it does not belong.
+
 ## Common Misconceptions
 
 - **Myth**: Eliminating all smells guarantees clean code
@@ -90,6 +112,15 @@ Tests should be comprehensive, fast, and easy to run. They are the safety net th
 
 - **Myth**: Fixing smells always improves code
   **Reality**: Over-engineering to avoid smells can be worse than the smell itself.
+
+- **Myth**: A correct finding is worth reporting
+  **Reality**: A correct finding nobody acts on is a false positive by the
+  operational definition above, and it costs the credibility of the findings that
+  do matter.
+
+- **Myth**: Thresholds (line counts, parameter counts) decide smells
+  **Reality**: Thresholds are triggers to look. The finding is the design problem
+  the threshold pointed at — report that, not the number.
 
 ## Quick Reference
 
