@@ -24,27 +24,27 @@ This reference covers the common build systems. Detect which one applies to the 
 
 Inspect the project root for these markers. The first match wins; many projects combine several (e.g., Node.js monorepo packaged as Docker). Work outer-in: Docker wraps the language build, so rebuild the Docker image, and the language build happens inside the Dockerfile.
 
-| Marker present | Build system |
-|----------------|--------------|
-| `docker-compose.yml` or `compose.yaml` | **Docker Compose** (primary — rebuild images) |
-| `Dockerfile` (no compose) | **Plain Docker** |
-| `package.json` + `package-lock.json` | npm |
-| `package.json` + `pnpm-lock.yaml` | pnpm |
-| `package.json` + `yarn.lock` | Yarn |
-| `package.json` + `bun.lockb` | Bun |
-| `pyproject.toml` + `uv.lock` | **uv** |
-| `pyproject.toml` + `poetry.lock` | Poetry |
-| `requirements.txt` / `setup.py` only | pip |
-| `Cargo.toml` | Cargo (Rust) |
-| `go.mod` | Go |
-| `pom.xml` | Maven |
-| `build.gradle` / `build.gradle.kts` | Gradle |
-| `mix.exs` | Mix (Elixir) |
-| `*.csproj` / `*.sln` | .NET |
-| `nx.json` | Nx monorepo |
-| `turbo.json` | Turborepo |
-| `WORKSPACE` / `BUILD.bazel` | Bazel |
-| `.gitmodules` | **Multi-repo** — rebuild each affected submodule |
+| Marker present                         | Build system                                     |
+| -------------------------------------- | ------------------------------------------------ |
+| `docker-compose.yml` or `compose.yaml` | **Docker Compose** (primary — rebuild images)    |
+| `Dockerfile` (no compose)              | **Plain Docker**                                 |
+| `package.json` + `package-lock.json`   | npm                                              |
+| `package.json` + `pnpm-lock.yaml`      | pnpm                                             |
+| `package.json` + `yarn.lock`           | Yarn                                             |
+| `package.json` + `bun.lockb`           | Bun                                              |
+| `pyproject.toml` + `uv.lock`           | **uv**                                           |
+| `pyproject.toml` + `poetry.lock`       | Poetry                                           |
+| `requirements.txt` / `setup.py` only   | pip                                              |
+| `Cargo.toml`                           | Cargo (Rust)                                     |
+| `go.mod`                               | Go                                               |
+| `pom.xml`                              | Maven                                            |
+| `build.gradle` / `build.gradle.kts`    | Gradle                                           |
+| `mix.exs`                              | Mix (Elixir)                                     |
+| `*.csproj` / `*.sln`                   | .NET                                             |
+| `nx.json`                              | Nx monorepo                                      |
+| `turbo.json`                           | Turborepo                                        |
+| `WORKSPACE` / `BUILD.bazel`            | Bazel                                            |
+| `.gitmodules`                          | **Multi-repo** — rebuild each affected submodule |
 
 If multiple markers apply (e.g., Docker + Node.js), start from the outermost (Docker) — the Dockerfile invokes the inner build.
 
