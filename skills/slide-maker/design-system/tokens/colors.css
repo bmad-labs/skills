@@ -1,0 +1,54 @@
+/* ============================================================
+   slide-maker — Color tokens (clean-light default theme)
+   Neutral, unbranded. Swap this file (or override the aliases)
+   to re-skin every slide. Aliases at the bottom are the contract.
+   ============================================================ */
+:root {
+  /* ---- Accent (single restrained hue) ---- */
+  --accent-500: #4F46E5;   /* indigo — primary accent            */
+  --accent-600: #4338CA;   /* pressed / darker accent            */
+  --accent-050: #EEF2FF;   /* soft accent wash                   */
+
+  /* ---- Neutral / ink scale (slate) ---- */
+  --ink-900: #0F172A;
+  --ink-800: #1E293B;
+  --ink-700: #334155;
+  --ink-600: #475569;
+  --ink-500: #64748B;
+  --ink-400: #94A3B8;
+  --ink-300: #CBD5E1;
+  --ink-200: #E2E8F0;
+  --ink-100: #F1F5F9;
+  --ink-50:  #F8FAFC;
+  --white:   #FFFFFF;
+
+  /* ---- Semantic data / status ---- */
+  --status-positive: #16A34A;
+  --status-info:     #2563EB;
+  --status-warning:  #D97706;
+  --status-danger:   #DC2626;
+
+  /* ---- Semantic aliases (THE CONTRACT — components/slides use these) ---- */
+  --color-accent:        var(--accent-500);
+  --color-accent-bright: var(--accent-500);
+  --color-accent-soft:   var(--accent-050);
+
+  --text-primary:   var(--ink-900);
+  --text-secondary: var(--ink-600);
+  --text-muted:     var(--ink-500);
+  --text-inverse:   var(--white);
+  --text-on-accent: var(--white);
+  --text-accent:    var(--accent-600);
+
+  --surface-page:   var(--white);
+  --surface-card:   var(--white);
+  --surface-subtle: var(--ink-50);
+  --surface-muted:  var(--ink-100);
+  --surface-ink:    var(--ink-900);
+  --surface-accent: var(--accent-500);
+
+  --border-subtle:  var(--ink-200);
+  --border-default: var(--ink-300);
+  --border-strong:  var(--ink-900);
+  --border-accent:  var(--accent-500);
+}

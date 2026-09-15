@@ -1,0 +1,31 @@
+<!--
+  WIDGET: timeline  (zero dependencies — pure HTML/CSS, no SVG, no JS)
+  Use for: a journey, a migration sequence, a rollout plan, an evolution over time.
+  How: copy the block, repeat a .tl-item per step. Palette matches the briefing.
+  Pure CSS so it always renders and prints; nothing to break.
+-->
+<div class="tl" style="border:1px solid #e4e9f2;border-radius:12px;padding:26px 30px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 18px;color:#16203a;">FILL: timeline title</h4>
+  <div style="position:relative;padding-left:26px;border-left:2px solid #cdd6e6;">
+    <!-- repeat one .tl-item per step -->
+    <div class="tl-item" style="position:relative;padding-bottom:20px;">
+      <span style="position:absolute;left:-33px;top:2px;width:12px;height:12px;border-radius:50%;background:#2563eb;border:2px solid #fff;box-shadow:0 0 0 2px #2563eb;"></span>
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;letter-spacing:0.04em;">FILL: date / phase</div>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:600;font-size:14.5px;color:#16203a;margin:2px 0 3px;">FILL: milestone</div>
+      <div style="font-size:13.5px;color:#283449;line-height:1.5;">FILL: what happened / what it unlocked.</div>
+    </div>
+    <div class="tl-item" style="position:relative;padding-bottom:20px;">
+      <span style="position:absolute;left:-33px;top:2px;width:12px;height:12px;border-radius:50%;background:#2563eb;border:2px solid #fff;box-shadow:0 0 0 2px #2563eb;"></span>
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;letter-spacing:0.04em;">FILL: date / phase</div>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:600;font-size:14.5px;color:#16203a;margin:2px 0 3px;">FILL: milestone</div>
+      <div style="font-size:13.5px;color:#283449;line-height:1.5;">FILL: detail.</div>
+    </div>
+    <!-- final step: use green dot to mark the end/outcome -->
+    <div class="tl-item" style="position:relative;">
+      <span style="position:absolute;left:-33px;top:2px;width:12px;height:12px;border-radius:50%;background:#15803d;border:2px solid #fff;box-shadow:0 0 0 2px #15803d;"></span>
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;letter-spacing:0.04em;">FILL: date</div>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:600;font-size:14.5px;color:#16203a;margin:2px 0 3px;">FILL: outcome</div>
+      <div style="font-size:13.5px;color:#283449;line-height:1.5;">FILL: where it landed.</div>
+    </div>
+  </div>
+</div>

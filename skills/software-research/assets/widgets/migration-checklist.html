@@ -1,0 +1,46 @@
+<!--
+  WIDGET: migration-checklist  (zero dependencies — pure HTML/CSS + native checkbox)
+  Use for: an ordered list of migration steps a reader can tick off, each tagged
+  with effort (S/M/L), a risk color dot, and a breaking / non-breaking marker.
+  How: copy the whole block. Repeat one <li> per step. Set:
+    - effort badge text: S / M / L
+    - risk dot color: green #15803d (low) / amber #b45309 (med) / red #b91c1c (high)
+    - breaking marker: "breaking" (red) or "safe" (green)
+  Checkboxes are native <input type="checkbox"> — reader progress is in-page only
+  (not persisted). All styles inline; prints with empty boxes.
+-->
+<div class="mc" style="border:1px solid #e4e9f2;border-radius:12px;padding:22px 24px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Migrate v3 &rarr; v4")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 8px;">FILL: one-line framing. Legend below.</p>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#5b6677;margin-bottom:14px;">
+    <span><b style="color:#16203a;">S/M/L</b> effort</span>
+    <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#15803d;vertical-align:middle;"></span> low &nbsp; <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#b45309;vertical-align:middle;"></span> med &nbsp; <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#b91c1c;vertical-align:middle;"></span> high risk</span>
+  </div>
+
+  <ol style="list-style:none;counter-reset:mc;margin:0;padding:0;">
+    <!-- Repeat one <li> per step. This example: breaking, high risk, L effort. -->
+    <li style="counter-increment:mc;display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #e4e9f2;">
+      <input type="checkbox" style="margin-top:3px;width:16px;height:16px;accent-color:#2563eb;flex:none;"/>
+      <div style="flex:none;font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;color:#1e3a8a;width:1.6em;">01</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13.5px;color:#16203a;font-weight:600;">FILL: step name</div>
+        <div style="font-size:12px;color:#5b6677;margin-top:2px;">FILL: one-line detail / command.</div>
+      </div>
+      <span style="flex:none;display:inline-block;width:10px;height:10px;border-radius:50%;background:#b91c1c;margin-top:4px;" title="high risk"></span>
+      <span style="flex:none;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#b45309;background:#fdf3e7;border-radius:5px;padding:2px 7px;">L</span>
+      <span style="flex:none;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#b91c1c;background:#fdecec;border-radius:5px;padding:2px 7px;">breaking</span>
+    </li>
+    <!-- Example: non-breaking, low risk, S effort. -->
+    <li style="counter-increment:mc;display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #e4e9f2;">
+      <input type="checkbox" style="margin-top:3px;width:16px;height:16px;accent-color:#2563eb;flex:none;"/>
+      <div style="flex:none;font-family:'Roboto Mono',monospace;font-size:12px;font-weight:700;color:#1e3a8a;width:1.6em;">02</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13.5px;color:#16203a;font-weight:600;">FILL: step name</div>
+        <div style="font-size:12px;color:#5b6677;margin-top:2px;">FILL: one-line detail / command.</div>
+      </div>
+      <span style="flex:none;display:inline-block;width:10px;height:10px;border-radius:50%;background:#15803d;margin-top:4px;" title="low risk"></span>
+      <span style="flex:none;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#1e3a8a;background:#e7f0fe;border-radius:5px;padding:2px 7px;">S</span>
+      <span style="flex:none;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#15803d;background:#e9f6ee;border-radius:5px;padding:2px 7px;">safe</span>
+    </li>
+  </ol>
+</div>

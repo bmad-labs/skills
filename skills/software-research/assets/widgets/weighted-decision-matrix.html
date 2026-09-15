@@ -1,0 +1,104 @@
+<!--
+  WIDGET: weighted-decision-matrix  (zero dependencies — HTML/CSS + ~35 lines vanilla JS)
+  Use for: the core ADR artifact — options (columns) scored 1-5 against weighted
+  decision drivers (rows). Each cell is heatmap-shaded by its 1-5 score; a
+  weighted-total row is computed and the winning column is highlighted.
+  How: copy the whole block (markup + <script>). Give IDs a UNIQUE suffix if you
+  place more than one on a page (all ids here are prefixed wdm-). Weights are
+  editable <input> — the reader can retune and totals recompute live. Add/remove
+  driver rows or option columns by editing the table; keep data-score on each cell.
+  Heatmap colour is a hint; the number in each cell is the source of truth (prints
+  fine in grayscale). SECURITY: this JS is template code you control — safe inline.
+-->
+<div class="wdm" style="border:1px solid #e4e9f2;border-radius:12px;padding:22px 24px;background:#f6f8fc;overflow-x:auto;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: decision title (e.g. "Datastore choice")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;font-family:'Roboto',sans-serif;">Score 1-5 per driver. Edit a weight to retune; totals recompute. Winner highlighted.</p>
+
+  <table id="wdm-table" style="border-collapse:collapse;width:100%;min-width:520px;font-family:'Roboto',sans-serif;font-size:13px;color:#16203a;">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e4e9f2;font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:#5b6677;">Driver</th>
+        <th style="text-align:center;padding:8px 6px;border-bottom:2px solid #e4e9f2;font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:#5b6677;width:70px;">Weight</th>
+        <th style="text-align:center;padding:8px 10px;border-bottom:2px solid #e4e9f2;font-family:'Montserrat',sans-serif;font-size:12.5px;color:#16203a;">FILL: Option A</th>
+        <th style="text-align:center;padding:8px 10px;border-bottom:2px solid #e4e9f2;font-family:'Montserrat',sans-serif;font-size:12.5px;color:#16203a;">FILL: Option B</th>
+        <th style="text-align:center;padding:8px 10px;border-bottom:2px solid #e4e9f2;font-family:'Montserrat',sans-serif;font-size:12.5px;color:#16203a;">FILL: Option C</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- one row per driver; data-score is the 1-5 score used for weighting -->
+      <tr>
+        <td style="padding:9px 10px;border-bottom:1px solid #e4e9f2;">FILL: driver 1</td>
+        <td style="text-align:center;padding:6px;border-bottom:1px solid #e4e9f2;"><input class="wdm-w" type="number" min="0" max="10" step="1" value="5" style="width:46px;text-align:center;font-family:'Roboto Mono',monospace;font-size:12px;border:1px solid #e4e9f2;border-radius:5px;padding:3px;" oninput="wdmRecompute()"/></td>
+        <td class="wdm-cell" data-score="4" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+        <td class="wdm-cell" data-score="3" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+        <td class="wdm-cell" data-score="5" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+      </tr>
+      <tr>
+        <td style="padding:9px 10px;border-bottom:1px solid #e4e9f2;">FILL: driver 2</td>
+        <td style="text-align:center;padding:6px;border-bottom:1px solid #e4e9f2;"><input class="wdm-w" type="number" min="0" max="10" step="1" value="4" style="width:46px;text-align:center;font-family:'Roboto Mono',monospace;font-size:12px;border:1px solid #e4e9f2;border-radius:5px;padding:3px;" oninput="wdmRecompute()"/></td>
+        <td class="wdm-cell" data-score="5" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+        <td class="wdm-cell" data-score="3" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+        <td class="wdm-cell" data-score="2" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+      </tr>
+      <tr>
+        <td style="padding:9px 10px;border-bottom:1px solid #e4e9f2;">FILL: driver 3</td>
+        <td style="text-align:center;padding:6px;border-bottom:1px solid #e4e9f2;"><input class="wdm-w" type="number" min="0" max="10" step="1" value="2" style="width:46px;text-align:center;font-family:'Roboto Mono',monospace;font-size:12px;border:1px solid #e4e9f2;border-radius:5px;padding:3px;" oninput="wdmRecompute()"/></td>
+        <td class="wdm-cell" data-score="2" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+        <td class="wdm-cell" data-score="5" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+        <td class="wdm-cell" data-score="4" style="text-align:center;padding:9px;border-bottom:1px solid #e4e9f2;"></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td style="padding:11px 10px;font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:#5b6677;">Weighted total</td>
+        <td></td>
+        <td id="wdm-total-0" style="text-align:center;padding:11px 9px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;">—</td>
+        <td id="wdm-total-1" style="text-align:center;padding:11px 9px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;">—</td>
+        <td id="wdm-total-2" style="text-align:center;padding:11px 9px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;">—</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+<script>
+  // ~35 lines, no library. Reads data-score cells + editable weights, shades
+  // each cell as a heatmap, computes weighted totals, highlights the winner.
+  function wdmShade(score) {
+    // 1..5 -> red -> amber -> green background + text colour
+    var map = {
+      1: ['#fdecec', '#b91c1c'], 2: ['#fdf0e6', '#b45309'],
+      3: ['#fdf3e7', '#b45309'], 4: ['#eef7f1', '#15803d'],
+      5: ['#e9f6ee', '#15803d']
+    };
+    return map[score] || ['#f6f8fc', '#5b6677'];
+  }
+  function wdmRecompute() {
+    var rows = document.querySelectorAll('#wdm-table tbody tr');
+    var weights = [], totals = [0, 0, 0];
+    rows.forEach(function (row) {
+      weights.push(parseFloat(row.querySelector('.wdm-w').value) || 0);
+    });
+    rows.forEach(function (row, r) {
+      var cells = row.querySelectorAll('.wdm-cell');
+      cells.forEach(function (cell, c) {
+        var score = parseInt(cell.getAttribute('data-score'), 10);
+        var sh = wdmShade(score);
+        cell.style.background = sh[0];
+        cell.style.color = sh[1];
+        cell.style.fontFamily = "'Montserrat',sans-serif";
+        cell.style.fontWeight = '700';
+        cell.textContent = score;
+        totals[c] += score * weights[r];
+      });
+    });
+    var max = Math.max.apply(null, totals);
+    for (var c = 0; c < 3; c++) {
+      var el = document.getElementById('wdm-total-' + c);
+      el.textContent = totals[c];
+      var win = totals[c] === max && max > 0;
+      el.style.background = win ? '#1e3a8a' : 'transparent';
+      el.style.color = win ? '#fff' : '#16203a';
+      el.style.borderRadius = '6px';
+    }
+  }
+  wdmRecompute();
+</script>

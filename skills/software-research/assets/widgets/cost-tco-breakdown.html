@@ -1,0 +1,62 @@
+<!--
+  WIDGET: cost-tco-breakdown  (zero dependencies — pure HTML/CSS flex, no JS)
+  Use for: comparing total cost of ownership per option as stacked horizontal bars,
+  each segmented into license / build / ops / migration, with a legend and totals.
+  How: copy the whole block. Repeat one option group per row. Set each segment's
+  width to a PERCENTAGE of the widest option's total so bars are comparable across
+  rows (e.g. if option A total = 100k is the max, its segments sum to 100%; a 60k
+  option's segments sum to 60%). Put the currency total in the right-hand label.
+  All widths are inline flex-basis %; prints fine (backgrounds are solid colors).
+-->
+<div class="tco" style="border:1px solid #e4e9f2;border-radius:12px;padding:22px 24px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "3-year TCO by option")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 8px;">FILL: framing. Bar widths are relative to the highest total.</p>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#5b6677;margin-bottom:16px;">
+    <span><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#1e3a8a;vertical-align:middle;"></span> license</span>
+    <span><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#2563eb;vertical-align:middle;"></span> build</span>
+    <span><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#15803d;vertical-align:middle;"></span> ops</span>
+    <span><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#b45309;vertical-align:middle;"></span> migration</span>
+  </div>
+
+  <!-- Repeat one block per option. Segment %s should sum to (thisTotal / maxTotal * 100). -->
+  <div style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;">
+      <span style="font-weight:600;color:#16203a;">FILL: option A</span>
+      <span style="font-family:'Roboto Mono',monospace;color:#1e3a8a;font-weight:700;">FILL: $100k</span>
+    </div>
+    <div style="display:flex;height:22px;border-radius:6px;overflow:hidden;background:#e4e9f2;" title="license/build/ops/migration">
+      <div style="flex:0 0 20%;background:#1e3a8a;" title="license"></div>
+      <div style="flex:0 0 40%;background:#2563eb;" title="build"></div>
+      <div style="flex:0 0 25%;background:#15803d;" title="ops"></div>
+      <div style="flex:0 0 15%;background:#b45309;" title="migration"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;">
+      <span style="font-weight:600;color:#16203a;">FILL: option B</span>
+      <span style="font-family:'Roboto Mono',monospace;color:#1e3a8a;font-weight:700;">FILL: $65k</span>
+    </div>
+    <div style="display:flex;height:22px;border-radius:6px;overflow:hidden;background:#e4e9f2;" title="license/build/ops/migration">
+      <div style="flex:0 0 5%;background:#1e3a8a;" title="license"></div>
+      <div style="flex:0 0 30%;background:#2563eb;" title="build"></div>
+      <div style="flex:0 0 20%;background:#15803d;" title="ops"></div>
+      <div style="flex:0 0 10%;background:#b45309;" title="migration"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:2px;">
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;">
+      <span style="font-weight:600;color:#16203a;">FILL: option C</span>
+      <span style="font-family:'Roboto Mono',monospace;color:#1e3a8a;font-weight:700;">FILL: $80k</span>
+    </div>
+    <div style="display:flex;height:22px;border-radius:6px;overflow:hidden;background:#e4e9f2;" title="license/build/ops/migration">
+      <div style="flex:0 0 35%;background:#1e3a8a;" title="license"></div>
+      <div style="flex:0 0 25%;background:#2563eb;" title="build"></div>
+      <div style="flex:0 0 15%;background:#15803d;" title="ops"></div>
+      <div style="flex:0 0 5%;background:#b45309;" title="migration"></div>
+    </div>
+  </div>
+</div>

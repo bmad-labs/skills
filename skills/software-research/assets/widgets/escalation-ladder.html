@@ -1,0 +1,63 @@
+<!--
+  WIDGET: escalation-ladder  (zero dependencies — pure HTML/CSS flex steps)
+  Use for: a vertical escalation path — on-call → lead → manager → incident
+  commander → exec. Each rung shows a TRIGGER condition and a response-time SLA badge.
+  How: copy this whole block. Replace FILL markers. Add/remove .el-rung blocks.
+  Rungs step rightward (margin-left) to read as a ladder; severity climbs top→bottom
+  so the SLA badge color intensifies (green → amber → red). Icon+color, not color alone.
+  Palette matches the briefing template. Prints fine (static). No CDN, no framework.
+-->
+<div class="el" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Incident escalation ladder")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 18px;">FILL: one-line framing (who to page, when).</p>
+
+  <!-- RUNG 1 -->
+  <div class="el-rung" style="display:flex;align-items:center;gap:14px;margin:0 0 10px 0;border-left:3px solid #15803d;background:#fff;border-radius:0 10px 10px 0;padding:11px 14px;">
+    <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#5b6677;min-width:22px;text-align:center;">1</div>
+    <div style="flex:1;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: On-call engineer</div>
+      <div style="font-size:12px;color:#5b6677;margin-top:2px;">Trigger: FILL (e.g. alert fires / first responder)</div>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#e9f6ee;color:#15803d;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap;"><span aria-hidden="true">&#9201;</span> 5 min</div>
+  </div>
+
+  <!-- RUNG 2 -->
+  <div class="el-rung" style="display:flex;align-items:center;gap:14px;margin:0 0 10px 26px;border-left:3px solid #15803d;background:#fff;border-radius:0 10px 10px 0;padding:11px 14px;">
+    <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#5b6677;min-width:22px;text-align:center;">2</div>
+    <div style="flex:1;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Team lead</div>
+      <div style="font-size:12px;color:#5b6677;margin-top:2px;">Trigger: FILL (e.g. no ack in 15 min / needs a second pair of eyes)</div>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#e9f6ee;color:#15803d;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap;"><span aria-hidden="true">&#9201;</span> 15 min</div>
+  </div>
+
+  <!-- RUNG 3 -->
+  <div class="el-rung" style="display:flex;align-items:center;gap:14px;margin:0 0 10px 52px;border-left:3px solid #b45309;background:#fff;border-radius:0 10px 10px 0;padding:11px 14px;">
+    <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#5b6677;min-width:22px;text-align:center;">3</div>
+    <div style="flex:1;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Engineering manager</div>
+      <div style="font-size:12px;color:#5b6677;margin-top:2px;">Trigger: FILL (e.g. customer-facing impact / SLA at risk)</div>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#fdf3e7;color:#b45309;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap;"><span aria-hidden="true">&#9201;</span> 30 min</div>
+  </div>
+
+  <!-- RUNG 4 -->
+  <div class="el-rung" style="display:flex;align-items:center;gap:14px;margin:0 0 10px 78px;border-left:3px solid #b45309;background:#fff;border-radius:0 10px 10px 0;padding:11px 14px;">
+    <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#5b6677;min-width:22px;text-align:center;">4</div>
+    <div style="flex:1;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Incident commander</div>
+      <div style="font-size:12px;color:#5b6677;margin-top:2px;">Trigger: FILL (e.g. SEV1 declared / multi-team coordination)</div>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#fdecec;color:#b91c1c;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap;"><span aria-hidden="true">&#9201;</span> immediate</div>
+  </div>
+
+  <!-- RUNG 5 -->
+  <div class="el-rung" style="display:flex;align-items:center;gap:14px;margin:0 0 0 104px;border-left:3px solid #b91c1c;background:#fff;border-radius:0 10px 10px 0;padding:11px 14px;">
+    <div style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#5b6677;min-width:22px;text-align:center;">5</div>
+    <div style="flex:1;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;">FILL: Executive / VP</div>
+      <div style="font-size:12px;color:#5b6677;margin-top:2px;">Trigger: FILL (e.g. company-wide outage / regulatory / PR exposure)</div>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#fdecec;color:#b91c1c;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap;"><span aria-hidden="true">&#9201;</span> immediate</div>
+  </div>
+</div>

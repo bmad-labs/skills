@@ -1,0 +1,137 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Hero metrics — showcase" subtitle="Worked 'wow' exemplar: one hero KPI + supporting chart, accent-blob depth, accent rule" -->
+<!--
+  SHOWCASE SLIDE — read this end-to-end to see the wow-guide techniques combined.
+  Each block is annotated with the craft rule it demonstrates (see references/wow-guide.md).
+  Plain-HTML version: uses only var(--*) tokens. The JSX/Tailwind equivalents are
+  the snippets in wow-guide.md §5.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hero Metrics (showcase)</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide {
+    width: var(--slide-w); height: var(--slide-h);
+    background: var(--surface-page);
+    position: relative; overflow: hidden;
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column;
+    padding: var(--slide-margin);
+  }
+
+  /* §3 DEPTH — accent-blob background layer, bleeding off the edges, low opacity.
+     Never centered behind text. The light-idiom alternative to glow. */
+  .bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  .bg .blob-a { position: absolute; right: -120px; bottom: -140px;
+    width: 560px; height: 560px; border-radius: 50%; background: var(--color-accent-soft); }
+  .bg .blob-b { position: absolute; left: -100px; top: -120px;
+    width: 320px; height: 320px; border-radius: 50%; background: var(--color-accent-soft); opacity: .4; }
+  /* dot-trail motif — small accent only, never a fill */
+  .bg .dots { position: absolute; left: var(--slide-margin); bottom: var(--slide-margin);
+    width: 12px; height: 12px; border-radius: 50%; background: var(--color-accent);
+    box-shadow: 22px 0 0 var(--color-accent-soft), 44px 0 0 var(--color-accent-soft); }
+
+  .stage { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; }
+
+  /* §7 TYPOGRAPHY RHYTHM — eyebrow → title → accent rule, in this order. */
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--color-accent); }
+  /* §5 DENSITY — title states the takeaway in <=8 words, measured width. */
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); max-width: 760px; }
+  h1 .accent { color: var(--color-accent); }      /* §7 one accent word, max */
+  .rule { margin-top: var(--space-5); width: 56px; height: var(--rule-accent-w);
+    background: var(--color-accent); border-radius: var(--radius-pill); }
+
+  .body { flex: 1; display: grid; grid-template-columns: 1.1fr 0.9fr;
+    gap: var(--space-16); align-items: center; }
+
+  /* §1 HERO — ONE dominant element. A 120px black accent number; everything else
+     recedes. This is the focal point the eye lands on first. */
+  .hero .kpi { display: flex; align-items: flex-end; gap: var(--space-6); }
+  .hero .num { font-size: 120px; font-weight: var(--fw-black); line-height: .9;
+    letter-spacing: var(--ls-tight); color: var(--color-accent); }
+  .hero .num span { color: var(--text-primary); }   /* unit in ink, number in accent */
+  .hero .cap { margin-bottom: var(--space-4); max-width: 320px; }
+  .hero .cap .lead { font-size: var(--fs-h3); font-weight: var(--fw-bold); color: var(--text-primary); }
+  /* §7 weight discipline — supporting copy stays light + secondary, never bold. */
+  .hero .cap .desc { margin-top: var(--space-2); font-size: var(--fs-body);
+    font-weight: var(--fw-light); color: var(--text-secondary); line-height: var(--lh-normal); }
+
+  /* §2 DATA-VIZ — a supporting bar chart. Highlight ONE bar in the accent color,
+     mute the rest to the neutral ink track. Chrome stays quiet (axis = ink track). */
+  .chart { background: var(--surface-card); border: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); }
+  .chart .label { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: var(--space-4); }
+  .chart text { fill: var(--text-muted); }
+
+  /* §3 elevation — exactly ONE element carries shadow-accent: the headline stat chip. */
+  .footer { display: flex; align-items: center; justify-content: space-between; }
+  .footer .logo { height: 20px; }
+  .footer .chip { background: var(--color-accent); color: var(--text-on-accent);
+    font-size: var(--fs-small); font-weight: var(--fw-bold); letter-spacing: .04em;
+    padding: var(--space-2) var(--space-5); border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-accent); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <!-- §3 background depth layer -->
+    <div class="bg">
+      <div class="blob-a"></div>
+      <div class="blob-b"></div>
+      <div class="dots"></div>
+    </div>
+
+    <div class="stage">
+      <!-- §7 rhythm: eyebrow → title → rule -->
+      <span class="eyebrow">Adoption</span>
+      <h1>Seventy percent adopt it in <span class="accent">week one</span></h1>
+      <div class="rule"></div>
+
+      <div class="body">
+        <!-- §1 the hero: one decisive number -->
+        <div class="hero">
+          <div class="kpi">
+            <div class="num">70<span>%</span></div>
+            <div class="cap">
+              <p class="lead">Weekly active use</p>
+              <p class="desc">Target adoption across the audience inside the first quarter.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- §2 supporting chart: highlight-one-bar, quiet chrome -->
+        <div class="chart">
+          <div class="label">Adoption by quarter</div>
+          <svg viewBox="0 0 480 252" width="100%" role="img" aria-label="Adoption rising to 78% in Q4">
+            <line x1="0" y1="220" x2="480" y2="220" stroke="var(--ink-200)" stroke-width="1"></line>
+            <!-- muted bars (neutral ink track) -->
+            <rect x="20"  y="104" width="64" height="116" rx="4" fill="var(--ink-200)"></rect>
+            <rect x="124" y="69"  width="64" height="151" rx="4" fill="var(--ink-200)"></rect>
+            <rect x="228" y="52"  width="64" height="168" rx="4" fill="var(--ink-200)"></rect>
+            <!-- highlight bar (primary series = accent color) -->
+            <rect x="332" y="6"   width="64" height="214" rx="4" fill="var(--color-accent)"></rect>
+            <text x="52"  y="240" text-anchor="middle" font-size="12">Q1</text>
+            <text x="156" y="240" text-anchor="middle" font-size="12">Q2</text>
+            <text x="260" y="240" text-anchor="middle" font-size="12">Q3</text>
+            <text x="364" y="240" text-anchor="middle" font-size="12">Q4</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- §3 the one shadow-accent element: the headline chip -->
+      <div class="footer">
+        <img class="logo" src="../assets/logos/logo-full.svg" alt="Your Brand">
+        <span class="chip">+12 pts vs last year</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

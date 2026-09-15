@@ -1,0 +1,55 @@
+<!--
+  WIDGET: skills-heatmap  (zero dependencies — plain HTML table + inline bg color)
+  Use for: a people (rows) x skills (columns) matrix. Cell bg intensity encodes
+  proficiency 0-4 (empty light → dark blue), and the NUMBER is printed in the cell
+  so it is never color-only. Surfaces SINGLE POINTS OF FAILURE: a skill column with
+  only one high number = bus-factor 1. Add a footnote flagging those columns.
+  How: copy this whole block. Replace FILL markers. Add rows/cols to match.
+  Level → bg / text (copy the pair matching each score):
+    0  #f0f2f6 / #9aa6b8     1  #dbe4f5 / #16203a     2  #a9c1ef / #16203a
+    3  #5b8def / #ffffff     4  #1e3a8a / #ffffff
+  Palette matches the briefing template. Prints fine (static). No CDN, no framework.
+-->
+<div class="shm" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;overflow-x:auto;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Team skills coverage")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 14px;">FILL: framing. Scale 0 (none) &rarr; 4 (expert). Watch columns with a single 3&ndash;4 &mdash; that is a single point of failure.</p>
+
+  <table role="table" aria-label="FILL: skills heatmap, people by skill, proficiency 0 to 4" style="border-collapse:collapse;width:100%;font-size:13px;min-width:520px;">
+    <thead>
+      <tr>
+        <th scope="col" style="text-align:left;font-family:'Montserrat',sans-serif;font-size:12px;color:#16203a;padding:8px 10px;border-bottom:2px solid #e4e9f2;">Person</th>
+        <th scope="col" style="text-align:center;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;padding:8px 6px;border-bottom:2px solid #e4e9f2;">FILL: Backend</th>
+        <th scope="col" style="text-align:center;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;padding:8px 6px;border-bottom:2px solid #e4e9f2;">FILL: Frontend</th>
+        <th scope="col" style="text-align:center;font-family:'Roboto Mono',monospace;font-size:11px;color:#5b6677;padding:8px 6px;border-bottom:2px solid #e4e9f2;">FILL: Infra</th>
+        <th scope="col" style="text-align:center;font-family:'Roboto Mono',monospace;font-size:11px;color:#b91c1c;padding:8px 6px;border-bottom:2px solid #e4e9f2;">FILL: Payments &#9888;</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ROW 1 -->
+      <tr>
+        <td style="padding:6px 10px;border-bottom:1px solid #e4e9f2;color:#16203a;">FILL: Alice</td>
+        <td style="text-align:center;padding:0;border-bottom:1px solid #e4e9f2;"><div style="background:#1e3a8a;color:#ffffff;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">4</div></td>
+        <td style="text-align:center;padding:0;border-bottom:1px solid #e4e9f2;"><div style="background:#a9c1ef;color:#16203a;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">2</div></td>
+        <td style="text-align:center;padding:0;border-bottom:1px solid #e4e9f2;"><div style="background:#dbe4f5;color:#16203a;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">1</div></td>
+        <td style="text-align:center;padding:0;border-bottom:1px solid #e4e9f2;"><div style="background:#1e3a8a;color:#ffffff;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">4</div></td>
+      </tr>
+      <!-- ROW 2 -->
+      <tr>
+        <td style="padding:6px 10px;border-bottom:1px solid #e4e9f2;color:#16203a;">FILL: Bo</td>
+        <td style="text-align:center;padding:0;border-bottom:1px solid #e4e9f2;"><div style="background:#5b8def;color:#ffffff;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">3</div></td>
+        <td style="text-align:center;padding:0;border-bottom:1px solid #e4e9f2;"><div style="background:#1e3a8a;color:#ffffff;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">4</div></td>
+        <td style="text-align:center;padding:0;border-bottom:1px solid #e4e9f2;"><div style="background:#a9c1ef;color:#16203a;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">2</div></td>
+        <td style="text-align:center;padding:0;border-bottom:1px solid #e4e9f2;"><div style="background:#f0f2f6;color:#9aa6b8;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">0</div></td>
+      </tr>
+      <!-- ROW 3 -->
+      <tr>
+        <td style="padding:6px 10px;color:#16203a;">FILL: Chen</td>
+        <td style="text-align:center;padding:0;"><div style="background:#a9c1ef;color:#16203a;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">2</div></td>
+        <td style="text-align:center;padding:0;"><div style="background:#5b8def;color:#ffffff;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">3</div></td>
+        <td style="text-align:center;padding:0;"><div style="background:#1e3a8a;color:#ffffff;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">4</div></td>
+        <td style="text-align:center;padding:0;"><div style="background:#f0f2f6;color:#9aa6b8;font-family:'Roboto Mono',monospace;font-weight:700;padding:9px 0;">0</div></td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-family:'Roboto Mono',monospace;font-size:10.5px;color:#b91c1c;margin:12px 0 0;">&#9888; FILL: Payments has one expert (Alice) &mdash; single point of failure. Cross-train a backup.</p>
+</div>

@@ -1,0 +1,71 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Content — three columns" subtitle="Title with accent rule and three supporting cards" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Three Column Content</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide {
+    width: var(--slide-w); height: var(--slide-h);
+    background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column;
+    padding: var(--slide-margin);
+  }
+  .head { margin-bottom: var(--space-10); }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+  .rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--slide-gutter); flex: 1; }
+  .card { background: var(--surface-card); border: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-lg); padding: var(--space-8); box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column; }
+  .num { width: 40px; height: 40px; border-radius: var(--radius-pill);
+    background: var(--color-accent-soft); color: var(--color-accent); font-weight: var(--fw-black);
+    font-size: var(--fs-h3); display: flex; align-items: center; justify-content: center;
+    margin-bottom: var(--space-5); }
+  .card h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); line-height: var(--lh-snug); }
+  .card p { margin-top: var(--space-3); font-size: var(--fs-body); line-height: var(--lh-normal);
+    color: var(--text-secondary); font-weight: var(--fw-light); }
+  .foot { margin-top: var(--space-8); display: flex; justify-content: space-between; align-items: center; }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="head">
+      <span class="eyebrow">Overview</span>
+      <h1>A clear slide title summarizing the point</h1>
+      <div class="rule"></div>
+    </div>
+    <div class="cols">
+      <div class="card">
+        <div class="num">1</div>
+        <h3>First pillar</h3>
+        <p>A short, plain-language description of this column's idea in a clear, plain voice.</p>
+      </div>
+      <div class="card">
+        <div class="num">2</div>
+        <h3>Second pillar</h3>
+        <p>Keep supporting copy to two or three lines so the slide stays scannable.</p>
+      </div>
+      <div class="card">
+        <div class="num">3</div>
+        <h3>Third pillar</h3>
+        <p>Use the accent color sparingly to draw the eye to what matters most.</p>
+      </div>
+    </div>
+    <div class="foot">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <span class="pageno">03</span>
+    </div>
+  </div>
+</body>
+</html>

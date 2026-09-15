@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!-- =============================================================================
+     index.html — genericized page skeleton for the architecture-viz studio
+     =============================================================================
+     WHAT THIS IS
+       The structural shell that wires every module together:
+         - a fixed full-screen 3D stage (<canvas id="world">) with a hero overlay
+           and a pinned step rail on top of it
+         - a top nav (with a .dark variant for the dark architecture section)
+         - a tall invisible #journey scroll-driver that scrubs the 3D journey
+         - after-content sections (cards / flow / stats) that scroll OVER the world
+         - the architecture section: overlay (lens) picker + an inline SVG system
+           map placeholder + the drill-down modal scaffold + the ERD modal scaffold
+         - GSAP + ScrollTrigger script tags, then the ESM entrypoint
+
+     WIRING / IMPORT GRAPH (write a main.js that does this)
+       import { scene, camera, renderer } from './scene/scene-setup.js';  // renderer/scene/camera/lights + IBL + rim (studio-grade by default)
+       import './scene/primitives.js';            // build the world
+       import './scroll/scroll-journey.js';       // ScrollTrigger → state.p + rig
+       import { startRender, setComposer } from './scene/render-loop.js';
+       // OPTIONAL Biggest-5 #3 — selective bloom + grain + vignette (the last 20% of "wow"):
+       import { makeComposer } from './scene/post-processing.js';
+       const { composer, resizeComposer } = makeComposer({ scene, camera, renderer });
+       setComposer(composer, resizeComposer);     // omit these 3 lines to skip post-processing
+       import { initOverlays } from './diagrams/overlay-lens-system.js';
+       import { initDrill } from './diagrams/component-detail-modal.js';
+       import { initErd } from './diagrams/erd-diagram.js';        // open/close/draw lifecycle bundled
+       import { attachPanZoom } from './diagrams/pan-zoom-viewport.js';
+       const { drill } = initOverlays({ sectionId: 'architecture', reduced: REDUCED });
+       initDrill({ drill, panZoom: attachPanZoom });               // data-drill nodes → component design
+       initErd({ drill, panZoom: attachPanZoom });                 // data-erd nodes → the data model
+       startRender();
+
+     PLACEHOLDERS
+       Every bit of copy is a `<!-- PLACEHOLDER: ... -->` marker with ONE short
+       generic example. Replace with your own product copy + your SVG system map.
+
+     DESIGN TOKENS
+       styles.css defines a neutral :root token block (--font-primary, --primary-500,
+       --neutral-*, …). Swap that block (or layer your design system's CSS before it)
+       to rebrand. No vendor CSS is imported here.
+============================================================================== -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><!-- PLACEHOLDER: page title --> Architecture Viz</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23bd0f72'/%3E%3C/svg%3E">
+<!-- Plug your design-system CSS here BEFORE styles.css to override the :root tokens. -->
+<!-- <link rel="stylesheet" href="your-design-system/colors_and_type.css"> -->
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.36.4/build/index.js",
+    "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.mjs"
+  }
+}
+<!-- NOTE: `postprocessing` maps to the RAW build (build/index.js), which bare-imports
+     `three` so the importmap unifies it to the SAME instance above. Do NOT swap in the
+     `/+esm` bundle — it inlines a 2nd copy of three ("Multiple instances of Three.js")
+     and bloom/selection silently break. This map powers the optional Biggest-5 #3
+     composer in scene/post-processing.js; remove this line if you don't use it.
+     `lenis` is the smooth-scroll inertia layer wired in scroll/scroll-journey.js —
+     it makes mouse-wheel scrolling glide instead of jerk (see that file's header and
+     the playbook's "Smooth scroll" section). Free/MIT; keep it. -->
+</head>
+<body>
+
+<!-- ===== Fixed 3D stage ===== -->
+<div class="stage" id="stage">
+  <canvas id="world"></canvas>
+
+  <!-- Hero overlay (tilts away as you scroll).
+       NOTE the data-viz-id attributes: every meaningful component self-identifies with a
+       stable, dotted, human-readable id. This is what lets edit-mode hand you exact targets
+       and what lets you map feedback → code in one hop. Tag every component you build.
+       (data-viz-label is optional friendlier text shown in the edit panel.) -->
+  <div class="hero" id="hero" data-viz-id="hero" data-viz-label="Hero section">
+    <div class="hero-tilt" id="heroTilt">
+      <!-- PLACEHOLDER: hero headline -->
+      <h1 class="hero-title" data-viz-id="hero.title">Your Headline.<br>One Clear Idea.</h1>
+      <!-- PLACEHOLDER: hero subtitle -->
+      <p class="hero-sub" data-viz-id="hero.subtitle">A single live view of how one request flows through the system, end to end.</p>
+    </div>
+    <div class="hero-scroll" id="heroScroll" data-viz-id="hero.scroll-cue">Scroll — Follow A Request</div>
+  </div>
+
+  <!-- Pinned step rail (one .rail-item per narrative step; data-step is the index) -->
+  <div class="rail" id="rail" aria-hidden="true">
+    <!-- PLACEHOLDER: 4 steps. Keep the structure; replace copy. -->
+    <div class="rail-item" data-step="0">
+      <div class="rail-row"><span class="rail-num">01</span><span class="rail-title">Step one title</span></div>
+      <p class="rail-body">Step one body — what happens at this point in the journey.</p>
+    </div>
+    <div class="rail-item" data-step="1">
+      <div class="rail-row"><span class="rail-num">02</span><span class="rail-title">Step two title</span></div>
+      <p class="rail-body">Step two body.</p>
+    </div>
+    <div class="rail-item" data-step="2">
+      <div class="rail-row"><span class="rail-num">03</span><span class="rail-title">Step three title</span></div>
+      <p class="rail-body">Step three body.</p>
+    </div>
+    <div class="rail-item" data-step="3">
+      <div class="rail-row"><span class="rail-num">04</span><span class="rail-title">Step four title</span></div>
+      <p class="rail-body">Step four body.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Top navigation ===== -->
+<header class="nav">
+  <nav class="nav-left">
+    <!-- PLACEHOLDER: nav links -->
+    <a href="#people">Section A</a>
+    <a href="#data">Section B</a>
+    <a href="#architecture">Architecture</a>
+  </nav>
+  <div class="nav-brand">
+    <!-- PLACEHOLDER: your logo (or text). -->
+    <span class="nav-product">YOUR&nbsp;· PRODUCT</span>
+  </div>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="#data">Secondary</a>
+    <a class="btn btn-solid" href="#people">Primary</a>
+  </div>
+</header>
+
+<!-- ===== Scroll driver for the 3D journey (height set in scroll-journey.js) ===== -->
+<div id="journey"></div>
+
+<!-- ===== DOM content (scrolls over the world) ===== -->
+<main class="after">
+
+  <!-- PLACEHOLDER: a "cards" band. Tag the section AND each card so feedback can target either. -->
+  <section class="band" id="people" data-viz-id="section.cards" data-viz-label="Who-it-helps cards">
+    <h2 class="band-title">Section A headline.</h2>
+    <div class="cards">
+      <article class="card" data-viz-id="card.1">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="4" rx="1"/><rect x="3" y="11" width="18" height="4" rx="1" opacity=".55"/></svg></div>
+        <h3>Card one</h3><p>One short paragraph.</p>
+      </article>
+      <article class="card" data-viz-id="card.2"><div class="card-icon"></div><h3>Card two</h3><p>One short paragraph.</p></article>
+      <article class="card"><div class="card-icon"></div><h3>Card three</h3><p>One short paragraph.</p></article>
+    </div>
+  </section>
+
+  <!-- PLACEHOLDER: a "flow + stats" band -->
+  <section class="band band-grey" id="data">
+    <h2 class="band-title">Section B headline.</h2>
+    <p class="band-sub">One-sentence framing of the data flow.</p>
+    <div class="flow">
+      <div class="flow-node"><span class="flow-k">Sources</span><span class="flow-v">A · B · C</span></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node flow-node-hub"><span class="flow-k">Hub</span><span class="flow-v">the queue</span></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node flow-node-done"><span class="flow-k">Done</span><span class="flow-v">complete</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="stat-n">1</span><span class="stat-l">queue</span></div>
+      <div class="stat"><span class="stat-n">9</span><span class="stat-l">event types</span></div>
+      <div class="stat"><span class="stat-n">10</span><span class="stat-l">milestones</span></div>
+      <div class="stat"><span class="stat-n">0</span><span class="stat-l">dropped</span></div>
+    </div>
+  </section>
+
+  <!-- ===== Architecture: overlay-switched system map ===== -->
+  <!-- data-ov is the active lens id; overlay-lens-system.js sets it. -->
+  <section class="arch" id="architecture" data-ov="sy">
+    <div class="arch-head">
+      <h2 class="band-title arch-title">The architect's view.</h2>
+      <p class="band-sub arch-sub">One system — several lenses. Switch overlays to read a different aspect of the same map.</p>
+    </div>
+    <div class="arch-body">
+      <aside class="arch-side">
+        <div class="ov-picker" id="ovPicker"></div>     <!-- buttons injected by JS -->
+        <div class="ov-panel">
+          <div class="ov-panel-name" id="ovName"></div>
+          <p class="ov-panel-desc" id="ovDesc"></p>
+          <ul class="ov-panel-list" id="ovList"></ul>
+        </div>
+      </aside>
+
+      <div class="arch-map">
+      <!-- PLACEHOLDER: your inline SVG system map.
+           Tag each node/edge with on-XX classes (matching OVERLAYS[].id) so the
+           lens dimming works. Mark drill nodes with data-drill / data-erd. The two
+           example nodes below show the convention. -->
+      <svg id="archSvg" viewBox="0 0 1320 900" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans, sans-serif">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5"
+                  orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+            <path d="M0,0.5 L9,5 L0,9.5 z" fill="context-stroke"/>
+          </marker>
+        </defs>
+        <g class="edges" fill="none">
+          <path class="edge arr on-sy on-df" d="M300,200 H520"/>   <!-- EXAMPLE edge -->
+        </g>
+        <g class="nodes">
+          <!-- EXAMPLE drill node: clicking opens the component-detail modal -->
+          <g class="node cool drill on-sy on-df" data-drill="engine" role="button" tabindex="0" aria-label="Open engine component design">
+            <rect x="60" y="160" width="240" height="80" rx="10"/>
+            <text class="nt sm" x="180" y="190" text-anchor="middle">process engine</text>
+            <text class="ns" x="180" y="212" text-anchor="middle">append → fold → persist</text>
+            <text class="drill-cue" x="286" y="176">⤢</text>
+          </g>
+          <!-- EXAMPLE ERD node: clicking opens the ERD modal -->
+          <g class="node cool drill on-sy on-es" data-erd="1" role="button" tabindex="0" aria-label="Open data model ERD">
+            <rect x="520" y="160" width="260" height="80" rx="10"/>
+            <text class="nt sm" x="650" y="190" text-anchor="middle">data store</text>
+            <text class="ns" x="650" y="212" text-anchor="middle">events · projections · ledger</text>
+            <text class="drill-cue" x="766" y="176">⤢</text>
+          </g>
+        </g>
+      </svg>
+      </div>
+    </div>
+
+    <!-- drill-down modal: component design inside a clicked node.
+         data-lenis-prevent: the page smooth-scroll (Lenis) owns the wheel listener;
+         without this it swallows wheel events inside the modal and the modal's own
+         scrollable panes won't scroll (lenis.stop() alone does NOT release the wheel). -->
+    <div class="drill-modal" id="drillModal" aria-hidden="true">
+      <div class="drill-backdrop" data-drill-close></div>
+      <div class="drill-panel" role="dialog" aria-modal="true" aria-labelledby="drillTitle" data-lenis-prevent>
+        <header class="drill-head">
+          <div class="drill-tabs" id="drillTabs"></div>   <!-- tabs injected by JS -->
+          <div class="drill-legend">
+            <span class="dc-pill pure">pure · no I/O</span>
+            <span class="dc-pill impure">impure · I/O</span>
+          </div>
+          <button class="drill-x" id="drillX" data-drill-close aria-label="Close">✕</button>
+        </header>
+        <div class="drill-body">
+          <div class="drill-stage" id="drillStage"></div>   <!-- engine/lanes render here -->
+          <aside class="drill-rail" id="drillRail"></aside>  <!-- overview / detail -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ERD modal: data model (data-lenis-prevent — see drill modal above) -->
+    <div class="drill-modal" id="erdModal" aria-hidden="true">
+      <div class="drill-backdrop" data-erd-close></div>
+      <div class="drill-panel" role="dialog" aria-modal="true" aria-label="Data model" data-lenis-prevent>
+        <header class="drill-head">
+          <div class="erd-title">Data model <span>your store</span></div>
+          <div class="drill-legend">
+            <span class="erd-key"><i class="k-pk"></i> primary key</span>
+            <span class="erd-key"><i class="k-fk"></i> foreign key</span>
+            <span class="erd-key"><i class="k-emb"></i> embedded</span>
+          </div>
+          <button class="drill-x" data-erd-close aria-label="Close">✕</button>
+        </header>
+        <div class="erd-body" id="erdBody"></div>   <!-- buildErd() fills this -->
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <!-- PLACEHOLDER: footer -->
+    <span>Your Product — team</span>
+    <span class="foot-dim">Your Org</span>
+  </footer>
+</main>
+
+<!-- GSAP + ScrollTrigger must load before the module entrypoint -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<!-- PLACEHOLDER: your ESM entrypoint that imports the modules per the graph above -->
+<script type="module" src="main.js"></script>
+
+<!-- EDIT MODE — ships on every page. Toggle with the ✎ button or the `e` key.
+     Toolbar: Normal/Expert views (hover-reveal vs show-all ids, DOM + 3D) and
+     Select / Snip / Brush tools; ctrl/⌘+click opens an inline comment popup;
+     comments collect in the side panel → "Copy for AI" / "Download".
+     For PUBLISH builds, either omit these lines or call EditMode.setPublishMode(true).
+     In your main.js, after the scene is built, register 3D objects and init:
+        EditMode.attachScene({ THREE, renderer, camera, scene });
+        EditMode.registerVizObject(serviceCore, 'scene.service-core');  // per object
+        EditMode.init();
+     OPTIONAL one-hop-to-code: generate a manifest with
+        node scripts/gen-viz-manifest.mjs <thisDir> --as-js
+     then uncomment the two viz lines below (viz-manifest.js sets window.__VIZ_MANIFEST;
+     viz.js exposes window.__viz.find/list/pickAt and feeds source hints into exports). -->
+<link rel="stylesheet" href="edit-mode/edit-mode.css">
+<!-- <script src="viz-manifest.js"></script> -->
+<script src="edit-mode/edit-mode.js"></script>
+<!-- <script src="edit-mode/viz.js"></script> -->
+</body>
+</html>

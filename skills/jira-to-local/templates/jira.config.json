@@ -1,0 +1,51 @@
+{
+  "$schema": "jira-to-local/config-v1",
+  "jira": {
+    "domain": "REPLACE.atlassian.net"
+  },
+  "auth": {
+    "source": "env",
+    "envVars": {
+      "email": "ATLASSIAN_EMAIL",
+      "token": "ATLASSIAN_API_TOKEN"
+    }
+  },
+  "project": {
+    "key": "REPLACE",
+    "name": "REPLACE",
+    "checklistFields": {
+      "contentYaml": "customfield_NNNNN",
+      "text": "customfield_NNNNN",
+      "completed": "customfield_NNNNN"
+    }
+  },
+  "instructions": "Write down what an agent cannot learn from the API. Example: 'Time is logged on the subtask, never on the story, so a story showing zero hours is normal. The acceptance criteria live in a custom field, not in the description. The story-format field ships as a blank template and is almost never filled in; treat it as boilerplate. Tickets are written in more than one language; never translate.' Leave this empty if there is nothing to say yet, and add to it as you learn.",
+  "output": {
+    "dir": ".ai-artifacts/jira",
+    "mode": "markdown",
+    "assets": {
+      "maxMb": 10,
+      "imagesOnly": false
+    }
+  },
+  "confluence": {
+    "pullLinkedPages": true,
+    "subdir": "confluence",
+    "maxDepth": 0
+  },
+  "issueTypes": {
+    "Story": {
+      "docType": "story",
+      "instructions": "",
+      "fields": [
+        {
+          "id": "customfield_00000",
+          "name": "REPLACE with the Jira display name",
+          "heading": "REPLACE with the heading to write in content.md",
+          "type": "adf"
+        }
+      ]
+    }
+  },
+  "createdAt": "REPLACE with an ISO date"
+}

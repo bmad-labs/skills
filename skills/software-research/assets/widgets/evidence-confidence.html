@@ -1,0 +1,69 @@
+<!--
+  WIDGET: evidence-confidence  (zero dependencies — pure HTML/CSS, no JS)
+  Use for: the tool's on-brand TRUST indicator — one compact row per finding
+  that combines: a STATUS (icon+word), a SOURCE TIER pill (1-6, where 1 =
+  primary / best evidence, 6 = weakest), and a CONFIDENCE meter (n of 10 filled).
+  How: copy this whole block; duplicate an .ec-row per finding, edit the FILLs.
+  Confidence: fill exactly n of the 10 segments with #2563eb, rest #e4e9f2.
+  Status uses icon+colour (check/dot/warn) so it reads in grayscale print.
+  Tier pill colour is a hint only — the "T#" text is the source of truth.
+-->
+<div class="ec" style="border:1px solid #e4e9f2;border-radius:12px;padding:22px 24px;background:#f6f8fc;max-width:680px;">
+  <div style="display:flex;justify-content:space-between;font-family:'Roboto Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#5b6677;padding:0 4px 10px;border-bottom:1px solid #e4e9f2;">
+    <span>Finding</span><span>Tier &middot; Confidence</span>
+  </div>
+
+  <!-- ROW 1: Confirmed / Tier 1 / 9 of 10 -->
+  <div class="ec-row" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 4px;border-bottom:1px solid #e4e9f2;">
+    <div style="display:flex;align-items:center;gap:9px;min-width:0;">
+      <span aria-hidden="true" style="color:#15803d;font-size:14px;">&#10004;</span>
+      <div style="min-width:0;">
+        <div style="font-family:'Roboto',sans-serif;font-size:13.5px;color:#16203a;font-weight:600;">FILL: finding text</div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:10px;color:#15803d;text-transform:uppercase;letter-spacing:0.06em;">Confirmed</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <span style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#15803d;background:#e9f6ee;border:1px solid #bfe3cb;border-radius:20px;padding:3px 9px;">T1 primary</span>
+      <div style="display:flex;gap:2px;" role="img" aria-label="Confidence 9 of 10">
+        <span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span>
+      </div>
+      <span style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;color:#16203a;width:34px;text-align:right;">9/10</span>
+    </div>
+  </div>
+
+  <!-- ROW 2: Likely / Tier 3 / 6 of 10 -->
+  <div class="ec-row" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 4px;border-bottom:1px solid #e4e9f2;">
+    <div style="display:flex;align-items:center;gap:9px;min-width:0;">
+      <span aria-hidden="true" style="color:#2563eb;font-size:14px;">&#9679;</span>
+      <div style="min-width:0;">
+        <div style="font-family:'Roboto',sans-serif;font-size:13.5px;color:#16203a;font-weight:600;">FILL: finding text</div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:10px;color:#2563eb;text-transform:uppercase;letter-spacing:0.06em;">Likely</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <span style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#1e3a8a;background:#e7f0fe;border:1px solid #bcd2f7;border-radius:20px;padding:3px 9px;">T3 secondary</span>
+      <div style="display:flex;gap:2px;" role="img" aria-label="Confidence 6 of 10">
+        <span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span>
+      </div>
+      <span style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;color:#16203a;width:34px;text-align:right;">6/10</span>
+    </div>
+  </div>
+
+  <!-- ROW 3: Contested / Tier 5 / 3 of 10 -->
+  <div class="ec-row" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 4px 3px;">
+    <div style="display:flex;align-items:center;gap:9px;min-width:0;">
+      <span aria-hidden="true" style="color:#b91c1c;font-size:14px;">&#9888;</span>
+      <div style="min-width:0;">
+        <div style="font-family:'Roboto',sans-serif;font-size:13.5px;color:#16203a;font-weight:600;">FILL: finding text</div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:10px;color:#b91c1c;text-transform:uppercase;letter-spacing:0.06em;">Contested</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <span style="font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#b91c1c;background:#fdecec;border:1px solid #f3c4c4;border-radius:20px;padding:3px 9px;">T5 weak</span>
+      <div style="display:flex;gap:2px;" role="img" aria-label="Confidence 3 of 10">
+        <span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#2563eb;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span><span style="width:8px;height:14px;border-radius:1px;background:#e4e9f2;"></span>
+      </div>
+      <span style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;color:#16203a;width:34px;text-align:right;">3/10</span>
+    </div>
+  </div>
+</div>

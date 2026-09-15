@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<!--
+  SOFTWARE RESEARCH BRIEFING TEMPLATE
+  Clone this file, fill every {{TOKEN}}, delete instructional comments, repeat the
+  repeating blocks (finding cards, comparison rows, refs, action items) as needed.
+  Keep the <style> block as-is (palette/fonts are a design contract; the scoreboard
+  and comparison-table classes are part of it). Design = clean white and
+  professional: Montserrat headings, Roboto Mono labels, blue accent.
+  WRITE PLAIN: short sentences, no academic phrasing, define jargon inline. Lead
+  with the answer (scoreboard + Bottom Line), then the detail.
+  The "Side-by-Side" table (01b) is for option-comparison modes (library-eval,
+  architecture, migration); delete that section for single-subject research.
+  The References list at the end must contain every cited source.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Software Research: {{TOPIC_TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue: #2563eb; --blue-dark: #1e3a8a; --ink: #16203a; --muted: #5b6677; --line: #e4e9f2;
+    --bg-soft: #f6f8fc; --green: #15803d; --green-bg: #e9f6ee; --amber: #b45309; --amber-bg: #fdf3e7;
+    --slate: #475569; --slate-bg: #eef1f6; --red: #b91c1c; --red-bg: #fdecec;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Roboto', system-ui, sans-serif; color: var(--ink); background: #eef1f6; line-height: 1.62; font-weight: 400; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 900px; margin: 0 auto; background: #fff; padding: 64px 72px 80px; box-shadow: 0 1px 40px rgba(22,32,58,0.08); }
+  .eyebrow { font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+  h1 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 40px; line-height: 1.12; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 18px; }
+  .lede { font-size: 17px; color: var(--muted); max-width: 640px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 26px; padding-top: 22px; border-top: 2px solid var(--line); font-family: 'Roboto Mono', monospace; font-size: 12px; color: var(--muted); }
+  .meta-row b { color: var(--ink); font-weight: 600; }
+  .verify-banner { margin-top: 22px; background: var(--green-bg); border: 1px solid #bfe3cc; border-radius: 8px; padding: 13px 18px; font-size: 13px; color: #14532d; display: flex; gap: 10px; align-items: baseline; }
+  .verify-banner b { font-weight: 700; }
+  .verify-banner .tag { font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: var(--green); color: #fff; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; }
+  .howto { margin-top: 18px; border: 1px solid var(--line); border-radius: 8px; padding: 18px 22px; background: var(--bg-soft); }
+  .howto h4 { font-family: 'Roboto Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .howto ul { list-style: none; }
+  .howto li { font-size: 13.5px; color: #2b3950; margin-bottom: 7px; padding-left: 16px; position: relative; }
+  .howto li::before { content: "›"; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+  .section { margin-top: 56px; }
+  .section-num { font-family: 'Roboto Mono', monospace; font-size: 13px; font-weight: 600; color: var(--blue); letter-spacing: 0.05em; }
+  h2 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 25px; letter-spacing: -0.01em; color: var(--ink); margin: 6px 0 18px; line-height: 1.2; }
+  h2 .bar { display: inline-block; width: 38px; height: 4px; background: var(--blue); border-radius: 2px; vertical-align: middle; margin-right: 14px; }
+  p { margin-bottom: 14px; }
+  p.body-lg { font-size: 16.5px; }
+  .ceo { background: var(--bg-soft); border-left: 5px solid var(--blue); padding: 26px 30px; border-radius: 4px; font-size: 16.5px; }
+  .ceo strong { font-weight: 700; color: var(--blue-dark); }
+  .finding { border: 1px solid var(--line); border-radius: 10px; padding: 24px 26px; margin-bottom: 18px; position: relative; }
+  .finding-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 12px; }
+  .finding-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 18px; line-height: 1.3; color: var(--ink); flex: 1; }
+  .finding-rank { font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 13px; color: #fff; background: var(--ink); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .finding p { font-size: 15px; color: #283449; margin-bottom: 14px; }
+  .rel-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .rel { display: inline-flex; align-items: center; gap: 9px; font-family: 'Roboto Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; }
+  .rel.high { background: #e7f0fe; color: var(--blue); }
+  .rel.medhigh { background: var(--green-bg); color: var(--green); }
+  .rel.medium { background: var(--amber-bg); color: var(--amber); }
+  .rel.low { background: var(--red-bg); color: var(--red); }
+  .score { font-family: 'Roboto Mono', monospace; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .score b { font-size: 17px; }
+  .score span { color: var(--muted); font-weight: 400; }
+  .chips { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+  .chip-row { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; font-size: 13.5px; }
+  .chip-label { font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+  .chip-label.sup { background: var(--green-bg); color: var(--green); }
+  .chip-label.chal { background: var(--red-bg); color: var(--red); }
+  .chip-label.fix { background: var(--amber-bg); color: var(--amber); }
+  .chip-row span.who { color: #2b3950; }
+  .chip-row span.who b { font-weight: 600; }
+  .contested { border: 1px dashed var(--amber); background: #fffaf2; border-radius: 10px; padding: 22px 26px; margin-bottom: 18px; }
+  .contested .tag { font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); }
+  .contested h4 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 16px; color: var(--ink); margin: 6px 0 10px; }
+  .contested p { font-size: 14px; color: #4a3a22; margin-bottom: 0; }
+  .connection { background: linear-gradient(135deg, #16203a 0%, #1e3a8a 100%); color: #eaf0fb; border-radius: 12px; padding: 34px 38px; }
+  .connection h2 { color: #fff; }
+  .connection h2 .bar { background: #6ea8ff; }
+  .connection .section-num { color: #9ec1ff; }
+  .connection p { color: #d3def3; font-size: 16px; }
+  .connection .punch { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 18px; color: #fff; line-height: 1.4; margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.18); }
+  .assume { border: 1px solid var(--line); border-left: 5px solid var(--amber); border-radius: 6px; padding: 24px 28px; background: #fffdf9; }
+  .assume h3 { font-family: 'Montserrat', sans-serif; font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+  .assume p { font-size: 15px; color: #3a3320; }
+  .assume p:last-child { margin-bottom: 0; }
+  .action-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .action-item:last-child { border-bottom: none; }
+  .action-mark { font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 13px; color: var(--blue); flex-shrink: 0; width: 34px; }
+  .action-item .do { font-weight: 600; color: var(--ink); }
+  .action-item p { font-size: 14.5px; margin-bottom: 0; color: #2b3950; }
+  .frontier { border: 2px dashed var(--blue); border-radius: 12px; padding: 30px 34px; background: var(--bg-soft); }
+  .frontier .q { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.32; color: var(--blue-dark); margin-bottom: 16px; }
+  .frontier p { font-size: 15px; color: #2b3950; }
+  .oncam { margin-top: 18px; }
+  .oncam-col { border-radius: 10px; padding: 20px 24px; margin-bottom: 14px; }
+  .oncam-col.safe { background: var(--green-bg); border: 1px solid #bfe3cc; }
+  .oncam-col.caveat { background: var(--amber-bg); border: 1px solid #f0d9b5; }
+  .oncam-col.avoid { background: var(--red-bg); border: 1px solid #f3c9c9; }
+  .oncam-col h4 { font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .oncam-col.safe h4 { color: var(--green); }
+  .oncam-col.caveat h4 { color: var(--amber); }
+  .oncam-col.avoid h4 { color: var(--red); }
+  .oncam-col ul { list-style: none; }
+  .oncam-col li { font-size: 14px; color: #233; margin-bottom: 8px; padding-left: 16px; position: relative; line-height: 1.5; }
+  .oncam-col li::before { content: "•"; position: absolute; left: 0; font-weight: 700; }
+  .oncam-col.safe li::before { color: var(--green); }
+  .oncam-col.caveat li::before { color: var(--amber); }
+  .oncam-col.avoid li::before { color: var(--red); }
+  .refs { margin-top: 56px; padding-top: 26px; border-top: 2px solid var(--line); }
+  .refs h3 { font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .refs ul { list-style: none; }
+  .refs li { font-size: 12.5px; color: var(--muted); margin-bottom: 11px; padding-left: 16px; position: relative; line-height: 1.5; }
+  .refs li::before { content: "›"; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+  .refs a { color: #34507e; text-decoration: none; }
+  .refs a:hover { text-decoration: underline; }
+  .refs .vstat { font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; margin-right: 6px; }
+  .vstat.ok { background: var(--green-bg); color: var(--green); }
+  .vstat.part { background: var(--amber-bg); color: var(--amber); }
+  .vstat.weak { background: var(--red-bg); color: var(--red); }
+  .scoreboard { margin-top: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .sb-cell { background: #fff; padding: 16px 18px; }
+  .sb-cell h5 { font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+  .sb-cell .val { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 17px; color: var(--ink); line-height: 1.25; }
+  .sb-cell .val.rec { color: var(--blue-dark); }
+  .sb-cell .val.risk { color: var(--amber); }
+  .sb-cell small { display: block; font-family: 'Roboto', sans-serif; font-weight: 400; font-size: 13px; color: var(--muted); margin-top: 5px; line-height: 1.4; }
+  .cmp-wrap { overflow-x: auto; margin-top: 8px; border: 1px solid var(--line); border-radius: 10px; }
+  table.cmp { border-collapse: collapse; width: 100%; font-size: 14px; }
+  table.cmp th, table.cmp td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.cmp thead th { font-family: 'Roboto Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--bg-soft); }
+  table.cmp tbody th { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  table.cmp td { color: #283449; }
+  table.cmp tr:last-child th, table.cmp tr:last-child td { border-bottom: none; }
+  table.cmp .win { color: var(--green); font-weight: 600; }
+  table.cmp .tier { font-family: 'Roboto Mono', monospace; font-size: 10px; color: var(--muted); }
+  .footer { margin-top: 40px; font-family: 'Roboto Mono', monospace; font-size: 11px; color: #9aa6b8; text-align: center; }
+  @media (max-width: 640px) { .page { padding: 40px 24px 56px; } h1 { font-size: 30px; } }
+  @media print { body { background: #fff; } .page { box-shadow: none; max-width: 100%; padding: 0; } .connection, .oncam-col { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Software Research &middot; {{MODE}} &middot; v2 (verified)</div>
+    <h1>{{TOPIC_TITLE}}</h1>
+    <p class="lede">A multi-lens engineering synthesis. Every claim independently checked against its primary source &mdash; version-aware &mdash; before publication.</p>
+    <div class="meta-row">
+      <span><b>Date</b> &nbsp;{{DATE}}</span>
+      <span><b>Method</b> &nbsp;{{N_LENSES}} expert lenses ({{MODE}}) + contradiction map</span>
+      <span><b>Audience</b> &nbsp;{{AUDIENCE: the reader's role, default tech-lead; omit this span if none given}}</span>
+    </div>
+    <div class="verify-banner">
+      <span class="tag">Verified</span>
+      <span>All {{N}} citations independently checked against primary sources on {{DATE}}. <b>Result: {{X}} corrected, {{Y}} demoted, {{Z}} version-stale.</b> Confidence = source-tier evidence quality.</span>
+    </div>
+    <!-- ============ AT-A-GLANCE VERDICT SCOREBOARD (the answer in 5 seconds) ============ -->
+    <div class="scoreboard">
+      <div class="sb-cell"><h5>Recommendation</h5><div class="val rec">{{RECOMMENDATION: the pick, in 1-4 words}}</div><small>{{one-line why}}</small></div>
+      <div class="sb-cell"><h5>Confidence</h5><div class="val">{{SCORE}}/10</div><small>{{based on source tier}}</small></div>
+      <div class="sb-cell"><h5>Top risk</h5><div class="val risk">{{TOP_RISK: 1-4 words}}</div><small>{{one-line why it matters}}</small></div>
+      <div class="sb-cell"><h5>Decide by</h5><div class="val">{{THE ONE CHECK: what settles it, or "Ready"}}</div><small>{{what to test / confirm first}}</small></div>
+    </div>
+    <div class="howto">
+      <h4>How to read this</h4>
+      <ul>
+        <li><b>The lens panel is author-constructed.</b> Where lenses agree, treat it as a strong hypothesis, not field consensus.</li>
+        <li><b>Confidence is scored 1-10 on source tier:</b> primary docs/specs &gt; security DBs (OSV/GHSA) &gt; registries &gt; reproducible benchmarks &gt; sentiment surveys.</li>
+        <li><b>Every claim is version-bound.</b> A high score means the fact is verified for the stated version, not that it is the right choice for you.</li>
+      </ul>
+      <p style="margin-top:10px;font-family:'Roboto Mono',monospace;font-size:12px;color:var(--muted);">Version currency: verified against {{VERSIONS_CHECKED}} as of {{DATE}}.</p>
+    </div>
+  </header>
+
+  <!-- ============ 01 BOTTOM LINE ============ -->
+  <section class="section">
+    <div class="section-num">01</div>
+    <h2><span class="bar"></span>Bottom Line</h2>
+    <div class="ceo">
+      <p style="margin-bottom:0;">{{SUMMARY: 3-5 short sentences a busy tech-lead reads in under a minute. Plain words. Lead with the recommendation + the verified fact it rests on, then the main trade-off, then the key risk. Bold the single most important sentence.}}</p>
+    </div>
+  </section>
+
+  <!-- ============ 01b SIDE-BY-SIDE (option-comparison modes only; delete for single-subject research) ============ -->
+  <section class="section">
+    <div class="section-num">01b</div>
+    <h2><span class="bar"></span>Side-by-Side</h2>
+    <div class="cmp-wrap">
+      <table class="cmp">
+        <thead>
+          <tr><th>Criterion</th><th>{{OPTION_A}}</th><th>{{OPTION_B}}</th></tr>
+        </thead>
+        <tbody>
+          <!-- REPEAT one row per criterion (drawn from the lenses). Mark the better cell with class="win". Add a <span class="tier"> source tier where useful. -->
+          <tr><th>{{CRITERION}}</th><td>{{A verdict}} <span class="tier">{{T1-3}}</span></td><td class="win">{{B verdict}} <span class="tier">{{T1-3}}</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 02 KEY FINDINGS (ranked by reliability, highest first) ============ -->
+  <section class="section">
+    <div class="section-num">02</div>
+    <h2><span class="bar"></span>Key Findings, Ranked by Reliability</h2>
+
+    <!-- REPEAT this .finding block once per finding (4-5). rel class: high | medhigh | medium | low. score 1-10. -->
+    <div class="finding">
+      <div class="finding-head">
+        <div class="finding-title">{{FINDING_TITLE}}</div>
+        <div class="finding-rank">{{N}}</div>
+      </div>
+      <div class="rel-row">
+        <div class="rel {{RELCLASS}}">Reliability: {{RELIABILITY_LABEL}}</div>
+        <div class="score"><b>{{SCORE}}</b><span>/10</span></div>
+      </div>
+      <p>{{FINDING_BODY: plain and direct — what it says, the evidence, and the verified caveat that caps the score. Short sentences; define any term inline. Bold any correction made during verification.}}</p>
+      <div class="chips">
+        <div class="chip-row"><span class="chip-label sup">Supported by</span><span class="who">{{WHICH LENSES + the actual primary source}}</span></div>
+        <div class="chip-row"><span class="chip-label chal">Challenged by</span><span class="who">{{WHICH LENSES disagree, or "No one"}}</span></div>
+        <!-- add a 'fix' chip when verification forced a correction -->
+        <div class="chip-row"><span class="chip-label fix">Corrected</span><span class="who">{{what changed after primary-source check; delete if nothing changed}}</span></div>
+      </div>
+    </div>
+
+    <!-- CONTESTED / DEMOTED claims sidebar. Use for any claim verification flagged as contested or version-stale. Delete if none. -->
+    <div class="contested">
+      <div class="tag">Contested signal &middot; monitor, do not assert &middot; confidence {{SCORE}}/10</div>
+      <h4>{{CLAIM_TITLE}}</h4>
+      <p>{{Why it is contested: the critique, the counter-evidence, the source. Tell the reader not to state it as fact.}}</p>
+    </div>
+  </section>
+
+  <!-- ============ 03 HIDDEN CONNECTION ============ -->
+  <section class="section">
+    <div class="connection">
+      <div class="section-num">03</div>
+      <h2><span class="bar"></span>Why The Findings Seem To Conflict</h2>
+      <p>{{Name the two findings that look like they clash.}}</p>
+      <p>{{Explain what actually connects them — the link only visible across all the lenses.}}</p>
+      <p class="punch">{{The one-sentence takeaway. If it leans on a weak finding, say so in parentheses.}}</p>
+    </div>
+  </section>
+
+  <!-- ============ 03b KEY ASSUMPTION / MISSING 6TH LENS ============ -->
+  <section class="section">
+    <div class="assume">
+      <h3>What We Assumed / What We Didn't Check</h3>
+      <p>{{What the lenses took as fixed. Name the one perspective that would change the conclusions, not just add nuance.}}</p>
+      <p>{{The one gap that could flip the findings. Keep it in mind when you build.}}</p>
+    </div>
+  </section>
+
+  <!-- ============ 04 ACTIONABLE INSIGHT ============ -->
+  <section class="section">
+    <div class="section-num">04</div>
+    <h2><span class="bar"></span>What To Actually Do Differently</h2>
+    <p class="body-lg" style="color:var(--muted);">{{Who this is for + framing: specific moves, not principles.}}</p>
+    <!-- REPEAT 3-6 action items -->
+    <div class="action-item">
+      <div class="action-mark">{{NN}}</div>
+      <div><span class="do">{{The move in a sentence.}}</span><p>{{Why + exactly how, tied to a finding.}}</p></div>
+    </div>
+  </section>
+
+  <!-- ============ 04b CLAIM SAFETY GUIDE (assert / caveat / avoid) ============ -->
+  <section class="section">
+    <div class="section-num">04b</div>
+    <h2><span class="bar"></span>What You Can / Can't Say Confidently</h2>
+    <div class="oncam">
+      <div class="oncam-col safe">
+        <h4>✓ Safe — verified against primary source</h4>
+        <ul><li>{{Claims confirmed by official/primary sources, safe to state flatly.}}</li></ul>
+      </div>
+      <div class="oncam-col caveat">
+        <h4>⚠ Say with a caveat</h4>
+        <ul><li>{{Claims that need attribution or qualification.}}</li></ul>
+      </div>
+      <div class="oncam-col avoid">
+        <h4>✕ Don't assert</h4>
+        <ul><li>{{Contested, version-stale, or unverifiable claims. Name them so they don't slip back in.}}</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 FRONTIER QUESTION ============ -->
+  <section class="section">
+    <div class="section-num">05</div>
+    <h2><span class="bar"></span>The One Thing To Resolve Next</h2>
+    <div class="frontier">
+      <div class="q">{{The one question that would change everything if answered.}}</div>
+      <p>{{Why it matters: what it threatens, why no lens addressed it, what answering it unlocks.}}</p>
+    </div>
+  </section>
+
+  <!-- ============================================================================
+       DEEP REPORT BODY (12-section spine). Everything ABOVE is the fast-scan layer
+       (a reader can stop there). Everything BELOW is the detailed report.
+       CONCRETENESS CONTRACT — see references/report-structure.md. For EVERY section:
+       name exact versions, show real commands/config/code, use real numbers, and tie
+       it to THE READER'S stack/team/scale. Cut any sentence that describes a category
+       instead of stating a fact (ban "offers robust support for…", "is widely used…").
+       Render comparisons/numbers/flows with a widget from assets/widgets/, not prose.
+       Delete any section that is genuinely N/A for this mode (say why in one line).
+       ============================================================================ -->
+
+  <!-- 06 Landscape & current state -->
+  <section class="section">
+    <div class="section-num">06</div>
+    <h2><span class="bar"></span>Landscape &amp; Current State</h2>
+    <p>{{The specific players / versions / patterns in play as of the research date. Name them. State what is current vs deprecated and the version where it changed. Not "the ecosystem is mature" — the actual state.}}</p>
+  </section>
+
+  <!-- 07 Implementation approach (the practical core) -->
+  <section class="section">
+    <div class="section-num">07</div>
+    <h2><span class="bar"></span>How To Actually Do It</h2>
+    <p>{{The practical core — win or lose "practical" here. Real setup steps, commands, config, minimal code, file layout, env vars. Show the actual path, not "an overview of implementation." Use a code-compare / annotated-diagram / deployment-pipeline widget where it helps.}}</p>
+  </section>
+
+  <!-- 08 Technology / stack detail -->
+  <section class="section">
+    <div class="section-num">08</div>
+    <h2><span class="bar"></span>Stack &amp; Tooling Detail</h2>
+    <p>{{Exact languages / frameworks / versions / tools, and WHY each fits the reader's case. Pin versions. A comparison-matrix widget fits here.}}</p>
+  </section>
+
+  <!-- 09 Integration & interoperability -->
+  <section class="section">
+    <div class="section-num">09</div>
+    <h2><span class="bar"></span>Integration &amp; Interoperability</h2>
+    <p>{{How it connects to what the reader ALREADY runs: APIs, protocols, data formats, compatibility windows. Cite the compat matrix / version-support window. c4-container-view or sequence-flow widget if a picture helps.}}</p>
+  </section>
+
+  <!-- 10 Performance & scalability -->
+  <section class="section">
+    <div class="section-num">10</div>
+    <h2><span class="bar"></span>Performance &amp; Scalability</h2>
+    <p>{{Real numbers with disclosed methodology; the scaling model and where it saturates; the reader's expected load vs that ceiling. Not "scales well." Use metric-bars / range-bar / capacity-scaling-curve.}}</p>
+  </section>
+
+  <!-- 11 Security & compliance -->
+  <section class="section">
+    <div class="section-num">11</div>
+    <h2><span class="bar"></span>Security &amp; Compliance</h2>
+    <p>{{Concrete: specific CVEs/GHSA + affected/patched versions, the SPDX license + obligations, the attack surface, the hardening steps. Use the severity-summary widget.}}</p>
+  </section>
+
+  <!-- 12 Recommendations (tied to the reader) -->
+  <section class="section">
+    <div class="section-num">12</div>
+    <h2><span class="bar"></span>Recommendation, For Your Situation</h2>
+    <p>{{The decision and why, referencing the reader's stack / team size / scale / constraints BY NAME. State what you'd NOT do and why. weighted-decision-matrix or verdict-card widget.}}</p>
+  </section>
+
+  <!-- 13 Implementation roadmap -->
+  <section class="section">
+    <div class="section-num">13</div>
+    <h2><span class="bar"></span>Roadmap</h2>
+    <p>{{Phased, estimable steps (effort S/M/L, sequence, what unblocks what) — concrete enough to hand to the team on Monday. phasing-roadmap or migration-checklist widget.}}</p>
+  </section>
+
+  <!-- 14 Risks & mitigations -->
+  <section class="section">
+    <div class="section-num">14</div>
+    <h2><span class="bar"></span>Risks &amp; Mitigations</h2>
+    <p>{{Named risks with likelihood/impact and a SPECIFIC mitigation each; the rollback / exit path. No "there are risks" — enumerate them. risk-heatmap widget.}}</p>
+  </section>
+
+  <!-- 15 Methodology -->
+  <section class="section">
+    <div class="section-num">15</div>
+    <h2><span class="bar"></span>How This Was Verified</h2>
+    <p>{{How claims were checked; the verification tally (N checked / X corrected / Y demoted / Z version-stale); confidence by source tier. The evidence-confidence widget fits here.}}</p>
+  </section>
+
+  <!-- ============ 16 · APPENDIX / REFERENCES with verification status ============ -->
+  <div class="refs">
+    <h3>References &middot; sources &amp; verification status</h3>
+    <ul>
+      <!-- REPEAT per citation. vstat class: ok (confirmed) | part (corrected/partial) | weak (demoted/version-stale/contested). -->
+      <li><span class="vstat {{ok|part|weak}}">{{Confirmed|Corrected|Contested|VersionStale}}</span> {{Full citation: source name/title, the version/date it applies to, the key fact/figure, and any limit found during verification.}} <a href="{{PRIMARY_URL}}">{{domain}}</a></li>
+    </ul>
+  </div>
+
+  <div class="footer">Software Research v2 &middot; {{N}}/{{N}} citations verified against primary sources, {{DATE}} &middot; {{X}} corrected, {{Y}} demoted, {{Z}} version-stale &middot; Reliability = source-tier evidence quality</div>
+
+</div>
+</body>
+</html>

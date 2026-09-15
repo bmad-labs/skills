@@ -1,0 +1,15 @@
+{
+  "eval_id": "reviewer-fixes-handoff",
+  "eval_name": "reviewer-fixes-handoff",
+  "prompt": "Orchestrator composes reviewer-fixes-issues handoff for story 9-14 Kafka producer options (4 findings).",
+  "assertions": [
+    {"text": "Has a clearly labeled Task section stating what the reviewer must do this round", "check": "section_task"},
+    {"text": "Has a Why-this-matters section explaining user-visible or architectural consequence", "check": "section_why"},
+    {"text": "Pastes the reviewer's prior 4 findings substantively (not summarized to 'apply the 4 fixes')", "check": "prior_findings_verbatim"},
+    {"text": "Mentions all 4 specific findings: UT-001 assertions, mapProducerOptions/mapSendOptions alias, mapSendOptions export, AC4 headers invariant", "check": "all_four_findings_mentioned"},
+    {"text": "Names knowledge sources: CLAUDE.md and docs/kafka-conventions.md (or the specific sections)", "check": "knowledge_sources_named"},
+    {"text": "Invokes at least one relevant skill by name (typescript-clean-code, typescript-unit-testing, or bmad-bmm-code-review)", "check": "skills_named"},
+    {"text": "Defines success criteria (tests pass, lint/typecheck clean, or equivalent concrete done-check)", "check": "success_criteria"},
+    {"text": "Includes Round 1/2 marker", "check": "round_marker"}
+  ]
+}

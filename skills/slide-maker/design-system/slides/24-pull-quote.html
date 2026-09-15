@@ -1,0 +1,53 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Pull quote" subtitle="Large editorial pull quote with a big quote mark and attribution" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pull Quote</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { position: relative; overflow: hidden;
+    width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  .bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .bg .blob { position: absolute; border-radius: 50%; background: var(--color-accent-soft);
+    width: 520px; height: 520px; left: -180px; bottom: -200px; }
+  .body { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column;
+    justify-content: center; max-width: 960px; }
+  .mark { font-size: 160px; line-height: .6; font-weight: var(--fw-black);
+    color: var(--color-accent); font-family: var(--font-display); }
+  .quote { margin-top: var(--space-4); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); color: var(--text-primary); }
+  .quote .accent { color: var(--color-accent); }
+  .attr { margin-top: var(--space-8); display: flex; align-items: center; gap: var(--space-4); }
+  .attr .bar { width: 40px; height: 3px; background: var(--color-accent); border-radius: var(--radius-pill); }
+  .attr .who { font-size: var(--fs-body); }
+  .attr .who b { font-weight: var(--fw-bold); }
+  .attr .who span { display: block; font-size: var(--fs-small); color: var(--text-muted);
+    font-weight: var(--fw-light); }
+  .foot { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg"><div class="blob"></div></div>
+    <div class="body">
+      <div class="mark">&ldquo;</div>
+      <div class="quote">This changed the way our whole team works — and we <span class="accent">noticed the difference</span> in the first week.</div>
+      <div class="attr">
+        <span class="bar"></span>
+        <div class="who"><b>Full Name</b><span>Role · Organization</span></div>
+      </div>
+    </div>
+    <div class="foot">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <span class="pageno">24</span>
+    </div>
+  </div>
+</body>
+</html>

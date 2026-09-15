@@ -1,0 +1,61 @@
+<!--
+  WIDGET: kpi-row  (zero dependencies — pure HTML/CSS, no JS)
+  Use for: a scannable row of "big number" stat cards at the top of a section —
+  each card = big value + unit + label + an up/down delta with an arrow.
+  How: copy this whole block; duplicate a .kpi-card per stat, edit the FILLs.
+  Delta direction is shown by arrow glyph + colour (green up / red down) so it
+  reads in grayscale. "Up" is not always good — pick the colour that means
+  BETTER for your metric (e.g. cost going down should be green). Cards wrap on
+  narrow screens (flex-wrap). No CDN, no framework.
+-->
+<div class="kpi" style="display:flex;flex-wrap:wrap;gap:14px;">
+
+  <!-- CARD 1: value up = good (green) -->
+  <div class="kpi-card" style="flex:1 1 150px;min-width:150px;border:1px solid #e4e9f2;border-radius:12px;padding:18px 20px;background:#f6f8fc;">
+    <div style="display:flex;align-items:baseline;gap:4px;">
+      <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:32px;line-height:1;color:#16203a;">FILL</span>
+      <span style="font-family:'Roboto',sans-serif;font-size:14px;color:#5b6677;">FILL: unit</span>
+    </div>
+    <div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;margin:8px 0 6px;">FILL: label</div>
+    <div style="display:flex;align-items:center;gap:5px;font-family:'Roboto',sans-serif;font-size:12.5px;font-weight:600;color:#15803d;">
+      <span aria-hidden="true">&#9650;</span><span>FILL: +12%</span>
+    </div>
+  </div>
+
+  <!-- CARD 2: value down = bad (red) -->
+  <div class="kpi-card" style="flex:1 1 150px;min-width:150px;border:1px solid #e4e9f2;border-radius:12px;padding:18px 20px;background:#f6f8fc;">
+    <div style="display:flex;align-items:baseline;gap:4px;">
+      <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:32px;line-height:1;color:#16203a;">FILL</span>
+      <span style="font-family:'Roboto',sans-serif;font-size:14px;color:#5b6677;">FILL: unit</span>
+    </div>
+    <div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;margin:8px 0 6px;">FILL: label</div>
+    <div style="display:flex;align-items:center;gap:5px;font-family:'Roboto',sans-serif;font-size:12.5px;font-weight:600;color:#b91c1c;">
+      <span aria-hidden="true">&#9660;</span><span>FILL: -8%</span>
+    </div>
+  </div>
+
+  <!-- CARD 3: value down = good (green, e.g. cost/latency) -->
+  <div class="kpi-card" style="flex:1 1 150px;min-width:150px;border:1px solid #e4e9f2;border-radius:12px;padding:18px 20px;background:#f6f8fc;">
+    <div style="display:flex;align-items:baseline;gap:4px;">
+      <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:32px;line-height:1;color:#16203a;">FILL</span>
+      <span style="font-family:'Roboto',sans-serif;font-size:14px;color:#5b6677;">FILL: unit</span>
+    </div>
+    <div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;margin:8px 0 6px;">FILL: label</div>
+    <div style="display:flex;align-items:center;gap:5px;font-family:'Roboto',sans-serif;font-size:12.5px;font-weight:600;color:#15803d;">
+      <span aria-hidden="true">&#9660;</span><span>FILL: -30%</span>
+    </div>
+  </div>
+
+  <!-- CARD 4: neutral / flat (muted) -->
+  <div class="kpi-card" style="flex:1 1 150px;min-width:150px;border:1px solid #e4e9f2;border-radius:12px;padding:18px 20px;background:#f6f8fc;">
+    <div style="display:flex;align-items:baseline;gap:4px;">
+      <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:32px;line-height:1;color:#16203a;">FILL</span>
+      <span style="font-family:'Roboto',sans-serif;font-size:14px;color:#5b6677;">FILL: unit</span>
+    </div>
+    <div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;margin:8px 0 6px;">FILL: label</div>
+    <div style="display:flex;align-items:center;gap:5px;font-family:'Roboto',sans-serif;font-size:12.5px;font-weight:600;color:#5b6677;">
+      <span aria-hidden="true">&#9644;</span><span>FILL: flat</span>
+    </div>
+  </div>
+
+</div>

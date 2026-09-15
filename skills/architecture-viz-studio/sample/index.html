@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How a video reaches your screen — a Netflix-style delivery pipeline</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <!-- fixed 3D stage the camera flies through on scroll -->
+  <div id="stage" data-viz-id="scene.stage" data-viz-label="3D stage"></div>
+
+  <!-- scroll narrative over the stage -->
+  <header class="nav" data-viz-id="nav">
+    <span class="brand" data-viz-id="nav.brand">▶ Streamflix · Delivery</span>
+    <nav class="nav-links">
+      <a data-viz-id="nav.link.how">How it works</a>
+      <a data-viz-id="nav.link.cdn">The CDN</a>
+    </nav>
+  </header>
+
+  <section class="hero" data-viz-id="hero" data-viz-label="Hero">
+    <div class="hero-inner">
+      <p class="eyebrow" data-viz-id="hero.eyebrow">Video delivery architecture</p>
+      <h1 class="hero-title" data-viz-id="hero.title">One film.<br>A billion screens.</h1>
+      <p class="hero-sub" data-viz-id="hero.subtitle">Follow a single title from the studio to your TV — encoded once, pre-positioned everywhere, streamed to fit your connection. (A simplified take on Netflix's Open Connect.)</p>
+      <div class="hero-cue" data-viz-id="hero.scroll-cue">Scroll to follow the stream ↓</div>
+    </div>
+  </section>
+
+  <!-- NOTE: text you want individually selectable carries its OWN data-viz-id
+       (dotted under its card). Without an id, hovering text selects the card. -->
+  <section class="beat">
+    <div class="beat-card" data-viz-id="beat.ingest">
+      <span class="beat-no" data-viz-id="beat.ingest.no">01</span>
+      <h2 data-viz-id="beat.ingest.title">A master arrives from the studio</h2>
+      <p data-viz-id="beat.ingest.body">The high-bitrate source is ingested and validated — one pristine copy to derive everything else from.</p>
+    </div>
+  </section>
+
+  <section class="beat">
+    <div class="beat-card" data-viz-id="beat.encode">
+      <span class="beat-no" data-viz-id="beat.encode.no">02</span>
+      <h2 data-viz-id="beat.encode.title">Encoded into a per-title ladder</h2>
+      <p data-viz-id="beat.encode.body">The title is split into shots and encoded in parallel across a farm, building a quality ladder tuned by VMAF — many bitrates, multiple codecs (H.264, AV1).</p>
+    </div>
+  </section>
+
+  <section class="beat">
+    <div class="beat-card" data-viz-id="beat.fill">
+      <span class="beat-no" data-viz-id="beat.fill.no">03</span>
+      <h2 data-viz-id="beat.fill.title">Pre-positioned across the CDN</h2>
+      <p data-viz-id="beat.fill.body">During off-peak "fill windows" the encoded assets are pushed out to Open Connect appliances worldwide — before anyone presses play.</p>
+    </div>
+  </section>
+
+  <section class="beat">
+    <div class="beat-card" data-viz-id="beat.edge">
+      <span class="beat-no" data-viz-id="beat.edge.no">04</span>
+      <h2 data-viz-id="beat.edge.title">Cached at an edge node in your ISP</h2>
+      <p data-viz-id="beat.edge.body">An Open Connect Appliance sits inside your internet provider, so the bytes start a short hop away — not across the ocean.</p>
+    </div>
+  </section>
+
+  <section class="beat">
+    <div class="beat-card" data-viz-id="beat.play">
+      <span class="beat-no" data-viz-id="beat.play.no">05</span>
+      <h2 data-viz-id="beat.play.title">Streamed to fit your connection</h2>
+      <p data-viz-id="beat.play.body">The player fetches the manifest and segments from the nearest appliance, adapting the bitrate in real time as your bandwidth shifts.</p>
+    </div>
+  </section>
+
+  <section class="cards" data-viz-id="section.cards" data-viz-label="Why it works">
+    <article class="card" data-viz-id="card.encodeonce"><div class="card-dot"></div><h3 data-viz-id="card.encodeonce.title">Encode once</h3><p data-viz-id="card.encodeonce.body">Per-title ladders cut bandwidth without losing quality.</p></article>
+    <article class="card" data-viz-id="card.preposition"><div class="card-dot"></div><h3 data-viz-id="card.preposition.title">Pre-positioned</h3><p data-viz-id="card.preposition.body">Content is on the edge before you ever request it.</p></article>
+    <article class="card" data-viz-id="card.closetoyou"><div class="card-dot"></div><h3 data-viz-id="card.closetoyou.title">Close to you</h3><p data-viz-id="card.closetoyou.body">Appliances inside ISPs mean a short, fast last hop.</p></article>
+  </section>
+
+  <!-- ===== Architect view — one system map, several lenses, drill-down + ERD =====
+       Demonstrates the diagrams/ modules: overlay-lens-system (the lens picker +
+       on-XX dimming), component-detail-modal (click a node → pipeline/lanes), and
+       erd-diagram (click the store → data model). Domain = the CDN delivery system. -->
+  <section class="arch" id="architecture" data-ov="sy" data-viz-id="section.architecture" data-viz-label="Architect view">
+    <div class="arch-head">
+      <h2 class="band-title arch-title" data-viz-id="arch.title">The architect's view.</h2>
+      <p class="band-sub arch-sub" data-viz-id="arch.subtitle">One delivery system — five lenses. Switch overlays to read a different aspect of the same map; click a module to open its component design.</p>
+    </div>
+    <div class="arch-body">
+      <aside class="arch-side">
+        <div class="ov-picker" id="ovPicker"></div>     <!-- lens buttons injected by JS -->
+        <div class="ov-panel">
+          <div class="ov-panel-name" id="ovName"></div>
+          <p class="ov-panel-desc" id="ovDesc"></p>
+          <ul class="ov-panel-list" id="ovList"></ul>
+        </div>
+      </aside>
+
+      <div class="arch-map">
+      <!-- The CDN delivery map. on-XX classes tag each node/edge for a lens; the two
+           data-drill nodes open component designs; data-erd opens the catalog ERD. -->
+      <svg id="archSvg" viewBox="0 0 1320 720" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Roboto, sans-serif">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5"
+                  orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+            <path d="M0,0.5 L9,5 L0,9.5 z" fill="context-stroke"/>
+          </marker>
+        </defs>
+
+        <!-- regions -->
+        <rect class="region" x="40" y="70" width="300" height="560" rx="14"/>
+        <text class="rlabel" x="60" y="100">STUDIO SIDE</text>
+        <rect class="region" x="372" y="70" width="560" height="560" rx="14"/>
+        <text class="rlabel" x="392" y="100">STREAMFLIX CONTROL PLANE</text>
+        <rect class="region" x="964" y="70" width="316" height="560" rx="14"/>
+        <text class="rlabel" x="984" y="100">EDGE · YOUR ISP</text>
+
+        <!-- edges -->
+        <g class="edges" fill="none">
+          <path class="edge arr on-df" d="M190,250 V320"/>                         <!-- master → ingest -->
+          <path class="edge arr on-df on-es" d="M340,360 H520"/>                    <!-- ingest → encode pipeline -->
+          <path class="edge arr on-df on-es" d="M780,360 H812 V250 H760"/>          <!-- pipeline → catalog store -->
+          <path class="edge arr on-df" d="M650,420 V470"/>                          <!-- pipeline → fill -->
+          <path class="edge arr on-df on-re" d="M780,510 H1040 V430"/>              <!-- fill → edge appliance -->
+          <path class="edge arr on-df" d="M1120,360 V300"/>                         <!-- appliance → player -->
+          <path class="edge dash on-ow" d="M340,540 H520"/>                         <!-- ops → delivery workflow -->
+        </g>
+
+        <!-- nodes -->
+        <g class="node warm on-df" id="n-master">
+          <rect x="70" y="190" width="240" height="80" rx="10"/>
+          <text class="nt sm" x="190" y="222" text-anchor="middle">Studio master</text>
+          <text class="ns" x="190" y="244" text-anchor="middle">high-bitrate source · ingested once</text>
+        </g>
+
+        <g class="node cool on-df on-es" id="n-ingest">
+          <rect x="70" y="320" width="240" height="80" rx="10"/>
+          <text class="nt sm" x="190" y="352" text-anchor="middle">Ingest &amp; validate</text>
+          <text class="ns" x="190" y="374" text-anchor="middle">one pristine mezzanine copy</text>
+        </g>
+
+        <!-- DRILL node → the encode pipeline (engine view) -->
+        <g class="node cool drill on-df on-es on-re" id="n-encode" data-drill="engine" role="button" tabindex="0" aria-label="Open the encode pipeline component design">
+          <rect x="520" y="320" width="260" height="100" rx="10"/>
+          <text class="nt" x="650" y="356" text-anchor="middle">Encode pipeline</text>
+          <text class="ns" x="650" y="380" text-anchor="middle">per-title ladder · shot-split · VMAF</text>
+          <text class="nx" x="650" y="402" text-anchor="middle">the generic processing engine</text>
+          <text class="drill-cue" x="762" y="340">⤢</text>
+        </g>
+
+        <!-- ERD node → the catalog/asset data model -->
+        <g class="node bus drill on-es on-ow" id="n-catalog" data-erd="1" role="button" tabindex="0" aria-label="Open the asset catalog data model">
+          <rect x="640" y="210" width="120" height="80" rx="10"/>
+          <text class="nt sm" x="700" y="244" text-anchor="middle">Catalog</text>
+          <text class="ns" x="700" y="266" text-anchor="middle">assets · ladders</text>
+          <text class="drill-cue" x="742" y="230">⤢</text>
+        </g>
+
+        <!-- DRILL node → the delivery workflow (lanes view) -->
+        <g class="node cool drill on-df on-ow" id="n-fill" data-drill="lanes" role="button" tabindex="0" aria-label="Open the delivery workflow component design">
+          <rect x="520" y="470" width="260" height="80" rx="10"/>
+          <text class="nt sm" x="650" y="502" text-anchor="middle">Delivery workflow</text>
+          <text class="ns" x="650" y="524" text-anchor="middle">fill windows · pre-position</text>
+          <text class="drill-cue" x="762" y="490">⤢</text>
+        </g>
+
+        <g class="node cool on-df on-re" id="n-appliance">
+          <rect x="1010" y="350" width="220" height="80" rx="10"/>
+          <text class="nt sm" x="1120" y="382" text-anchor="middle">Edge appliance</text>
+          <text class="ns" x="1120" y="404" text-anchor="middle">cache inside your ISP</text>
+        </g>
+
+        <g class="node on-df" id="n-player">
+          <rect x="1010" y="220" width="220" height="80" rx="10"/>
+          <text class="nt sm" x="1120" y="252" text-anchor="middle">Player</text>
+          <text class="ns" x="1120" y="274" text-anchor="middle">adaptive bitrate · nearest hop</text>
+        </g>
+
+        <g class="node ghost on-ow" id="n-ops">
+          <rect x="70" y="500" width="240" height="80" rx="10"/>
+          <text class="nt sm" x="190" y="532" text-anchor="middle">Ops &amp; scheduling</text>
+          <text class="ns" x="190" y="554" text-anchor="middle">off-peak fill orchestration</text>
+        </g>
+      </svg>
+      </div>
+    </div>
+
+    <!-- drill-down modal: component design inside a clicked module -->
+    <div class="drill-modal" id="drillModal" aria-hidden="true">
+      <div class="drill-backdrop" data-drill-close></div>
+      <div class="drill-panel" role="dialog" aria-modal="true" aria-labelledby="drillTitle">
+        <header class="drill-head">
+          <div class="drill-tabs" id="drillTabs"></div>   <!-- tabs injected by JS -->
+          <div class="drill-legend">
+            <span class="dc-pill pure">pure · no I/O</span>
+            <span class="dc-pill impure">impure · I/O</span>
+          </div>
+          <button class="drill-x" id="drillX" data-drill-close aria-label="Close">✕</button>
+        </header>
+        <div class="drill-body">
+          <div class="drill-stage" id="drillStage"></div>   <!-- engine/lanes render here -->
+          <aside class="drill-rail" id="drillRail"></aside>  <!-- overview / detail -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ERD modal: the asset catalog data model -->
+    <div class="drill-modal" id="erdModal" aria-hidden="true">
+      <div class="drill-backdrop" data-erd-close></div>
+      <div class="drill-panel" role="dialog" aria-modal="true" aria-label="Asset catalog data model">
+        <header class="drill-head">
+          <div class="erd-title">Asset catalog <span>the delivery store</span></div>
+          <div class="drill-legend">
+            <span class="erd-key"><i class="k-pk"></i> primary key</span>
+            <span class="erd-key"><i class="k-fk"></i> foreign key</span>
+            <span class="erd-key"><i class="k-emb"></i> embedded</span>
+          </div>
+          <button class="drill-x" data-erd-close aria-label="Close">✕</button>
+        </header>
+        <div class="erd-body" id="erdBody"></div>   <!-- buildErd() fills this -->
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot" data-viz-id="footer"><span data-viz-id="footer.text">A sample built with the architecture-viz-studio skill — a simplified illustration of a CDN video-delivery pipeline, inspired by Netflix Open Connect.</span></footer>
+
+  <!-- libs -->
+  <script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.36.4/build/index.js"
+  } }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+  <!-- edit mode + viz query API + manifest -->
+  <link rel="stylesheet" href="edit-mode/edit-mode.css">
+  <script src="viz-manifest.js"></script>
+  <script src="edit-mode/edit-mode.js"></script>
+  <script src="edit-mode/viz.js"></script>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

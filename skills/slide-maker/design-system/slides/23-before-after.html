@@ -1,0 +1,70 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Before / after" subtitle="A before → after transformation with an arrow between two states" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Before / After</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  .head { margin-bottom: var(--space-10); }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); max-width: 900px; }
+  .accent-rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .stage { flex: 1; display: grid; grid-template-columns: 1fr 64px 1fr; align-items: center; gap: var(--space-4); }
+  .state { border-radius: var(--radius-lg); padding: var(--space-8); height: 100%;
+    display: flex; flex-direction: column; justify-content: center; }
+  .before { background: var(--surface-subtle); border: var(--border-w) solid var(--border-subtle); }
+  .after { background: var(--color-accent); color: var(--text-inverse); box-shadow: var(--shadow-md); }
+  .state .tag { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; }
+  .before .tag { color: var(--text-muted); }
+  .after .tag { color: var(--color-accent-soft); }
+  .state .big { margin-top: var(--space-4); font-size: var(--fs-h2); font-weight: var(--fw-black);
+    line-height: var(--lh-tight); letter-spacing: var(--ls-tight); }
+  .before .big { color: var(--text-secondary); }
+  .state .line { margin-top: var(--space-4); font-size: var(--fs-body); font-weight: var(--fw-light);
+    line-height: var(--lh-normal); }
+  .before .line { color: var(--text-muted); }
+  .after .line { color: rgba(255,255,255,0.85); }
+  .arrow { display: flex; align-items: center; justify-content: center; color: var(--color-accent); }
+  .arrow svg { width: 40px; height: 40px; }
+  .foot { display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-10); }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="head">
+      <span class="eyebrow">The transformation</span>
+      <h1>From where we are to where we're going</h1>
+      <div class="accent-rule"></div>
+    </div>
+    <div class="stage">
+      <div class="state before">
+        <div class="tag">Before</div>
+        <div class="big">Manual, slow, error-prone</div>
+        <p class="line">Work moves by hand across disconnected tools, and every hand-off adds delay.</p>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="state after">
+        <div class="tag">After</div>
+        <div class="big">Automated, fast, reliable</div>
+        <p class="line">One connected flow does the work, so the team spends its time on the decisions that matter.</p>
+      </div>
+    </div>
+    <div class="foot">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <span class="pageno">23</span>
+    </div>
+  </div>
+</body>
+</html>

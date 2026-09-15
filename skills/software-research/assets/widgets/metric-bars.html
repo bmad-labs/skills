@@ -1,0 +1,47 @@
+<!--
+  WIDGET: metric-bars  (zero dependencies — pure HTML/CSS)
+  Use for: ranked horizontal bars comparing ONE metric across options
+  (req/s, bundle KB, cost, latency…). Bar width = value / max * 100%.
+  How: copy the whole block. Replace FILL markers. Set each bar's width:NN%
+  to value/max*100 (compute by hand — no JS). Order rows best→worst yourself.
+  Mark the WINNER row green (#15803d / #e9f6ee); others use blue (#2563eb).
+  NOTE: state whether higher or lower is better in the caption — the widget
+  can't infer it. Raw number is labelled on every bar (not color-only). Prints fine.
+-->
+<div style="border:1px solid #e4e9f2;border-radius:12px;padding:20px 24px;background:#f6f8fc;font-family:'Roboto',sans-serif;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: metric title (e.g. "Throughput — req/s")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 18px;">FILL: source + note. Higher is better · max = FILL.</p>
+
+  <!-- WINNER row (green). Repeat a block per option; set width:NN%. -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:11px;">
+    <div style="width:120px;flex-shrink:0;font-size:12.5px;color:#16203a;font-weight:600;text-align:right;">FILL: Option A ★</div>
+    <div style="flex:1;background:#fff;border:1px solid #e4e9f2;border-radius:6px;height:22px;overflow:hidden;">
+      <div style="width:100%;height:100%;background:#e9f6ee;border-right:3px solid #15803d;"></div>
+    </div>
+    <div style="width:78px;flex-shrink:0;font-family:'Roboto Mono',monospace;font-size:12px;color:#15803d;font-weight:700;">FILL: 12,400</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:11px;">
+    <div style="width:120px;flex-shrink:0;font-size:12.5px;color:#16203a;font-weight:600;text-align:right;">FILL: Option B</div>
+    <div style="flex:1;background:#fff;border:1px solid #e4e9f2;border-radius:6px;height:22px;overflow:hidden;">
+      <div style="width:68%;height:100%;background:#dbe6fb;border-right:3px solid #2563eb;"></div>
+    </div>
+    <div style="width:78px;flex-shrink:0;font-family:'Roboto Mono',monospace;font-size:12px;color:#1e3a8a;font-weight:600;">FILL: 8,430</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:11px;">
+    <div style="width:120px;flex-shrink:0;font-size:12.5px;color:#16203a;font-weight:600;text-align:right;">FILL: Option C</div>
+    <div style="flex:1;background:#fff;border:1px solid #e4e9f2;border-radius:6px;height:22px;overflow:hidden;">
+      <div style="width:41%;height:100%;background:#dbe6fb;border-right:3px solid #2563eb;"></div>
+    </div>
+    <div style="width:78px;flex-shrink:0;font-family:'Roboto Mono',monospace;font-size:12px;color:#1e3a8a;font-weight:600;">FILL: 5,080</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:120px;flex-shrink:0;font-size:12.5px;color:#16203a;font-weight:600;text-align:right;">FILL: Option D</div>
+    <div style="flex:1;background:#fff;border:1px solid #e4e9f2;border-radius:6px;height:22px;overflow:hidden;">
+      <div style="width:19%;height:100%;background:#dbe6fb;border-right:3px solid #2563eb;"></div>
+    </div>
+    <div style="width:78px;flex-shrink:0;font-family:'Roboto Mono',monospace;font-size:12px;color:#1e3a8a;font-weight:600;">FILL: 2,350</div>
+  </div>
+</div>

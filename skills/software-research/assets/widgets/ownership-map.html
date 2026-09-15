@@ -1,0 +1,104 @@
+<!--
+  WIDGET: ownership-map  (zero dependencies — inline SVG bipartite + ~40 lines vanilla JS)
+  Use for: team -> service ownership (Conway's law lens). Teams on the LEFT,
+  services on the RIGHT, connector lines for who owns what. Highlights:
+     orphaned service  = no owning team -> red left-border, red dot
+     over-loaded team  = owns > OM_LOAD_LIMIT services -> amber badge
+  How: copy the whole block (markup + <script>). Edit OM_TEAMS, OM_SERVICES, and
+  OM_OWNS (pairs of team-id/service-id). JS lays out both columns evenly and
+  draws the connectors. If you place two maps on a page, suffix the ids (om2-*).
+  Prints fine (static after first paint). No CDN.
+-->
+<div class="om" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Service ownership")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 12px;">FILL: framing. Orphaned services + overloaded teams flagged.</p>
+
+  <svg id="om-svg" viewBox="0 0 620 320" width="100%" role="img" aria-label="FILL: describe team to service ownership for screen readers">
+    <title>FILL: team to service ownership map</title>
+    <g id="om-links" stroke="#9aa6b8" stroke-width="1.3" fill="none"></g>
+    <g id="om-nodes"></g>
+  </svg>
+
+  <div style="margin-top:12px;font-family:'Roboto Mono',monospace;font-size:10.5px;color:#5b6677;display:flex;gap:20px;flex-wrap:wrap;">
+    <span style="color:#b91c1c;">&#9679; orphaned service (no owner)</span>
+    <span style="color:#b45309;">&#9679; overloaded team</span>
+  </div>
+</div>
+<script>
+  // FILL your data. ids are arbitrary strings.
+  var OM_TEAMS    = [ 'Payments', 'Identity', 'Growth' ];
+  var OM_SERVICES = [ 'checkout-api', 'billing', 'auth', 'sessions', 'referral', 'legacy-cron' ];
+  var OM_OWNS = [
+    ['Payments', 'checkout-api'], ['Payments', 'billing'],
+    ['Identity', 'auth'], ['Identity', 'sessions'],
+    ['Growth', 'referral'],
+    // 'legacy-cron' intentionally unowned -> orphan
+  ];
+  var OM_LOAD_LIMIT = 2; // owning MORE than this flags the team as overloaded
+
+  (function omRender() {
+    var LX = 70, RX = 470, W = 150, H = 30, TOP = 30, GAP = 46;
+    var links = document.getElementById('om-links');
+    var nodes = document.getElementById('om-nodes');
+    var teamY = {}, svcY = {};
+
+    var owns = {}; // team -> count
+    OM_OWNS.forEach(function (p) { owns[p[0]] = (owns[p[0]] || 0) + 1; });
+    var ownedSvc = {}; OM_OWNS.forEach(function (p) { ownedSvc[p[1]] = true; });
+
+    function box(x, y, label, opts) {
+      opts = opts || {};
+      var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      var r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      r.setAttribute('x', x); r.setAttribute('y', y); r.setAttribute('width', W);
+      r.setAttribute('height', H); r.setAttribute('rx', '7');
+      r.setAttribute('fill', '#fff');
+      r.setAttribute('stroke', opts.stroke || '#2563eb');
+      r.setAttribute('stroke-width', opts.orphan ? '2' : '1.3');
+      g.appendChild(r);
+      var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', x + 12); t.setAttribute('y', y + 19);
+      t.setAttribute('font-family', "'Roboto',sans-serif"); t.setAttribute('font-size', '12');
+      t.setAttribute('fill', '#16203a'); t.textContent = label;
+      g.appendChild(t);
+      if (opts.badge) {
+        var b = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        b.setAttribute('x', x + W - 10); b.setAttribute('y', y + 19);
+        b.setAttribute('text-anchor', 'end');
+        b.setAttribute('font-family', "'Roboto Mono',monospace"); b.setAttribute('font-size', '10');
+        b.setAttribute('fill', opts.badgeColor || '#5b6677'); b.textContent = opts.badge;
+        g.appendChild(b);
+      }
+      nodes.appendChild(g);
+    }
+
+    OM_TEAMS.forEach(function (tm, i) {
+      var y = TOP + i * GAP; teamY[tm] = y + H / 2;
+      var over = (owns[tm] || 0) > OM_LOAD_LIMIT;
+      box(LX, y, tm, {
+        stroke: over ? '#b45309' : '#2563eb',
+        badge: (owns[tm] || 0) + ' svc',
+        badgeColor: over ? '#b45309' : '#5b6677'
+      });
+    });
+    OM_SERVICES.forEach(function (sv, i) {
+      var y = TOP + i * GAP; svcY[sv] = y + H / 2;
+      var orphan = !ownedSvc[sv];
+      box(RX, y, sv, {
+        stroke: orphan ? '#b91c1c' : '#e4e9f2',
+        orphan: orphan,
+        badge: orphan ? '&#9679;' : '',
+        badgeColor: '#b91c1c'
+      });
+    });
+
+    OM_OWNS.forEach(function (p) {
+      var y1 = teamY[p[0]], y2 = svcY[p[1]];
+      if (y1 == null || y2 == null) return;
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      var x1 = LX + W, x2 = RX, mx = (x1 + x2) / 2;
+      path.setAttribute('d', 'M' + x1 + ',' + y1 + ' C' + mx + ',' + y1 + ' ' + mx + ',' + y2 + ' ' + x2 + ',' + y2);
+      links.appendChild(path);
+    });
+  })();
+</script>

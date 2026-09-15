@@ -1,0 +1,60 @@
+{
+  "expectations": [
+    {
+      "text": "Has a clearly labeled Task section",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Has a Why-this-matters section citing Epic 3 critical path",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Pastes developer's prior 2 reports verbatim (not paraphrased)",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Mentions both failure causes (ESM + TLS)",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Explicitly states TLS verification must stay on",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Instructs researcher to message developer directly / no relay",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Names knowledge sources: package.json and architecture.md",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Invokes at least one relevant skill",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Defines success criteria",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "text": "Uses Delegation Packet structure (\u22656 of 8 labeled slots)",
+      "passed": true,
+      "evidence": "8/8 slots present"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "pass_rate": 1.0
+  }
+}

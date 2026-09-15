@@ -1,0 +1,21 @@
+<!--
+  WIDGET: diff-block  (zero dependencies — pure HTML/CSS, no JS)
+  Use for: a single unified diff showing a before/after code change.
+  How: copy the whole block. Each source line is one <span> row inside the <pre>.
+  - added   line: green bg (#e9f6ee), green gutter "+"
+  - removed  line: red   bg (#fdecec), red   gutter "-"
+  - context  line: plain, gutter " "
+  Replace the FILL rows. Keep the "+" / "-" / " " gutter character consistent
+  with the row color.
+  CAVEAT: ESCAPE any HTML in code — &lt; &gt; &amp; — or it renders as tags.
+  All styles inline; prints fine (backgrounds are light).
+  NO syntax highlighting here by design: in a diff, the green/red line color IS the
+  meaning (added/removed), and a token highlighter would fight it. For token-colored
+  NON-diff code (side-by-side snippets), use code-compare.html instead.
+-->
+<div class="db" style="border:1px solid #e4e9f2;border-radius:12px;padding:20px 22px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "config.ts — enable retries")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 14px;">FILL: one-line note on what changed and why.</p>
+
+  <pre style="margin:0;background:#fff;border:1px solid #e4e9f2;border-radius:8px;padding:12px 0;overflow-x:auto;font-family:'Roboto Mono',monospace;font-size:12.5px;line-height:1.7;color:#16203a;"><span style="display:block;padding:0 16px;color:#5b6677;"><span style="display:inline-block;width:1.2em;color:#9aa6b8;"> </span>export const client = new Client({</span><span style="display:block;padding:0 16px;background:#fdecec;"><span style="display:inline-block;width:1.2em;color:#b91c1c;font-weight:700;">-</span>  timeout: 5000,</span><span style="display:block;padding:0 16px;background:#e9f6ee;"><span style="display:inline-block;width:1.2em;color:#15803d;font-weight:700;">+</span>  timeout: 10000,</span><span style="display:block;padding:0 16px;background:#e9f6ee;"><span style="display:inline-block;width:1.2em;color:#15803d;font-weight:700;">+</span>  retries: 3,</span><span style="display:block;padding:0 16px;color:#5b6677;"><span style="display:inline-block;width:1.2em;color:#9aa6b8;"> </span>});</span></pre>
+</div>

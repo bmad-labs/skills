@@ -31,11 +31,13 @@ command -v cppcheck && echo "cppcheck: available"
 ### Step 1: Build for Target Hardware
 
 PlatformIO:
+
 ```bash
 pio run -e <default_env>
 ```
 
 Make/CMake:
+
 ```bash
 mkdir -p build && cd build
 cmake .. -DCMAKE_TOOLCHAIN_FILE=<toolchain_file>
@@ -43,6 +45,7 @@ make -j$(nproc)
 ```
 
 ESP-IDF:
+
 ```bash
 idf.py build
 ```
@@ -52,11 +55,13 @@ Must exit with code 0. Report warnings but do not fail for warnings alone.
 ### Step 2: Build for Simulator (if available)
 
 Look for simulator environments in `platformio.ini`:
+
 ```bash
 grep -E '\[env:.*sim|native|linux|debug' platformio.ini
 ```
 
 If found:
+
 ```bash
 pio run -e <simulator_env>
 ```
@@ -64,11 +69,13 @@ pio run -e <simulator_env>
 ### Step 3: Run Simulator (if available and environment supports it)
 
 Check for simulator scripts:
+
 ```bash
 ls scripts/sim-*.sh 2>/dev/null
 ```
 
 If simulator build succeeded, run it:
+
 ```bash
 # For Marlin/PlatformIO native simulator
 .pio/build/<sim_env>/program
@@ -89,6 +96,7 @@ cppcheck --enable=all --error-exitcode=1 src/
 ### Step 5: Serial Port Testing (if hardware connected)
 
 Only if hardware is physically connected:
+
 ```bash
 # List serial ports
 ls /dev/tty.usb* /dev/ttyUSB* /dev/ttyACM* 2>/dev/null
@@ -104,12 +112,14 @@ If native tools are not installed, use Docker containers as a convenient alterna
 ### PlatformIO in Docker
 
 Build without installing PlatformIO locally:
+
 ```bash
 docker run --rm -v "$(pwd)":/project -w /project platformio/platformio-core:latest \
   pio run -e <default_env>
 ```
 
 For projects with custom PlatformIO configurations:
+
 ```bash
 # List available environments
 docker run --rm -v "$(pwd)":/project -w /project platformio/platformio-core:latest \
@@ -123,6 +133,7 @@ docker run --rm -v "$(pwd)":/project -w /project platformio/platformio-core:late
 ### Simulation in Docker
 
 For QEMU-based simulation:
+
 ```bash
 # Build a Dockerfile with QEMU
 cat > /tmp/Dockerfile.sim << 'SIMEOF'
@@ -137,6 +148,7 @@ docker run --rm firmware-sim qemu-system-arm -M <machine> -kernel <binary> -nogr
 ```
 
 For Renode simulation:
+
 ```bash
 docker run --rm -v "$(pwd)":/firmware antmicro/renode:latest \
   renode --disable-xwt -e "include @/firmware/<script.resc>; start; sleep 10; quit"

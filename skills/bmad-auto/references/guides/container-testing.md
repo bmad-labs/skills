@@ -27,6 +27,7 @@ hadolint Dockerfile
 ```
 
 Common issues caught:
+
 - Using `latest` tag instead of pinned versions
 - Running as root
 - Missing `HEALTHCHECK`
@@ -105,6 +106,7 @@ docker images $BASE --format "Base image size: {{.Size}}"
 ## Multi-Stage Build Verification
 
 If the Dockerfile uses multi-stage builds:
+
 ```bash
 # Verify final image doesn't contain build tools
 docker run --rm test-image:validation which gcc make npm 2>/dev/null && \

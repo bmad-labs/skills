@@ -42,21 +42,9 @@ Use this for new test plans. Save to the project's test directory — `tests/uat
 ```
 
 ### Environment Variables
-
-No test case hardcodes a machine path. Export these before the first scenario; every path in the
-suite is written against them.
-
-```bash
-export PROJECT_ROOT="$(git rev-parse --show-toplevel)"
-export RUN_DIR="$PROJECT_ROOT/tests/uat/run/$(date +%F)-01"   # absolute; pick the next free -NN
-mkdir -p "$RUN_DIR/evidence"
-```
-
-| Variable       | Purpose                                                        | Example                          |
-| -------------- | -------------------------------------------------------------- | -------------------------------- |
-| `PROJECT_ROOT` | checkout root; fixtures and inputs are written against it      | `$(git rev-parse --show-toplevel)` |
-| `RUN_DIR`      | this run's folder, absolute; all evidence is written against it | `$PROJECT_ROOT/tests/uat/run/2026-09-13-01` |
-| `VAR_NAME`     | [description]                                                  | `value`                          |
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `VAR_NAME` | [description] | `value` |
 
 ## 5. Test Case Index
 

@@ -1,0 +1,9 @@
+/* ============================================================
+   slide-maker — clean-light theme (bundled default).
+   This file is the SWAP POINT. To re-skin the deck, overwrite
+   the token values here (or point styles.css at another theme).
+   By default it inherits the neutral token contract as-is.
+   ============================================================ */
+/* clean-light uses the neutral defaults already defined in
+   ../tokens/*.css — no overrides needed. A design-system import
+   (user DS or ui-ux-pro-max suggestion) replaces this file. */

@@ -1,0 +1,48 @@
+<!--
+  WIDGET: phasing-roadmap  (zero dependencies — pure CSS grid, no JS)
+  Use for: a Now / Next / Later three-lane roadmap; each lane holds cards
+  (milestone + one-line note). This is the SIMPLE version.
+  How: copy the whole block. Add/remove .pr-card divs within each lane. Lanes
+  collapse to a single column on narrow screens (grid auto-fit).
+  VARIANT: a dated gantt-lite (bars on a time axis) is possible with the same
+  palette, but keep THIS widget the simple three-lane view — use a separate
+  widget file if you need dates.
+  All styles inline; prints fine (static grid).
+-->
+<div class="pr" style="border:1px solid #e4e9f2;border-radius:12px;padding:22px 24px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Rollout roadmap")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: one-line framing.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+    <!-- NOW lane -->
+    <div style="background:#fff;border:1px solid #e4e9f2;border-top:3px solid #2563eb;border-radius:10px;padding:14px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#2563eb;font-weight:700;margin-bottom:12px;">Now</div>
+      <div class="pr-card" style="background:#f6f8fc;border:1px solid #e4e9f2;border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:600;color:#16203a;">FILL: milestone</div>
+        <div style="font-size:12px;color:#5b6677;margin-top:3px;">FILL: one-line note.</div>
+      </div>
+      <div class="pr-card" style="background:#f6f8fc;border:1px solid #e4e9f2;border-radius:8px;padding:10px 12px;">
+        <div style="font-size:13px;font-weight:600;color:#16203a;">FILL: milestone</div>
+        <div style="font-size:12px;color:#5b6677;margin-top:3px;">FILL: one-line note.</div>
+      </div>
+    </div>
+
+    <!-- NEXT lane -->
+    <div style="background:#fff;border:1px solid #e4e9f2;border-top:3px solid #1e3a8a;border-radius:10px;padding:14px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#1e3a8a;font-weight:700;margin-bottom:12px;">Next</div>
+      <div class="pr-card" style="background:#f6f8fc;border:1px solid #e4e9f2;border-radius:8px;padding:10px 12px;">
+        <div style="font-size:13px;font-weight:600;color:#16203a;">FILL: milestone</div>
+        <div style="font-size:12px;color:#5b6677;margin-top:3px;">FILL: one-line note.</div>
+      </div>
+    </div>
+
+    <!-- LATER lane -->
+    <div style="background:#fff;border:1px solid #e4e9f2;border-top:3px solid #9aa6b8;border-radius:10px;padding:14px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#5b6677;font-weight:700;margin-bottom:12px;">Later</div>
+      <div class="pr-card" style="background:#f6f8fc;border:1px solid #e4e9f2;border-radius:8px;padding:10px 12px;">
+        <div style="font-size:13px;font-weight:600;color:#16203a;">FILL: milestone</div>
+        <div style="font-size:12px;color:#5b6677;margin-top:3px;">FILL: one-line note.</div>
+      </div>
+    </div>
+  </div>
+</div>

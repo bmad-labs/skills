@@ -1,0 +1,70 @@
+<!--
+  WIDGET: code-compare  (zero dependencies — inline HTML/CSS + ~20 lines vanilla JS)
+  Use for: "same task in library A vs B" — two labeled snippets shown side-by-side
+  AND as A/B tabs. Side-by-side collapses to stacked on narrow/print; tabs are the
+  compact mobile view. Copy the whole block (markup + <script>).
+  How: replace FILL markers and the two <pre> code bodies. Give IDs a UNIQUE suffix
+  if you place more than one on a page (e.g. cc-tab-a-2).
+  CAVEAT: ESCAPE any HTML in sample code — &lt; &gt; &amp; — or the browser will
+  render it as tags. All styles are inline; prints fine (tabs show the active pane).
+  SYNTAX HIGHLIGHTING: the block at the bottom loads highlight.js (pinned + SRI) and
+  colors each <code>. Set the language on each <code> via class="language-ts|js|json|
+  bash|python|…". This is the ONE widget that pulls a CDN dependency — highlighting
+  needs a real tokenizer. If the report must work fully offline, delete that block and
+  the code stays readable in plain monospace (just uncolored). See widgets/README.md.
+-->
+<div class="cc" style="border:1px solid #e4e9f2;border-radius:12px;padding:20px 22px;background:#f6f8fc;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Fetch a user: Axios vs Fetch")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 14px;">FILL: one-line framing of what the two snippets do.</p>
+
+  <!-- TABS (compact view). Buttons toggle the panes below. -->
+  <div style="display:flex;gap:6px;margin-bottom:12px;">
+    <button id="cc-tab-a" onclick="ccShow('a')" style="font-family:'Roboto Mono',monospace;font-size:12px;padding:6px 14px;border-radius:7px;border:1px solid #2563eb;background:#2563eb;color:#fff;cursor:pointer;">FILL: A label</button>
+    <button id="cc-tab-b" onclick="ccShow('b')" style="font-family:'Roboto Mono',monospace;font-size:12px;padding:6px 14px;border-radius:7px;border:1px solid #e4e9f2;background:#fff;color:#5b6677;cursor:pointer;">FILL: B label</button>
+  </div>
+
+  <!-- SIDE-BY-SIDE + PANES. The two children are the same nodes referenced by tabs. -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div id="cc-pane-a" style="min-width:0;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#1e3a8a;margin-bottom:6px;">FILL: A label</div>
+      <pre style="margin:0;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.55;"><code class="language-js" style="font-family:'Roboto Mono',monospace;padding:14px 16px;">// FILL: snippet A — ESCAPE html: &lt; &gt; &amp;
+const res = await axios.get(&#39;/api/user/1&#39;);
+const user = res.data;
+console.log(user.name);</code></pre>
+    </div>
+    <div id="cc-pane-b" style="min-width:0;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:#1e3a8a;margin-bottom:6px;">FILL: B label</div>
+      <pre style="margin:0;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.55;"><code class="language-js" style="font-family:'Roboto Mono',monospace;padding:14px 16px;">// FILL: snippet B — ESCAPE html: &lt; &gt; &amp;
+const res = await fetch(&#39;/api/user/1&#39;);
+const user = await res.json();
+console.log(user.name);</code></pre>
+    </div>
+  </div>
+</div>
+<script>
+  // ~15 lines, no library. Tabs toggle single-pane mode; on wide screens the
+  // default grid already shows both, so the tabs mainly help narrow/mobile views.
+  function ccShow(which) {
+    var a = document.getElementById('cc-pane-a'),
+        b = document.getElementById('cc-pane-b'),
+        ta = document.getElementById('cc-tab-a'),
+        tb = document.getElementById('cc-tab-b');
+    var onA = which === 'a';
+    a.style.display = onA ? '' : 'none';
+    b.style.display = onA ? 'none' : '';
+    ta.style.background = onA ? '#2563eb' : '#fff';
+    ta.style.color = onA ? '#fff' : '#5b6677';
+    ta.style.borderColor = onA ? '#2563eb' : '#e4e9f2';
+    tb.style.background = onA ? '#fff' : '#2563eb';
+    tb.style.color = onA ? '#5b6677' : '#fff';
+    tb.style.borderColor = onA ? '#e4e9f2' : '#2563eb';
+  }
+  ccShow('a');
+</script>
+
+<!-- Syntax highlighting: highlight.js 11.11.1, pinned + Subresource Integrity.
+     Include ONCE per report (not per widget) if you use several code widgets.
+     Delete this whole block for a fully-offline report; code stays readable, just uncolored. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/styles/github.min.css" integrity="sha384-eFTL69TLRZTkNfYZOLM+G04821K1qZao/4QLJbet1pP4tcF+fdXq/9CdqAbWRl/L" crossorigin="anonymous" />
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/highlight.min.js" integrity="sha384-RH2xi4eIQ/gjtbs9fUXM68sLSi99C7ZWBRX1vDrVv6GQXRibxXLbwO2NGZB74MbU" crossorigin="anonymous"></script>
+<script>document.querySelectorAll('pre code[class^="language-"]').forEach(function(el){ if (window.hljs) hljs.highlightElement(el); });</script>

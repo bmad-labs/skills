@@ -10,23 +10,23 @@ basic commands work.
 
 ### Step 1: Build
 
-| Language | Build Command | Artifact |
-|----------|--------------|----------|
-| Rust | `cargo build --release` | `target/release/<binary>` |
-| Go | `go build -o bin/<name> ./...` | `bin/<name>` |
-| Node.js | `npm run build` | `dist/` or `lib/` |
-| Python | `pip install -e .` or `poetry build` | Package installed |
-| C/C++ | `make` or `cmake --build build` | Binary in `build/` |
+| Language | Build Command                        | Artifact                  |
+| -------- | ------------------------------------ | ------------------------- |
+| Rust     | `cargo build --release`              | `target/release/<binary>` |
+| Go       | `go build -o bin/<name> ./...`       | `bin/<name>`              |
+| Node.js  | `npm run build`                      | `dist/` or `lib/`         |
+| Python   | `pip install -e .` or `poetry build` | Package installed         |
+| C/C++    | `make` or `cmake --build build`      | Binary in `build/`        |
 
 ### Step 2: Run Tests
 
-| Language | Test Command | Coverage |
-|----------|-------------|----------|
-| Rust | `cargo test` | `cargo llvm-cov` (if available) |
-| Go | `go test ./...` | `go test -cover ./...` |
-| Node.js | `npm test` | Built into Jest/Vitest |
-| Python | `pytest` | `pytest --cov` |
-| C/C++ | `make test` or `ctest` | `gcov` (if configured) |
+| Language | Test Command           | Coverage                        |
+| -------- | ---------------------- | ------------------------------- |
+| Rust     | `cargo test`           | `cargo llvm-cov` (if available) |
+| Go       | `go test ./...`        | `go test -cover ./...`          |
+| Node.js  | `npm test`             | Built into Jest/Vitest          |
+| Python   | `pytest`               | `pytest --cov`                  |
+| C/C++    | `make test` or `ctest` | `gcov` (if configured)          |
 
 ### Step 3: CLI Smoke Test (for CLI tools)
 
@@ -42,6 +42,7 @@ echo "test input" | ./<binary> <subcommand>
 ### Step 4: Library Example Validation (for libraries)
 
 If an `examples/` directory exists:
+
 ```bash
 # Rust
 for example in examples/*.rs; do

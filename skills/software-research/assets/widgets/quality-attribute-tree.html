@@ -1,0 +1,63 @@
+<!--
+  WIDGET: quality-attribute-tree  (zero dependencies — nested HTML + CSS borders, no JS)
+  Use for: an ATAM-style utility tree — Quality Attribute -> Refinement -> concrete
+  Scenario, each leaf tagged priority H / M / L. Pure nested divs with left-border
+  connectors (no SVG, so it reflows and stays readable at any width).
+  Priority tag colors:
+    H = red  (#b91c1c / #fdecec)   M = amber (#b45309 / #fdf3e7)   L = green (#15803d / #e9f6ee)
+  How: copy the block. Repeat a .qat-attr per quality attribute; inside it repeat a
+  .qat-ref per refinement; inside that repeat a .qat-leaf per scenario, setting the leaf
+  text and swapping the priority pill (change bg/color + letter). Two paired H/M/L values
+  are common per scenario (stimulus priority + difficulty) — add a second pill if needed.
+  Prints fine (static CSS). No auto-layout concern — it's a list, not a graph.
+-->
+<div class="qat" style="border:1px solid #e4e9f2;border-radius:12px;padding:24px 26px;background:#f6f8fc;font-family:'Roboto',sans-serif;">
+  <h4 style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;color:#16203a;">FILL: title (e.g. "Utility tree — ATAM")</h4>
+  <p style="font-size:13px;color:#5b6677;margin:0 0 16px;">FILL: framing. Leaf priority: H = high / M = medium / L = low.</p>
+
+  <!-- ROOT -->
+  <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#fff;background:#1e3a8a;display:inline-block;padding:5px 14px;border-radius:8px;margin-bottom:10px;">FILL: Utility</div>
+
+  <!-- ===== QUALITY ATTRIBUTE (repeat .qat-attr per attribute) ===== -->
+  <div class="qat-attr" style="border-left:2px solid #e4e9f2;margin-left:12px;padding-left:18px;padding-top:4px;">
+    <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;margin:8px 0 4px;">FILL: Performance</div>
+
+    <!-- REFINEMENT (repeat .qat-ref per refinement) -->
+    <div class="qat-ref" style="border-left:2px solid #e4e9f2;margin-left:10px;padding-left:18px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:11.5px;color:#5b6677;margin:8px 0 4px;">FILL: Latency</div>
+
+      <!-- LEAF SCENARIO (repeat .qat-leaf; swap the priority pill) -->
+      <div class="qat-leaf" style="display:flex;align-items:flex-start;gap:10px;margin:6px 0;">
+        <span style="flex:0 0 auto;font-family:'Roboto Mono',monospace;font-size:10.5px;font-weight:700;color:#b91c1c;background:#fdecec;border-radius:6px;padding:2px 8px;line-height:1.5;">H</span>
+        <span style="font-size:12.5px;color:#16203a;background:#fff;border:1px solid #e4e9f2;border-radius:8px;padding:6px 10px;flex:1 1 auto;">FILL: scenario (e.g. "Under 1k req/s, p99 response &lt; 200ms").</span>
+      </div>
+      <div class="qat-leaf" style="display:flex;align-items:flex-start;gap:10px;margin:6px 0;">
+        <span style="flex:0 0 auto;font-family:'Roboto Mono',monospace;font-size:10.5px;font-weight:700;color:#b45309;background:#fdf3e7;border-radius:6px;padding:2px 8px;line-height:1.5;">M</span>
+        <span style="font-size:12.5px;color:#16203a;background:#fff;border:1px solid #e4e9f2;border-radius:8px;padding:6px 10px;flex:1 1 auto;">FILL: scenario (e.g. "Batch job finishes within the nightly window").</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECOND QUALITY ATTRIBUTE ===== -->
+  <div class="qat-attr" style="border-left:2px solid #e4e9f2;margin-left:12px;padding-left:18px;padding-top:4px;">
+    <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#16203a;margin:8px 0 4px;">FILL: Availability</div>
+    <div class="qat-ref" style="border-left:2px solid #e4e9f2;margin-left:10px;padding-left:18px;">
+      <div style="font-family:'Roboto Mono',monospace;font-size:11.5px;color:#5b6677;margin:8px 0 4px;">FILL: Fault recovery</div>
+      <div class="qat-leaf" style="display:flex;align-items:flex-start;gap:10px;margin:6px 0;">
+        <span style="flex:0 0 auto;font-family:'Roboto Mono',monospace;font-size:10.5px;font-weight:700;color:#b91c1c;background:#fdecec;border-radius:6px;padding:2px 8px;line-height:1.5;">H</span>
+        <span style="font-size:12.5px;color:#16203a;background:#fff;border:1px solid #e4e9f2;border-radius:8px;padding:6px 10px;flex:1 1 auto;">FILL: scenario (e.g. "Node fails; traffic reroutes with no dropped requests").</span>
+      </div>
+      <div class="qat-leaf" style="display:flex;align-items:flex-start;gap:10px;margin:6px 0;">
+        <span style="flex:0 0 auto;font-family:'Roboto Mono',monospace;font-size:10.5px;font-weight:700;color:#15803d;background:#e9f6ee;border-radius:6px;padding:2px 8px;line-height:1.5;">L</span>
+        <span style="font-size:12.5px;color:#16203a;background:#fff;border:1px solid #e4e9f2;border-radius:8px;padding:6px 10px;flex:1 1 auto;">FILL: scenario (e.g. "Region outage; degraded read-only mode within 5 min").</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- legend -->
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#16203a;margin-top:14px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;"><span style="font-family:'Roboto Mono',monospace;font-size:10px;font-weight:700;color:#b91c1c;background:#fdecec;border-radius:6px;padding:1px 7px;">H</span>High priority</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;"><span style="font-family:'Roboto Mono',monospace;font-size:10px;font-weight:700;color:#b45309;background:#fdf3e7;border-radius:6px;padding:1px 7px;">M</span>Medium</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;"><span style="font-family:'Roboto Mono',monospace;font-size:10px;font-weight:700;color:#15803d;background:#e9f6ee;border-radius:6px;padding:1px 7px;">L</span>Low</span>
+  </div>
+</div>

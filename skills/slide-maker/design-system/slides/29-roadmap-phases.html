@@ -1,0 +1,89 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Roadmap phases" subtitle="Horizontal phased roadmap blocks along a track" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Roadmap Phases</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--ink-100); }
+  .slide { position: relative; overflow: hidden;
+    width: var(--slide-w); height: var(--slide-h); background: var(--surface-page);
+    font-family: var(--font-sans); color: var(--text-primary);
+    display: flex; flex-direction: column; padding: var(--slide-margin); }
+  .head { }
+  .eyebrow { font-size: var(--fs-eyebrow); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase; color: var(--color-accent); }
+  h1 { margin-top: var(--space-3); font-size: var(--fs-h1); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); letter-spacing: var(--ls-tight); max-width: 820px; }
+  .accent-rule { width: 56px; height: var(--rule-accent-w); background: var(--color-accent);
+    border-radius: var(--radius-pill); margin-top: var(--space-5); }
+  .track { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .line { position: relative; height: 4px; background: var(--ink-200); border-radius: var(--radius-pill);
+    margin: 0 8%; }
+  .line .fill { position: absolute; left: 0; top: 0; height: 100%; width: 62%;
+    background: var(--color-accent); border-radius: var(--radius-pill); }
+  .phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-6);
+    margin-top: var(--space-8); }
+  .phase { background: var(--surface-card); border: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); }
+  .phase .badge { display: inline-block; font-size: var(--fs-footnote); font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--color-accent);
+    background: var(--color-accent-soft); padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill); }
+  .phase.upcoming .badge { color: var(--text-muted); background: var(--surface-subtle); }
+  .phase h3 { margin-top: var(--space-4); font-size: var(--fs-h3); font-weight: var(--fw-bold);
+    line-height: var(--lh-snug); }
+  .phase ul { list-style: none; margin-top: var(--space-4); display: flex; flex-direction: column;
+    gap: var(--space-2); }
+  .phase li { display: flex; gap: var(--space-3); align-items: flex-start;
+    font-size: var(--fs-small); font-weight: var(--fw-light); color: var(--text-secondary);
+    line-height: var(--lh-normal); }
+  .phase li .mk { flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-accent); margin-top: 7px; }
+  .phase.upcoming li .mk { background: var(--ink-300); }
+  .foot { display: flex; justify-content: space-between; align-items: center; }
+  .foot img { height: 20px; }
+  .pageno { font-size: var(--fs-small); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="head">
+      <span class="eyebrow">The roadmap</span>
+      <h1>Where we're headed, phase by phase</h1>
+      <div class="accent-rule"></div>
+    </div>
+    <div class="track">
+      <div class="line"><div class="fill"></div></div>
+      <div class="phases">
+        <div class="phase">
+          <span class="badge">Now</span>
+          <h3>Foundations</h3>
+          <ul><li><span class="mk"></span>Core platform live</li><li><span class="mk"></span>First users onboarded</li></ul>
+        </div>
+        <div class="phase">
+          <span class="badge">Next</span>
+          <h3>Expansion</h3>
+          <ul><li><span class="mk"></span>Broader rollout</li><li><span class="mk"></span>Key integrations added</li></ul>
+        </div>
+        <div class="phase upcoming">
+          <span class="badge">Later</span>
+          <h3>Scale</h3>
+          <ul><li><span class="mk"></span>Automation across flows</li><li><span class="mk"></span>Self-serve options</li></ul>
+        </div>
+        <div class="phase upcoming">
+          <span class="badge">Future</span>
+          <h3>Optimize</h3>
+          <ul><li><span class="mk"></span>Continuous tuning</li><li><span class="mk"></span>New use cases</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot">
+      <img src="../assets/logos/logo-full.svg" alt="Your Brand">
+      <span class="pageno">29</span>
+    </div>
+  </div>
+</body>
+</html>
