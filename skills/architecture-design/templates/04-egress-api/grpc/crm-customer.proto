@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+// Excerpt of the CRM service proto: only the methods order-service calls.
+// Owner: CRM team. Source: <repository path>. Methods marked PROPOSED do not exist yet (DQ-<n>).
+package crm.v1;
+
+service CustomerService {
+  // Existing. Reads one customer.
+  rpc GetCustomer (GetCustomerRequest) returns (GetCustomerResponse);
+  // PROPOSED. Searches customers of one channel for the operator's picker.
+  rpc SearchCustomers (SearchCustomersRequest) returns (SearchCustomersResponse);
+}
+
+message GetCustomerRequest {
+  string customer_id = 1;
+}
+
+message Customer {
+  string customer_id = 1;
+  string name = 2;
+  string channel_code = 3;
+}
+
+message GetCustomerResponse {
+  int32 status = 1;
+  int32 code = 2;
+  string message = 3;
+  optional Customer data = 4;
+}
+
+message SearchCustomersRequest {
+  string channel_code = 1;
+  string keyword = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+message SearchCustomersResponse {
+  int32 status = 1;
+  int32 code = 2;
+  string message = 3;
+  repeated Customer data = 4;
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "FRD_001.schema.json",
+  "title": "FRD_001 Fraud check request",
+  "description": "What the vendor needs to score one order. Nothing else",
+  "type": "object",
+  "required": ["checkId", "orderId", "total", "customerId"],
+  "properties": {
+    "checkId": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/objectId", "description": "Attempt id; the vendor copies it into the answer" },
+    "orderId": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/objectId", "description": "Message key" },
+    "total": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/money" },
+    "customerId": { "type": "string" }
+  },
+  "additionalProperties": false
+}

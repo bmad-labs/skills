@@ -1,0 +1,51 @@
+asyncapi: 3.1.0
+info:
+  title: Order Service — consumed messages
+  version: 1.0.0
+  description: Every message order-service consumes. Invalid messages are logged and acked; infrastructure errors are not acked, so Kafka redelivers.
+defaultContentType: application/json
+
+servers:
+  kafka:
+    host: '{brokers}'
+    protocol: kafka
+    variables:
+      brokers:
+        description: Kafka bootstrap servers of the environment
+
+channels:
+  paymentResults:
+    address: payment.{env}.results
+    parameters:
+      env:
+        description: RUNTIME_ENV
+    messages:
+      paymentSettled:
+        $ref: '#/components/messages/paymentSettled'
+
+operations:
+  receivePaymentSettled:
+    action: receive
+    summary: PaymentController.onPaymentSettled
+    channel:
+      $ref: '#/channels/paymentResults'
+    messages:
+      - $ref: '#/channels/paymentResults/messages/paymentSettled'
+
+components:
+  messageTraits:
+    keyedByOrder:
+      bindings:
+        kafka:
+          key:
+            type: string
+            pattern: '^[0-9a-f]{24}$'
+            description: data.orderId. Messages of one order keep their order in one partition.
+  messages:
+    paymentSettled:
+      name: PAY101
+      title: Payment Settled
+      traits:
+        - $ref: '#/components/messageTraits/keyedByOrder'
+      payload:
+        $ref: './kafka/payment-settled.schema.json'

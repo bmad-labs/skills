@@ -1,0 +1,29 @@
+[
+  {
+    "id": "3f1c2a5e-7b8d-4c1e-9a2b-000000000101",
+    "code": "ORD101",
+    "source": {
+      "system": "shop",
+      "service": "order-service"
+    },
+    "entity": "ORDER",
+    "timestamp": "2026-09-22T08:30:00.120Z",
+    "actor": {
+      "email": "jane@example.com",
+      "role": "USER"
+    },
+    "data": {
+      "orderId": "66f100000000000000000001",
+      "channelCode": "WEB",
+      "transition": {
+        "from": null,
+        "to": "placed",
+        "at": "2026-09-22T08:30:00Z"
+      },
+      "total": {
+        "amount": 25,
+        "currency": "EUR"
+      }
+    }
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "_envelope.schema.json",
+  "title": "Domain event envelope",
+  "description": "Common attributes of every message. data is camelCase. A consumer ignores top-level fields it does not know.",
+  "type": "object",
+  "required": [
+    "id",
+    "code",
+    "source",
+    "entity",
+    "timestamp",
+    "actor",
+    "data"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Event id (UUID v4). Consumers drop a repeated id"
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}[0-9]{3}$",
+      "description": "Event code"
+    },
+    "source": {
+      "type": "object",
+      "description": "Producer of the event",
+      "required": [
+        "system",
+        "service"
+      ],
+      "properties": {
+        "system": {
+          "type": "string",
+          "description": "Source system"
+        },
+        "service": {
+          "type": "string",
+          "description": "Source service. Loop guard: a consumer acts only on the services it trusts"
+        }
+      },
+      "additionalProperties": false
+    },
+    "entity": {
+      "enum": [
+        "ORDER",
+        "PAYMENT",
+        "FRAUD_CHECK"
+      ],
+      "description": "Entity of the event"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the event was emitted (ISO-8601 UTC)"
+    },
+    "actor": {
+      "description": "Who made the action; null for a system action",
+      "oneOf": [
+        {
+          "$ref": "../06-data-modeling/_common.schema.json#/$defs/actor"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "data": {
+      "type": "object",
+      "description": "Event payload; shape by schema id"
+    }
+  }
+}

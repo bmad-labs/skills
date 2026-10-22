@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "FRD001.schema.json",
+  "title": "FRD001 Fraud Check Completed",
+  "allOf": [
+    {
+      "$ref": "../02-domain-events/_envelope.schema.json"
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "FRD001"
+        },
+        "entity": {
+          "const": "FRAUD_CHECK"
+        },
+        "source": {
+          "properties": {
+            "service": {
+              "const": "fraud-vendor"
+            }
+          }
+        },
+        "data": {
+          "allOf": [
+            {
+              "$ref": "FRD_002.schema.json"
+            },
+            {
+              "required": [
+                "score"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

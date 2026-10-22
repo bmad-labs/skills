@@ -1,0 +1,15 @@
+@startuml context
+!include <C4/C4_Context>
+LAYOUT_LEFT_RIGHT()
+
+Person(customer, "Customer", "Places orders")
+Person(operator, "Operator", "Reviews orders")
+System(sys, "Order Service", "Takes orders and sends them for payment")
+System_Ext(payment, "Payment Gateway", "Charges the customer")
+System_Ext(crm, "CRM", "Owns customer data")
+
+Rel(customer, sys, "Places orders", "HTTPS")
+Rel(operator, sys, "Reviews orders", "HTTPS")
+Rel(sys, payment, "Requests payment", "HTTPS")
+Rel(sys, crm, "Reads customer", "gRPC")
+@enduml

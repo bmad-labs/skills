@@ -1,0 +1,74 @@
+[
+  {
+    "code": "ORD101",
+    "slug": "order-placed",
+    "name": "Order Placed",
+    "entity": "ORDER",
+    "schema": "ORD_001",
+    "topic": "shop.{env}.order-events",
+    "key": "data.orderId",
+    "producer": "order-service",
+    "when": "A valid order is stored (status `placed`).",
+    "raisedBy": "`PlaceOrderUseCase` (order-intake), after its transaction commits",
+    "consumers": "payment-service starts the charge. Reporting counts it.",
+    "requirements": "FR-1, FR-3",
+    "dataRequired": ["total"],
+    "examples": [
+      {
+        "title": "Sample",
+        "message": {
+          "id": "3f1c2a5e-7b8d-4c1e-9a2b-000000000101",
+          "code": "ORD101",
+          "source": { "system": "shop", "service": "order-service" },
+          "entity": "ORDER",
+          "timestamp": "2026-09-22T08:30:00.120Z",
+          "actor": { "email": "jane@example.com", "role": "USER" },
+          "data": {
+            "orderId": "66f100000000000000000001",
+            "channelCode": "WEB",
+            "transition": { "from": null, "to": "placed", "at": "2026-09-22T08:30:00Z" },
+            "total": { "amount": 25, "currency": "EUR" }
+          }
+        }
+      }
+    ],
+    "errors": [
+      ["Consumer gets an unknown `code`", "Ignore", "—"],
+      ["Consumer gets a repeated `id`", "Drop", "—"]
+    ]
+  },
+  {
+    "code": "ORD103",
+    "slug": "payment-failed",
+    "name": "Payment Failed",
+    "entity": "ORDER",
+    "schema": "ORD_001",
+    "topic": "shop.{env}.order-events",
+    "key": "data.orderId",
+    "producer": "order-service",
+    "when": "The gateway declined the charge, or did not answer in time (status `payment_failed`).",
+    "raisedBy": "`RecordPaymentResultUseCase` (payment)",
+    "consumers": "Notification service tells the customer.",
+    "requirements": "FR-7",
+    "dataRequired": ["error"],
+    "examples": [
+      {
+        "title": "Declined",
+        "message": {
+          "id": "3f1c2a5e-7b8d-4c1e-9a2b-000000000103",
+          "code": "ORD103",
+          "source": { "system": "shop", "service": "order-service" },
+          "entity": "ORDER",
+          "timestamp": "2026-09-22T08:31:00.050Z",
+          "actor": null,
+          "data": {
+            "orderId": "66f100000000000000000001",
+            "channelCode": "WEB",
+            "transition": { "from": "placed", "to": "payment_failed", "at": "2026-09-22T08:31:00Z" },
+            "error": { "reason": "declined", "message": "Card declined" }
+          }
+        }
+      }
+    ]
+  }
+]

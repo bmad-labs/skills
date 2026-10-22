@@ -1,0 +1,3 @@
+[
+  { "template": "payment_failed", "orderId": "66f100000000000000000001", "recipient": "jane@example.com" }
+]

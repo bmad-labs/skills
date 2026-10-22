@@ -1,0 +1,98 @@
+openapi: 3.1.0
+info:
+  title: Payment Gateway API (as used by order-service)
+  version: 1.0.0
+  license:
+    name: Internal
+    identifier: LicenseRef-Internal
+  description: Subset of the vendor API that order-service calls. Only the fields we send and read. Key = orderId.
+servers:
+  - url: 'https://{host}/v2'
+    variables:
+      host:
+        default: pay.sandbox.example.com
+security:
+  - apiKey: []
+paths:
+  /charges:
+    post:
+      operationId: createCharge
+      summary: Charge one order
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: orders._id; a retry with the same key never charges twice
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChargeRequest'
+            examples:
+              charge:
+                value:
+                  orderReference: 66f100000000000000000001
+                  amount: 25
+                  currency: EUR
+      responses:
+        '201':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeResponse'
+              examples:
+                accepted:
+                  value:
+                    chargeId: PAY-889201
+                    state: accepted
+        '400':
+          description: Rejected. Recorded as failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorError'
+              examples:
+                declined:
+                  value:
+                    errorCode: CARD_DECLINED
+                    errorMessage: Card declined
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+  schemas:
+    ChargeRequest:
+      type: object
+      required: [orderReference, amount, currency]
+      properties:
+        orderReference:
+          type: string
+        amount:
+          type: number
+          minimum: 0
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+    ChargeResponse:
+      type: object
+      required: [chargeId, state]
+      properties:
+        chargeId:
+          type: string
+        state:
+          type: string
+          enum: [accepted]
+    VendorError:
+      type: object
+      required: [errorCode, errorMessage]
+      properties:
+        errorCode:
+          type: string
+        errorMessage:
+          type: string

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order-notification-requested.schema.json",
+  "title": "Notification request (produced, plain payload)",
+  "type": "object",
+  "required": ["template", "orderId", "recipient"],
+  "properties": {
+    "template": { "enum": ["payment_failed", "order_paid"], "description": "Template owned by the notification service" },
+    "orderId": { "$ref": "../../06-data-modeling/_common.schema.json#/$defs/objectId", "description": "Message key" },
+    "recipient": { "type": "string", "description": "Customer email" }
+  },
+  "additionalProperties": false
+}

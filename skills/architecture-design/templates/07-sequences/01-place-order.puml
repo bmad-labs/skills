@@ -1,0 +1,67 @@
+@startuml 01-place-order
+!include _style.iuml
+title 01 — Place an order (FR-1, FR-3)
+
+box "Client" #E8EAF6
+    actor "Customer" as U
+    participant "Frontend →\nBFF (GraphQL)" as FE
+end box
+box "order-intake" #E8F5E9
+    participant "OrderController" as C
+    participant "PlaceOrder\nUseCase" as UC
+end box
+box "Shared domain" #F3E5F5
+    participant "OrderStatusMachine +\nvalidateOrder" as SD
+end box
+box "Storage" #FFF3E0
+    database "MongoDB" as DB
+end box
+box "External" #FFEBEE
+    participant "CRM gRPC" as CRM
+    queue "Kafka\ndomain events" as K
+end box
+
+U -> FE : Place order
+activate FE $CTL
+FE -> C : PlaceOrder {customerId, lines}
+activate C $CTL
+C -> UC : execute(request, scope)
+activate UC $UC
+
+== Check ==
+UC -> CRM : GetCustomer(customerId)
+activate CRM $EXT
+CRM --> UC : customer (channelCode)
+deactivate CRM
+UC -> SD : validateOrder(lines)
+activate SD $SVC
+SD --> UC : passed
+deactivate SD
+note right of UC
+  Refuse: CUSTOMER_NOT_FOUND, ORDER_LINES_EMPTY,
+  SCOPE_FORBIDDEN (channel not the caller's)
+end note
+
+== Store ==
+group one transaction
+    UC -> SD : transition(order, placed)
+    activate SD $SVC
+    SD --> UC : ORD101 descriptor
+    deactivate SD
+    UC -> DB : insert order
+    activate DB $DB
+    DB --> UC : committed
+    deactivate DB
+end
+UC -> K : ORD101 Order Placed (after commit, key orderId)
+activate K $PUB
+K --> UC : sent
+deactivate K
+
+UC --> C : PlaceOrderResponse
+deactivate UC
+C --> FE : status 200, data {orderId, status placed}
+deactivate C
+FE --> U : order number
+deactivate FE
+@enduml

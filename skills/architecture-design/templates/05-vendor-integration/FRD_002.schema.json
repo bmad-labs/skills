@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "FRD_002.schema.json",
+  "title": "FRD_002 Fraud check answer",
+  "description": "Result of one check. score on completed, error on failed",
+  "type": "object",
+  "required": ["checkId", "orderId"],
+  "properties": {
+    "checkId": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/objectId", "description": "Copied from the request" },
+    "orderId": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/objectId", "description": "Copied from the request; message key" },
+    "score": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Risk score; higher is riskier" },
+    "error": {
+      "type": "object",
+      "required": ["errorType"],
+      "properties": {
+        "errorType": { "enum": ["invalid_request", "internal"] },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

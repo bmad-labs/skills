@@ -1,0 +1,19 @@
+@startuml container
+!include <C4/C4_Container>
+LAYOUT_LEFT_RIGHT()
+
+Person(operator, "Operator", "Reviews orders")
+System_Boundary(sys, "Order Service") {
+  Container(bff, "Web BFF", "NestJS, GraphQL", "Proxies the UI to gRPC")
+  Container(svc, "order-service", "NestJS, CQRS", "Order workflow and rules")
+  ContainerDb(db, "Order DB", "MongoDB", "orders, order_events")
+  ContainerQueue(topic, "Domain events", "Kafka", "ORD101..")
+}
+System_Ext(payment, "Payment Gateway", "Charges the customer")
+
+Rel(operator, bff, "Uses", "HTTPS, GraphQL")
+Rel(bff, svc, "Calls", "gRPC")
+Rel(svc, db, "Reads and writes", "MongoDB wire")
+Rel(svc, topic, "Publishes events", "Kafka")
+Rel(svc, payment, "Requests payment", "HTTPS")
+@enduml

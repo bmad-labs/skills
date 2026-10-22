@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+// Order service API, served to the Web BFF. Every response carries status, code, message;
+// data is set on success only.
+package order.v1;
+
+service OrderService {
+  // Places an order. Requirements: FR-1, FR-3.
+  rpc PlaceOrder (PlaceOrderRequest) returns (PlaceOrderResponse);
+  // Reads one order in the caller's scope. Requirements: FR-5.
+  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse);
+}
+
+message Money {
+  double amount = 1;
+  string currency = 2;
+}
+
+message OrderLine {
+  string sku = 1;
+  int32 quantity = 2;
+  Money price = 3;
+}
+
+message PlaceOrderRequest {
+  string customer_id = 1;
+  repeated OrderLine lines = 2;
+}
+
+message OrderSummary {
+  string order_id = 1;
+  string status = 2;
+  Money total = 3;
+  int32 version = 4;
+}
+
+message PlaceOrderResponse {
+  int32 status = 1;
+  int32 code = 2;
+  string message = 3;
+  optional OrderSummary data = 4;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message GetOrderResponse {
+  int32 status = 1;
+  int32 code = 2;
+  string message = 3;
+  optional OrderSummary data = 4;
+}

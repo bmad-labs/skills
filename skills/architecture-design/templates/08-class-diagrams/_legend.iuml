@@ -1,0 +1,13 @@
+legend right
+  |= Colour |= Role |
+  |<#E3F2FD>        | controller (gRPC, Kafka, cron entry) |
+  |<#FFF3E0>        | use case |
+  |<#F3E5F5>        | command + handler |
+  |<#E8F5E9>        | port / domain service |
+  |<#F1F8E9>        | pure rule |
+  |<#ECEFF1>        | request / response / presenter model |
+  |<#FCE4EC>        | domain event |
+  |<#FFEBEE>        | driven adapter (vendor SDK) |
+  |<#E8EAF6>        | entity |
+  Solid arrow = calls or uses. Dashed arrow = sends a command, publishes, or creates.
+endlegend

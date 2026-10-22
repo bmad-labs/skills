@@ -1,0 +1,22 @@
+[
+  {
+    "id": "9b1c2a5e-7b8d-4c1e-9a2b-000000000111",
+    "code": "ORD111",
+    "source": {
+      "system": "shop",
+      "service": "order-service"
+    },
+    "entity": "FRAUD_CHECK",
+    "timestamp": "2026-09-22T08:30:01.000Z",
+    "actor": null,
+    "data": {
+      "checkId": "66f100000000000000000a01",
+      "orderId": "66f100000000000000000001",
+      "total": {
+        "amount": 25,
+        "currency": "EUR"
+      },
+      "customerId": "C-10023"
+    }
+  }
+]

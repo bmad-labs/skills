@@ -1,0 +1,83 @@
+asyncapi: 3.1.0
+info:
+  title: Order Service — produced messages
+  version: 1.0.0
+  description: Every message order-service produces. Published after the transaction commits.
+defaultContentType: application/json
+
+servers:
+  kafka:
+    host: '{brokers}'
+    protocol: kafka
+    variables:
+      brokers:
+        description: Kafka bootstrap servers of the environment
+
+channels:
+  domainEvents:
+    address: shop.{env}.order-events
+    parameters:
+      env:
+        description: RUNTIME_ENV
+    messages:
+      orderPlaced:
+        $ref: '#/components/messages/orderPlaced'
+      paymentFailed:
+        $ref: '#/components/messages/paymentFailed'
+  notifications:
+    address: notify.{env}.requests
+    parameters:
+      env:
+        description: RUNTIME_ENV
+    messages:
+      notificationRequested:
+        $ref: '#/components/messages/notificationRequested'
+
+operations:
+  sendDomainEvent:
+    action: send
+    summary: DomainEventsHandler, after commit
+    channel:
+      $ref: '#/channels/domainEvents'
+    messages:
+      - $ref: '#/channels/domainEvents/messages/orderPlaced'
+      - $ref: '#/channels/domainEvents/messages/paymentFailed'
+  sendNotification:
+    action: send
+    summary: NotificationApi.request
+    channel:
+      $ref: '#/channels/notifications'
+    messages:
+      - $ref: '#/channels/notifications/messages/notificationRequested'
+
+components:
+  messageTraits:
+    keyedByOrder:
+      bindings:
+        kafka:
+          key:
+            type: string
+            pattern: '^[0-9a-f]{24}$'
+            description: orderId. Messages of one order keep their order in one partition.
+  messages:
+    orderPlaced:
+      name: ORD101
+      title: Order Placed
+      traits:
+        - $ref: '#/components/messageTraits/keyedByOrder'
+      payload:
+        $ref: '../02-domain-events/ORD101.schema.json'
+    paymentFailed:
+      name: ORD103
+      title: Payment Failed
+      traits:
+        - $ref: '#/components/messageTraits/keyedByOrder'
+      payload:
+        $ref: '../02-domain-events/ORD103.schema.json'
+    notificationRequested:
+      name: NotificationRequested
+      title: Notification requested
+      traits:
+        - $ref: '#/components/messageTraits/keyedByOrder'
+      payload:
+        $ref: './kafka/order-notification-requested.schema.json'

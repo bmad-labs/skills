@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "_common.schema.json",
+  "title": "Shared definitions",
+  "description": "Enums and sub-shapes used by more than one collection, event, or API. Each enum is one file in src/shared/domain/enums/ with the same wire values.",
+  "$defs": {
+    "objectId": { "type": "string", "pattern": "^[0-9a-f]{24}$", "description": "MongoDB ObjectId, hex" },
+    "date": { "type": "string", "format": "date-time", "description": "ISO-8601 UTC" },
+    "OrderStatus": {
+      "enum": ["placed", "paid", "payment_failed", "cancelled"],
+      "description": "Order status. Only OrderStatusMachine changes it"
+    },
+    "money": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      },
+      "additionalProperties": false
+    },
+    "actor": {
+      "type": "object",
+      "required": ["email", "role"],
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "enum": ["USER", "SYSTEM"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ORD111.schema.json",
+  "title": "ORD111 Fraud Check Requested",
+  "allOf": [
+    {
+      "$ref": "../02-domain-events/_envelope.schema.json"
+    },
+    {
+      "properties": {
+        "code": {
+          "const": "ORD111"
+        },
+        "entity": {
+          "const": "FRAUD_CHECK"
+        },
+        "source": {
+          "properties": {
+            "service": {
+              "const": "order-service"
+            }
+          }
+        },
+        "data": {
+          "$ref": "FRD_001.schema.json"
+        }
+      }
+    }
+  ]
+}

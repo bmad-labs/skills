@@ -1,0 +1,14 @@
+{
+  "_id": "66f100000000000000000001",
+  "metadata": { "channelCode": "WEB", "customerId": "C-10023" },
+  "lines": [{ "sku": "SKU-001", "quantity": 2, "price": { "amount": 12.5, "currency": "EUR" } }],
+  "payment": { "state": "accepted", "reference": "PAY-889201", "at": "2026-09-22T08:31:00Z" },
+  "status": "paid",
+  "statusHistory": [
+    { "from": null, "to": "placed", "at": "2026-09-22T08:30:00Z", "actor": { "email": "system", "role": "SYSTEM" } },
+    { "from": "placed", "to": "paid", "at": "2026-09-22T08:31:00Z", "actor": { "email": "system", "role": "SYSTEM" } }
+  ],
+  "createdAt": "2026-09-22T08:30:00Z",
+  "updatedAt": "2026-09-22T08:31:00Z",
+  "__v": 2
+}

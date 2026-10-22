@@ -1,0 +1,48 @@
+[
+  {
+    "name": "order_on_payment_failed",
+    "description": "ORD103 Payment Failed from order-service: start the review of the order.",
+    "event": "kafka:<integration>:shop.{env}.order-events",
+    "evaluatorType": "javascript",
+    "condition": "$.source.service == 'order-service' && $.code == 'ORD103'",
+    "active": true,
+    "actions": [
+      {
+        "action": "start_workflow",
+        "expandInlineJSON": true,
+        "start_workflow": {
+          "name": "order_review",
+          "version": 1,
+          "correlationId": "${data.orderId}",
+          "idempotencyKey": "${id}",
+          "idempotencyStrategy": "RETURN_EXISTING",
+          "input": {
+            "orderId": "${data.orderId}",
+            "channelCode": "${data.channelCode}",
+            "reason": "${data.error.reason}"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "order_on_review_opened",
+    "description": "ORD105 Review Opened from order-service: complete the WAIT task of the running review. [ASSUMPTION] the service stores no workflow id, so the running review must be found by correlationId = data.orderId; confirm the action shape with <team>.",
+    "event": "kafka:<integration>:shop.{env}.order-events",
+    "evaluatorType": "javascript",
+    "condition": "$.source.service == 'order-service' && $.code == 'ORD105'",
+    "active": true,
+    "actions": [
+      {
+        "action": "complete_task",
+        "complete_task": {
+          "workflowId": "${workflowInstanceId}",
+          "taskRefName": "wait_opened_ref",
+          "output": {
+            "openedAt": "${timestamp}"
+          }
+        }
+      }
+    ]
+  }
+]
