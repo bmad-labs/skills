@@ -16,7 +16,7 @@ coordinates drift; computed ones stay aligned when a box moves. Change the scrip
 
 ```python
 W, H = 1240, 800
-C = dict(accent="#BD0F72", accent_soft="#F8E7F1", muted="#F2F4F7", ink="#37474F",
+C = dict(accent="#1565C0", accent_soft="#E3F2FD", muted="#F2F4F7", ink="#37474F",
          border="#B0BEC5", subtle="#D8DDE5", text="#1F2933", text_muted="#5F6B7A", card="#FFFFFF")
 FONT = "'Noto Sans', Arial, Helvetica, sans-serif"
 out = []
@@ -43,7 +43,7 @@ Standalone files use **literal hex** (deck tokens such as `var(--color-accent)` 
 
   | Role | Fill | Stroke |
   | --- | --- | --- |
-  | What we build | accent soft `#F8E7F1` | accent `#BD0F72`, 2px |
+  | What we build | accent soft `#E3F2FD` | accent `#1565C0`, 2px |
   | External system | muted `#F2F4F7` | ink `#37474F`, 1.6px |
   | A wait | card `#FFFFFF` | border `#B0BEC5`, dashed `5 4` |
   | An exit branch | muted `#F2F4F7` | subtle `#D8DDE5`, dashed |
@@ -98,5 +98,5 @@ checks cannot see. When the user reports one defect, look for the whole class: t
 ## Worked example (shape)
 
 A pipeline of one unit of work: one lane per phase, steps left to right on a spine, one dashed exit box under each
-step that has an exit, magenta hand-off lines between lanes labelled with the message and transport, and a caption
+step that has an exit, blue (accent) hand-off lines between lanes labelled with the message and transport, and a caption
 per lane naming its owner. Colour code and regeneration command in the folder README.
