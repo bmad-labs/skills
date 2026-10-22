@@ -14,7 +14,7 @@ Each dashed box under a step is an exit of that step. Every exit ends automatic 
 
 | Fill and stroke | Meaning |
 | --- | --- |
-| Magenta border, pink fill | Built in <service> |
+| Blue border, light blue fill | Built in <service> |
 | Dark grey border, grey fill | External system |
 | Dashed grey border, white fill | A wait |
 | Dashed light border, grey fill | An exit branch |

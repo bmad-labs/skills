@@ -17,10 +17,10 @@ SPINE_Y = 110
 EXIT_Y = 250
 H = EXIT_Y + EXIT_H + 40
 FONT = "'Noto Sans', Arial, Helvetica, sans-serif"
-C = dict(accent="#BD0F72", accent_soft="#F8E7F1", muted="#F2F4F7", ink="#37474F", border="#B0BEC5",
+C = dict(accent="#1565C0", accent_soft="#E3F2FD", muted="#F2F4F7", ink="#37474F", border="#B0BEC5",
          subtle="#D8DDE5", text="#1F2933", text_muted="#5F6B7A", card="#FFFFFF")
 
-LANE_CAPTION = "One order, phase 1 — magenta = built in order-service, grey = external"
+LANE_CAPTION = "One order, phase 1 — blue = built in order-service, grey = external"
 # kind: ours | ext | wait. exit: lines of the exit box, or None.
 STEPS = [
     ("ours", "INTAKE", "Place order", ["validate, store"], ["invalid → refused,", "not stored"]),
