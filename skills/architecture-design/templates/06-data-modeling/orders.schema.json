@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "orders.schema.json",
+  "title": "orders",
+  "type": "object",
+  "required": ["_id", "metadata", "lines", "status", "statusHistory", "createdAt", "updatedAt", "__v"],
+  "properties": {
+    "_id": { "$ref": "_common.schema.json#/$defs/objectId" },
+    "metadata": {
+      "type": "object",
+      "required": ["channelCode", "customerId"],
+      "properties": {
+        "channelCode": { "type": "string", "minLength": 1 },
+        "customerId": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "lines": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["sku", "quantity", "price"],
+        "properties": {
+          "sku": { "type": "string" },
+          "quantity": { "type": "integer", "minimum": 1 },
+          "price": { "$ref": "_common.schema.json#/$defs/money" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "payment": {
+      "type": "object",
+      "required": ["state", "at"],
+      "properties": {
+        "state": { "enum": ["accepted", "failed"] },
+        "reference": { "type": ["string", "null"] },
+        "at": { "$ref": "_common.schema.json#/$defs/date" }
+      },
+      "additionalProperties": false
+    },
+    "status": { "$ref": "_common.schema.json#/$defs/OrderStatus" },
+    "statusHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "at", "actor"],
+        "properties": {
+          "from": { "oneOf": [{ "$ref": "_common.schema.json#/$defs/OrderStatus" }, { "type": "null" }] },
+          "to": { "$ref": "_common.schema.json#/$defs/OrderStatus" },
+          "at": { "$ref": "_common.schema.json#/$defs/date" },
+          "actor": { "$ref": "_common.schema.json#/$defs/actor" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "createdAt": { "$ref": "_common.schema.json#/$defs/date" },
+    "updatedAt": { "$ref": "_common.schema.json#/$defs/date" },
+    "__v": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

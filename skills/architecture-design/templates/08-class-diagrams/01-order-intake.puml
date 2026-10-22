@@ -1,0 +1,59 @@
+@startuml 01-order-intake
+!include _style.iuml
+title 01 — order-intake: place and read orders
+left to right direction
+
+package "Interface adapters — src/modules/order-intake" {
+  class OrderController <<controller>> {
+    @GrpcMethod('OrderService', <method>)
+    +PlaceOrder()  +GetOrder()
+  }
+  package "models" {
+    class PlaceOrderRequest <<model>> {
+      requests/ — customerId, lines[]
+    }
+    class PlaceOrderResponse <<model>> {
+      responses/ — orderId, status, total, version
+    }
+    class OrderPresenter <<model>> {
+      presenters/ — order summary for GetOrder
+    }
+  }
+}
+
+package "Application layer — src/modules/order-intake" {
+  package "usecases" {
+    class PlaceOrderUseCase <<usecase>> {
+      +execute(req: PlaceOrderRequest, scope): Promise<PlaceOrderResponse>
+      ..uses..
+      CustomerApi, validateOrder, OrderStatusMachine, OrderRepository
+      ..publishes..
+      ORD101
+    }
+    class GetOrderUseCase <<usecase>> {
+      +execute(req: GetOrderRequest, scope): Promise<OrderPresenter>
+      ..uses..
+      OrderRepository
+    }
+  }
+  package "commands (+ handlers/)" {
+    class CancelOrderCommand <<command>> {
+      +orderId, actor, reason
+    }
+    class CancelOrderHandler <<handler>> {
+      delegates to CancelOrderUseCase
+    }
+  }
+}
+
+class "payment\nRecordPaymentFailureUseCase" as RPF <<usecase>>
+
+OrderController --> PlaceOrderUseCase
+OrderController --> GetOrderUseCase
+PlaceOrderUseCase ..> PlaceOrderResponse
+GetOrderUseCase ..> OrderPresenter
+RPF ..> CancelOrderCommand : CommandBus
+CancelOrderHandler ..> CancelOrderCommand : handles
+
+!include _legend.iuml
+@enduml

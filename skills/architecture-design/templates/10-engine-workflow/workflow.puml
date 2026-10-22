@@ -1,0 +1,23 @@
+@startuml workflow
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam roundCorner 10
+skinparam ActivityBackgroundColor #E3F2FD
+skinparam ActivityBorderColor #B0BEC5
+skinparam ActivityDiamondBackgroundColor #FFF3E0
+skinparam ActivityDiamondBorderColor #B0BEC5
+title order_review — started by ORD103 Payment Failed (correlationId = orderId)
+
+start
+:Event handler order_on_payment_failed: ORD103 from order-service;
+:Publish ORD112 Review Requested;
+:WAIT for ORD105 Review Opened (timeout REVIEW_WAIT_MINUTES);
+if (ORD105 arrived?) then (yes)
+  :Notify the review team;
+  :HUMAN task review_task (LEAVE_OPEN);
+else (no)
+  :Alert and end;
+endif
+stop
+@enduml

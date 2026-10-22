@@ -1,0 +1,18 @@
+@startuml entity-states
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #E8F5E9
+  BorderColor #B0BEC5
+}
+
+[*] --> placed : PlaceOrder (ORD101)
+placed --> paid : gateway accepted (ORD102)
+placed --> payment_failed : gateway failed or timeout (ORD103)
+payment_failed --> placed : RetryPayment
+placed --> cancelled : CancelOrder (ORD104)
+payment_failed --> cancelled : CancelOrder (ORD104)
+paid --> [*]
+cancelled --> [*]
+@enduml

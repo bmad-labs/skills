@@ -1,0 +1,94 @@
+openapi: 3.1.0
+info:
+  title: Order Service REST API
+  version: 1.0.0
+  license:
+    name: Internal
+    identifier: LicenseRef-Internal
+  description: REST endpoints the order service serves. Failed responses carry status, code, message only.
+servers:
+  - url: 'https://{host}'
+    variables:
+      host:
+        default: orders.dev.example.com
+security:
+  - bearer: []
+paths:
+  /api/v1/orders/{orderId}:
+    get:
+      operationId: getOrder
+      summary: Read one order in the caller's scope
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-f]{24}$'
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrderResponse'
+              examples:
+                found:
+                  value:
+                    status: 200
+                    code: 1
+                    message: SUCCESS
+                    data:
+                      orderId: 66f100000000000000000001
+                      status: paid
+                      version: 2
+        '404':
+          description: Not found or outside the caller's scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Failure'
+              examples:
+                notFound:
+                  value:
+                    status: 404
+                    code: -100001
+                    message: Order not found
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+  schemas:
+    Failure:
+      type: object
+      required: [status, code, message]
+      properties:
+        status:
+          type: integer
+        code:
+          type: integer
+        message:
+          type: string
+      additionalProperties: false
+    GetOrderResponse:
+      type: object
+      required: [status, code, message, data]
+      properties:
+        status:
+          type: integer
+        code:
+          type: integer
+        message:
+          type: string
+        data:
+          type: object
+          required: [orderId, status, version]
+          properties:
+            orderId:
+              type: string
+            status:
+              type: string
+              enum: [placed, paid, payment_failed, cancelled]
+            version:
+              type: integer

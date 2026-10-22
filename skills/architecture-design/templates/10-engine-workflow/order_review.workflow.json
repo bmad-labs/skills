@@ -1,0 +1,62 @@
+{
+  "name": "order_review",
+  "description": "One review of one order (correlationId = orderId). Asks the service to open the review (ORD112), waits for its fact ORD105, then opens the human task.",
+  "version": 1,
+  "schemaVersion": 2,
+  "ownerEmail": "<owner team email>",
+  "inputParameters": ["orderId", "channelCode", "reason"],
+  "timeoutPolicy": "ALERT_ONLY",
+  "timeoutSeconds": 0,
+  "variables": { "REVIEW_WAIT_MINUTES": 30 },
+  "tasks": [
+    {
+      "name": "prepare",
+      "taskReferenceName": "prepare_ref",
+      "type": "INLINE",
+      "inputParameters": {
+        "evaluatorType": "graaljs",
+        "input": "${workflow.input}",
+        "expression": "(function () { return { eventId: java.util.UUID.randomUUID().toString(), now: new Date().toISOString(), group: 'order-review-' + $.input.channelCode }; })()"
+      }
+    },
+    {
+      "name": "request_review",
+      "taskReferenceName": "request_review_ref",
+      "type": "EVENT",
+      "sink": "kafka:<integration>:shop.{env}.order-events",
+      "inputParameters": {
+        "id": "${prepare_ref.output.result.eventId}",
+        "code": "ORD112",
+        "source": { "system": "shop", "service": "<engine>" },
+        "entity": "ORDER",
+        "timestamp": "${prepare_ref.output.result.now}",
+        "actor": null,
+        "data": { "orderId": "${workflow.input.orderId}", "reason": "${workflow.input.reason}" }
+      }
+    },
+    {
+      "name": "wait_opened",
+      "taskReferenceName": "wait_opened_ref",
+      "type": "WAIT",
+      "inputParameters": { "duration": "${workflow.variables.REVIEW_WAIT_MINUTES}m" },
+      "description": "Completed by handler order_on_review_opened when the service publishes ORD105"
+    },
+    {
+      "name": "review_task",
+      "taskReferenceName": "review_task_ref",
+      "type": "HUMAN",
+      "inputParameters": {
+        "__humanTaskDefinition": {
+          "displayName": "Review order ${workflow.input.orderId}",
+          "assignmentCompletionStrategy": "LEAVE_OPEN",
+          "assignments": [
+            { "assignee": { "user": "${prepare_ref.output.result.group}", "userType": "EXTERNAL_GROUP" }, "slaMinutes": 0 }
+          ],
+          "userFormTemplate": { "name": "<form name>", "version": 1 }
+        },
+        "orderId": "${workflow.input.orderId}",
+        "reason": "${workflow.input.reason}"
+      }
+    }
+  ]
+}

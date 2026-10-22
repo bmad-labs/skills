@@ -1,0 +1,60 @@
+' Shared class style: colour by role (stereotype).
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam ArrowColor #455A64
+skinparam ArrowFontColor #455A64
+skinparam ArrowThickness 1.2
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam class {
+  BorderColor #B0BEC5
+  BackgroundColor #FFFFFF
+  FontColor #263238
+}
+skinparam package {
+  BorderColor #B0BEC5
+  BackgroundColor #FAFAFA
+}
+hide empty members
+hide circle
+
+' Colour by role
+skinparam class<<controller>> {
+  BackgroundColor #E3F2FD
+}
+skinparam class<<usecase>> {
+  BackgroundColor #FFF3E0
+}
+skinparam class<<command>> {
+  BackgroundColor #F3E5F5
+}
+skinparam class<<handler>> {
+  BackgroundColor #F3E5F5
+}
+skinparam class<<port>> {
+  BackgroundColor #E8F5E9
+}
+skinparam class<<service>> {
+  BackgroundColor #E8F5E9
+}
+skinparam class<<rule>> {
+  BackgroundColor #F1F8E9
+}
+skinparam class<<model>> {
+  BackgroundColor #ECEFF1
+}
+skinparam class<<event>> {
+  BackgroundColor #FCE4EC
+}
+skinparam class<<adapter>> {
+  BackgroundColor #FFEBEE
+}
+skinparam class<<entity>> {
+  BackgroundColor #E8EAF6
+}
+skinparam class<<enum>> {
+  BackgroundColor #FFFDE7
+}

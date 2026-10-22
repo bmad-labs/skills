@@ -1,0 +1,11 @@
+[
+  {
+    "id": "7a1c2a5e-7b8d-4c1e-9a2b-000000000201",
+    "code": "PAY101",
+    "source": { "system": "shop", "service": "payment-service" },
+    "entity": "PAYMENT",
+    "timestamp": "2026-09-22T08:31:00.000Z",
+    "actor": null,
+    "data": { "orderId": "66f100000000000000000001", "state": "accepted", "reference": "PAY-889201" }
+  }
+]

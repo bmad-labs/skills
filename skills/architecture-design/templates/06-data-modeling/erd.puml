@@ -1,0 +1,33 @@
+@startuml erd
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam class {
+  BackgroundColor #F3E5F5
+  BorderColor #B0BEC5
+}
+hide circle
+
+entity "orders" as O {
+  *_id : ObjectId <<PK>>
+  --
+  metadata (channelCode, customerId)
+  lines[] (sku, quantity, price)
+  payment (state, reference)
+  status
+}
+entity "order_events" as E {
+  *_id : ObjectId <<PK>>
+  --
+  *orderId : ObjectId <<FK>>
+  code
+  at
+}
+entity "customers (CRM, read only)" as C {
+  *customerId : string <<PK>>
+}
+
+O ||--o{ E : "has audit events"
+C ||--o{ O : "places"
+@enduml

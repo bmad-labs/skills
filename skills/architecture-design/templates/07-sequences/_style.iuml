@@ -1,0 +1,27 @@
+' Shared sequence style. Activation bar colours by role below.
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam maxMessageSize 260
+skinparam sequence {
+    ArrowThickness 2
+    ParticipantBorderThickness 2
+    LifeLineBorderColor #888888
+    DividerBackgroundColor #F0F0F0
+    GroupBodyBackgroundColor #FFFFFF80
+    GroupBackgroundColor #ECEFF1
+    GroupBorderColor #90A4AE
+}
+skinparam NoteBackgroundColor #FFFDE7
+skinparam NoteBorderColor #E6D77A
+
+' Activation bar colours by role
+!$CTL = "#C5CAE9"
+!$UC = "#A5D6A7"
+!$SVC = "#E1BEE7"
+!$REPO = "#80CBC4"
+!$DB = "#FFE0B2"
+!$PUB = "#B39DDB"
+!$EXT = "#EF9A9A"

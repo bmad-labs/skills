@@ -1,0 +1,27 @@
+// orders — one document per customer order. Base shape: <reference ERD path>. Lines marked "NEW" are not in the reference.
+// Writers: order-intake (create, lines), payment (payment block), OrderStatusMachine (status, statusHistory).
+// Optimistic concurrency on __v for every user mutation.
+{
+  "_id": { "$oid": "66f100000000000000000001" },
+  "metadata": {                                          // NEW. Where the order came from; every user query filters on channelCode
+    "channelCode": "WEB",                                // Owning channel (scope rule)
+    "customerId": "C-10023"                              // CRM customer id (read from CRM at intake)
+  },
+  "lines": [                                             // At least one line (FR-3)
+    { "sku": "SKU-001", "quantity": 2, "price": { "amount": 12.5, "currency": "EUR" } }
+  ],
+  "payment": {                                           // Written by payment on the gateway answer
+    "state": "accepted",                                 // accepted | failed
+    "reference": "PAY-889201",                           // Gateway reference; null until accepted
+    "at": { "$date": "2026-09-22T08:31:00Z" }
+  },
+  "status": "paid",                                      // OrderStatus; only OrderStatusMachine writes it
+  "statusHistory": [
+    { "from": null, "to": "placed", "at": { "$date": "2026-09-22T08:30:00Z" }, "actor": { "email": "system", "role": "SYSTEM" } },
+    { "from": "placed", "to": "paid", "at": { "$date": "2026-09-22T08:31:00Z" }, "actor": { "email": "system", "role": "SYSTEM" } }
+  ],
+  "createdAt": { "$date": "2026-09-22T08:30:00Z" },
+  "updatedAt": { "$date": "2026-09-22T08:31:00Z" },
+  "__v": 2                                               // Optimistic concurrency
+  // Not stored: order total (sum of lines, computed at read), display status (derived from status + payment)
+}

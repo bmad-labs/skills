@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "payment-settled.schema.json",
+  "title": "PAY101 Payment Settled (consumed)",
+  "allOf": [
+    { "$ref": "../../02-domain-events/_envelope.schema.json" },
+    {
+      "properties": {
+        "code": { "const": "PAY101" },
+        "source": { "properties": { "service": { "const": "payment-service" } } },
+        "data": {
+          "type": "object",
+          "required": ["orderId", "state"],
+          "properties": {
+            "orderId": { "$ref": "../../06-data-modeling/_common.schema.json#/$defs/objectId" },
+            "state": { "enum": ["accepted", "failed"] },
+            "reference": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

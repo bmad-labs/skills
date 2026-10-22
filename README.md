@@ -193,6 +193,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [jira-to-local](skills/jira-to-local) | Pull a Jira issue onto disk as readable local files — fields, comments, subtasks, worklogs, images, dev panel, and any linked Confluence page; read-only, markdown or JSON output | Productivity |
 | [to-markdown](skills/to-markdown) | Faithful PDF/DOCX/slide-deck to Markdown transcription — verbatim prose, LaTeX equations with source numbers, tables as Markdown rows, real cropped figures, page provenance, and a multi-lens subagent review | Productivity |
 | [to-wiki](skills/to-wiki) | Turn a transcribed source into a Karpathy-style LLM wiki — concept, entity, source, and synthesis pages with index, append-only log, and schema; every claim anchored to raw text, no outside knowledge, gated by independent reviewers | Productivity |
+| [create-intent](skills/create-intent) | Turn Jira stories or raw requirement notes into traceable business intent docs — intent, FR with AC, NFR, reading log — plus sourced questions split for the PO and the tech lead, with a consistency check script | Productivity |
+| [architecture-design](skills/architecture-design) | Build a design package (C4, ERD, domain events, ingress/egress APIs, sequence, class, state, pipeline diagrams) at high, medium, or low detail — single-source contracts, every protocol file proven by a real validator, one folder at a time | Development |
 
 ## Recommended Skills from Other Repositories
 

@@ -1,0 +1,81 @@
+asyncapi: 3.1.0
+info:
+  title: Order Service ⇄ Fraud vendor
+  version: 1.0.0
+  description: Request on the command topic; answers on the results topic. First answer for an open attempt wins.
+defaultContentType: application/json
+
+servers:
+  kafka:
+    host: '{brokers}'
+    protocol: kafka
+    variables:
+      brokers:
+        description: Kafka bootstrap servers of the environment
+
+channels:
+  command:
+    address: fraud.{env}.check-requests
+    parameters:
+      env:
+        description: RUNTIME_ENV
+    messages:
+      checkRequested:
+        $ref: '#/components/messages/checkRequested'
+  results:
+    address: fraud.{env}.check-results
+    parameters:
+      env:
+        description: RUNTIME_ENV
+    messages:
+      checkCompleted:
+        $ref: '#/components/messages/checkCompleted'
+      checkFailed:
+        $ref: '#/components/messages/checkFailed'
+
+operations:
+  sendCheckRequest:
+    action: send
+    channel:
+      $ref: '#/channels/command'
+    messages:
+      - $ref: '#/channels/command/messages/checkRequested'
+  receiveCheckAnswer:
+    action: receive
+    channel:
+      $ref: '#/channels/results'
+    messages:
+      - $ref: '#/channels/results/messages/checkCompleted'
+      - $ref: '#/channels/results/messages/checkFailed'
+
+components:
+  messageTraits:
+    keyedByOrder:
+      bindings:
+        kafka:
+          key:
+            type: string
+            pattern: '^[0-9a-f]{24}$'
+            description: data.orderId, copied by the vendor into each answer.
+  messages:
+    checkRequested:
+      name: ORD111
+      title: Fraud Check Requested
+      traits:
+        - $ref: '#/components/messageTraits/keyedByOrder'
+      payload:
+        $ref: './ORD111.schema.json'
+    checkCompleted:
+      name: FRD001
+      title: Fraud Check Completed
+      traits:
+        - $ref: '#/components/messageTraits/keyedByOrder'
+      payload:
+        $ref: './FRD001.schema.json'
+    checkFailed:
+      name: FRD002
+      title: Fraud Check Failed
+      traits:
+        - $ref: '#/components/messageTraits/keyedByOrder'
+      payload:
+        $ref: './FRD002.schema.json'

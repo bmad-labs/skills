@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ORD_001.schema.json",
+  "title": "ORD_001 Order status change",
+  "description": "Order id, owning channel, the transition, and what a consumer needs to act. No other order field",
+  "type": "object",
+  "required": ["orderId", "channelCode", "transition"],
+  "properties": {
+    "orderId": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/objectId", "description": "orders._id; also the message key" },
+    "channelCode": { "type": "string", "description": "Owning channel; consumers route by it" },
+    "transition": {
+      "type": "object",
+      "description": "The status change",
+      "required": ["from", "to", "at"],
+      "properties": {
+        "from": { "oneOf": [{ "$ref": "../06-data-modeling/_common.schema.json#/$defs/OrderStatus" }, { "type": "null" }] },
+        "to": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/OrderStatus" },
+        "at": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/date" }
+      },
+      "additionalProperties": false
+    },
+    "total": { "$ref": "../06-data-modeling/_common.schema.json#/$defs/money", "description": "Order total at the transition" },
+    "error": {
+      "type": "object",
+      "description": "Present on a failed transition",
+      "required": ["reason"],
+      "properties": {
+        "reason": { "enum": ["declined", "timeout"] },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

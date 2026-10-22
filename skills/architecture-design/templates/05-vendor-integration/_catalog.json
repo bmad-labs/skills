@@ -1,0 +1,88 @@
+[
+  {
+    "code": "ORD111",
+    "slug": "fraud-check-requested",
+    "name": "Fraud Check Requested",
+    "entity": "FRAUD_CHECK",
+    "schema": "FRD_001",
+    "topic": "fraud.{env}.check-requests",
+    "key": "data.orderId",
+    "producer": "order-service",
+    "when": "An order is placed and needs a score before payment.",
+    "raisedBy": "`RequestFraudCheckUseCase`; opens an attempt and registers a timeout timer",
+    "consumers": "Fraud vendor scores the order and answers with FRD001 or FRD002.",
+    "requirements": "FR-11",
+    "examples": [
+      {
+        "title": "Sample",
+        "message": {
+          "id": "9b1c2a5e-7b8d-4c1e-9a2b-000000000111",
+          "code": "ORD111",
+          "source": { "system": "shop", "service": "order-service" },
+          "entity": "FRAUD_CHECK",
+          "timestamp": "2026-09-22T08:30:01.000Z",
+          "actor": null,
+          "data": { "checkId": "66f100000000000000000a01", "orderId": "66f100000000000000000001", "total": { "amount": 25, "currency": "EUR" }, "customerId": "C-10023" }
+        }
+      }
+    ]
+  },
+  {
+    "code": "FRD001",
+    "slug": "fraud-check-completed",
+    "name": "Fraud Check Completed",
+    "entity": "FRAUD_CHECK",
+    "schema": "FRD_002",
+    "topic": "fraud.{env}.check-results",
+    "key": "data.orderId",
+    "producer": "fraud-vendor",
+    "when": "The vendor scored the order.",
+    "raisedBy": "Fraud vendor",
+    "consumers": "`RecordFraudResultUseCase`: first answer for an open attempt wins; later answers are dropped.",
+    "requirements": "FR-12",
+    "dataRequired": ["score"],
+    "examples": [
+      {
+        "title": "Sample",
+        "message": {
+          "id": "9b1c2a5e-7b8d-4c1e-9a2b-000000000201",
+          "code": "FRD001",
+          "source": { "system": "fraud", "service": "fraud-vendor" },
+          "entity": "FRAUD_CHECK",
+          "timestamp": "2026-09-22T08:30:03.000Z",
+          "actor": null,
+          "data": { "checkId": "66f100000000000000000a01", "orderId": "66f100000000000000000001", "score": 12 }
+        }
+      }
+    ]
+  },
+  {
+    "code": "FRD002",
+    "slug": "fraud-check-failed",
+    "name": "Fraud Check Failed",
+    "entity": "FRAUD_CHECK",
+    "schema": "FRD_002",
+    "topic": "fraud.{env}.check-results",
+    "key": "data.orderId",
+    "producer": "fraud-vendor",
+    "when": "The vendor could not score the order.",
+    "raisedBy": "Fraud vendor",
+    "consumers": "`RecordFraudFailureUseCase`: order goes to manual review.",
+    "requirements": "FR-13",
+    "dataRequired": ["error"],
+    "examples": [
+      {
+        "title": "Sample",
+        "message": {
+          "id": "9b1c2a5e-7b8d-4c1e-9a2b-000000000202",
+          "code": "FRD002",
+          "source": { "system": "fraud", "service": "fraud-vendor" },
+          "entity": "FRAUD_CHECK",
+          "timestamp": "2026-09-22T08:30:03.000Z",
+          "actor": null,
+          "data": { "checkId": "66f100000000000000000a01", "orderId": "66f100000000000000000001", "error": { "errorType": "internal", "message": "Model unavailable" } }
+        }
+      }
+    ]
+  }
+]
