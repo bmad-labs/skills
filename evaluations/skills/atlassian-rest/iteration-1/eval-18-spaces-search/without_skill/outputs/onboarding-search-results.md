@@ -36,7 +36,7 @@
 | 18 | Welcome onboard, Hiep | Guardian (Guardian) | Sep 29, 2025 |
 | 19 | Onboarding Guideline | OTS DevSecOps Governance (DevSecOpsGov) | Dec 02, 2025 |
 | 20 | Team and Onboarding | NA Regional Spoke - Confluence Space (NCST) | Nov 10, 2025 |
-| 21 | Onboarding | cuong.phungthinh.tpv (personal) | Aug 22, 2025 |
+| 21 | Onboarding | cuong (personal) | Aug 22, 2025 |
 | 22 | Onboarding | Linh Le PT (personal) | Aug 05, 2025 |
 | 23 | [BKC-Standby] Onboarding | OPUS Modernization Journey (BTH) | Nov 05, 2025 |
 | 24 | [MOM] Onboarding Developer | OPUS Modernization Journey (BTH) | Jul 28, 2025 |
