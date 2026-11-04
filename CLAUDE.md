@@ -17,11 +17,11 @@ skills/[skill-name]/
 ```
 
 **Key directories:**
-- `skills/` — all skill implementations (10+ skills)
+- `skills/` — all skill implementations (20+ skills)
 - `template/` — starter template for new skills
 - `spec/` — skills specification documentation
 - `_bmad/` — BMAD workflow automation framework (roles, phases, orchestration)
-- `.claude/commands/` — BMAD slash commands for Claude Code
+- `.claude/skills/` — installed BMAD skills for Claude Code
 - `books/` — source books used by book-related skills
 
 ## SKILL.md Format

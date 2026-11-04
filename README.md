@@ -53,7 +53,7 @@ This method installs the entire plugin with all skills automatically detected.
 
 **Step 2: Install the plugin**
 ```bash
-/plugin install bmad-labs@skills
+/plugin install bmad-skills@bmad-skills
 ```
 
 **Step 3: Verify installation**
@@ -71,7 +71,7 @@ Add to your project's `.claude/settings.json`:
 ```json
 {
   "extraKnownMarketplaces": {
-    "bmad-labs": {
+    "bmad-skills": {
       "source": {
         "source": "github",
         "repo": "bmad-labs/skills"
@@ -79,7 +79,7 @@ Add to your project's `.claude/settings.json`:
     }
   },
   "enabledPlugins": {
-    "bmad-labs@skills": true
+    "bmad-skills@bmad-skills": true
   }
 }
 ```
@@ -99,24 +99,29 @@ If you only need specific skills, add them individually to your project's `.clau
 ```
 
 **Available skill paths:**
-- `github:bmad-labs/skills/skills/mcp-builder`
-- `github:bmad-labs/skills/skills/typescript-e2e-testing`
-- `github:bmad-labs/skills/skills/typescript-unit-testing`
-- `github:bmad-labs/skills/skills/skill-creator`
-- `github:bmad-labs/skills/skills/typescript-clean-code`
+- `github:bmad-labs/skills/skills/architecture-design`
+- `github:bmad-labs/skills/skills/architecture-viz-studio`
+- `github:bmad-labs/skills/skills/bmad-leader`
 - `github:bmad-labs/skills/skills/book-converter`
-- `github:bmad-labs/skills/skills/skill-from-book`
-- `github:bmad-labs/skills/skills/slides-generator`
-- `github:bmad-labs/skills/skills/ai-multimodal`
-- `github:bmad-labs/skills/skills/atlassian-rest`
-- `github:bmad-labs/skills/skills/multi-repo-git-ops`
-- `github:bmad-labs/skills/skills/trade-off-analysis`
-- `github:bmad-labs/skills/skills/manual-testing`
-- `github:bmad-labs/skills/skills/load-docs`
-- `github:bmad-labs/skills/skills/rca-report`
+- `github:bmad-labs/skills/skills/close-loop-dev-setup`
+- `github:bmad-labs/skills/skills/create-intent`
+- `github:bmad-labs/skills/skills/github-sync`
 - `github:bmad-labs/skills/skills/jira-to-local`
+- `github:bmad-labs/skills/skills/load-docs`
+- `github:bmad-labs/skills/skills/manual-testing`
+- `github:bmad-labs/skills/skills/mcp-builder`
+- `github:bmad-labs/skills/skills/multi-repo-git-ops`
+- `github:bmad-labs/skills/skills/rca-report`
+- `github:bmad-labs/skills/skills/release-please`
+- `github:bmad-labs/skills/skills/skill-from-book`
+- `github:bmad-labs/skills/skills/slide-maker`
 - `github:bmad-labs/skills/skills/to-markdown`
 - `github:bmad-labs/skills/skills/to-wiki`
+- `github:bmad-labs/skills/skills/trade-off-analysis`
+- `github:bmad-labs/skills/skills/typescript-clean-code`
+- `github:bmad-labs/skills/skills/typescript-e2e-testing`
+- `github:bmad-labs/skills/skills/typescript-unit-testing`
+- `github:bmad-labs/skills/skills/ultrathink-protocol`
 
 ### Troubleshooting
 
@@ -179,22 +184,23 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 | [typescript-clean-code](skills/typescript-clean-code) | Clean Code principles and workflows for TypeScript development | Development |
 | [book-converter](skills/book-converter) | Convert EPUB books to formatted Markdown | Productivity |
 | [skill-from-book](skills/skill-from-book) | Convert book content into structured Claude Code skills | Development |
-| [slides-generator](skills/slides-generator) | Generate interactive presentation slides using React + Tailwind, export to PDF or HTML | Productivity |
 | [slide-maker](skills/slide-maker) | Design-system-agnostic slide/deck maker — brainstorm, generate, and export to editable PPTX, image PPTX, standalone HTML, or PDF; 34 token-driven layouts, bundled neutral theme, works with your design system or a suggested one | Productivity |
-| [ai-multimodal](skills/ai-multimodal) | Process and generate multimedia content using Google Gemini API (audio, images, videos, documents) | Data |
-| [atlassian-rest](skills/atlassian-rest) | Jira & Confluence integration via REST APIs — tickets, epics, pages, status reports, triage, bidirectional BMAD document sync | Productivity |
 | [multi-repo-git-ops](skills/multi-repo-git-ops) | Git operations across multi-repo systems with submodules — branching, committing, pushing, syncing across parent and service repos | Development |
 | [release-please](skills/release-please) | Automated versioning and releases with Google's release-please — pipeline setup, Conventional Commits, pre-releases, monorepos | Development |
 | [trade-off-analysis](skills/trade-off-analysis) | Structured technology trade-off analysis with scored comparison matrices for architecture decisions, build-vs-buy, and technology selection | Productivity |
 | [manual-testing](skills/manual-testing) | Plan, write, review, execute, and maintain manual test cases — API/backend, frontend, pipeline, AI/LLM, and infrastructure testing with risk-based prioritization | Development |
 | [load-docs](skills/load-docs) | Load documents (files, folders, URLs, PDFs) fully into the main agent's context for follow-up Q&A, summarization, or review | Productivity |
 | [rca-report](skills/rca-report) | Investigate and document production incidents — guides evidence collection during the investigation and produces rich, reproducible Root Cause Analysis reports with layered root cause, workaround playbook, Five Whys, and binned recommendations | Development |
-| [software-research](skills/software-research) | STORM-style, dev-specialized research: auto-detects a mode (library-eval, deep-research, architecture/ADR, spike, migration), runs expert lenses in parallel, and verifies every claim against primary sources (docs, RFCs, OSV/CVE, benchmarks) version-aware | Development |
+| [ultrathink-protocol](skills/ultrathink-protocol) | Structured root-cause investigation protocol for complex, multi-layer problems that have resisted repeated fix attempts | Development |
+| [bmad-leader](skills/bmad-leader) | Drive a long-running BMAD build session — plan, dispatch bmad-build subagents per story, approve gates, verify, and report progress | Development |
+| [close-loop-dev-setup](skills/close-loop-dev-setup) | Set up a minimal drive-and-observe loop so an agent can validate user-visible behavior the way a human would — browser/desktop harness, screenshots, vision checks | Development |
 | [jira-to-local](skills/jira-to-local) | Pull a Jira issue onto disk as readable local files — fields, comments, subtasks, worklogs, images, dev panel, and any linked Confluence page; read-only, markdown or JSON output | Productivity |
+| [github-sync](skills/github-sync) | Bidirectional sync between BMAD planning artifacts and GitHub Projects v2 — push stories, pull status, onboard projects, manage boards | Productivity |
 | [to-markdown](skills/to-markdown) | Faithful PDF/DOCX/slide-deck to Markdown transcription — verbatim prose, LaTeX equations with source numbers, tables as Markdown rows, real cropped figures, page provenance, and a multi-lens subagent review | Productivity |
 | [to-wiki](skills/to-wiki) | Turn a transcribed source into a Karpathy-style LLM wiki — concept, entity, source, and synthesis pages with index, append-only log, and schema; every claim anchored to raw text, no outside knowledge, gated by independent reviewers | Productivity |
 | [create-intent](skills/create-intent) | Turn Jira stories or raw requirement notes into traceable business intent docs — intent, FR with AC, NFR, reading log — plus sourced questions split for the PO and the tech lead, with a consistency check script | Productivity |
 | [architecture-design](skills/architecture-design) | Build a design package (C4, ERD, domain events, ingress/egress APIs, sequence, class, state, pipeline diagrams) at high, medium, or low detail — single-source contracts, every protocol file proven by a real validator, one folder at a time | Development |
+| [architecture-viz-studio](skills/architecture-viz-studio) | Build animated Three.js + GSAP architecture visualizations — cinematic scroll-story pages and interactive architecture maps with switchable lenses, drill-down diagrams, and ERDs | Development |
 
 ## Recommended Skills from Other Repositories
 

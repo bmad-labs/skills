@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Correct-course change record — Celestia Factory</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0 auto; max-width: 1160px; padding: 40px 24px 90px;
+         font: 15.5px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+         color: #1c1c1c; background: #fcfcfb; }
+  header { border-bottom: 2px solid #1c1c1c; padding-bottom: 16px; }
+  h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.015em; }
+  h2 { font-size: 20px; margin: 54px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+  h3 { font-size: 16.5px; margin: 28px 0 6px; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 6px 0 16px; padding-left: 24px; }
+  li { margin-bottom: 6px; }
+  .meta { color: #5d5d5d; font-size: 13.5px; }
+  .badge { display: inline-block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+           padding: 2px 8px; border-radius: 999px; border: 1px solid; margin-left: 8px; vertical-align: 3px; }
+  .badge.done { color: #0a7d32; border-color: #0a7d32; background: #eef7f0; }
+  .badge.open { color: #8a6a00; border-color: #8a6a00; background: #faf5e6; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+         font-size: 12.5px; background: #f1f1ee; padding: 1px 4px; border-radius: 4px; }
+  pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12.5px; line-height: 1.45; background: #fff; border: 1px solid #e3e3e0;
+        border-radius: 8px; padding: 14px 16px; overflow-x: auto; margin: 8px 0 14px; }
+  .del { color: #b3122b; }
+  .add { color: #0a7d32; }
+  .chg { color: #7a5800; }
+  .note { color: #6b6b6b; }
+  strong.hl { background: #fbf3cf; padding: 0 2px; }
+  .nav { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; margin: 18px 0 0; }
+  .nav a { color: #1a4f8a; text-decoration: none; }
+  .nav a:hover { text-decoration: underline; }
+  .legend { display: flex; gap: 22px; flex-wrap: wrap; margin: 14px 0 0; font-size: 13px;
+            background: #fff; border: 1px solid #e3e3e0; border-radius: 8px; padding: 10px 14px; }
+  .card { background: #fff; border: 1px solid #e3e3e0; border-radius: 10px; padding: 18px 20px;
+          margin: 16px 0; }
+  .card h3 { margin-top: 0; }
+  .card dl { display: grid; grid-template-columns: 150px 1fr; gap: 4px 14px; margin: 10px 0 0; }
+  .card dt { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #6f6f6f;
+             padding-top: 2px; }
+  .card dd { margin: 0 0 6px; }
+  .scroll { overflow-x: auto; border: 1px solid #e3e3e0; border-radius: 8px; background: #fff; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 11px; border-bottom: 1px solid #ececea; }
+  th { background: #f4f4f1; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: #4a4a4a; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { width: 30px; color: #888; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 20px; }
+  .pair pre { margin: 0; min-width: 0; }
+  .label { font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: #6f6f6f;
+           margin: 0 0 5px; }
+  details { margin: 18px 0; border: 1px solid #e3e3e0; border-radius: 8px; background: #fff; padding: 0 16px; }
+  summary { cursor: pointer; padding: 13px 0; font-weight: 600; font-size: 14px; }
+  details[open] summary { border-bottom: 1px solid #ececea; margin-bottom: 14px; }
+  footer { margin-top: 50px; padding-top: 14px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
+  @media print { body { background: #fff; } .nav { display: none; } }
+  .card .diagram { margin: 14px 0 0; }
+  .card .pair pre { font-size: 11.5px; padding: 10px 12px; }
+  .review { display: flex; gap: 22px; align-items: center; flex-wrap: wrap;
+            border-top: 1px solid #ececea; margin-top: 14px; padding-top: 11px; font-size: 13px; }
+  .review label { display: flex; gap: 7px; align-items: center; }
+  .review input[type="checkbox"] { width: 15px; height: 15px; accent-color: #0a7d32; }
+  .review select { font: inherit; font-size: 13px; padding: 3px 7px; border: 1px solid #cfcfcb;
+                   border-radius: 6px; background: #fff; }
+  .progress { font-size: 13.5px; color: #4a4a4a; margin: 2px 0 0; }
+  .badge.need { color: #8a2b00; border-color: #8a2b00; background: #fdf0e8; }
+
+  .term { border-bottom: 1px dotted #8a8a8a; cursor: help; position: relative; }
+  .term:hover::after, .term:focus::after {
+    content: attr(data-tip); position: absolute; left: 0; top: 1.55em; z-index: 20;
+    width: max-content; max-width: 330px; white-space: normal;
+    background: #23231f; color: #f6f6f2; font-size: 12.5px; line-height: 1.45;
+    padding: 8px 10px; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+  .term:hover::before, .term:focus::before {
+    content: ""; position: absolute; left: 10px; top: 1.05em; z-index: 21;
+    border: 6px solid transparent; border-bottom-color: #23231f; }
+  table .term:hover::after { left: auto; right: 0; }
+  .v-ok { color: #0a7d32; font-weight: 600; }
+  .v-watch { color: #8a2b00; font-weight: 600; }
+  ol li .badge { margin-right: 6px; }
+
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Correct-course change record</h1>
+  <p class="meta">Celestia Factory · 2026-11-03 · 14 text clauses in one batch · source tree <code>6fc8008</code></p>
+  <nav class="nav">
+    <a href="#overview">Overview</a>
+    <a href="#purpose">Purpose</a>
+    <a href="#behaviour">Behaviour changes</a>
+    <a href="#documents">Document-only changes</a>
+    <a href="#impact">Impact</a>
+    <a href="#process">Process before and after</a>
+    <a href="#enables">What it enables</a>
+    <a href="#decisions">Decisions</a>
+    <a href="#appendix">Full clause list</a>
+  </nav>
+  <div class="legend">
+    <span><b class="del">red</b> — before only, removed</span>
+    <span><b class="add">green</b> — after only, added</span>
+    <span><b class="chg">amber</b> — changed in place</span>
+    <span><strong class="hl">highlighted</strong> — the deciding fact</span>
+    <span><span class="badge need">your decision</span> — an item that needs your answer</span>
+    <span><b class="v-ok">green word</b> / <b class="v-watch">amber word</b> — no effect / effect, in the Impact table</span>
+  </div>
+</header>
+
+<h2 id="overview">1. Overview</h2>
+
+<table>
+  <tbody>
+    <tr><td style="width:170px"><b>Scope</b></td>
+        <td><b>14 clauses</b>: <b>2</b> in the architecture spine, <b>12</b> in the design package, build plan and one tool. <b>0 applied</b>, <b>14 proposed</b>.</td></tr>
+    <tr><td><b>Reason</b></td>
+        <td>Epic 3 closed. Epic 4 has <b>six gaps</b> that stop a Story from being built.</td></tr>
+    <tr><td><b>Effect on the user's work</b></td>
+        <td><b class="v-ok">No change.</b> The same three tasks remain: merge releases, answer questions, approve proposals.</td></tr>
+    <tr><td><b>Status</b></td>
+        <td>Epic 4 batch <span class="badge open">not applied</span> · the applied Epic 3 batch is its own pack: <code>sprint-change-proposal-2026-11-03-epic-3-close.html</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="purpose">2. Purpose</h2>
+
+<p>The design documents are read as <span class="term" data-tip="The design package is the build contract. Agents follow it as their task description.">instructions</span> by three readers:</p>
+
+<ul>
+  <li>the <b><span class="term" data-tip="The Agent that writes the Factory's own code from these documents.">builder Agent</span></b>, which decides what to implement and what to leave alone;</li>
+  <li>the <b><span class="term" data-tip="The one Agent that runs all Labs, picks the next Story and reports finished Features.">Delivery Manager</span></b>, which plans the next Story;</li>
+  <li>the <b>tests</b>, which check what a sentence promises.</li>
+</ul>
+
+<p>A wrong sentence causes one of two faults.</p>
+
+<table>
+  <thead><tr><th style="width:220px">Fault</th><th>Consequence</th><th style="width:280px">Example in this batch</th></tr></thead>
+  <tbody>
+    <tr><td><b>A sentence describes work that is not done</b></td>
+        <td><span class="term" data-tip="An Agent or a test that follows this document and expects what it promises.">The reader</span> checks for <b>an output that does not exist</b>. A later builder assumes the work is present, so it is <b>omitted or duplicated</b>.</td>
+        <td>The <span class="term" data-tip="Copying main into staging when main changes.">sync</span> note claimed it <span class="del">marks finished setup work as done and lists Stories affected by a Blueprint change</span>. <b>It does neither.</b></td></tr>
+    <tr><td><b>A sentence omits a fact that is needed</b></td>
+        <td>The reader has <b>no answer</b> and must infer one. Two readers can <b>infer differently</b>.</td>
+        <td>No document stated where a Story's status is read from, so <b>the rule "wait until earlier Stories are done" had no input</b>.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="behaviour">3. Behaviour changes</h2>
+
+<p class="progress">Reviewed <span id="reviewed">0</span> of 4</p>
+
+<div class="card" id="item-31">
+  <h3>3.1 The Delivery Manager can join a Lab chat <span class="badge need">your decision</span> <span class="badge open">clauses 6, 8, 10</span></h3>
+  <dl>
+    <dt>Current</dt><dd><span class="term" data-tip="The channel where a Lab's two members talk and ask for help.">Lab chat</span> holds the Lab's two members. The membership rule requires <span class="chg">every member to belong to that Lab</span>, and the Delivery Manager belongs to none, so <span class="chg">the runner refuses the chat</span>.</dd>
+    <dt>After</dt><dd>The rule reads: <span class="add">every Lab member is in the Lab, and the Delivery Manager may join as an extra member</span>. The chat holds <span class="add">three members</span>.</dd>
+    <dt>Reason</dt><dd>The help ladder requires the Lab to ask for help in its own chat and the Delivery Manager to answer there. <strong class="hl">Without this clause, Story 4.1 cannot create the Lab chat.</strong></dd>
+    <dt>Observed by</dt><dd><b>Delivery Manager</b>, <b>both Lab members</b>.</dd>
+  </dl>
+  <div class="diagram">
+  <div class="pair">
+    <div>
+      <p class="label">Before</p>
+      <pre>Epic starts
+   │
+   ▼
+DM creates Lab
+   │
+   ▼
+runner opens lab-1/general
+with [dev, validator, DM]
+   │
+   ▼
+<span class="del">rule: every member must</span>
+<span class="del">be in Lab 1</span>
+   │
+   ▼
+<span class="del">REFUSED  ✗</span>
+   │
+   ▼
+<span class="del">Lab cannot start</span></pre>
+    </div>
+    <div>
+      <p class="label">After</p>
+      <pre>Epic starts
+   │
+   ▼
+DM creates Lab
+   │
+   ▼
+runner opens lab-1/general
+with [dev, validator, DM]
+   │
+   ▼
+<span class="add">rule: every Lab member is in</span>
+<span class="add">Lab 1, DM may join</span>
+   │
+   ▼
+<span class="add">chat created  ✓</span>
+   │
+   ▼
+<span class="add">Lab starts, asks for help</span>
+<span class="add">in its own chat</span></pre>
+    </div>
+  </div>
+</div>
+  <div class="review">
+  <label><input type="checkbox" data-key="31-done"> Reviewed</label>
+  <label>Decision
+    <select data-key="31-decision">
+      <option value="not decided">not decided</option>
+      <option value="accept">accept</option>
+      <option value="reject">reject</option>
+      <option value="discuss">discuss</option>
+    </select>
+  </label>
+</div>
+</div>
+
+<div class="card" id="item-32">
+  <h3>3.2 A claim records the commit the Story starts from <span class="badge need">your decision</span> <span class="badge open">clauses 14, 15</span></h3>
+  <dl>
+    <dt>Current</dt><dd>The <span class="term" data-tip="The record written when the Delivery Manager takes a Story to build. It holds the Lab and, after the change, the start commit.">claim record</span> holds <span class="chg">the Lab name only</span>. At the end of a build the runner must compare the final commit with the <span class="term" data-tip="Called the start commit: the point a Story's work is measured from.">commit the Story started from</span>, and <span class="chg">no record holds that commit</span>.</dd>
+    <dt>After</dt><dd>The claim also records <span class="add">the <span class="term" data-tip="The branch where approved PRs merge. Never main."><code>origin/staging</code></span> commit the worktree starts from</span>. The runner can then <span class="add">name the commits and files that belong to the Story</span>.</dd>
+    <dt>Reason</dt><dd><strong class="hl">The build result cannot be read without a start point</strong>, and a Story cannot move to validation without that result. The change adds one value to each claim.</dd>
+    <dt>Observed by</dt><dd><b>Runner</b>, <b>Review Lead</b> through the PR, <b>Delivery Manager</b>.</dd>
+  </dl>
+  <div class="diagram">
+  <div class="pair">
+    <div>
+      <p class="label">Before</p>
+      <pre>DM claims Story 3.2
+record: lab_id = lab-1
+<span class="del">        (no start commit)</span>
+   │
+   ▼
+Dev builds in worktree
+   │
+   ▼
+runner reads result:
+compare HEAD vs <span class="del">???  → no start</span>
+<span class="del">commit anywhere  ✗</span></pre>
+    </div>
+    <div>
+      <p class="label">After</p>
+      <pre>DM claims Story 3.2
+record: lab_id = lab-1
+<span class="add">        sha   = start commit</span>
+   │
+   ▼
+Dev builds in worktree
+   │
+   ▼
+runner reads result:
+compare HEAD vs <span class="add">start commit</span>
+<span class="add">→ commits and files of this</span>
+<span class="add">Story  ✓</span></pre>
+    </div>
+  </div>
+</div>
+  <div class="review">
+  <label><input type="checkbox" data-key="32-done"> Reviewed</label>
+  <label>Decision
+    <select data-key="32-decision">
+      <option value="not decided">not decided</option>
+      <option value="accept">accept</option>
+      <option value="reject">reject</option>
+      <option value="discuss">discuss</option>
+    </select>
+  </label>
+</div>
+</div>
+
+<div class="card" id="item-33">
+  <h3>3.3 A refused claim names the check that failed <span class="badge need">your decision</span> <span class="badge open">clauses 11, 12, 18</span></h3>
+  <dl>
+    <dt>Current</dt><dd>Seven checks gate a claim. Three return a message. <span class="chg">Four — missing approval, unfinished dependency, overlapping file area, another Lab holds the Story — return none</span>, so the Agent <span class="chg">cannot tell what to fix</span>. The written order also lists <span class="chg">the money check before the pause check</span>, while the machine checks pause first.</dd>
+    <dt>After</dt><dd><span class="add">One message names the failing check.</span> The written order <span class="add">matches the machine</span>.</dd>
+    <dt>Reason</dt><dd><strong class="hl">A refused Agent needs the reason to act on it.</strong> A written order that contradicts a tested order causes the next builder to break that test.</dd>
+    <dt>Observed by</dt><dd><b>Dev Agent</b>, <b>Delivery Manager</b>, <b>tests</b>.</dd>
+  </dl>
+  <div class="diagram">
+  <div class="pair">
+    <div>
+      <p class="label">Before</p>
+      <pre>claim → 7 checks
+   │
+   ├─ plan membership     → CF411
+   ├─ approval owed       → <span class="del">(no code)</span>
+   ├─ dependency not done → <span class="del">(no code)</span>
+   ├─ file-area overlap   → <span class="del">(no code)</span>
+   ├─ another Lab holds   → <span class="del">(no code)</span>
+   ├─ paused              → CF410
+   └─ money limit         → CF408/CF409
+   │
+   ▼
+<span class="del">Agent receives a refusal</span>
+<span class="del">with no failing check</span></pre>
+    </div>
+    <div>
+      <p class="label">After</p>
+      <pre>claim → 7 checks, <span class="add">in order</span>
+   │
+   ├─ plan membership     → CF411
+   ├─ approval owed       → <span class="add">CF413 names it</span>
+   ├─ dependency not done → <span class="add">CF413 names it</span>
+   ├─ file-area overlap   → <span class="add">CF413 names it</span>
+   ├─ another Lab holds   → <span class="add">CF413 names it</span>
+   ├─ paused              → CF410
+   └─ money limit         → CF408/CF409
+   │
+   ▼
+<span class="add">Agent receives the check</span>
+<span class="add">that failed</span></pre>
+    </div>
+  </div>
+</div>
+  <div class="review">
+  <label><input type="checkbox" data-key="33-done"> Reviewed</label>
+  <label>Decision
+    <select data-key="33-decision">
+      <option value="not decided">not decided</option>
+      <option value="accept">accept</option>
+      <option value="reject">reject</option>
+      <option value="discuss">discuss</option>
+    </select>
+  </label>
+</div>
+</div>
+
+<div class="card" id="item-34">
+  <h3>3.4 A session that attempted a <span class="term" data-tip="A holdout scenario: an acceptance check only the App Validator runs. The Dev Agent never sees it.">hidden-test</span> read is not resumed <span class="badge need">your decision</span> <span class="badge open">clauses 7, 16</span></h3>
+  <dl>
+    <dt>Current</dt><dd>The <span class="term" data-tip="The hook that blocks a forbidden read and records an alert.">guard</span> denies the read and writes an alert. <span class="chg">No record marks the session</span>, so <span class="chg">the next restart resumes it</span>.</dd>
+    <dt>After</dt><dd>The denial also <span class="add">sets a yes/no mark on the session record</span>. The next restart <span class="add">refuses to resume that session</span> for any Role except the App Validator and starts a new one.</dd>
+    <dt>Reason</dt><dd>The rule "a conversation that saw hidden tests is never resumed" <strong class="hl">has no record to read, so it cannot be enforced or tested</strong>. Story 4.6 needs the mark for its test.</dd>
+    <dt>Observed by</dt><dd><b>Runner</b>. The Agent <b>starts a new conversation</b> at the next restart.</dd>
+  </dl>
+  <div class="diagram">
+  <div class="pair">
+    <div>
+      <p class="label">Before</p>
+      <pre>Agent writes a holdout path
+   │
+   ▼
+guard denies, writes an alert
+   │
+   ▼
+next restart: <span class="del">session resumed</span>
+<span class="del">with its previous conversation</span>
+   │
+   ▼
+<span class="del">conversation continues,</span>
+<span class="del">no record of the attempt</span></pre>
+    </div>
+    <div>
+      <p class="label">After</p>
+      <pre>Agent writes a holdout path
+   │
+   ▼
+guard denies, writes an alert
+   │  <span class="add">+ marks the session</span>
+   ▼
+next restart: <span class="add">non-Validator</span>
+<span class="add">session NOT resumed</span>
+   │
+   ▼
+<span class="add">a new session starts,</span>
+<span class="add">previous conversation dropped</span></pre>
+    </div>
+  </div>
+</div>
+  <div class="review">
+  <label><input type="checkbox" data-key="34-done"> Reviewed</label>
+  <label>Decision
+    <select data-key="34-decision">
+      <option value="not decided">not decided</option>
+      <option value="accept">accept</option>
+      <option value="reject">reject</option>
+      <option value="discuss">discuss</option>
+    </select>
+  </label>
+</div>
+</div>
+
+<h2 id="documents">4. Document-only changes</h2>
+
+<p>Four clauses. No step moves and no Agent behaves differently. Each removes a statement the code does not support, or adds a fact the code needs. <b>No decision is needed from you in this section.</b></p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>#</th><th>Where</th><th>Stated before</th><th>Actual</th><th>Effect if unchanged</th></tr></thead>
+  <tbody>
+    <tr><td>9</td><td><code>designs/README.md:102</code><br>record writer table</td>
+        <td><span class="del">One way</span> to create a chat record</td>
+        <td><span class="add">Three: create a chat, post a message, runner opens the default at start</span></td>
+        <td><b>One record has no named writer</b>, against the one-writer rule</td></tr>
+    <tr><td>11</td><td><code>designs/README.md:163</code><br>claim rule</td>
+        <td><span class="del">Three of seven checks</span></td>
+        <td><span class="add">All seven, in order, with their messages</span></td>
+        <td>An implementer builds a gate that <b>admits what it should refuse</b></td></tr>
+    <tr><td>13</td><td><code>shared-domain.md:14</code><br>Story entry</td>
+        <td>Status is held <span class="del">somewhere in the Story</span></td>
+        <td><span class="add">It is read from the Story file, never from the <span class="term" data-tip="factory-plan.yaml: every work unit and Story in one build order. It holds no status.">plan index</span></span></td>
+        <td>The plan index becomes <b>a second source of status</b></td></tr>
+    <tr><td>17</td><td><code>P_HEALTH.schema.json:32</code><br>health report types</td>
+        <td><span class="del">Six problem types</span></td>
+        <td><span class="add">Seven, including another Story's problem</span></td>
+        <td>Problems are <b>omitted from the daily report</b> without a message</td></tr>
+    <tr><td>19</td><td><code>designs/tools/render_api.py:135-141</code><br>page generator</td>
+        <td><span class="del">Every merge must name a work unit</span></td>
+        <td><span class="add">Only a plan merge must</span></td>
+        <td>The generated page <b>misleads Epic 5</b>, and a hand edit is <b>overwritten on the next render</b></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="note">Clauses 6, 8, 10, 12, 14, 15 and 18 also appear under behaviour changes.</p>
+
+<h2 id="impact">5. Impact</h2>
+
+<div class="scroll">
+<table>
+  <thead><tr><th style="width:200px">Area</th><th>Impact</th></tr></thead>
+  <tbody>
+    <tr><td>User's work</td><td><span class="v-ok">No change.</span> Three tasks remain: merge releases, answer questions, approve proposals. No new setting and no new screen.</td></tr>
+    <tr><td>Intent and PRD</td><td><span class="v-ok">No clause.</span> <b>No feature, success measure or promise</b> changes.</td></tr>
+    <tr><td>Architecture</td><td><span class="v-watch">Two clauses.</span> Clause 6 changes <b>one membership rule</b>. Clause 7 states <b>where one safety fact is stored</b>. Both make an existing rule implementable.</td></tr>
+    <tr><td>Agent behaviour</td><td><span class="v-watch">Four changes:</span> the Delivery Manager can join a Lab chat; a claim carries its start commit; a refusal names the failing check; a session is marked after a denied hidden-test read.</td></tr>
+    <tr><td>Stored data</td><td><span class="v-watch">Two additions.</span> The session record gains <b>an optional yes/no mark</b>. The claim record gains <b>a required start commit</b>. Existing session files remain valid. The claim change applies to Stories built after it lands.</td></tr>
+    <tr><td>Rollback</td><td><span class="v-ok">One commit.</span> <b>Documents only</b>; no data migration and no schema field is removed. Reverting restores the previous text.</td></tr>
+    <tr><td>If not applied</td><td><span class="v-watch">Epic 4 stops.</span> <b>Story 4.1</b> cannot create the Lab chat. <b>Story 4.2</b> cannot report a refusal reason. <b>Story 4.5</b> cannot read a build result. <b>Story 4.6</b> cannot test the safety rule. <b>Story 4.11</b> omits problems. <b>Epic 5</b> can reverse the tested pause-before-money order.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="process">6. Process before and after</h2>
+
+<p>The four behaviour diagrams sit with their items in section 3. Two flows remain here: the full Story journey, and how the batch is applied.</p>
+
+<h3>6.1 A Story's journey</h3>
+
+<p>Two complete diagrams. The left one is the journey as it stands. The right one is the journey after the batch. Both show all ten steps; colour marks the difference.</p>
+
+<div class="pair">
+<div>
+<p class="label">Before</p>
+<pre>1  CLAIM
+   DM picks the Story
+   record: lab_id only
+   <span class="del">refusal: no reason</span>
+        │
+2  DISPATCH
+   runner launches
+   a Dev session
+        │
+3  BUILD
+   Dev builds,
+   stops in-review
+        │
+4  READ RESULT
+   <span class="del">HEAD vs ???  ✗</span>
+        │
+5  VALIDATE
+   <span class="del">not reached  ✗</span>
+        │
+6  STORY PR
+   <span class="del">not reached  ✗</span>
+        │
+7  REVIEW
+   <span class="del">not reached  ✗</span>
+        │
+8  GRADE
+   <span class="del">not reached  ✗</span>
+        │
+9  MERGE
+   <span class="del">not reached  ✗</span>
+        │
+10 DONE
+   <span class="del">not reached  ✗</span></pre>
+</div>
+<div>
+<p class="label">After</p>
+<pre>1  CLAIM
+   DM picks the Story
+   record: lab_id
+   <span class="add">+ start commit</span>
+   <span class="add">refusal: names the check</span>
+        │
+2  DISPATCH
+   runner launches
+   a Dev session
+        │
+3  BUILD
+   Dev builds,
+   stops in-review
+        │
+4  READ RESULT
+   <span class="add">HEAD vs start commit ✓</span>
+        │
+5  VALIDATE
+   <span class="add">App Validator runs</span>
+   <span class="add">AC + holdouts</span>
+        │
+6  STORY PR
+   <span class="add">opened for the Story</span>
+        │
+7  REVIEW
+   <span class="add">Review Lead verdict</span>
+        │
+8  GRADE
+   <span class="add">Gold / Silver / Bronze</span>
+        │
+9  MERGE
+   <span class="add">Gate merges to staging</span>
+        │
+10 DONE
+   <span class="add">status-only done commit</span></pre>
+</div>
+</div>
+<h3>6.2 How the batch is applied</h3>
+<pre>PROPOSAL          USER APPROVAL     EDIT SOURCES        REGENERATE        VERIFY            COMMIT
+9 clauses    ───▶ all or part  ───▶ 9 hand files  ───▶ 3 renderers  ───▶ design checks ───▶ 1 commit,
+with before/                      designs/ +         pages, record      API 44/0          then
+after + reason                    epics.md line      docs, catalog      records 438/0     Story 4.1
+                                                                        data 12/0
+                                                                        pytest &gt;2840
+                                                                        installer 36</pre>
+
+<h2 id="enables">7. What it enables</h2>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Story</th><th>Requires</th><th>Without the clause</th></tr></thead>
+  <tbody>
+    <tr><td><b>4.1</b> Create and close named Labs</td><td>Clauses 6, 8, 10</td><td>The Lab chat <b>cannot be created</b>, so the Lab cannot start</td></tr>
+    <tr><td><b>4.2</b> Claim the next ready Story</td><td>Clauses 11, 12, 13, 18, and 15's writer</td><td><b>Four checks have no code</b>; "dependencies are done" has no status source; the claim records no start commit</td></tr>
+    <tr><td><b>4.5</b> Read the build result</td><td>Clauses 14, 15, 19</td><td>No value to compare against, so <b>the result cannot be read</b></td></tr>
+    <tr><td><b>4.6</b> Hide hidden tests</td><td>Clauses 7, 16</td><td><b>No place to store the fact</b>, so the rule cannot be tested</td></tr>
+    <tr><td><b>4.11</b> Health check</td><td>Clause 17</td><td>Another Story's problems are <b>omitted from the report</b></td></tr>
+    <tr><td><b>5.x</b> Review and merge</td><td>Clauses 2, 3, 18</td><td>A plan PR message and a tested pause order would <b>contradict the builder's instructions</b></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="decisions">8. Decisions</h2>
+
+<ol>
+  <li><span class="badge need">decision</span> <b>Apply the nine proposed clauses?</b> All nine, the six that block a Story, or none.</li>
+  <li><span class="badge need">decision</span> <b>Lab chat.</b> May the Delivery Manager join a Lab chat? If not, the build plan changes instead and Story 4.1 reads differently.</li>
+  <li><span class="badge need">decision</span> <b>Start commit.</b> May a claim record the commit the Story starts from? One value per claim.</li>
+  <li><span class="badge need">decision</span> <b>Hidden-test mark.</b> Two options: set the mark on any denied attempt, so that session is not resumed at the next restart; or leave the mark unset until a detector is built as its own Story.</li>
+</ol>
+
+<h2 id="appendix">Appendix — full clause list</h2>
+
+<details>
+<summary>14 clauses with path, line, before, after, change and reason</summary>
+
+<h3>Proposed — Epic 4 <span class="badge open">not applied</span></h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>#</th><th>Where</th><th>Before</th><th>After</th><th>Change</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">6</td>
+      <td><code>ARCHITECTURE-SPINE.md:602</code> — Lab folder rule</td>
+      <td><span class="del">Only that Lab's two members</span></td>
+      <td>Both members, <span class="add">and the Delivery Manager may join</span></td>
+      <td>Membership changed</td>
+      <td>The build plan places the DM in the Lab chat; the code refuses, so Story 4.1 cannot start</td>
+    </tr>
+    <tr>
+      <td class="num">7</td>
+      <td><code>ARCHITECTURE-SPINE.md:321</code> — hidden-test rule</td>
+      <td><span class="del">No record of the fact</span></td>
+      <td><span class="add">A yes/no mark on the session</span></td>
+      <td>The rule gains a record</td>
+      <td>A rule without a record cannot be enforced or tested</td>
+    </tr>
+    <tr>
+      <td class="num">8</td>
+      <td><code>designs/README.md:233</code> — decision D24</td>
+      <td>Same <span class="del">strict</span> rule</td>
+      <td>Same <span class="add">change</span> as 6</td>
+      <td>Mirror of 6</td>
+      <td>The design may not contradict the architecture</td>
+    </tr>
+    <tr>
+      <td class="num">9</td>
+      <td><code>designs/README.md:102</code> — record writer table</td>
+      <td>Names <span class="del">one way</span> to create a chat record</td>
+      <td><span class="add">All three ways</span></td>
+      <td>Every writer named</td>
+      <td>One record had no named writer</td>
+    </tr>
+    <tr>
+      <td class="num">10</td>
+      <td><code>06-data-modeling/README.md:78</code> — folder map comment</td>
+      <td><span class="del">members</span> are all in this Lab</td>
+      <td><span class="add">Lab members</span>, <span class="add">DM may join</span></td>
+      <td>Comment follows 6</td>
+      <td>The map would contradict the folder the Story creates</td>
+    </tr>
+    <tr>
+      <td class="num">11</td>
+      <td><code>designs/README.md:163</code> — claim rule</td>
+      <td><span class="del">Three of seven checks, no messages</span></td>
+      <td><span class="add">All seven, in order</span></td>
+      <td>Claim rule completed</td>
+      <td>It is the only rule for starting a Story</td>
+    </tr>
+    <tr>
+      <td class="num">12</td>
+      <td><code>error-codes.md:40</code> — after <code>CF412</code>; page from <code>_api.json:2420</code></td>
+      <td><span class="del">No message for four failures</span></td>
+      <td><span class="add">One message naming the check</span></td>
+      <td>One refusal message</td>
+      <td>Agents and tests need a value to assert</td>
+    </tr>
+    <tr>
+      <td class="num">13</td>
+      <td><code>shared-domain.md:14</code> — Story entry</td>
+      <td><span class="del">No source named</span></td>
+      <td><span class="add">Story file, never the plan index</span></td>
+      <td>Source stated</td>
+      <td>"Wait for earlier Stories" needs a status</td>
+    </tr>
+    <tr>
+      <td class="num">14</td>
+      <td><code>P_RUN_STATE.schema.json:38</code> — commit meaning</td>
+      <td><span class="del">Only from validation onward</span></td>
+      <td><span class="add">On claim, the Story's start commit</span></td>
+      <td>Meaning defined</td>
+      <td>The work is measured against that commit</td>
+    </tr>
+    <tr>
+      <td class="num">15</td>
+      <td><code>P_RUN_STATE.schema.json:58-73</code> — claim record; example at <code>_catalog.json:1133</code></td>
+      <td><span class="del">Lab name only</span></td>
+      <td><span class="add">Lab name and start commit</span></td>
+      <td>One required value</td>
+      <td>The start point must exist before the Agent begins</td>
+    </tr>
+    <tr>
+      <td class="num">16</td>
+      <td><code>registry-sessions.schema.json:87</code> — session record; example at <code>.jsonc:17</code></td>
+      <td><span class="del">No field</span></td>
+      <td><span class="add">Optional yes/no mark</span></td>
+      <td>One optional field</td>
+      <td>Optional keeps existing session files valid</td>
+    </tr>
+    <tr>
+      <td class="num">17</td>
+      <td><code>P_HEALTH.schema.json:32</code> — problem types</td>
+      <td><span class="del">Ended at "hung session"</span></td>
+      <td><span class="add">Adds "another Story's problem"</span></td>
+      <td>One allowed value</td>
+      <td>Otherwise the problem is omitted from the report without a message</td>
+    </tr>
+    <tr>
+      <td class="num">18</td>
+      <td><code>epics.md:1256</code> — Story 4.2 check order</td>
+      <td><span class="del">Money before pause</span>; no messages</td>
+      <td><span class="add">Pause before money</span>; with messages</td>
+      <td>Order and messages</td>
+      <td>The code checks pause first and a test pins that order</td>
+    </tr>
+    <tr>
+      <td class="num">19</td>
+      <td><code>designs/tools/render_api.py:135-141</code> — page generator</td>
+      <td><span class="del">Dropped a condition</span></td>
+      <td><span class="add">Writes it too</span></td>
+      <td>Tool corrected</td>
+      <td>A hand edit is overwritten on the next render</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Current state</h3>
+<div class="scroll">
+<table>
+  <tbody>
+    <tr><td style="width:200px">Epics 1, 2, 3</td><td><b class="v-ok">Done.</b> Epic 3 closed after its retrospective and the first batch</td></tr>
+    <tr><td>Epic 4 context</td><td><b class="v-ok">Compiled</b>, 629 lines, at <code>6fc8008</code></td></tr>
+    <tr><td>Epic 4 Stories</td><td>4.1–4.11, <b>none started</b>; <b>six blocked</b></td></tr>
+    <tr><td>Epic 4 code</td><td><b>No <code>modules/story</code></b>; <b>four Agent commands unserved</b>; two settings templates missing</td></tr>
+    <tr><td>Decisions</td><td>Section 8, four items</td></tr>
+  </tbody>
+</table>
+</div>
+</details>
+
+<footer>
+  Sources: <code>sprint-change-proposal-2026-11-03-epic-3-close.md</code>, <code>sprint-change-proposal-2026-11-03-epic-4-open.md</code>,
+  <code>epic-3-retro-2026-11-03.md</code>, <code>epic-4-context.md</code>.
+  Colour marks the difference; layout is unchanged.
+</footer>
+
+
+<script>
+(function () {
+  var KEY = 'celestia-correct-course-review-2026-11-03';
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.review input[type="checkbox"]'));
+  var selects = Array.prototype.slice.call(document.querySelectorAll('.review select'));
+  var counter = document.getElementById('reviewed');
+
+  function refresh() {
+    if (!counter) return;
+    counter.textContent = boxes.filter(function (b) { return b.checked; }).length;
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    refresh();
+  }
+  boxes.forEach(function (b) {
+    b.checked = !!state[b.dataset.key];
+    b.addEventListener('change', function () { state[b.dataset.key] = b.checked; save(); });
+  });
+  selects.forEach(function (s) {
+    if (state[s.dataset.key]) s.value = state[s.dataset.key];
+    s.addEventListener('change', function () { state[s.dataset.key] = s.value; save(); });
+  });
+  refresh();
+})();
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "name": "bmad-skills",
   "owner": {
-    "name": "thuantan2060",
+    "name": "bmad-labs",
     "email": "thuantan2060@gmail.com"
   },
   "metadata": {
@@ -12,7 +12,7 @@
   "plugins": [
     {
       "name": "bmad-skills",
-      "description": "Collection of skills including MCP server development, E2E testing, and unit testing guides for TypeScript/NestJS projects",
+      "description": "Collection of skills including BMAD planning and build orchestration, architecture design and visualization, MCP server development, and TypeScript/NestJS testing guides",
       "source": "./"
     }
   ]

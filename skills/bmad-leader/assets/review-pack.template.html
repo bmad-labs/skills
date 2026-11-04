@@ -1,0 +1,333 @@
+<!doctype html>
+<!--
+  Review pack template — bmad-leader.
+
+  Copy this file next to the work it reviews, for example
+  .ai-aftifacts/implementation-artifacts/diagrams/<batch>-review.html, then replace
+  every {{PLACEHOLDER}} and every "Example:" block. Keep the structure and the CSS:
+  they carry the reading rules (colour meaning, review rows, tooltips).
+
+  Rules that this template encodes. Read references/review-pack.md before you fill it.
+    1. Neutral tone. State facts. No pitch, no "the value is", no "smooth".
+    2. Highlight means an inline mark: colour, bold, badge, label. Never a summary block.
+    3. Before and after are two complete diagrams with the same layout, never one
+       diagram annotated with only the delta.
+    4. Every "Where" cell carries path:line plus a plain description.
+    5. Every item that needs the User's answer carries a "decision" badge and a review row.
+    6. Every specialist term gets a tooltip on first use. There is no glossary section.
+    7. A legend at the top names every mark the document uses.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0 auto; max-width: 1160px; padding: 40px 24px 90px;
+         font: 15.5px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+         color: #1c1c1c; background: #fcfcfb; }
+  header { border-bottom: 2px solid #1c1c1c; padding-bottom: 16px; }
+  h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.015em; }
+  h2 { font-size: 20px; margin: 54px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+  h3 { font-size: 16.5px; margin: 28px 0 6px; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 6px 0 16px; padding-left: 24px; }
+  li { margin-bottom: 6px; }
+  .meta { color: #5d5d5d; font-size: 13.5px; }
+  .badge { display: inline-block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+           padding: 2px 8px; border-radius: 999px; border: 1px solid; margin-left: 8px; vertical-align: 3px; }
+  .badge.done { color: #0a7d32; border-color: #0a7d32; background: #eef7f0; }
+  .badge.open { color: #8a6a00; border-color: #8a6a00; background: #faf5e6; }
+  .badge.need { color: #8a2b00; border-color: #8a2b00; background: #fdf0e8; }
+  .v-ok { color: #0a7d32; font-weight: 600; }
+  .v-watch { color: #8a2b00; font-weight: 600; }
+  ol li .badge { margin-right: 6px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+         font-size: 12.5px; background: #f1f1ee; padding: 1px 4px; border-radius: 4px; }
+  pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12.5px; line-height: 1.45; background: #fff; border: 1px solid #e3e3e0;
+        border-radius: 8px; padding: 14px 16px; overflow-x: auto; margin: 8px 0 14px; }
+  .del { color: #b3122b; }
+  .add { color: #0a7d32; }
+  .chg { color: #7a5800; }
+  .note { color: #6b6b6b; }
+  strong.hl { background: #fbf3cf; padding: 0 2px; }
+  .nav { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; margin: 18px 0 0; }
+  .nav a { color: #1a4f8a; text-decoration: none; }
+  .nav a:hover { text-decoration: underline; }
+  .legend { display: flex; gap: 22px; flex-wrap: wrap; margin: 14px 0 0; font-size: 13px;
+            background: #fff; border: 1px solid #e3e3e0; border-radius: 8px; padding: 10px 14px; }
+  .card { background: #fff; border: 1px solid #e3e3e0; border-radius: 10px; padding: 18px 20px;
+          margin: 16px 0; }
+  .card h3 { margin-top: 0; }
+  .card dl { display: grid; grid-template-columns: 150px 1fr; gap: 4px 14px; margin: 10px 0 0; }
+  .card dt { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #6f6f6f;
+             padding-top: 2px; }
+  .card dd { margin: 0 0 6px; }
+  .card .diagram { margin: 14px 0 0; }
+  .card .pair pre { font-size: 11.5px; padding: 10px 12px; }
+  .review { display: flex; gap: 22px; align-items: center; flex-wrap: wrap;
+            border-top: 1px solid #ececea; margin-top: 14px; padding-top: 11px; font-size: 13px; }
+  .review label { display: flex; gap: 7px; align-items: center; }
+  .review input[type="checkbox"] { width: 15px; height: 15px; accent-color: #0a7d32; }
+  .review select { font: inherit; font-size: 13px; padding: 3px 7px; border: 1px solid #cfcfcb;
+                   border-radius: 6px; background: #fff; }
+  .progress { font-size: 13.5px; color: #4a4a4a; margin: 2px 0 0; }
+  .scroll { overflow-x: auto; border: 1px solid #e3e3e0; border-radius: 8px; background: #fff; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 11px; border-bottom: 1px solid #ececea; }
+  th { background: #f4f4f1; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: #4a4a4a; }
+  tbody tr:last-child td { border-bottom: none; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 20px; }
+  .pair pre { margin: 0; min-width: 0; }
+  .label { font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: #6f6f6f;
+           margin: 0 0 5px; }
+  .term { border-bottom: 1px dotted #8a8a8a; cursor: help; position: relative; }
+  .term:hover::after, .term:focus::after {
+    content: attr(data-tip); position: absolute; left: 0; top: 1.55em; z-index: 20;
+    width: max-content; max-width: 330px; white-space: normal;
+    background: #23231f; color: #f6f6f2; font-size: 12.5px; line-height: 1.45;
+    padding: 8px 10px; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+  .term:hover::before, .term:focus::before {
+    content: ""; position: absolute; left: 10px; top: 1.05em; z-index: 21;
+    border: 6px solid transparent; border-bottom-color: #23231f; }
+  table .term:hover::after { left: auto; right: 0; }
+  details { margin: 18px 0; border: 1px solid #e3e3e0; border-radius: 8px; background: #fff; padding: 0 16px; }
+  summary { cursor: pointer; padding: 13px 0; font-weight: 600; font-size: 14px; }
+  details[open] summary { border-bottom: 1px solid #ececea; margin-bottom: 14px; }
+  footer { margin-top: 50px; padding-top: 14px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
+  @media print { body { background: #fff; } .nav { display: none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>{{TITLE}}</h1>
+  <p class="meta">{{PROJECT}} · {{DATE}} · {{CLAUSE_COUNT}} clauses in {{BATCH_COUNT}} batches · source tree <code>{{COMMIT}}</code></p>
+  <nav class="nav">
+    <a href="#overview">Overview</a>
+    <a href="#purpose">Purpose</a>
+    <a href="#behaviour">Behaviour changes</a>
+    <a href="#documents">Document-only changes</a>
+    <a href="#impact">Impact</a>
+    <a href="#process">Process before and after</a>
+    <a href="#enables">What it enables</a>
+    <a href="#decisions">Decisions</a>
+  </nav>
+  <div class="legend">
+    <span><b class="del">red</b> — before only, removed</span>
+    <span><b class="add">green</b> — after only, added</span>
+    <span><b class="chg">amber</b> — changed in place</span>
+    <span><strong class="hl">highlighted</strong> — the deciding fact</span>
+    <span><span class="badge need">your decision</span> — an item that needs your answer</span>
+    <span><b class="v-ok">green word</b> / <b class="v-watch">amber word</b> — no effect / effect, in the Impact table</span>
+  </div>
+</header>
+
+<!-- 1. OVERVIEW: four facts, no prose. Values carry bold numbers or a verdict colour. -->
+<h2 id="overview">1. Overview</h2>
+<table>
+  <tbody>
+    <tr><td style="width:170px"><b>Scope</b></td><td><b>{{CLAUSE_COUNT}} clauses</b>: {{TIER_SPLIT}}. <b>{{APPLIED_COUNT}} applied</b>, <b>{{PROPOSED_COUNT}} proposed</b>.</td></tr>
+    <tr><td><b>Reason</b></td><td>{{WHY_NOW}}</td></tr>
+    <tr><td><b>Effect on the user's work</b></td><td><b class="v-ok">No change.</b> {{KEEP_TASKS}}</td></tr>
+    <tr><td><b>Status</b></td><td>{{BATCH_NAMES}} <span class="badge done">applied</span> · {{OPEN_BATCH}} <span class="badge open">not applied</span></td></tr>
+  </tbody>
+</table>
+
+<!-- 2. PURPOSE: why the document is read as an instruction, and the two fault types.
+     Wrap the key phrase of each example in del/add, as below. -->
+<h2 id="purpose">2. Purpose</h2>
+
+<p>The design documents are read as <span class="term" data-tip="The design package is the build contract. Agents follow it as their task description.">instructions</span> by three readers:</p>
+<ul>
+  <li>the <b><span class="term" data-tip="The Agent that writes the Factory's own code from these documents.">builder Agent</span></b>, which decides what to implement and what to leave alone;</li>
+  <li>the <b><span class="term" data-tip="The one Agent that runs all Labs, picks the next Story and reports finished Features.">Delivery Manager</span></b>, which plans the next Story;</li>
+  <li>the <b>tests</b>, which check what a sentence promises.</li>
+</ul>
+
+<p>A wrong sentence causes one of two faults.</p>
+
+<table>
+  <thead><tr><th style="width:220px">Fault</th><th>Consequence</th><th style="width:280px">Example in this batch</th></tr></thead>
+  <tbody>
+    <tr><td><b>A sentence describes work that is not done</b></td>
+        <td>The reader checks for <b>an output that does not exist</b>. A later builder assumes the work is present, so it is <b>omitted or duplicated</b>.</td>
+        <td>{{EXAMPLE_FALSE_CLAIM — wrap the false part in <span class="del">…</span>, then bold the truth}}</td></tr>
+    <tr><td><b>A sentence omits a fact that is needed</b></td>
+        <td>The reader has <b>no answer</b> and must infer one. Two readers can <b>infer differently</b>.</td>
+        <td>{{EXAMPLE_MISSING_FACT}}</td></tr>
+  </tbody>
+</table>
+
+<!-- 3. BEHAVIOUR CHANGES: one card per change. Card order is fixed:
+     Current / After / Reason / Observed by, then the full before-after diagrams,
+     then the review row. Every card needs the "your decision" badge when the User must answer. -->
+<h2 id="behaviour">3. Behaviour changes</h2>
+
+<p class="progress">Reviewed <span id="reviewed">0</span> of {{BEHAVIOUR_COUNT}}</p>
+
+<div class="card" id="item-31">
+  <h3>3.1 {{BEHAVIOUR_TITLE}} <span class="badge need">your decision</span> <span class="badge open">clauses {{CLAUSE_NUMBERS}}</span></h3>
+  <dl>
+    <dt>Current</dt><dd>{{CURRENT — amber the part that changes}}</dd>
+    <dt>After</dt><dd>{{AFTER — green the new part}}</dd>
+    <dt>Reason</dt><dd>{{REASON — put the deciding consequence inside <strong class="hl">…</strong>}}</dd>
+    <dt>Observed by</dt><dd><b>{{ROLE}}</b>, <b>{{ROLE}}</b>.</dd>
+  </dl>
+  <div class="diagram">
+    <div class="pair">
+      <div>
+        <p class="label">Before</p>
+        <!-- FULL diagram of the flow before the change. Same step list as the After panel.
+
+             On Opus 5.5, replace the <pre> with inline SVG:
+
+             <svg viewBox="0 0 420 320" width="100%" role="img" aria-labelledby="b1-title b1-desc">
+               <title id="b1-title">Start a Lab, before the change</title>
+               <desc id="b1-desc">The membership rule refuses the third member, so the chat is not created.</desc>
+               <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                              markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                 <path d="M0,0 L10,5 L0,10 z" fill="#23231f"/></marker></defs>
+               <rect x="8" y="8" width="200" height="40" rx="6" fill="#fff" stroke="#e3e3e0"/>
+               <text x="18" y="26" font-family="ui-monospace, Menlo, monospace" font-size="13">1 CLAIM</text>
+               <text x="18" y="42" font-family="ui-monospace, Menlo, monospace" font-size="12">lab_id only</text>
+               <path d="M108,48 L108,72" stroke="#23231f" fill="none" marker-end="url(#arrow)"/>
+               (one rect + two tspans per step; same coordinates in the After panel)
+             </svg>
+
+             Keep the same viewBox and the same step coordinates in both panels. -->
+        <pre>{{BEFORE_DIAGRAM}}</pre>
+      </div>
+      <div>
+        <p class="label">After</p>
+        <!-- FULL diagram of the same flow after the change. Colour only the differing lines. -->
+        <pre>{{AFTER_DIAGRAM}}</pre>
+      </div>
+    </div>
+  </div>
+  <div class="review">
+    <label><input type="checkbox" data-key="31-done"> Reviewed</label>
+    <label>Decision
+      <select data-key="31-decision">
+        <option value="not decided">not decided</option>
+        <option value="accept">accept</option>
+        <option value="reject">reject</option>
+        <option value="discuss">discuss</option>
+      </select>
+    </label>
+  </div>
+</div>
+
+<!-- 4. DOCUMENT-ONLY CHANGES: no decision. Stated before in red, Actual in green,
+     Effect if unchanged in bold. One row per clause. -->
+<h2 id="documents">4. Document-only changes</h2>
+
+<p>{{DOC_INTRO — how many clauses, and the sentence "No decision is needed from you in this section." in bold.}}</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>#</th><th>Where</th><th>Stated before</th><th>Actual</th><th>Effect if unchanged</th></tr></thead>
+  <tbody>
+    <tr><td>{{N}}</td><td><code>{{PATH}}:{{LINE}}</code><br>{{PLAIN_DESCRIPTION}}</td>
+        <td><span class="del">{{FALSE_CLAIM}}</span></td>
+        <td><span class="add">{{TRUTH}}</span></td>
+        <td>{{EFFECT — bold the risk phrase}}</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- 5. IMPACT: verdict word first in each cell, coloured. green = none, amber = effect. -->
+<h2 id="impact">5. Impact</h2>
+
+<div class="scroll">
+<table>
+  <thead><tr><th style="width:200px">Area</th><th>Impact</th></tr></thead>
+  <tbody>
+    <tr><td>User's work</td><td><b class="v-ok">No change.</b> {{TASKS}}</td></tr>
+    <tr><td>Intent and PRD</td><td><b class="v-ok">No clause.</b> {{INTENT_NOTE}}</td></tr>
+    <tr><td>Architecture</td><td><span class="v-watch">{{N}} clauses.</span> {{ARCH_NOTE}}</td></tr>
+    <tr><td>Agent behaviour</td><td><span class="v-watch">{{N}} changes:</span> {{BEHAVIOUR_LIST}}</td></tr>
+    <tr><td>Stored data</td><td><span class="v-watch">{{N}} additions.</span> {{DATA_NOTE}}</td></tr>
+    <tr><td>Rollback</td><td><b class="v-ok">One commit.</b> {{ROLLBACK_NOTE}}</td></tr>
+    <tr><td>If not applied</td><td><span class="v-watch">{{CONSEQUENCE_HEADLINE}}</span> {{STORY_BY_STORY}}</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- 6. PROCESS: one pair of complete diagrams for the whole flow, then the application flow.
+     The four behaviour diagrams already sit in section 3; do not repeat them here. -->
+<h2 id="process">6. Process before and after</h2>
+
+<h3>6.1 {{FLOW_NAME}}</h3>
+<p>Two complete diagrams. The left one is the flow as it stands. The right one is the flow after the batch. Both show all {{STEP_COUNT}} steps; colour marks the difference.</p>
+<div class="pair">
+  <div><p class="label">Before</p><pre>{{FULL_BEFORE_FLOW}}</pre></div>
+  <div><p class="label">After</p><pre>{{FULL_AFTER_FLOW}}</pre></div>
+</div>
+
+<h3>6.2 How the batch is applied</h3>
+<pre>PROPOSAL          USER APPROVAL     EDIT SOURCES        REGENERATE        VERIFY            COMMIT
+{{N}} clauses ───▶ all or part  ───▶ {{FILES}}     ───▶ {{RENDERERS}}    ───▶ {{CHECKS}}    ───▶ 1 commit,
+with before/                      {{SOURCES}}                            {{COUNTS}}        then next Story
+after + reason</pre>
+
+<!-- 7. WHAT IT ENABLES: clause to Story to the failure without it. -->
+<h2 id="enables">7. What it enables</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>Story</th><th>Requires</th><th>Without the clause</th></tr></thead>
+  <tbody>
+    <tr><td><b>{{STORY_ID}}</b> {{STORY_TITLE}}</td><td>Clauses {{CLAUSES}}</td><td>{{FAILURE — bold the blocking part}}</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- 8. DECISIONS: one per item, each with the decision badge and the question in bold. -->
+<h2 id="decisions">8. Decisions</h2>
+<ol>
+  <li><span class="badge need">decision</span> <b>{{QUESTION}}</b> {{OPTIONS}}</li>
+</ol>
+
+<!-- 9. GLOSSARY: every term that has a tooltip, plus the terms a reader needs once. -->
+<h2 id="appendix">Appendix — full clause list</h2>
+<details>
+<summary>{{CLAUSE_COUNT}} clauses with path, line, before, after, change and reason</summary>
+<div class="scroll">
+<table>
+  <thead><tr><th>#</th><th>Where</th><th>Before</th><th>After</th><th>Change</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td>{{N}}</td><td><code>{{PATH}}:{{LINE}}</code> — {{DESCRIPTION}}</td>
+        <td>{{BEFORE — del marks}}</td><td>{{AFTER — add marks}}</td>
+        <td>{{CHANGE}}</td><td>{{REASON — hl marks}}</td></tr>
+  </tbody>
+</table>
+</div>
+</details>
+
+<footer>Sources: {{SOURCE_FILES}}. Colour marks the difference; layout is unchanged.</footer>
+
+<script>
+(function () {
+  var KEY = 'review-pack-{{PROJECT_SLUG}}-{{DATE}}';
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.review input[type="checkbox"]'));
+  var selects = Array.prototype.slice.call(document.querySelectorAll('.review select'));
+  var counter = document.getElementById('reviewed');
+  function refresh() { if (counter) counter.textContent = boxes.filter(function (b) { return b.checked; }).length; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} refresh(); }
+  boxes.forEach(function (b) {
+    b.checked = !!state[b.dataset.key];
+    b.addEventListener('change', function () { state[b.dataset.key] = b.checked; save(); });
+  });
+  selects.forEach(function (s) {
+    if (state[s.dataset.key]) s.value = state[s.dataset.key];
+    s.addEventListener('change', function () { state[s.dataset.key] = s.value; save(); });
+  });
+  refresh();
+})();
+</script>
+</body>
+</html>
