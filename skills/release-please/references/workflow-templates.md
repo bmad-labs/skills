@@ -704,9 +704,9 @@ jobs:
       - name: Create pre-release tag and GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag_name }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          TAG="${{ steps.version.outputs.tag_name }}"
-          VERSION="${{ steps.version.outputs.version }}"
           git tag "$TAG"
           git push origin "$TAG"
           gh release create "$TAG" \
@@ -737,8 +737,9 @@ jobs:
 
       - name: Resolve version and tag
         id: resolve
+        env:
+          VERSION: ${{ needs.release-please.outputs.version || needs.manual-release.outputs.version }}
         run: |
-          VERSION="${{ needs.release-please.outputs.version || needs.manual-release.outputs.version }}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           if [[ "$VERSION" == *-* ]]; then
             echo "npm_tag=next" >> "$GITHUB_OUTPUT"
@@ -753,7 +754,6 @@ jobs:
         id: check
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
-          VERSION="${{ steps.resolve.outputs.version }}"
           if npm view "${PACKAGE_NAME}@${VERSION}" version 2>/dev/null; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
@@ -761,13 +761,17 @@ jobs:
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.resolve.outputs.version }}
 
+      # Stable tags already carry the version in package.json; --allow-same-version keeps npm from refusing it.
       - if: steps.check.outputs.exists == 'false'
         run: |
-          npm version "${{ steps.resolve.outputs.version }}" --no-git-tag-version
-          npm publish --tag "${{ steps.resolve.outputs.npm_tag }}"
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          npm publish --tag "$NPM_TAG"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+          NPM_TAG: ${{ steps.resolve.outputs.npm_tag }}
 ```
 
 ### Usage

@@ -69,11 +69,12 @@ Ask before a system permission, a browser download over 100 MB, a paid service, 
 The vendor ships only an install script. Never pipe it into a shell.
 
 ```bash
-curl -fsSL https://cua.ai/driver/install.sh -o /tmp/cua-driver-install.sh
-shasum -a 256 /tmp/cua-driver-install.sh
+d=$(mktemp -d)
+curl -fsSL https://cua.ai/driver/install.sh -o "$d/install.sh"
+shasum -a 256 "$d/install.sh"
 ```
 
-Show the user the script's checksum and what it downloads and writes. Run `bash /tmp/cua-driver-install.sh` only after the user says yes. In a Tart VM, run it in the guest, not on the host.
+If the vendor publishes a checksum for the script, compare it; a hash you computed yourself proves nothing on its own. Read the script and tell the user what it downloads, where it writes, and whether it asks for `sudo`. Run `bash "$d/install.sh"` only after the user says yes. In a Tart VM, run it in the guest, not on the host.
 
 ### Untrusted content
 

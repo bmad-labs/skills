@@ -182,7 +182,9 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
      them to `/tmp/viz-edit/`. The user just says "read the feedback" — you read `edit-feedback.json` (each
      comment carries an absolute `imagePath`) and the PNGs directly. If the bridge ever isn't running,
      "Copy for AI" silently falls back to a normal clipboard copy. (Bare alternative: run
-     `node scripts/feedback-bridge.mjs` and `python3 -m http.server` yourself.)
+     `node scripts/feedback-bridge.mjs` and `python3 -m http.server` yourself.) The bridge accepts only a
+     page served from localhost; a page opened as a `file://` (for example a `--keep-edit` export) is
+     refused unless the bridge runs with `--allow-file-origin`.
    - **Without the bridge:** "Copy for AI" copies the markdown to paste into chat — fine for id/text
      comments, but snip images aren't included. Or use **Download** (`edit-feedback.json` + `snip-N.png`)
      then `node scripts/receive-feedback.mjs` to land them in `/tmp/viz-edit/` at the paths the JSON names.

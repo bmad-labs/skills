@@ -23,12 +23,12 @@
    the same browser cannot POST here, including through DNS rebinding. A page
    opened from file:// sends Origin "null"; that is refused unless
    --allow-file-origin is passed, because sandboxed iframes on any site also
-   send "null". Image files are named only snip-N.png and must resolve inside
-   --dir. No deps beyond Node.
+   send "null". Image files are named only snip-N.png, must resolve inside
+   --dir, and are never written through a symlink. No deps beyond Node.
    ============================================================================ */
 
 import { createServer } from 'node:http';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, constants } from 'node:fs';
 import { join, resolve, relative, isAbsolute } from 'node:path';
 
 const args = process.argv.slice(2);
@@ -51,9 +51,13 @@ function isAllowed(req) {
   try { return LOCAL_HOSTS.has(new URL(origin).hostname); } catch { return false; }
 }
 
+// Never follow a symlink planted in a shared dir such as /tmp. O_NOFOLLOW is absent on Windows.
+const NOFOLLOW = constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC | (constants.O_NOFOLLOW ?? 0);
+const writeFile = (path, data) => writeFileSync(path, data, { flag: NOFOLLOW });
+
 // Only snip-N.png, and only inside dir.
 function snipPath(requested, index) {
-  const name = /^snip-\d+\.png$/.test(requested || '') ? requested : `snip-${index + 1}.png`;
+  const name = typeof requested === 'string' && /^snip-\d+\.png$/.test(requested) ? requested : `snip-${index + 1}.png`;
   const path = resolve(dir, name);
   const rel = relative(dir, path);
   if (!rel || rel.startsWith('..') || isAbsolute(rel)) throw new Error(`path escapes ${dir}`);
@@ -70,11 +74,18 @@ const server = createServer((req, res) => {
   if (req.method !== 'POST') { res.writeHead(405); return res.end(); }
 
   let body = '';
+  let tooLarge = false;
   req.on('data', (c) => {
+    if (tooLarge) return;
     body += c;
-    if (body.length > MAX_BODY) { res.writeHead(413); res.end('too large\n'); req.destroy(); }
+    if (body.length > MAX_BODY) {
+      tooLarge = true;
+      res.writeHead(413, { Connection: 'close' });
+      res.end('too large\n', () => req.destroy());
+    }
   });
   req.on('end', () => {
+    if (tooLarge) return;
    try {
     let batch;
     try { batch = JSON.parse(body); } catch { res.writeHead(400); return res.end('bad json'); }
@@ -90,7 +101,7 @@ const server = createServer((req, res) => {
         const m = c.screenshotDataUrl.match(/^data:image\/png;base64,(.+)$/);
         if (m) {
           const path = snipPath(c.screenshotFile, i);
-          writeFileSync(path, Buffer.from(m[1], 'base64'));
+          writeFile(path, Buffer.from(m[1], 'base64'));
           c.imagePath = path;                 // stamp the absolute path
           written.push(path);
         }
@@ -99,7 +110,7 @@ const server = createServer((req, res) => {
     });
     batch.imageDir = dir;
     const jsonPath = join(dir, 'edit-feedback.json');
-    writeFileSync(jsonPath, JSON.stringify(batch, null, 2));
+    writeFile(jsonPath, JSON.stringify(batch, null, 2));
     written.unshift(jsonPath);
 
     // also write the human-readable markdown if the page sent it. The page builds the
@@ -109,7 +120,7 @@ const server = createServer((req, res) => {
     // path prefix (so an already-absolute path is REPLACED, not prepended to).
     if (batch.markdown) {
       const mdText = batch.markdown.replace(/\S*?(snip-\d+\.png)/g, (_, f) => join(dir, f));
-      const md = join(dir, 'edit-feedback.md'); writeFileSync(md, mdText); written.push(md);
+      const md = join(dir, 'edit-feedback.md'); writeFile(md, mdText); written.push(md);
     }
 
     console.log(`← received ${(batch.comments || []).length} comment(s); wrote:`);

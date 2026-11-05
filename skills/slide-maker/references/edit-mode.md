@@ -116,7 +116,9 @@ The comment panel's **"Copy for AI"** is the one button:
   starts the feedback-bridge on **:8930**; the deck is pre-wired to it. "Copy for
   AI" POSTs the batch + snip PNGs, and the bridge writes
   `/tmp/slide-maker-edit/edit-feedback.json` + `snip-N.png`. The user says **"read the
-  feedback"** and you read the JSON (+ images by absolute `imagePath`).
+  feedback"** and you read the JSON (+ images by absolute `imagePath`). The bridge
+  accepts only a page served from localhost; a deck opened as a `file://` is refused
+  unless the bridge runs with `--allow-file-origin`.
 - **Without the bridge:** "Copy for AI" copies human-readable **markdown** to the
   clipboard. When the user **dragged a snip**, the bridge wrote the PNG and the markdown
   carries its **absolute path** on a `screenshot (Read this image): <path>` line, plus a
