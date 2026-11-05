@@ -68,12 +68,31 @@ jobs:
       - name: Skip without token
         if: env.SNYK_TOKEN == ''
         run: echo "::warning::SNYK_TOKEN is not set (or this is a fork PR); Snyk Agent Scan skipped for ${{ matrix.skill }}"
+      # --ci requires --dangerously-run-mcp-servers, which starts every MCP server the
+      # scan discovers. Make sure there is none: no MCP config in the skill, and an
+      # empty HOME so no machine-wide agent config is found.
+      - name: Refuse MCP server configs
+        if: env.SNYK_TOKEN != ''
+        env:
+          SKILL: ${{ matrix.skill }}
+        run: |
+          found=$(grep -rlE '"?mcpServers"?|\[mcp_servers' "$SKILL" \
+            --include='*.json' --include='*.jsonc' --include='*.yaml' --include='*.yml' --include='*.toml' || true)
+          if [ -n "$found" ]; then
+            echo "::error::MCP server config found; refusing to run Snyk Agent Scan with --dangerously-run-mcp-servers:"
+            echo "$found"
+            exit 1
+          fi
       - name: Snyk Agent Scan
         if: env.SNYK_TOKEN != ''
-        # Sends the skill content to Snyk. --ci exits non-zero when findings remain.
+        # Sends the skill content to Snyk. --ci exits 1 when risks remain, 2 on bad usage.
+        env:
+          SKILL: ${{ matrix.skill }}
         run: |
           set -o pipefail
-          uvx snyk-agent-scan@0.6.9 --ci --json "${{ matrix.skill }}" | tee snyk-agent-scan.json
+          export HOME="$(mktemp -d)"
+          uvx snyk-agent-scan@0.6.9 --ci --dangerously-run-mcp-servers --json "$SKILL" \
+            | tee "$GITHUB_WORKSPACE/snyk-agent-scan.json"
       - name: Upload report
         if: always() && env.SNYK_TOKEN != ''
         uses: actions/upload-artifact@v4
