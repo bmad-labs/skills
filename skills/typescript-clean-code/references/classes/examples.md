@@ -151,6 +151,8 @@ class Sql {
 ### After: Family of Single-Purpose Classes
 
 ```typescript
+// Illustrates Open/Closed structure only. Real SQL must use parameterized queries,
+// never values interpolated into the string.
 abstract class Sql {
   constructor(protected table: string, protected columns: Column[]) { }
   abstract generate(): string;

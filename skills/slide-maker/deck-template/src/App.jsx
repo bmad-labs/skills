@@ -144,7 +144,7 @@ export default function App() {
   useEffect(() => {
     if (!editReady || !window.EditMode) return;
     if (!emInited.current) {
-      window.EditMode.init({ bridge: 'http://localhost:8930' });
+      window.EditMode.init({ bridge: 'http://127.0.0.1:8930' });
       emInited.current = true;
     }
     window.EditMode.setOn?.(mode === 'normal' && editOn);

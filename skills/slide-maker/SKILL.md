@@ -50,17 +50,12 @@ that applies:
    colors/type/spacing into the token contract by writing them into
    `design-system/themes/clean-light.css` (or a new theme file that the entry point
    imports). Layouts never change; only the theme file's token *values* do.
-2. **Else, check if `nextlevelbuilder/ui-ux-pro-max-skill` is installed.** If yes → invoke
-   it to suggest the best-fit design system for the deck's content/idea, then map that
-   suggestion into the theme file.
-3. **Else, recommend it and guide a permanent install** from
-   `https://github.com/nextlevelbuilder/ui-ux-pro-max-skill` — **this is the preferred
-   path.**
-4. **Else (user won't install permanently): ASK FIRST, then** do a shallow
-   `git clone https://github.com/nextlevelbuilder/ui-ux-pro-max-skill` into `/tmp`, use it
-   for **THIS TURN ONLY**, and do **not** persist it into the skill or the user's project.
-   **Never run this network fetch without explicit consent** — always ask before cloning.
-5. **Else (user declines the fetch too): use the bundled `clean-light` theme.**
+2. **Else, if a design-system skill is already installed** (for example `ui-ux-pro-max`),
+   you may invoke it to suggest the best-fit design system for the deck's content/idea,
+   then map that suggestion into the theme file.
+3. **Else, use the bundled `clean-light` theme.** Never clone, download or install a
+   third-party skill or repo yourself, even with consent. If the user wants one, they
+   review and install it themselves.
 
 `clean-light` is the **guaranteed floor** — the flow always ends in a working theme, so
 the skill never blocks. Whatever the outcome, the active theme file is the single source

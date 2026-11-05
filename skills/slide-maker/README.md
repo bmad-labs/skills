@@ -42,10 +42,8 @@ At the start of brainstorm and generate, Claude works down this list and stops a
 first match:
 
 1. Your own design system or brand tokens, mapped into the theme file.
-2. A `nextlevelbuilder/ui-ux-pro-max-skill` suggestion, if that skill is installed.
-3. A recommendation to install that skill.
-4. A one-turn-only clone of it, with your explicit consent.
-5. The bundled `clean-light` theme.
+2. A suggestion from a design-system skill you already installed (for example `ui-ux-pro-max`).
+3. The bundled `clean-light` theme.
 
 The last option is the floor, so the skill never blocks on a missing design system. The
 active theme file is the single source of truth for color and type. Layouts never change;

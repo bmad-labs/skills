@@ -18,13 +18,10 @@ order**, stop at the first branch that applies:
 1. **User's own design system / brand tokens** → map colors/type/spacing into
    `design-system/themes/clean-light.css` (or a new theme the entry point imports). Layouts
    never change; only the theme's token *values* do.
-2. **Else, `nextlevelbuilder/ui-ux-pro-max-skill` installed** → invoke it to suggest a
-   best-fit design system, then map that into the theme file.
-3. **Else, recommend + guide a permanent install** from
-   `https://github.com/nextlevelbuilder/ui-ux-pro-max-skill` (preferred path).
-4. **Else, ASK FIRST, then** shallow-clone it into `/tmp` for **THIS TURN ONLY**, don't
-   persist it. **Never fetch without explicit consent.**
-5. **Else, use the bundled `clean-light` theme** — the guaranteed floor.
+2. **Else, a design-system skill already installed** (for example `ui-ux-pro-max`) → invoke
+   it to suggest a best-fit design system, then map that into the theme file.
+3. **Else, use the bundled `clean-light` theme** — the guaranteed floor. Never clone,
+   download or install a third-party skill yourself; the user installs it if they want it.
 
 The active theme file is the single source of truth for color/type — read it, write token
 values into it, never hardcode a hex/font into a layout.

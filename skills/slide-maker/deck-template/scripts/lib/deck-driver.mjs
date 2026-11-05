@@ -11,8 +11,8 @@
 
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { resolve, join } from 'node:path';
-import { existsSync, readFileSync, mkdirSync } from 'node:fs';
+import { resolve, join, relative, isAbsolute } from 'node:path';
+import { existsSync, readFileSync, mkdirSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 
@@ -76,15 +76,18 @@ export function serveDir(dir, port = 0) {
   return new Promise((res) => {
     const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.woff2': 'font/woff2' };
     const srv = createServer((req, rq) => {
-      let p = decodeURIComponent((req.url || '/').split('?')[0]);
+      let p;
+      try { p = decodeURIComponent((req.url || '/').split('?')[0]); } catch { rq.writeHead(400); return rq.end('bad path'); }
       if (p === '/' || p.endsWith('/')) p += 'index.html';
-      const file = join(dir, p);
-      if (!file.startsWith(dir) || !existsSync(file)) { rq.writeHead(404); return rq.end('not found'); }
+      const file = resolve(dir, '.' + p);
+      const rel = relative(resolve(dir), file);
+      const st = statSync(file, { throwIfNoEntry: false });
+      if (rel.startsWith('..') || isAbsolute(rel) || !st || !st.isFile()) { rq.writeHead(404); return rq.end('not found'); }
       const ext = p.slice(p.lastIndexOf('.'));
       rq.writeHead(200, { 'Content-Type': types[ext] || 'application/octet-stream' });
       rq.end(readFileSync(file));
     });
-    srv.listen(port, () => res({ url: `http://localhost:${srv.address().port}/`, close: () => srv.close() }));
+    srv.listen(port, '127.0.0.1', () => res({ url: `http://127.0.0.1:${srv.address().port}/`, close: () => srv.close() }));
   });
 }
 
