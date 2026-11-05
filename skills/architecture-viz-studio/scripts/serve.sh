@@ -15,7 +15,7 @@
 #   pageDir defaults to "." (run it from your page directory).
 #
 # Then init edit-mode with the matching bridge URL:
-#   EditMode.init({ bridge: 'http://localhost:8910' });
+#   EditMode.init({ bridge: 'http://127.0.0.1:8910' });
 # Open http://localhost:8800/ and use "Copy for AI" — it now also saves to /tmp/viz-edit.
 # ============================================================================
 set -euo pipefail
@@ -60,7 +60,7 @@ trap cleanup EXIT INT TERM
 echo "────────────────────────────────────────────────────────"
 echo "  page    →  http://localhost:$PORT/"
 echo "  bridge  →  http://localhost:$BRIDGE_PORT/  (writes to $EDIT_DIR)"
-echo "  init edit-mode with:  EditMode.init({ bridge: 'http://localhost:$BRIDGE_PORT' })"
+echo "  init edit-mode with:  EditMode.init({ bridge: 'http://127.0.0.1:$BRIDGE_PORT' })"
 echo "  Ctrl-C to stop both."
 echo "────────────────────────────────────────────────────────"
 

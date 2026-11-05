@@ -659,4 +659,4 @@ EditMode.attachScene({ THREE, renderer, camera, scene });
 [studio, farm, origin, edge, tv, route.tube].forEach((o) =>
   EditMode.registerVizObject(o, o.userData.vizId));
 if (window.__viz) window.__viz.attachScene({ THREE, renderer, camera, scene });
-EditMode.init({ bridge: 'http://localhost:8910' });
+EditMode.init({ bridge: 'http://127.0.0.1:8910' });

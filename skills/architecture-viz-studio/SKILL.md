@@ -177,7 +177,7 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
    **Getting feedback back to you — "Copy for AI" is the one button, made smarter by the bridge:**
    - **Serve with `scripts/serve.sh` (recommended):** `./scripts/serve.sh <pageDir>` starts BOTH the page
      server (8800) and the feedback-bridge (8910) together, so the bridge is always up whenever the page
-     is — no separate process to forget. Init edit-mode with `{ bridge: 'http://localhost:8910' }`. Now
+     is — no separate process to forget. Init edit-mode with `{ bridge: 'http://127.0.0.1:8910' }`. Now
      **"Copy for AI"** both copies the markdown AND POSTs the batch + snip PNGs to the bridge, which writes
      them to `/tmp/viz-edit/`. The user just says "read the feedback" — you read `edit-feedback.json` (each
      comment carries an absolute `imagePath`) and the PNGs directly. If the bridge ever isn't running,
