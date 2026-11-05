@@ -56,12 +56,12 @@ A file written before the lenses existed stays valid; its three lenses use `revi
 | --- | --- | --- | --- |
 | anthropic | `claude-opus-5-5` (quality uses `claude-fable-5-1` for leader, planner, reviewer) | `claude-sonnet-5-5` | `claude-haiku-5-5` |
 | openai | `gpt-6-astra` | `gpt-6.1-sol` | `gpt-6-luna` |
-| deepseek | `deepseek-flash` | `deepseek-flash` | `deepseek-flash`; tiers differ by effort only |
+| deepseek | `deepseek-v4.1-flash` | `deepseek-v4.1-flash` | `deepseek-v4.1-flash`; tiers differ by effort only |
 | google | `gemini-4-argon` | `gemini-3.8-flash` | `gemini-3.5-flash-lite` |
 
 All three `anthropic-*` presets run `uat-runner` on `claude-sonnet-5-5`, whatever the tier.
 
-`deepseek-flash` is DeepSeek-V4.1-Flash-1017 on the DeepSeek API. The legacy id `deepseek-v4-flash` still routes to it. Gateways such as Vercel and Requesty name it `deepseek/deepseek-v4.1-flash`; use that id only through those gateways.
+`deepseek-v4.1-flash` is DeepSeek-V4.1-Flash-1017, the name gateways such as Vercel and Requesty use. The DeepSeek API itself names it `deepseek-flash` (legacy `deepseek-v4-flash` routes there too). If a direct DeepSeek API call rejects `deepseek-v4.1-flash`, set the model to `deepseek-flash` and `preset` to `custom`.
 
 Model ids were checked on 2026-11-05 (`checked` in the preset file). If a dispatch fails with an unknown-model error, look up the current id with `context7-mcp` or the vendor docs, fix `.leader.json`, and set `preset` to `custom`.
 
@@ -80,7 +80,7 @@ The `Agent` `name` allows no dots: write the Story id with a hyphen, `plan-1-1`,
 
 Claude Code dispatches only Anthropic models. A non-Anthropic preset under `harness: claude-code` is invalid: tell the user and offer an Anthropic preset or OpenCode.
 
-**OpenCode** — model is `<vendor>/<model>`, for example `openai/gpt-6.1-sol`, `deepseek/deepseek-flash`, `google/gemini-4-argon`. Set effort through the provider option (`reasoningEffort`) or a named variant.
+**OpenCode** — model is `<vendor>/<model>`, for example `openai/gpt-6.1-sol`, `deepseek/deepseek-v4.1-flash`, `google/gemini-4-argon`. Set effort through the provider option (`reasoningEffort`) or a named variant.
 
 Effort per vendor, when the vendor does not accept a value:
 

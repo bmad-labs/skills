@@ -128,18 +128,18 @@
       "tier": "quality",
       "summary": "Strongest model for every role. Highest cost.",
       "agents": [
-        { "name": "leader", "model": "deepseek-flash", "effort": "xhigh", "contextWindow": 1048576 },
-        { "name": "planner", "model": "deepseek-flash", "effort": "xhigh", "contextWindow": 1048576 },
-        { "name": "builder", "model": "deepseek-flash", "effort": "high", "contextWindow": 1048576 },
-        { "name": "verifier", "model": "deepseek-flash", "effort": "high", "contextWindow": 1048576 },
-        { "name": "uat-runner", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
-        { "name": "reviewer", "model": "deepseek-flash", "effort": "xhigh", "contextWindow": 200000 },
-        { "name": "research", "model": "deepseek-flash", "effort": "high", "contextWindow": 1048576 },
-        { "name": "retrospective", "model": "deepseek-flash", "effort": "high", "contextWindow": 1048576 },
-        { "name": "correct-course", "model": "deepseek-flash", "effort": "high", "contextWindow": 1048576 },
-        { "name": "blind-hunter", "model": "deepseek-flash", "effort": "xhigh", "contextWindow": 200000 },
-        { "name": "edge-cases-hunter", "model": "deepseek-flash", "effort": "xhigh", "contextWindow": 200000 },
-        { "name": "verification-gap-finder", "model": "deepseek-flash", "effort": "high", "contextWindow": 200000 }
+        { "name": "leader", "model": "deepseek-v4.1-flash", "effort": "xhigh", "contextWindow": 1048576 },
+        { "name": "planner", "model": "deepseek-v4.1-flash", "effort": "xhigh", "contextWindow": 1048576 },
+        { "name": "builder", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "deepseek-v4.1-flash", "effort": "xhigh", "contextWindow": 200000 },
+        { "name": "research", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "blind-hunter", "model": "deepseek-v4.1-flash", "effort": "xhigh", "contextWindow": 200000 },
+        { "name": "edge-cases-hunter", "model": "deepseek-v4.1-flash", "effort": "xhigh", "contextWindow": 200000 },
+        { "name": "verification-gap-finder", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 200000 }
       ]
     },
     {
@@ -148,18 +148,18 @@
       "tier": "balanced",
       "summary": "Top model where judgment matters (leader, planner, verifier, reviewer); mid model builds; small model runs UAT.",
       "agents": [
-        { "name": "leader", "model": "deepseek-flash", "effort": "high", "contextWindow": 1048576 },
-        { "name": "planner", "model": "deepseek-flash", "effort": "high", "contextWindow": 1048576 },
-        { "name": "builder", "model": "deepseek-flash", "effort": "high", "contextWindow": 1048576 },
-        { "name": "verifier", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
-        { "name": "uat-runner", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
-        { "name": "reviewer", "model": "deepseek-flash", "effort": "high", "contextWindow": 200000 },
-        { "name": "research", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
-        { "name": "retrospective", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
-        { "name": "correct-course", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
-        { "name": "blind-hunter", "model": "deepseek-flash", "effort": "high", "contextWindow": 200000 },
-        { "name": "edge-cases-hunter", "model": "deepseek-flash", "effort": "high", "contextWindow": 200000 },
-        { "name": "verification-gap-finder", "model": "deepseek-flash", "effort": "medium", "contextWindow": 200000 }
+        { "name": "leader", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "planner", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "builder", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "deepseek-v4.1-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 200000 },
+        { "name": "research", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "blind-hunter", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 200000 },
+        { "name": "edge-cases-hunter", "model": "deepseek-v4.1-flash", "effort": "high", "contextWindow": 200000 },
+        { "name": "verification-gap-finder", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 200000 }
       ]
     },
     {
@@ -168,18 +168,18 @@
       "tier": "budget",
       "summary": "Mid model for leader, planner, reviewer; small model everywhere else. Lowest cost.",
       "agents": [
-        { "name": "leader", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
-        { "name": "planner", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
-        { "name": "builder", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
-        { "name": "verifier", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
-        { "name": "uat-runner", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
-        { "name": "reviewer", "model": "deepseek-flash", "effort": "medium", "contextWindow": 200000 },
-        { "name": "research", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
-        { "name": "retrospective", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
-        { "name": "correct-course", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
-        { "name": "blind-hunter", "model": "deepseek-flash", "effort": "medium", "contextWindow": 200000 },
-        { "name": "edge-cases-hunter", "model": "deepseek-flash", "effort": "medium", "contextWindow": 200000 },
-        { "name": "verification-gap-finder", "model": "deepseek-flash", "effort": "low", "contextWindow": 200000 }
+        { "name": "leader", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "planner", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "builder", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "deepseek-v4.1-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "deepseek-v4.1-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 200000 },
+        { "name": "research", "model": "deepseek-v4.1-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "deepseek-v4.1-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "deepseek-v4.1-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "blind-hunter", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 200000 },
+        { "name": "edge-cases-hunter", "model": "deepseek-v4.1-flash", "effort": "medium", "contextWindow": 200000 },
+        { "name": "verification-gap-finder", "model": "deepseek-v4.1-flash", "effort": "low", "contextWindow": 200000 }
       ]
     },
     {
