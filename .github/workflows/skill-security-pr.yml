@@ -1,0 +1,72 @@
+name: Skill checks
+
+# Runs on every PR that adds or changes a skill. Checks only the changed skills.
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      skills: ${{ steps.list.outputs.skills }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: list
+        name: List changed skills
+        run: |
+          skills=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- skills/ \
+            | cut -d/ -f1-2 | sort -u \
+            | while read -r dir; do [ -f "$dir/SKILL.md" ] && echo "$dir"; done \
+            | jq -R . | jq -sc .)
+          echo "skills=$skills" >> "$GITHUB_OUTPUT"
+          echo "Changed skills: $skills"
+
+  frontmatter:
+    needs: changes
+    if: needs.changes.outputs.skills != '[]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml==6.0.2
+      - name: Check SKILL.md frontmatter
+        run: python .github/scripts/check_skill_frontmatter.py $(echo '${{ needs.changes.outputs.skills }}' | jq -r '.[]')
+
+  snyk-agent-scan:
+    needs: changes
+    if: needs.changes.outputs.skills != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        skill: ${{ fromJson(needs.changes.outputs.skills) }}
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Skip without token
+        if: env.SNYK_TOKEN == ''
+        run: echo "::warning::SNYK_TOKEN is not set (or this is a fork PR); Snyk Agent Scan skipped for ${{ matrix.skill }}"
+      - name: Snyk Agent Scan
+        if: env.SNYK_TOKEN != ''
+        # Sends the skill content to Snyk. --ci exits non-zero when findings remain.
+        run: |
+          set -o pipefail
+          uvx snyk-agent-scan@0.6.9 --ci --json "${{ matrix.skill }}" | tee snyk-agent-scan.json
+      - name: Upload report
+        if: always() && env.SNYK_TOKEN != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-agent-scan-${{ strategy.job-index }}
+          path: snyk-agent-scan.json
+          if-no-files-found: ignore
