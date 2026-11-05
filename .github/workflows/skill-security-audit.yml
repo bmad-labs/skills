@@ -1,0 +1,25 @@
+name: skills.sh security audit
+
+# Reads the published audit results (Gen Agent Trust Hub, Socket, Snyk) that
+# skills.sh shows at install time. Audits run after a skill is published, so this
+# runs on a schedule, not on PRs.
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check skills.sh audits
+        env:
+          SKILLS_SH_TOKEN: ${{ secrets.SKILLS_SH_TOKEN }}
+        run: python .github/scripts/skills_sh_audit.py "${{ github.repository }}"
