@@ -30,4 +30,4 @@ Duplicate step "2" in Planning first; `.ai-aftifacts` spelling; "agent-team team
 | L2 | `anthropic-balanced` with lens entries | PASS. Blind Hunter `opus/high`, Edge Cases Hunter `opus/high`, Verification Gap Finder `sonnet/medium`. |
 
 Gap closed: lens session names were ambiguous (`r1-1-1`); now `review-<lens>-r<n>-s<story>` with the config lens name.
-One-time narrow-input roles (reviewer, lenses, uat-runner) set to 200K in presets; research, retrospective and correct-course keep 1M.
+One-time narrow-input roles (reviewer, lenses) set to 200K in presets; uat-runner, research, retrospective and correct-course keep 1M.

@@ -100,8 +100,8 @@ The leader cannot change its own model mid-session. At Activate, compare the `le
 | Agent kind | Roles | Preset window | Rule |
 | --- | --- | --- | --- |
 | Persistent | leader, planner, builder, verifier | 1M | At about 70% used, start a fresh session with a handoff note. Record the switch in the report. |
-| One-time, wide input | research, retrospective, correct-course | 1M | Reads many sources: web pages and docs, or a whole epic of plans and evidence. |
-| One-time, narrow input | reviewer, the 3 lenses, uat-runner | 200K | Reads one Story's change or one set of UAT cases. If the brief and its inputs would pass about 70% of the window, split the work, for example one review per file group. |
+| One-time, wide input | uat-runner, research, retrospective, correct-course | 1M | Reads many sources: screenshots and logs, web pages and docs, or a whole epic of plans and evidence. |
+| One-time, narrow input | reviewer, the 3 lenses | 200K | Reads one Story's change. If the brief and its inputs would pass about 70% of the window, split the work, for example one review per file group. |
 
 ## Change the preset later
 
