@@ -11,7 +11,7 @@
 
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { resolve, join } from 'node:path';
+import { resolve, join, relative, isAbsolute } from 'node:path';
 import { existsSync, readFileSync, mkdirSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
@@ -78,13 +78,14 @@ export function serveDir(dir, port = 0) {
     const srv = createServer((req, rq) => {
       let p = decodeURIComponent((req.url || '/').split('?')[0]);
       if (p === '/' || p.endsWith('/')) p += 'index.html';
-      const file = join(dir, p);
-      if (!file.startsWith(dir) || !existsSync(file)) { rq.writeHead(404); return rq.end('not found'); }
+      const file = resolve(dir, '.' + p);
+      const rel = relative(resolve(dir), file);
+      if (rel.startsWith('..') || isAbsolute(rel) || !existsSync(file)) { rq.writeHead(404); return rq.end('not found'); }
       const ext = p.slice(p.lastIndexOf('.'));
       rq.writeHead(200, { 'Content-Type': types[ext] || 'application/octet-stream' });
       rq.end(readFileSync(file));
     });
-    srv.listen(port, () => res({ url: `http://localhost:${srv.address().port}/`, close: () => srv.close() }));
+    srv.listen(port, '127.0.0.1', () => res({ url: `http://127.0.0.1:${srv.address().port}/`, close: () => srv.close() }));
   });
 }
 

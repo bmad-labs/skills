@@ -24,16 +24,12 @@ those tokens. Run this flow **in order** and stop at the first branch that appli
 1. **Ask the user if they have their own design system / brand tokens.** If yes → map its
    colors/type/spacing into `design-system/themes/clean-light.css` (or a new theme file the
    entry point imports). Layouts never change; only the theme's token *values* do.
-2. **Else, check if `nextlevelbuilder/ui-ux-pro-max-skill` is installed.** If yes → invoke
-   it to suggest the best-fit design system for the deck's content/idea, then map that into
-   the theme file.
-3. **Else, recommend it and guide a permanent install** from
-   `https://github.com/nextlevelbuilder/ui-ux-pro-max-skill` — **the preferred path.**
-4. **Else (user won't install permanently): ASK FIRST, then** shallow-clone it into `/tmp`,
-   use it for **THIS TURN ONLY**, and don't persist it. **Never run this network fetch
-   without explicit consent.**
-5. **Else: use the bundled `clean-light` theme** — the guaranteed floor, so the skill never
-   blocks.
+2. **Else, if a design-system skill is already installed** (for example `ui-ux-pro-max`),
+   invoke it to suggest the best-fit design system for the deck's content/idea, then map
+   that into the theme file.
+3. **Else: use the bundled `clean-light` theme** — the guaranteed floor, so the skill never
+   blocks. Never clone, download or install a third-party skill yourself; the user
+   installs it if they want it.
 
 The active theme file is the single source of truth for color/type. This is why you don't
 brainstorm a "vibe" or palette — the design system is resolved, and you brainstorm content

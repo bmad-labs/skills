@@ -12,27 +12,57 @@
    reads the JSON + images by absolute path. No download, no manual move, no paste.
 
    USAGE
-     node feedback-bridge.mjs [--port 8930] [--dir /tmp/slide-maker-edit]
-   Then load edit-mode with:  EditMode.init({ bridge: 'http://localhost:8930' })
+     node feedback-bridge.mjs [--port 8930] [--dir /tmp/slide-maker-edit] [--allow-file-origin]
+   Then load edit-mode with:  EditMode.init({ bridge: 'http://127.0.0.1:8930' })
    "Copy for AI" then copies the markdown AND saves the files here. If the bridge
    isn't running, "Copy for AI" silently falls back to a normal clipboard copy.
 
-   CORS is wide-open (localhost dev tool). No deps beyond Node.
+   SAFETY
+   Listens on 127.0.0.1 only. Accepts requests only from a localhost page
+   (Origin and Host must be localhost / 127.0.0.1), so another website open in
+   the same browser cannot POST here, including through DNS rebinding. A page
+   opened from file:// sends Origin "null"; that is refused unless
+   --allow-file-origin is passed, because sandboxed iframes on any site also
+   send "null". Image files are named only snip-N.png and must resolve inside
+   --dir. No deps beyond Node.
    ============================================================================ */
 
 import { createServer } from 'node:http';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve, relative, isAbsolute } from 'node:path';
 
 const args = process.argv.slice(2);
 const val = (f, d) => { const i = args.indexOf(f); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 const port = +val('--port', 8930);
-const dir = val('--dir', '/tmp/slide-maker-edit');
+const dir = resolve(val('--dir', '/tmp/slide-maker-edit'));
+const allowFileOrigin = args.includes('--allow-file-origin');
+const MAX_BODY = 80 * 1024 * 1024;
 mkdirSync(dir, { recursive: true });
 
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
+const hostname = (value) => { try { return new URL(`http://${value}`).hostname; } catch { return ''; } };
+
+// Browser requests always carry Host; cross-site ones carry a foreign Origin.
+function isAllowed(req) {
+  if (!LOCAL_HOSTS.has(hostname(req.headers.host || ''))) return false;
+  const origin = req.headers.origin;
+  if (origin === undefined) return true;                 // same-origin GET or a local CLI client
+  if (origin === 'null') return allowFileOrigin;
+  try { return LOCAL_HOSTS.has(new URL(origin).hostname); } catch { return false; }
+}
+
+// Only snip-N.png, and only inside dir.
+function snipPath(requested, index) {
+  const name = /^snip-\d+\.png$/.test(requested || '') ? requested : `snip-${index + 1}.png`;
+  const path = resolve(dir, name);
+  const rel = relative(dir, path);
+  if (!rel || rel.startsWith('..') || isAbsolute(rel)) throw new Error(`path escapes ${dir}`);
+  return path;
+}
+
 const server = createServer((req, res) => {
-  // permissive CORS so the page (any localhost port / file://) can POST
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  if (!isAllowed(req)) { res.writeHead(403); return res.end('forbidden origin\n'); }
+  if (req.headers.origin) { res.setHeader('Access-Control-Allow-Origin', req.headers.origin); res.setHeader('Vary', 'Origin'); }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
@@ -40,7 +70,10 @@ const server = createServer((req, res) => {
   if (req.method !== 'POST') { res.writeHead(405); return res.end(); }
 
   let body = '';
-  req.on('data', (c) => { body += c; if (body.length > 80 * 1024 * 1024) req.destroy(); });   // 80MB guard
+  req.on('data', (c) => {
+    body += c;
+    if (body.length > MAX_BODY) { res.writeHead(413); res.end('too large\n'); req.destroy(); }
+  });
   req.on('end', () => {
    try {
     let batch;
@@ -56,8 +89,7 @@ const server = createServer((req, res) => {
       if (c.screenshotDataUrl) {
         const m = c.screenshotDataUrl.match(/^data:image\/png;base64,(.+)$/);
         if (m) {
-          const file = c.screenshotFile || `snip-${i + 1}.png`;
-          const path = join(dir, file);
+          const path = snipPath(c.screenshotFile, i);
           writeFileSync(path, Buffer.from(m[1], 'base64'));
           c.imagePath = path;                 // stamp the absolute path
           written.push(path);
@@ -95,8 +127,8 @@ const server = createServer((req, res) => {
 // last-resort guard: an unexpected throw should log, not kill the bridge
 process.on('uncaughtException', (e) => console.error('bridge error (kept alive):', e.message));
 
-server.listen(port, () => {
-  console.log(`slide-maker feedback-bridge listening on http://localhost:${port}  →  writes to ${dir}`);
-  console.log(`load edit-mode with:  EditMode.init({ bridge: 'http://localhost:${port}' })`);
+server.listen(port, '127.0.0.1', () => {
+  console.log(`slide-maker feedback-bridge listening on http://127.0.0.1:${port}  →  writes to ${dir}`);
+  console.log(`load edit-mode with:  EditMode.init({ bridge: 'http://127.0.0.1:${port}' })`);
   console.log(`then click "Copy for AI". Tell the assistant: "read ${join(dir, 'edit-feedback.json')}".`);
 });

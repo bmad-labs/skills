@@ -12,7 +12,7 @@
      node serve.mjs [deckDir] [--dev] [--port 8930] [--dir /tmp/slide-maker-edit]
 
    edit-mode is already wired in the deck to EditMode.init({ bridge:
-   'http://localhost:8930' }), so once this is up, "Copy for AI" writes
+   'http://127.0.0.1:8930' }), so once this is up, "Copy for AI" writes
    edit-feedback.json + snip-N.png to the feedback dir. Tell the assistant:
    "read /tmp/slide-maker-edit/edit-feedback.json".
    ============================================================================ */
@@ -43,7 +43,7 @@ process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
 console.log(`slide-maker serve:`);
-console.log(`  feedback-bridge → http://localhost:${port}  (writes ${dir})`);
+console.log(`  feedback-bridge → http://127.0.0.1:${port}  (writes ${dir})`);
 run('node', [resolve(HERE, 'feedback-bridge.mjs'), '--port', port, '--dir', dir]);
 
 if (withDev) {

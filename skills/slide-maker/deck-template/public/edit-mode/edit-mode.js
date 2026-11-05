@@ -65,7 +65,7 @@
     tool: 'select',             // 'pointer' | 'select' | 'brush'
     comments: [],               // [{ id, kind, targetIds[], relatedIds[], comment, screenshot?, rect? }]
     selection: [],              // in-progress multi-select: [{ id }]
-    bridge: null,               // e.g. 'http://localhost:8930'
+    bridge: null,               // e.g. 'http://127.0.0.1:8930'
     imageDir: '/tmp/slide-maker-edit',
     nextId: 1,
   };
