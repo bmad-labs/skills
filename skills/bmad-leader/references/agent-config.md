@@ -44,7 +44,7 @@ Valid means: JSON parses, every field above is present with an allowed value, ev
 | --- | --- | --- | --- |
 | anthropic | `claude-opus-5-5` (quality uses `claude-fable-5-1` for leader, planner, reviewer) | `claude-sonnet-5-5` | `claude-haiku-5-5` |
 | openai | `gpt-6-astra` | `gpt-6.1-sol` | `gpt-6-luna` |
-| deepseek | `deepseek-v4-pro` | `deepseek-v4-pro` (no separate mid model) | `deepseek-flash` |
+| deepseek | `deepseek-flash` (V4.1) | `deepseek-flash` (V4.1) | `deepseek-flash` (V4.1); tiers differ by effort only |
 | google | `gemini-4-argon` | `gemini-3.8-flash` | `gemini-3.5-flash-lite` |
 
 Model ids were checked on 2026-11-05 (`checked` in the preset file). If a dispatch fails with an unknown-model error, look up the current id with `context7-mcp` or the vendor docs, fix `.leader.json`, and set `preset` to `custom`.
