@@ -1,15 +1,7 @@
 ---
 name: typescript-clean-code
-description: |
-  Clean Code for TypeScript — code smell catalogs (Martin's per-line heuristics, Fowler's change-shape smells, TypeScript-native type smells), a linter-first detection policy, and step-by-step review, refactoring, TDD, and estimation workflows.
-
-  Use when the user:
-  - Writes, reviews, or refactors TypeScript/JavaScript code, or asks whether code is clean, maintainable, or well-designed
-  - Names a smell — Shotgun Surgery, Feature Envy, Data Clumps, Long Method, Divergent Change, Duplicated Code, Large Class, Long Parameter List, Primitive Obsession, Message Chains, Dead Code, Speculative Generality, god class, copy-paste, stringly typed, premature abstraction
-  - Asks about TypeScript type hygiene — `any` leakage, `as` assertions, non-null `!`, discriminated unions, exhaustiveness, strict flags, branded types
-  - Asks what to enforce with lint or tsconfig versus what needs judgment, or names knip, jscpd, dependency-cruiser, typescript-eslint, type-coverage
-  - Runs TDD, fixes a bug with test coverage, or plans test strategy
-  - Estimates tasks, negotiates a deadline, or works through a commitment or team problem
+description: >-
+  Use when the user writes, reviews, or refactors TypeScript/JavaScript code, or asks whether code is clean, maintainable, or well-designed; names a smell (Shotgun Surgery, Feature Envy, Data Clumps, Long Method, Divergent Change, Duplicated Code, Large Class, Long Parameter List, Primitive Obsession, Message Chains, Dead Code, Speculative Generality, god class, stringly typed); asks about TypeScript type hygiene (`any` leakage, `as` assertions, non-null `!`, discriminated unions, exhaustiveness, strict flags, branded types); asks what to enforce with lint or tsconfig (knip, jscpd, dependency-cruiser, typescript-eslint); runs TDD or plans test strategy; or estimates tasks and negotiates deadlines.
 ---
 
 # Clean Code
