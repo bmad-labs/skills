@@ -44,8 +44,10 @@ Valid means: JSON parses, every field above is present with an allowed value, ev
 | --- | --- | --- | --- |
 | anthropic | `claude-opus-5-5` (quality uses `claude-fable-5-1` for leader, planner, reviewer) | `claude-sonnet-5-5` | `claude-haiku-5-5` |
 | openai | `gpt-6-astra` | `gpt-6.1-sol` | `gpt-6-luna` |
-| deepseek | `deepseek-flash` (V4.1) | `deepseek-flash` (V4.1) | `deepseek-flash` (V4.1); tiers differ by effort only |
+| deepseek | `deepseek-flash` | `deepseek-flash` | `deepseek-flash`; tiers differ by effort only |
 | google | `gemini-4-argon` | `gemini-3.8-flash` | `gemini-3.5-flash-lite` |
+
+`deepseek-flash` is DeepSeek-V4.1-Flash-1017 on the DeepSeek API. The legacy id `deepseek-v4-flash` still routes to it. Gateways such as Vercel and Requesty name it `deepseek/deepseek-v4.1-flash`; use that id only through those gateways.
 
 Model ids were checked on 2026-11-05 (`checked` in the preset file). If a dispatch fails with an unknown-model error, look up the current id with `context7-mcp` or the vendor docs, fix `.leader.json`, and set `preset` to `custom`.
 
