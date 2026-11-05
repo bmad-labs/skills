@@ -1,10 +1,14 @@
 name: Skill checks
 
-# Runs on every PR that adds or changes a skill. Checks only the changed skills.
+# Runs on every PR that adds or changes a skill and checks only the changed skills.
+# A change to this workflow or its scripts, or a manual run, checks every skill.
 on:
   pull_request:
     paths:
       - "skills/**"
+      - ".github/workflows/skill-security-pr.yml"
+      - ".github/scripts/check_skill_frontmatter.py"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,10 +23,17 @@ jobs:
         with:
           fetch-depth: 0
       - id: list
-        name: List changed skills
+        name: List skills to check
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          skills=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- skills/ \
-            | cut -d/ -f1-2 | sort -u \
+          if [ "$EVENT" = "workflow_dispatch" ] || git diff --name-only "origin/$BASE_REF...HEAD" -- .github/ | grep -q .; then
+            dirs=$(ls -d skills/*/)
+          else
+            dirs=$(git diff --name-only "origin/$BASE_REF...HEAD" -- skills/ | cut -d/ -f1-2)
+          fi
+          skills=$(echo "$dirs" | sed 's#/$##' | sort -u \
             | while read -r dir; do [ -f "$dir/SKILL.md" ] && echo "$dir"; done \
             | jq -R . | jq -sc .)
           echo "skills=$skills" >> "$GITHUB_OUTPUT"
