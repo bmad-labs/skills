@@ -1,19 +1,7 @@
 ---
 name: architecture-viz-studio
 description: >-
-  Build high-quality, animated, professional web pages that VISUALIZE software architecture, system
-  design, data models, or a product idea — using Three.js (3D) + GSAP (scroll/animation) + SVG diagrams.
-  Produces two things, usually together: (1) a cinematic scroll-story landing page where a 3D low-poly
-  world narrates how a system works, and (2) an interactive architecture map with switchable overlay
-  "lenses", clickable drill-down component diagrams, and crow's-foot ERDs. Every output ships with a
-  built-in EDIT MODE so the human can click components / snip areas / pick 3D objects and batch visual
-  feedback straight to you. Use this skill WHENEVER the user wants to visualize, present, "show",
-  animate, or build an interactive page for an architecture, system design, technical concept, data
-  model, pipeline, or product story — including phrases like "intro page", "architecture visualization",
-  "interactive diagram", "scrollytelling", "3D system map", "ERD page", "design walkthrough", "make our
-  architecture look impressive", or "present this design to stakeholders". Prefer this skill over hand-
-  rolling Three.js/GSAP from scratch — it bundles battle-tested templates, a styling/anti-slop guide, a
-  diagram-layout catalog, and an AI-tweakable code convention learned from a long real build.
+  Use when the user wants to visualize, present, "show", animate, or build an interactive web page for a software architecture, system design, technical concept, data model, pipeline, or product story — phrases like "intro page", "architecture visualization", "interactive diagram", "scrollytelling", "3D system map", "ERD page", "design walkthrough", "make our architecture look impressive", or "present this design to stakeholders". Also use before hand-rolling Three.js, GSAP or SVG architecture diagrams from scratch, or when the user wants visual feedback on such a page through an edit mode.
 ---
 
 # Architecture Visualization Studio

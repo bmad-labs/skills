@@ -1,18 +1,7 @@
 ---
 name: release-please
-description: >
-  Set up and configure Google's release-please for automated versioning, changelog generation,
-  and publishing via GitHub Actions. Covers pipeline creation, Conventional Commits formatting,
-  pre-release workflows, monorepo configuration, and troubleshooting release pipelines.
-  Use this skill whenever the user wants to automate releases, set up CI/CD for publishing,
-  configure version bumping, write release-please-compatible commit messages, tag versions
-  automatically, publish to npm/PyPI/crates.io/Maven/Docker, or troubleshoot why a release PR
-  wasn't created. Activate even if the user doesn't mention "release-please" by name — phrases
-  like "automate my npm releases", "set up GitHub Actions for publishing", "how do I tag versions
-  automatically", "changelog generation", "semver automation", or "pre-release workflow" all
-  indicate this skill. For commit message guidance specifically, this skill focuses on
-  release-please-compatible conventions; for broader multi-repo git operations with submodules,
-  defer to multi-repo-git-ops instead.
+description: >-
+  Use when the user wants to automate releases, versioning or changelogs with GitHub Actions; set up or configure release-please (pipelines, pre-releases, monorepos); write release-please-compatible Conventional Commits; tag versions or publish to npm, PyPI, crates.io, Maven or Docker automatically; or troubleshoot why a release PR wasn't created — even without naming release-please ("automate my npm releases", "semver automation", "pre-release workflow"). For multi-repo git operations with submodules, use multi-repo-git-ops instead.
 ---
 
 # release-please
