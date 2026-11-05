@@ -41,10 +41,29 @@ Scan before planning:
 | Subagents | dispatch works; worktrees or file isolation |
 | Git | branch, dirty tree, remote, approval policy |
 | Environment | credentials, VM/GUI, budget |
+| Agent config | `./.leader.json` present and valid (see Agent config) |
 
 Report each check as `Ready`, `Missing` (name the absent thing) or `Blocked` (the check does not apply to this work, and why).
 
-Ask for exactly three things if the user did not say: **scope**, **document location**, **test level**.
+Ask for exactly three things if the user did not say: **scope**, **document location**, **test level**. If `.leader.json` is missing, add the preset choice to the same message.
+
+## Agent config
+
+`./.leader.json` in the project root sets `model`, `effort` and `contextWindow` for each of the 9 roles. Read it at every Activate, before any dispatch. Schema, validation and harness mapping: `references/agent-config.md`.
+
+| State | Action |
+| --- | --- |
+| Present and valid | Load it. Report `Agent config: <preset>` in the scan. Never ask the preset question again. |
+| Missing | Show the 12 presets from `assets/leader-presets.json` as one table: id, then the leader, builder and uat-runner models. Recommend `<vendor>-balanced`, where vendor is `anthropic` on Claude Code and the running model's vendor on OpenCode. Ask once, batched with scope, docs and test level. Write `./.leader.json` from the chosen preset, with `preset`, `vendor`, `harness`. |
+| Invalid | Name the bad field and role. Offer to fill it from the file's `preset` (or the recommended preset if `preset` is `custom` or unknown). Do not invent a value. |
+
+The file wins over its preset: values that differ from the named preset are hand edits, not errors.
+
+If the user said "don't ask", "keep moving" or gives no answer: for a missing file, write the recommended preset; for an invalid one, fill only the bad fields as above. Record the assumption in the report and continue. Never dispatch without a valid config.
+
+Every dispatch passes the role's `model` and `effort` from the file. On Claude Code, map the id to the `Agent` alias (`opus`, `sonnet`, `haiku`, `fable`) and always pass `effort`; the tool sets none by default. Name the role's model and effort in the brief header.
+
+The leader cannot switch its own model. If the `leader` entry differs from the running model, say so once and tell the user how to restart on it. Do not block the build.
 
 Then show the testing pyramid for this project and mark each level `RUN`, `BLOCKED` (not applicable) or `NOT RUN` (applies, cannot run yet):
 
@@ -272,7 +291,7 @@ Reuse is deliberate for the planner, builder and verifier: each keeps its decisi
 
 Start a fresh session mid-Story only when:
 
-- the session is out of context or behaving stale;
+- the session has used about 70% of its role's `contextWindow`, or is behaving stale;
 - three rounds pass without convergence;
 - the work moves to a different failure domain.
 
@@ -534,6 +553,8 @@ Stop and ask only for the five reasons in the Decision ladder: an approval tier,
 - Marking UAT PASS from the product's own output.
 - Calling a level `BLOCKED` when it lacks setup, a harness or a credential. That is `NOT RUN`.
 - Leaving a test VM or Factory running.
+- Dispatching a role without the `model` and `effort` from `.leader.json`.
+- Asking the preset question when a valid `.leader.json` exists.
 
 ## References
 
@@ -544,3 +565,4 @@ Stop and ask only for the five reasons in the Decision ladder: an approval tier,
 
 Brief, report and decision-log templates: `references/briefs.md`.
 Review pack template: `assets/review-pack.template.html`; worked example: `assets/review-pack.example.html`; rules: `references/review-pack.md`.
+Agent config: presets `assets/leader-presets.json`; schema and harness mapping `references/agent-config.md`.

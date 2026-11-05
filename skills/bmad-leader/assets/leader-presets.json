@@ -1,0 +1,210 @@
+{
+  "version": 1,
+  "checked": "2026-11-05",
+  "presets": [
+    {
+      "id": "anthropic-quality",
+      "vendor": "anthropic",
+      "tier": "quality",
+      "summary": "Strongest model for every role. Highest cost.",
+      "agents": [
+        { "name": "leader", "model": "claude-fable-5-1", "effort": "xhigh", "contextWindow": 1000000 },
+        { "name": "planner", "model": "claude-fable-5-1", "effort": "xhigh", "contextWindow": 1000000 },
+        { "name": "builder", "model": "claude-opus-5-5", "effort": "high", "contextWindow": 1000000 },
+        { "name": "verifier", "model": "claude-opus-5-5", "effort": "high", "contextWindow": 1000000 },
+        { "name": "uat-runner", "model": "claude-opus-5-5", "effort": "medium", "contextWindow": 1000000 },
+        { "name": "reviewer", "model": "claude-fable-5-1", "effort": "xhigh", "contextWindow": 1000000 },
+        { "name": "research", "model": "claude-opus-5-5", "effort": "high", "contextWindow": 1000000 },
+        { "name": "retrospective", "model": "claude-opus-5-5", "effort": "high", "contextWindow": 1000000 },
+        { "name": "correct-course", "model": "claude-opus-5-5", "effort": "high", "contextWindow": 1000000 }
+      ]
+    },
+    {
+      "id": "anthropic-balanced",
+      "vendor": "anthropic",
+      "tier": "balanced",
+      "summary": "Top model where judgment matters (leader, planner, verifier, reviewer); mid model builds; small model runs UAT.",
+      "agents": [
+        { "name": "leader", "model": "claude-opus-5-5", "effort": "high", "contextWindow": 1000000 },
+        { "name": "planner", "model": "claude-opus-5-5", "effort": "high", "contextWindow": 1000000 },
+        { "name": "builder", "model": "claude-sonnet-5-5", "effort": "high", "contextWindow": 1000000 },
+        { "name": "verifier", "model": "claude-opus-5-5", "effort": "medium", "contextWindow": 1000000 },
+        { "name": "uat-runner", "model": "claude-haiku-5-5", "effort": "low", "contextWindow": 1000000 },
+        { "name": "reviewer", "model": "claude-opus-5-5", "effort": "high", "contextWindow": 1000000 },
+        { "name": "research", "model": "claude-sonnet-5-5", "effort": "medium", "contextWindow": 1000000 },
+        { "name": "retrospective", "model": "claude-sonnet-5-5", "effort": "medium", "contextWindow": 1000000 },
+        { "name": "correct-course", "model": "claude-sonnet-5-5", "effort": "medium", "contextWindow": 1000000 }
+      ]
+    },
+    {
+      "id": "anthropic-budget",
+      "vendor": "anthropic",
+      "tier": "budget",
+      "summary": "Mid model for leader, planner, reviewer; small model everywhere else. Lowest cost.",
+      "agents": [
+        { "name": "leader", "model": "claude-sonnet-5-5", "effort": "medium", "contextWindow": 1000000 },
+        { "name": "planner", "model": "claude-sonnet-5-5", "effort": "medium", "contextWindow": 1000000 },
+        { "name": "builder", "model": "claude-haiku-5-5", "effort": "medium", "contextWindow": 1000000 },
+        { "name": "verifier", "model": "claude-haiku-5-5", "effort": "low", "contextWindow": 1000000 },
+        { "name": "uat-runner", "model": "claude-haiku-5-5", "effort": "low", "contextWindow": 1000000 },
+        { "name": "reviewer", "model": "claude-sonnet-5-5", "effort": "medium", "contextWindow": 1000000 },
+        { "name": "research", "model": "claude-haiku-5-5", "effort": "low", "contextWindow": 1000000 },
+        { "name": "retrospective", "model": "claude-haiku-5-5", "effort": "low", "contextWindow": 1000000 },
+        { "name": "correct-course", "model": "claude-haiku-5-5", "effort": "low", "contextWindow": 1000000 }
+      ]
+    },
+    {
+      "id": "openai-quality",
+      "vendor": "openai",
+      "tier": "quality",
+      "summary": "Strongest model for every role. Highest cost.",
+      "agents": [
+        { "name": "leader", "model": "gpt-6-astra", "effort": "xhigh", "contextWindow": 1050000 },
+        { "name": "planner", "model": "gpt-6-astra", "effort": "xhigh", "contextWindow": 1050000 },
+        { "name": "builder", "model": "gpt-6-astra", "effort": "high", "contextWindow": 1050000 },
+        { "name": "verifier", "model": "gpt-6-astra", "effort": "high", "contextWindow": 1050000 },
+        { "name": "uat-runner", "model": "gpt-6-astra", "effort": "medium", "contextWindow": 1050000 },
+        { "name": "reviewer", "model": "gpt-6-astra", "effort": "xhigh", "contextWindow": 1050000 },
+        { "name": "research", "model": "gpt-6-astra", "effort": "high", "contextWindow": 1050000 },
+        { "name": "retrospective", "model": "gpt-6-astra", "effort": "high", "contextWindow": 1050000 },
+        { "name": "correct-course", "model": "gpt-6-astra", "effort": "high", "contextWindow": 1050000 }
+      ]
+    },
+    {
+      "id": "openai-balanced",
+      "vendor": "openai",
+      "tier": "balanced",
+      "summary": "Top model where judgment matters (leader, planner, verifier, reviewer); mid model builds; small model runs UAT.",
+      "agents": [
+        { "name": "leader", "model": "gpt-6-astra", "effort": "high", "contextWindow": 1050000 },
+        { "name": "planner", "model": "gpt-6-astra", "effort": "high", "contextWindow": 1050000 },
+        { "name": "builder", "model": "gpt-6.1-sol", "effort": "high", "contextWindow": 1050000 },
+        { "name": "verifier", "model": "gpt-6-astra", "effort": "medium", "contextWindow": 1050000 },
+        { "name": "uat-runner", "model": "gpt-6-luna", "effort": "low", "contextWindow": 1050000 },
+        { "name": "reviewer", "model": "gpt-6-astra", "effort": "high", "contextWindow": 1050000 },
+        { "name": "research", "model": "gpt-6.1-sol", "effort": "medium", "contextWindow": 1050000 },
+        { "name": "retrospective", "model": "gpt-6.1-sol", "effort": "medium", "contextWindow": 1050000 },
+        { "name": "correct-course", "model": "gpt-6.1-sol", "effort": "medium", "contextWindow": 1050000 }
+      ]
+    },
+    {
+      "id": "openai-budget",
+      "vendor": "openai",
+      "tier": "budget",
+      "summary": "Mid model for leader, planner, reviewer; small model everywhere else. Lowest cost.",
+      "agents": [
+        { "name": "leader", "model": "gpt-6.1-sol", "effort": "medium", "contextWindow": 1050000 },
+        { "name": "planner", "model": "gpt-6.1-sol", "effort": "medium", "contextWindow": 1050000 },
+        { "name": "builder", "model": "gpt-6-luna", "effort": "medium", "contextWindow": 1050000 },
+        { "name": "verifier", "model": "gpt-6-luna", "effort": "low", "contextWindow": 1050000 },
+        { "name": "uat-runner", "model": "gpt-6-luna", "effort": "low", "contextWindow": 1050000 },
+        { "name": "reviewer", "model": "gpt-6.1-sol", "effort": "medium", "contextWindow": 1050000 },
+        { "name": "research", "model": "gpt-6-luna", "effort": "low", "contextWindow": 1050000 },
+        { "name": "retrospective", "model": "gpt-6-luna", "effort": "low", "contextWindow": 1050000 },
+        { "name": "correct-course", "model": "gpt-6-luna", "effort": "low", "contextWindow": 1050000 }
+      ]
+    },
+    {
+      "id": "deepseek-quality",
+      "vendor": "deepseek",
+      "tier": "quality",
+      "summary": "Strongest model for every role. Highest cost.",
+      "agents": [
+        { "name": "leader", "model": "deepseek-v4-pro", "effort": "xhigh", "contextWindow": 1048576 },
+        { "name": "planner", "model": "deepseek-v4-pro", "effort": "xhigh", "contextWindow": 1048576 },
+        { "name": "builder", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "deepseek-v4-pro", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "deepseek-v4-pro", "effort": "xhigh", "contextWindow": 1048576 },
+        { "name": "research", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 }
+      ]
+    },
+    {
+      "id": "deepseek-balanced",
+      "vendor": "deepseek",
+      "tier": "balanced",
+      "summary": "Top model where judgment matters (leader, planner, verifier, reviewer); mid model builds; small model runs UAT.",
+      "agents": [
+        { "name": "leader", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 },
+        { "name": "planner", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 },
+        { "name": "builder", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "deepseek-v4-pro", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "deepseek-v4-pro", "effort": "high", "contextWindow": 1048576 },
+        { "name": "research", "model": "deepseek-v4-pro", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "deepseek-v4-pro", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "deepseek-v4-pro", "effort": "medium", "contextWindow": 1048576 }
+      ]
+    },
+    {
+      "id": "deepseek-budget",
+      "vendor": "deepseek",
+      "tier": "budget",
+      "summary": "Mid model for leader, planner, reviewer; small model everywhere else. Lowest cost.",
+      "agents": [
+        { "name": "leader", "model": "deepseek-v4-pro", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "planner", "model": "deepseek-v4-pro", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "builder", "model": "deepseek-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "deepseek-v4-pro", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "research", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "deepseek-flash", "effort": "low", "contextWindow": 1048576 }
+      ]
+    },
+    {
+      "id": "google-quality",
+      "vendor": "google",
+      "tier": "quality",
+      "summary": "Strongest model for every role. Highest cost.",
+      "agents": [
+        { "name": "leader", "model": "gemini-4-argon", "effort": "xhigh", "contextWindow": 1048576 },
+        { "name": "planner", "model": "gemini-4-argon", "effort": "xhigh", "contextWindow": 1048576 },
+        { "name": "builder", "model": "gemini-4-argon", "effort": "high", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "gemini-4-argon", "effort": "high", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "gemini-4-argon", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "gemini-4-argon", "effort": "xhigh", "contextWindow": 1048576 },
+        { "name": "research", "model": "gemini-4-argon", "effort": "high", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "gemini-4-argon", "effort": "high", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "gemini-4-argon", "effort": "high", "contextWindow": 1048576 }
+      ]
+    },
+    {
+      "id": "google-balanced",
+      "vendor": "google",
+      "tier": "balanced",
+      "summary": "Top model where judgment matters (leader, planner, verifier, reviewer); mid model builds; small model runs UAT.",
+      "agents": [
+        { "name": "leader", "model": "gemini-4-argon", "effort": "high", "contextWindow": 1048576 },
+        { "name": "planner", "model": "gemini-4-argon", "effort": "high", "contextWindow": 1048576 },
+        { "name": "builder", "model": "gemini-3.8-flash", "effort": "high", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "gemini-4-argon", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "gemini-3.5-flash-lite", "effort": "low", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "gemini-4-argon", "effort": "high", "contextWindow": 1048576 },
+        { "name": "research", "model": "gemini-3.8-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "gemini-3.8-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "gemini-3.8-flash", "effort": "medium", "contextWindow": 1048576 }
+      ]
+    },
+    {
+      "id": "google-budget",
+      "vendor": "google",
+      "tier": "budget",
+      "summary": "Mid model for leader, planner, reviewer; small model everywhere else. Lowest cost.",
+      "agents": [
+        { "name": "leader", "model": "gemini-3.8-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "planner", "model": "gemini-3.8-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "builder", "model": "gemini-3.5-flash-lite", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "verifier", "model": "gemini-3.5-flash-lite", "effort": "low", "contextWindow": 1048576 },
+        { "name": "uat-runner", "model": "gemini-3.5-flash-lite", "effort": "low", "contextWindow": 1048576 },
+        { "name": "reviewer", "model": "gemini-3.8-flash", "effort": "medium", "contextWindow": 1048576 },
+        { "name": "research", "model": "gemini-3.5-flash-lite", "effort": "low", "contextWindow": 1048576 },
+        { "name": "retrospective", "model": "gemini-3.5-flash-lite", "effort": "low", "contextWindow": 1048576 },
+        { "name": "correct-course", "model": "gemini-3.5-flash-lite", "effort": "low", "contextWindow": 1048576 }
+      ]
+    }
+  ]
+}
