@@ -8,6 +8,7 @@ on:
       - "skills/**"
       - ".github/workflows/skill-security-pr.yml"
       - ".github/scripts/check_skill_frontmatter.py"
+      - ".github/snyk-agent-scan-allow.json"
   workflow_dispatch:
 
 permissions:
@@ -90,8 +91,15 @@ jobs:
           SKILL: ${{ matrix.skill }}
         run: |
           set -o pipefail
+          # Risks accepted for this skill, with reasons, live in .github/snyk-agent-scan-allow.json.
+          ignore=$(jq -r --arg s "$SKILL" '.[$s] // {} | keys | join(",")' .github/snyk-agent-scan-allow.json)
+          args=()
+          if [ -n "$ignore" ]; then
+            echo "::notice::$SKILL: accepted risks ignored: $ignore"
+            args=(--ignore-risks "$ignore")
+          fi
           export HOME="$(mktemp -d)"
-          uvx snyk-agent-scan@0.6.9 --ci --dangerously-run-mcp-servers --json "$SKILL" \
+          uvx snyk-agent-scan@0.6.9 --ci --dangerously-run-mcp-servers "${args[@]}" --json "$SKILL" \
             | tee "$GITHUB_WORKSPACE/snyk-agent-scan.json"
       - name: Upload report
         if: always() && env.SNYK_TOKEN != ''

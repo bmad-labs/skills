@@ -1,0 +1,30 @@
+{
+  "_comment": "Snyk Agent Scan risks accepted per skill, with the reason. CI passes these to --ignore-risks for that skill only. Remove an entry when the reason no longer holds.",
+  "skills/create-intent": {
+    "third_party_content_exposure": "Reading Jira stories and comments is the skill's job; SKILL.md step 2 treats that text as data, not instructions."
+  },
+  "skills/github-sync": {
+    "third_party_content_exposure": "Pulling GitHub issues is the skill's job; SKILL.md treats issue and comment text as data and reports requests to the user."
+  },
+  "skills/jira-to-local": {
+    "third_party_content_exposure": "Pulling Jira issues is the skill's job; it is read-only and treats issue text as data."
+  },
+  "skills/load-docs": {
+    "third_party_content_exposure": "Loads only URLs the user names; loaded content is treated as data."
+  },
+  "skills/trade-off-analysis": {
+    "third_party_content_exposure": "Web research for options is the skill's job; results are evidence, not instructions."
+  },
+  "skills/mcp-builder": {
+    "secret_detection": "False positive: Snyk's own redaction of placeholders such as ANTHROPIC_API_KEY=your_api_key_here in reference/evaluation.md."
+  },
+  "skills/typescript-clean-code": {
+    "secret_detection": "False positive: Snyk's own redaction of a checkPassword example in references/functions/examples.md."
+  },
+  "skills/typescript-e2e-testing": {
+    "secret_detection": "False positive: Snyk's own redaction of a local test DATABASE_URL (test:test@localhost) in references/common/rules.md."
+  },
+  "skills/typescript-unit-testing": {
+    "secret_detection": "False positive: Snyk's own redaction of an ApiKeyService mock in references/nestjs/guards.md."
+  }
+}
