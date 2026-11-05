@@ -21,3 +21,13 @@ Same fake project and prompt as the baseline.
 ## Out of scope (pre-existing, reported to user)
 
 Duplicate step "2" in Planning first; `.ai-aftifacts` spelling; "agent-team teammate" not mapped to Agent + SendMessage; UAT Runner reuse contradiction (Harness mapping vs Session continuity); no mark for a level the user opts out of; no guidance when the project has no git repo.
+
+## Review lenses and one-time windows (2026-11-05)
+
+| Scenario | Setup | Result |
+| --- | --- | --- |
+| L1 | Old `anthropic-budget` file, no lens entries, review round 1 | PASS. File valid, not changed. All 3 lenses dispatch on `reviewer` (`sonnet/medium`). |
+| L2 | `anthropic-balanced` with lens entries | PASS. Blind Hunter `opus/high`, Edge Cases Hunter `opus/high`, Verification Gap Finder `sonnet/medium`. |
+
+Gap closed: lens session names were ambiguous (`r1-1-1`); now `review-<lens>-r<n>-s<story>` with the config lens name.
+One-time narrow-input roles (reviewer, lenses, uat-runner, research) set to 200K in presets; retrospective and correct-course keep 1M.

@@ -23,16 +23,28 @@ The project-root file `.leader.json` fixes the model, effort and context window 
 | `preset` | The preset id it came from, or `custom` after a hand edit |
 | `vendor` | `anthropic`, `openai`, `deepseek`, `google` |
 | `harness` | `claude-code` or `opencode`; the harness the leader runs in |
-| `agents[].name` | One of the 9 roles: `leader`, `planner`, `builder`, `verifier`, `uat-runner`, `reviewer`, `research`, `retrospective`, `correct-course` |
+| `agents[].name` | One of the 9 required roles: `leader`, `planner`, `builder`, `verifier`, `uat-runner`, `reviewer`, `research`, `retrospective`, `correct-course`; or one of the 3 optional `bmad-build` review lenses: `blind-hunter`, `edge-cases-hunter`, `verification-gap-finder` |
 | `agents[].model` | Vendor model id, without a provider prefix |
 | `agents[].effort` | `low`, `medium`, `high`, `xhigh`, `max` |
 | `agents[].contextWindow` | Tokens, positive integer |
 
-Valid means: JSON parses, every field above is present with an allowed value, every role appears exactly once. A missing role is invalid, not a fallback.
+Valid means: JSON parses, every field above is present with an allowed value, every required role appears exactly once, each lens appears at most once, and no other name appears. A missing required role is invalid, not a fallback.
+
+## Review lenses
+
+`bmad-build` reviews through three lenses, each a fresh `bmad-code-review` subagent: Blind Hunter (any ten things to fix), Edge Cases Hunter (forgotten corner cases), Verification Gap Finder (is it covered by tests). The `reviewer` entry is the default for all three. A lens entry, when present, overrides `reviewer` for that lens only.
+
+| Dispatch | Uses |
+| --- | --- |
+| Blind Hunter | `blind-hunter`, else `reviewer` |
+| Edge Cases Hunter | `edge-cases-hunter`, else `reviewer` |
+| Verification Gap Finder | `verification-gap-finder`, else `reviewer` |
+
+A file written before the lenses existed stays valid; its three lenses use `reviewer`. Do not add lens entries to an existing file unless the user asks.
 
 ## Presets
 
-`assets/leader-presets.json` holds 12 presets: 4 vendors x 3 tiers. Each preset lists all 9 roles.
+`assets/leader-presets.json` holds 12 presets: 4 vendors x 3 tiers. Each preset lists the 9 required roles and the 3 lenses. Verification Gap Finder runs one model step lower than the other two lenses: checking test coverage needs less reasoning than hunting defects.
 
 | Tier | Shape |
 | --- | --- |
@@ -62,7 +74,7 @@ Model ids were checked on 2026-11-05 (`checked` in the preset file). If a dispat
 | `claude-sonnet-*` | `sonnet` |
 | `claude-haiku-*` | `haiku` |
 
-The `Agent` `name` allows no dots: write session names as `plan-1-1`, not `plan-1.1`.
+The `Agent` `name` allows no dots: write the Story id with a hyphen, `plan-1-1`, not `plan-1.1`. A lens session uses the lens name from this file and `s` before the Story: `review-blind-hunter-r1-s1-1`.
 
 Claude Code dispatches only Anthropic models. A non-Anthropic preset under `harness: claude-code` is invalid: tell the user and offer an Anthropic preset or OpenCode.
 
@@ -83,7 +95,13 @@ The leader cannot change its own model mid-session. At Activate, compare the `le
 
 ## Context window
 
-`contextWindow` drives the "out of context" rule in Session continuity. A persistent session (planner, builder, verifier) that has used about 70% of its role's window gets a fresh session with a handoff note. Record the switch in the report.
+`contextWindow` is a budget the leader keeps, not the model's limit; no harness enforces it. Every listed model supports about 1M tokens.
+
+| Agent kind | Roles | Preset window | Rule |
+| --- | --- | --- | --- |
+| Persistent | leader, planner, builder, verifier | 1M | At about 70% used, start a fresh session with a handoff note. Record the switch in the report. |
+| One-time, wide input | retrospective, correct-course | 1M | Reads a whole epic of plans and evidence. |
+| One-time, narrow input | reviewer, the 3 lenses, uat-runner, research | 200K | Reads one Story's change or one question. If the brief and its inputs would pass about 70% of the window, split the work, for example one review per file group. |
 
 ## Change the preset later
 

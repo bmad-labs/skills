@@ -49,7 +49,7 @@ Ask for exactly three things if the user did not say: **scope**, **document loca
 
 ## Agent config
 
-`./.leader.json` in the project root sets `model`, `effort` and `contextWindow` for each of the 9 roles. Read it at every Activate, before any dispatch. Schema, validation and harness mapping: `references/agent-config.md`.
+`./.leader.json` in the project root sets `model`, `effort` and `contextWindow` for each of the 9 roles, plus optional entries for the three `bmad-build` review lenses (`blind-hunter`, `edge-cases-hunter`, `verification-gap-finder`). A lens entry overrides `reviewer` for that lens; without it, the lens uses `reviewer`. Read it at every Activate, before any dispatch. Schema, validation and harness mapping: `references/agent-config.md`.
 
 | State | Action |
 | --- | --- |
@@ -229,7 +229,7 @@ The leader keeps the current-situation note fresh after every Story. A stale sta
 
 **UAT Runner subagent:** runs the UAT cases exactly as written and returns observed output and evidence. Every run gets a fresh session; it is never reused. The verifier spawns it when the harness allows nested agents; otherwise the leader dispatches it. It does not edit product code or test cases.
 
-**Reviewer subagents (three per round):** each loads `bmad-code-review` with one lens: Blind Hunter, Edge Cases Hunter, or Verification Gap Finder. Every review round gets three fresh sessions; reviewers are never reused. They do not edit product code.
+**Reviewer subagents (three per round):** each loads `bmad-code-review` with one lens: Blind Hunter, Edge Cases Hunter, or Verification Gap Finder. Every review round gets three fresh sessions; reviewers are never reused. They do not edit product code. Each lens dispatches with its lens entry from `.leader.json`, else the `reviewer` entry.
 
 **Research subagent:** loads `bmad-deep-recon` for a decision the evidence cannot settle. Returns cited findings.
 
@@ -269,7 +269,7 @@ Each Story gets its own set of agents. Never reuse a session across Stories.
 | --- | --- | --- |
 | Planner | `plan-<story>` | Yes |
 | Builder | `builder-<story>` | Yes |
-| Reviewers (3 per round) | `review-<lens>-r<n>-<story>` | **No. Fresh every round** |
+| Reviewers (3 per round) | `review-<lens>-r<n>-s<story>` | **No. Fresh every round** |
 | Verifier | `verifier-<story>` | Yes |
 | UAT Runner | `uat-r<n>-<story>` | **No. Fresh every run** |
 
@@ -341,7 +341,7 @@ OpenCode has no nested subagents, so the leader runs `bmad-build` as separate ph
 | Approved plan | Leader | — |
 | Implement | Builder subagent | `builder-<story>` |
 | Fits AC? | Leader, using verifier evidence | — |
-| Review | Three fresh reviewer subagents, one lens each | `review-<lens>-r<n>-<story>` |
+| Review | Three fresh reviewer subagents, one lens each | `review-<lens>-r<n>-s<story>` |
 | Patch | Builder | `builder-<story>` |
 | Present and result | Leader | — |
 | Defer | Leader writes `deferred_work.md` | — |
