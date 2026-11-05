@@ -2,7 +2,7 @@
 
 Before executing any test suite (unit, integration, or manual), rebuild the application from source so the tests hit the latest code. Stale images, stale bytecode, and stale binaries are the most common cause of confusing test results: the test hits a version of the code that doesn't match what's in the working tree, and you spend an hour debugging a bug that was already fixed — or conversely, a test passes against old code that no longer reflects reality.
 
-This reference covers the common build systems. Detect which one applies to the project, then run the matching rebuild command **before** starting services or executing tests.
+This reference covers the common build systems. Detect which one applies to the project, then run the matching rebuild command **before** starting services or executing tests. Show the command to the user once per session first: installs may download packages from registries. Prefer lockfile-pinned installs.
 
 ## Table of Contents
 
