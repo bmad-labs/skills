@@ -3,20 +3,20 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/bmad-labs/skills/actions/workflows/skill-security-pr.yml"><img src="https://github.com/bmad-labs/skills/actions/workflows/skill-security-pr.yml/badge.svg" alt="Skill checks"></a>
-  <a href="https://github.com/bmad-labs/skills/actions/workflows/skill-security-audit.yml"><img src="https://github.com/bmad-labs/skills/actions/workflows/skill-security-audit.yml/badge.svg" alt="skills.sh security audit"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/bmad-labs/skills?color=4F8CFF" alt="License: MIT"></a>
-  <a href="#available-skills"><img src="https://img.shields.io/badge/skills-23-4F8CFF" alt="23 skills"></a>
-  <a href="https://github.com/bmad-labs/skills/stargazers"><img src="https://img.shields.io/github/stars/bmad-labs/skills?style=flat&color=4F8CFF" alt="GitHub stars"></a>
+  <a href="https://github.com/bmad-labs/skills/actions/workflows/skill-security-pr.yml"><img src="https://img.shields.io/github/actions/workflow/status/bmad-labs/skills/skill-security-pr.yml?style=for-the-badge&logo=githubactions&logoColor=4ADE80&label=skill%20checks&labelColor=0B1220" alt="Skill checks"></a>
+  <a href="https://github.com/bmad-labs/skills/actions/workflows/skill-security-audit.yml"><img src="https://img.shields.io/github/actions/workflow/status/bmad-labs/skills/skill-security-audit.yml?style=for-the-badge&logo=snyk&logoColor=A78BFA&label=security%20audit&labelColor=0B1220" alt="skills.sh security audit"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-F7B500?style=for-the-badge&logo=opensourceinitiative&logoColor=F7B500&labelColor=0B1220" alt="License: MIT"></a>
+  <a href="#available-skills"><img src="https://img.shields.io/badge/skills-23-8B5CF6?style=for-the-badge&logo=bookstack&logoColor=8B5CF6&labelColor=0B1220" alt="23 skills"></a>
+  <a href="https://github.com/bmad-labs/skills/stargazers"><img src="https://img.shields.io/github/stars/bmad-labs/skills?style=for-the-badge&logo=github&logoColor=EC4899&color=EC4899&labelColor=0B1220" alt="GitHub stars"></a>
 </p>
 
 <p align="center">
-  <a href="https://skills.sh/bmad-labs/skills"><img src="https://img.shields.io/badge/skills.sh-bmad--labs%2Fskills-0B1220" alt="skills.sh"></a>
-  <img src="https://img.shields.io/badge/Claude%20Code-supported-0B1220" alt="Claude Code">
-  <img src="https://img.shields.io/badge/Cursor-supported-0B1220" alt="Cursor">
-  <img src="https://img.shields.io/badge/Codex-supported-0B1220" alt="Codex">
-  <img src="https://img.shields.io/badge/OpenCode-supported-0B1220" alt="OpenCode">
-  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-4F8CFF" alt="PRs welcome"></a>
+  <a href="https://skills.sh/bmad-labs/skills"><img src="https://img.shields.io/badge/skills.sh-listed-000000?style=for-the-badge&logo=vercel&logoColor=white&labelColor=0B1220" alt="skills.sh"></a>
+  <img src="https://img.shields.io/badge/Claude%20Code-ready-D97757?style=for-the-badge&logo=claude&logoColor=D97757&labelColor=0B1220" alt="Claude Code">
+  <img src="https://img.shields.io/badge/Cursor-ready-2563EB?style=for-the-badge&logo=cursor&logoColor=60A5FA&labelColor=0B1220" alt="Cursor">
+  <img src="https://img.shields.io/badge/Codex-ready-10A37F?style=for-the-badge&labelColor=0B1220" alt="Codex">
+  <img src="https://img.shields.io/badge/OpenCode-ready-F97316?style=for-the-badge&labelColor=0B1220" alt="OpenCode">
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-22C55E?style=for-the-badge&logo=git&logoColor=22C55E&labelColor=0B1220" alt="PRs welcome"></a>
 </p>
 
 <p align="center">
