@@ -4,7 +4,7 @@ Name the skills; never paste or paraphrase their steps. The subagent loads each 
 
 Every brief carries a context pack. A brief without one is incomplete.
 
-Keep one session per persistent role per Story: planner, builder, verifier. Fix rounds continue in those sessions. Reviewers are fresh every round; the UAT Runner is fresh every run.
+Keep one session per persistent role per Story: builder and verifier, plus the planner on OpenCode. Fix rounds continue in those sessions. Reviewers are fresh every round; the UAT Runner is fresh every run.
 
 ## Current situation note
 
@@ -99,7 +99,7 @@ Rules:
 - Work only in <worktree or path>. Do not touch files owned by another Story.
 - Do not edit intent, PRD, spine, or designs. If the design is wrong, stop and
   report the mismatch with file:line evidence.
-- Do not commit, merge, or push.
+- Commit only on your Story branch or worktree; do not merge or push.
 - Fix every finding this Story can prove. Defer only when blocked; name the blocker.
 - Tests: <unit / integration / e2e / UAT level>.
 
@@ -111,7 +111,60 @@ Deliver:
 - One sentence per open decision, with the options and your recommendation.
 ```
 
+## Builder brief (Full build)
+
+Claude Code. One builder runs the whole `bmad-build`.
+
+```markdown
+You are the builder for Story <id>. Model <model>, effort <effort>.
+
+Load `bmad-build` and run it end to end for this Story: clarify and route,
+plan, implement, review, patch, present. Do not skip or shorten any step.
+Load <domain skills, for example `cpp-embedded`> before you write code in that domain.
+Follow <CLAUDE.md / AGENTS.md> and <standards path>.
+
+The leader is your user. At every `bmad-build` question or gate — intent gap,
+plan approval, reject, defer — message the leader and wait for the answer.
+Send the plan for approval before you write code.
+
+Review: spawn the three `bmad-build` lenses as fresh subagents, one lens each,
+with these models from `.leader.json`: Blind Hunter <model/effort>,
+Edge Cases Hunter <model/effort>, Verification Gap Finder <model/effort>.
+
+Commit only on <branch or worktree>. Do not merge and do not push.
+
+Context pack: <paths, per the Context pack table>.
+
+Report when `bmad-build` presents:
+- Result and commit SHA on the Story branch.
+- Review: the three lens session ids, findings, and what was patched, rejected or deferred.
+- Deferred items with blocker and unblock condition.
+- Tests you ran, with counts.
+```
+
+## Builder brief (Phase split)
+
+OpenCode. Implement phase only, from the approved plan.
+
+```markdown
+You are the builder for Story <id>. Model <model>, effort <effort>.
+
+Load `bmad-build` and run its Implement phase only, from the approved plan at <path>.
+Skip its review phase; the leader dispatches the reviewers.
+Load <domain skills> before you write code in that domain. Follow <CLAUDE.md / AGENTS.md>.
+
+Commit only on <branch or worktree>. Do not merge and do not push.
+
+Context pack: <paths>.
+
+On a fix round, continue this session and close the findings at <path> through `bmad-build`'s Patch phase.
+
+Report: files changed, commit SHA, tests run with counts, open questions.
+```
+
 ## Planner brief
+
+At epic start on every harness; per Story on OpenCode only.
 
 ```markdown
 You are planning Story <id>. Do not write product code and do not implement.

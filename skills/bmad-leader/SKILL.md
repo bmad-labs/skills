@@ -139,9 +139,9 @@ No build starts before a plan is approved.
 
 1. Dispatch the planner subagent: compile the epic context and map the Stories in dependency order. It does not write Story files.
 2. If a requirement is not in the plan, dispatch a `bmad-spec` subagent first.
-2. The leader reviews the plan against the intent, PRD, architecture spine and design package. Approval needs evidence, not optimism.
-3. The leader checks deferred work and answers or queues open questions.
-4. Only then dispatch `bmad-build`, one planned Story at a time. It writes the Story file, builds and verifies.
+3. The leader reviews the plan against the intent, PRD, architecture spine and design package. Approval needs evidence, not optimism.
+4. The leader checks deferred work and answers or queues open questions.
+5. Only then build, one planned Story at a time, by harness: **Full build** on Claude Code, **Phase split** on OpenCode. Either way the Story plan is approved by the leader before any code.
 
 Planning is delegated; approval is not.
 
@@ -221,15 +221,22 @@ The leader keeps the current-situation note fresh after every Story. A stale sta
 
 **Leader:** size the work, approve each plan, decide, read the verification evidence, triage review, commit, merge, report.
 
-**Planner subagent:** fresh context per Story; loads `bmad-build` for the Plan phase only. At epic start it loads `bmad-create-epics-and-stories` and `bmad-sprint-planning` for the Story order. It does not implement.
+**Planner subagent:** at epic start it loads `bmad-create-epics-and-stories` and `bmad-sprint-planning` for the Story order. On OpenCode it also plans each Story: fresh context per Story, `bmad-build` Plan phase only. It does not implement.
 
-**Builder subagent:** fresh context per Story; loads `bmad-build` for the Implement phase only, from the approved plan. The same session fixes the review findings.
+**Builder subagent:** fresh context per Story. The harness decides its scope:
+
+| Harness | Builder runs | Story plan from | Review lenses run by |
+| --- | --- | --- | --- |
+| Claude Code | the whole `bmad-build`: clarify, plan, implement, review, patch, present (**Full build**) | the builder's own Plan phase, approved by the leader | the builder, inside `bmad-build` |
+| OpenCode | `bmad-build` Implement phase only, from the approved plan (**Phase split**) | the planner | three reviewers the leader dispatches |
+
+The same builder session fixes review, verifier and UAT findings.
 
 **Verifier subagent:** independent of the builder; loads `manual-testing` for UAT and runs the project's gate commands. It owns the UAT cases: if a case is wrong, it fixes the case or harness. If the product is wrong, it records the defect and reports it to the leader; it never edits product code. The same session re-runs after a fix.
 
 **UAT Runner subagent:** runs the UAT cases exactly as written and returns observed output and evidence. Every run gets a fresh session; it is never reused. The verifier spawns it when the harness allows nested agents; otherwise the leader dispatches it. It does not edit product code or test cases.
 
-**Reviewer subagents (three per round):** each loads `bmad-code-review` with one lens: Blind Hunter, Edge Cases Hunter, or Verification Gap Finder. Every review round gets three fresh sessions; reviewers are never reused. They do not edit product code. Each lens dispatches with its lens entry from `.leader.json`, else the `reviewer` entry.
+**Reviewer subagents (three per round):** on OpenCode, and on Claude Code only when the builder's `bmad-build` review did not run its lenses in fresh subagents. Each loads `bmad-code-review` with one lens: Blind Hunter, Edge Cases Hunter, or Verification Gap Finder. Every review round gets three fresh sessions; reviewers are never reused. They do not edit product code. Each lens dispatches with its lens entry from `.leader.json`, else the `reviewer` entry.
 
 **Research subagent:** loads `bmad-deep-recon` for a decision the evidence cannot settle. Returns cited findings.
 
@@ -251,7 +258,7 @@ The leader may do a trivial edit. Anything that needs a plan is delegated.
 
 `bmad-build` owns its sequence, its plan gate and its review lenses. Read that skill for them; this playbook does not restate them.
 
-The leader handles only the checkpoints:
+The leader stands in for the human at `bmad-build`'s checkpoints. On Claude Code the builder runs the sequence and messages the leader at each checkpoint, then waits; on OpenCode the leader owns each checkpoint between phases. The leader handles only the checkpoints:
 
 - approve the plan when `bmad-build` asks;
 - answer an intent gap through the decision ladder;
@@ -259,21 +266,33 @@ The leader handles only the checkpoints:
 - triage findings: fix now when the Story can prove it, defer only when blocked, or void the work;
 - accept a deferral into `deferred_work.md`; never drop it silently.
 
-The builder must not commit. The leader commits and merges after gates, AC check and review, under the Activate contract.
+The builder commits only on its own Story branch or worktree, as `bmad-build` does; it never merges and never pushes. The leader merges after gates, AC check and review, under the Activate contract.
 
 ## Session continuity
 
 Each Story gets its own set of agents. Never reuse a session across Stories.
 
+Write the Story id with hyphens in a session name: `builder-2-3`, not `builder-2.3`.
+
 | Role | Session | Reused within Story |
 | --- | --- | --- |
-| Planner | `plan-<story>` | Yes |
+| Planner (OpenCode) | `plan-<story>` | Yes |
 | Builder | `builder-<story>` | Yes |
 | Reviewers (3 per round) | `review-<lens>-r<n>-s<story>` | **No. Fresh every round** |
 | Verifier | `verifier-<story>` | Yes |
 | UAT Runner | `uat-r<n>-<story>` | **No. Fresh every run** |
 
-The loop:
+The Claude Code loop (Full build):
+
+1. The builder runs `bmad-build` from Clarify. At its plan gate it sends the plan to the leader and waits; the leader approves it or returns `bad_plan`.
+2. The builder implements, runs `bmad-build`'s three review lenses in fresh subagents, patches, and presents.
+3. The verifier runs gates and tests on the presented result.
+4. Verifier failures go back to the **same builder session**, which fixes them through `bmad-build`'s patch loop and its review again.
+5. The verifier prepares the UAT cases; a **fresh UAT Runner session** runs them. A wrong case goes to the verifier, which fixes it; a product defect goes to the builder. Each rerun is a new UAT Runner session.
+
+Repeat steps 3–5 until the Story passes.
+
+The OpenCode loop (Phase split):
 
 1. Planner drafts the plan; the leader approves it.
 2. Builder implements.
@@ -317,10 +336,10 @@ OpenCode rules:
 
 Claude Code rules:
 
-- Keep one teammate per persistent role: planner, builder, verifier. Reviewers and the UAT Runner are new teammates each round or run.
+- Use the Full build: one builder teammate runs the whole `bmad-build`. Never brief it for a single phase.
+- Keep two persistent teammates per Story: builder and verifier. Start one UAT Runner each run, and three reviewers only for the fallback in Full build; shut each down when it finishes.
 - Hand the next instruction to the same teammate; do not respawn it.
 - Shut each teammate down when the Story passes or is abandoned. Do not carry teammates into the next Story.
-- Keep three persistent teammates: planner, builder, verifier. Start three reviewers each round and one UAT Runner each run; shut each down when it finishes.
 
 Nested agents:
 
@@ -329,6 +348,27 @@ Nested agents:
 - Either way, the verifier owns the UAT case fix; the runner only runs cases.
 
 No reuse support: fall back to fresh agents per round, and say so in the report.
+
+## Full build (Claude Code)
+
+On Claude Code one builder runs `bmad-build` end to end, as its docs describe. The leader does not split it. `bmad-build`'s review works best when the builder can spawn subagents; when it cannot, the fallback rule below applies.
+
+| `bmad-build` step | Who | Leader does |
+| --- | --- | --- |
+| Clarify and route | Builder | Answers an intent gap through the Decision ladder |
+| Plan, approved plan | Builder writes; leader approves | Runs the `Approve a plan` checks; returns `bad_plan` with reasons |
+| Implement | Builder | — |
+| Fits AC? | Builder | — |
+| Review: three lenses | Builder spawns three fresh subagents, one lens each, with the lens entries from `.leader.json` | Reads the findings and the lens session ids in the report |
+| Patch, reject, defer | Builder | Confirms each deferral has a blocker and goes to `deferred_work.md` |
+| Present, result | Builder presents; leader accepts | Sends the result to the verifier |
+
+Rules:
+
+- Brief the builder from `## Builder brief (Full build)` in `references/briefs.md`. Name `bmad-build`; never name a single phase, and never ask it to skip review.
+- The builder treats the leader as the user: at every `bmad-build` question or gate it messages the leader and waits.
+- The builder's report lists the three lens session ids. A review run inline in the builder's own context, or with fewer than three lenses, is not independent: the leader then dispatches the three reviewers itself, as in Phase split.
+- The verifier and UAT Runner stay separate from the builder. `bmad-build`'s own tests do not replace them.
 
 ## Phase split (OpenCode)
 
@@ -484,8 +524,8 @@ Per Story:
 2. **Build complete** — one subagent, one Story, no shared tree.
 3. **Gates run by the verifier subagent** — independent of the builder. It pastes counts, not exit codes, and falsifies: remove a guard or delete the tests and confirm red.
 4. **AC check by the verifier** — every criterion maps to a named test. The leader reads the mapping and spot-checks one row.
-5. **Review ran** — dispatch three fresh reviewer subagents in parallel, each with one lens (`bmad-code-review`): Blind Hunter, Edge Cases Hunter, Verification Gap Finder. If the builder ran its own review, still run the three; do not collapse them. No review means no close. If no independent review is possible, label it `review unavailable`; do not call it reviewed.
-6. **Fix loop** — findings go back to the same builder session. The same verifier re-runs gates. After a fix, dispatch **three new reviewers**; close the previous three. Repeat until pass.
+5. **Review ran** — on Claude Code this happens inside the builder, before the verifier's gates. Three fresh reviewers, one lens each: Blind Hunter, Edge Cases Hunter, Verification Gap Finder. On Claude Code they are the lenses `bmad-build` spawned, with their session ids in the builder's report. On OpenCode, or when `bmad-build` ran fewer than three lenses or ran them in its own context, the leader dispatches three fresh reviewer subagents in parallel (`bmad-code-review`). No review means no close. If no independent review is possible, label it `review unavailable`; do not call it reviewed.
+6. **Fix loop** — findings go back to the same builder session. The same verifier re-runs gates. After a fix, the review runs again with **three new reviewers**: `bmad-build`'s lenses on Claude Code, leader-dispatched on OpenCode. Repeat until pass.
 7. **UAT** — the verifier prepares the cases from the AC and design; a fresh UAT Runner session runs them. Triage a failure:
    - **Case wrong** — the verifier fixes the case or harness, then a new UAT Runner session reruns the failed cases.
    - **Product wrong** — the verifier records a defect report and sends it to the leader. The leader dispatches the builder to fix it; a new UAT Runner session reruns afterwards. The verifier never edits product code.
@@ -555,6 +595,7 @@ Stop and ask only for the five reasons in the Decision ladder: an approval tier,
 - Leaving a test VM or Factory running.
 - Dispatching a role without the `model` and `effort` from `.leader.json`.
 - Asking the preset question when a valid `.leader.json` exists.
+- On Claude Code, briefing the builder for one `bmad-build` phase, or telling it to skip review.
 
 ## References
 
