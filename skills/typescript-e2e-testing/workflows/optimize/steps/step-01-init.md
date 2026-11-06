@@ -47,10 +47,10 @@ If starting fresh:
    - `date`: current date
 3. Write the initialized report to the output path
 
-### 4. Create the Session Temp Directory
+### 4. Initialize Session
 
 ```bash
-mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
+export E2E_SESSION=$(date +%s)-$$
 ```
 
 ### 5. Load Technology-Specific References
@@ -67,7 +67,7 @@ Append to the output document:
 ## Step 1: Session Setup
 
 **Test Suite**: {{testSuite}}
-**Temp Directory**: {{E2E_DIR}}
+**Session ID**: {{E2E_SESSION}}
 **References Loaded**: {{list of loaded references}}
 ```
 

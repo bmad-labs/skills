@@ -24,14 +24,14 @@ Document resolution of current test and decide whether to continue with the next
 1. Run final full suite verification:
 
 ```bash
-npm run test:e2e > <E2E_DIR>/output.log 2>&1
-tail -50 <E2E_DIR>/output.log
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 2. Clean up temp files:
 
 ```bash
-rm -rf <E2E_DIR>
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ```
 
 3. Set `status` to `'complete'`

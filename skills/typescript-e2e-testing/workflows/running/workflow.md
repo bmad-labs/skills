@@ -23,9 +23,9 @@ Have E2E tests written and Docker infrastructure configured.
 
 ## Fast Path
 
-For a plain "run the tests" request, skip the run log and the `[C]` gates: create the
-session temp directory, confirm the Docker infrastructure is up (step 2's checks), run
-the requested scope with output redirected to `<E2E_DIR>/output.log`, read the summary
+For a plain "run the tests" request, skip the run log and the `[C]` gates: set the
+session ID (`export E2E_SESSION=$(date +%s)-$$`), confirm the Docker infrastructure is up (step 2's checks), run
+the requested scope with output redirected to `/tmp/e2e-${E2E_SESSION}-output.log`, read the summary
 and failures from that file, and summarise the result in chat. Use the full step flow
 below only when the user asks for a run log or wants failures worked through.
 
@@ -69,30 +69,30 @@ This workflow uses a **step-file architecture** for context-safe execution:
 
 ### Context Efficiency: Temp File Output
 
-**IMPORTANT**: Redirect output to temp files only (NO console output). Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID to prevent conflicts.
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
+# Initialize session (once at start of E2E work)
+export E2E_SESSION=$(date +%s)-$$
 
 # Standard pattern for all test runs
-npm run test:e2e > <E2E_DIR>/output.log 2>&1
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 
 # Then read only what's needed
-tail -50 <E2E_DIR>/output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Cleanup when done
-rm -rf <E2E_DIR>
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ```
 
 ### Quick Command Reference
 
 ```bash
 npm run docker:e2e                                                                    # Start infrastructure
-npm run test:e2e > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log  # Run all
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log  # Run file
-npm run test:e2e -- -t "{test name}" > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log  # Run test
-grep -B 2 -A 15 "FAIL\|✕" <E2E_DIR>/output.log                        # Get failures
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log  # Run all
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log  # Run file
+npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log  # Run test
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log                        # Get failures
 docker compose -f docker-compose.e2e.yml down                                         # Stop infrastructure
 ```
 

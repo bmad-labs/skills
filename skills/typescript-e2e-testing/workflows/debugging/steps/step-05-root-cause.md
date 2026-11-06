@@ -32,8 +32,8 @@ docker logs postgres-e2e --tail 50
 docker logs kafka-e2e --tail 50
 
 # Run with extended timeout (no console output)
-npm run test:e2e -- -t "{test}" --testTimeout=60000 > <E2E_DIR>/debug.log 2>&1
-tail -50 <E2E_DIR>/debug.log
+npm run test:e2e -- -t "{test}" --testTimeout=60000 > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 **Common Causes**: Kafka consumer not subscribed before test, database query slow, external API mock not configured, async operation never completes

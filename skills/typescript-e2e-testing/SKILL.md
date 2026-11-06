@@ -143,13 +143,13 @@ references/
 ### Run E2E Tests
 **Workflow**: [Running E2E Test](workflows/running/workflow.md)
 1. Verify Docker infrastructure is running
-2. Run tests sequentially with `npm run test:e2e > <E2E_DIR>/output.log 2>&1`
+2. Run tests sequentially with `npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1`
 3. Follow failure protocol if tests fail
 
 ### Debug Failing Tests
 **Workflow**: [Debugging E2E Test](workflows/debugging/workflow.md)
 1. Read `references/common/debugging.md`
-2. Create `<E2E_DIR>/failures.md` tracking file
+2. Create `/tmp/e2e-${E2E_SESSION}-failures.md` tracking file
 3. Fix ONE test at a time
 
 ### Optimize Test Performance
@@ -169,31 +169,31 @@ references/
 ### 0. Context Efficiency (Temp File Output)
 **ALWAYS redirect E2E test output to temp files, NOT console**. E2E output is verbose and bloats agent context.
 
-**IMPORTANT**: Redirect output to temp files only (NO console output). Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID to prevent conflicts.
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
+# Generate unique session ID at start of debugging session
+export E2E_SESSION=$(date +%s)-$$
 
 # Standard pattern - redirect to file only (no console output)
-npm run test:e2e > <E2E_DIR>/output.log 2>&1
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 
 # Read summary only (last 50 lines)
-tail -50 <E2E_DIR>/output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Get failure details
-grep -B 2 -A 15 "FAIL\|✕" <E2E_DIR>/output.log
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
 
 # Cleanup when done
-rm -rf <E2E_DIR>
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ```
 
-**Temp Files** (inside `<E2E_DIR>`, created once per session):
-- `<E2E_DIR>/output.log` - Full test output
-- `<E2E_DIR>/failures.log` - Filtered failure output
-- `<E2E_DIR>/failures.md` - Tracking file for one-by-one fixing
-- `<E2E_DIR>/debug.log` - Debug runs
-- `<E2E_DIR>/verify.log` - Verification runs
+**Temp Files** (with `${E2E_SESSION}` unique per agent):
+- `/tmp/e2e-${E2E_SESSION}-output.log` - Full test output
+- `/tmp/e2e-${E2E_SESSION}-failures.log` - Filtered failure output
+- `/tmp/e2e-${E2E_SESSION}-failures.md` - Tracking file for one-by-one fixing
+- `/tmp/e2e-${E2E_SESSION}-debug.log` - Debug runs
+- `/tmp/e2e-${E2E_SESSION}-verify.log` - Verification runs
 
 ### 1. Real Infrastructure
 Test against actual services via Docker. Never mock databases or message brokers for E2E tests.
@@ -296,23 +296,26 @@ const config: Config = {
 
 When E2E tests fail:
 
-1. **Create the session temp directory** once, as in Core Principle 0 (Context Efficiency)
-2. **Create tracking file**: `<E2E_DIR>/failures.md` with all failing tests
+1. **Initialize session** (once at start):
+   ```bash
+   export E2E_SESSION=$(date +%s)-$$
+   ```
+2. **Create tracking file**: `/tmp/e2e-${E2E_SESSION}-failures.md` with all failing tests
 3. **Select ONE failing test** - work on only this test
 4. **Run ONLY that test** (never full suite):
    ```bash
-   npm run test:e2e -- -t "test name" > <E2E_DIR>/debug.log 2>&1
-   tail -50 <E2E_DIR>/debug.log
+   npm run test:e2e -- -t "test name" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
+   tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
    ```
 5. **Fix the issue** - analyze error, make targeted fix
 6. **Verify fix** - run same test 3-5 times:
    ```bash
-   for i in {1..5}; do npm run test:e2e -- -t "test name" > <E2E_DIR>/run$i.log 2>&1 && echo "Run $i: PASS" || echo "Run $i: FAIL"; done
+   for i in {1..5}; do npm run test:e2e -- -t "test name" > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1 && echo "Run $i: PASS" || echo "Run $i: FAIL"; done
    ```
 7. **Mark as FIXED** in tracking file
 8. **Move to next failing test** - repeat steps 3-7
 9. **Run full suite ONLY ONCE** after ALL individual tests pass
-10. **Cleanup**: `rm -rf <E2E_DIR>`
+10. **Cleanup**: `rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md`
 
 **WHY**: Running full suite wastes time and context. Each failing test pollutes output, making debugging harder.
 
@@ -354,6 +357,9 @@ beforeEach(async () => {
   await redis.flushdb();
 });
 ```
+# Initialize session (once at start)
+export E2E_SESSION=$(date +%s)-$$
+
 
 ### External API Mock (MSW)
 ```typescript
@@ -372,24 +378,27 @@ const messages = await kafkaHelper.waitForMessages(outputTopic, 1, 20000);
 expect(messages[0].value).toMatchObject({ id: event.id });
 ```
 
+
+# Cleanup session files
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ---
 
 ## Debugging Commands
 
-**All commands redirect output to temp files only (no console output).** `<E2E_DIR>` is the session directory from Core Principle 0.
+**All commands redirect output to temp files only (no console output).**
 
 ```bash
 # Run specific test (no console output)
-npm run test:e2e -- -t "should create user" > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log
+npm run test:e2e -- -t "should create user" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run specific file
-npm run test:e2e -- test/e2e/user.e2e-spec.ts > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log
+npm run test:e2e -- test/e2e/user.e2e-spec.ts > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run full suite
-npm run test:e2e > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Get failure details from last run
-grep -B 2 -A 15 "FAIL\|✕" <E2E_DIR>/output.log
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
 
 # Debug with breakpoints (requires console for interactive debugging)
 node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand

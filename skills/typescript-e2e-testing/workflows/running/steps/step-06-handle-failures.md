@@ -24,7 +24,7 @@ Before starting, load and read:
 ### 1. Create Tracking File
 
 ```markdown
-<!-- <E2E_DIR>/failures.md -->
+<!-- /tmp/e2e-${E2E_SESSION}-failures.md -->
 # E2E Test Failures - {date}
 
 ## Test: "{test name}"
@@ -43,17 +43,17 @@ Before starting, load and read:
 
 ```bash
 # Run only the failing test (no console output)
-npm run test:e2e -- -t "{exact test name}" > <E2E_DIR>/output.log 2>&1
+npm run test:e2e -- -t "{exact test name}" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 
 # Read the result
-tail -50 <E2E_DIR>/output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 ### 3. Analyze Logs
 
 ```bash
 # Search for errors in test output
-grep -i "error\|fail\|exception" <E2E_DIR>/output.log
+grep -i "error\|fail\|exception" /tmp/e2e-${E2E_SESSION}-output.log
 
 # View application logs (last 100 lines)
 tail -100 logs/e2e-test.log

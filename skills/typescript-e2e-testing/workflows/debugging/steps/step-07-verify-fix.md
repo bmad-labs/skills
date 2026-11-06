@@ -18,7 +18,7 @@ All commands redirect to temp files only (no console):
 
 ```bash
 for i in {1..5}; do
-  npm run test:e2e -- -t "{test name}" > <E2E_DIR>/run$i.log 2>&1
+  npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1
   if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
 ```
@@ -26,16 +26,16 @@ done
 ### 2. Run With Related Tests
 
 ```bash
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts > <E2E_DIR>/verify.log 2>&1
-tail -50 <E2E_DIR>/verify.log
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts > /tmp/e2e-${E2E_SESSION}-verify.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-verify.log
 ```
 
 ### 3. Check for Regressions
 
 ```bash
 # Run full suite (only if all were passing before)
-npm run test:e2e > <E2E_DIR>/output.log 2>&1
-tail -50 <E2E_DIR>/output.log
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 ### 4. Update Tracking

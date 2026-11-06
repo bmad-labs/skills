@@ -71,23 +71,23 @@ This workflow uses a **step-file architecture** for context-safe execution:
 
 ### Context Efficiency: Temp File Output
 
-**IMPORTANT**: Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts.
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
+# Initialize session (once at start of debugging)
+export E2E_SESSION=$(date +%s)-$$
 
 # Run test and capture output (no console output)
-npm run test:e2e -- -t "{test name}" > <E2E_DIR>/debug.log 2>&1
+npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
 
 # Read only summary
-tail -50 <E2E_DIR>/debug.log
+tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
 
 # Get failure details
-grep -B 5 -A 20 "FAIL\|Error:" <E2E_DIR>/debug.log
+grep -B 5 -A 20 "FAIL\|Error:" /tmp/e2e-${E2E_SESSION}-debug.log
 
 # Cleanup when done
-rm -rf <E2E_DIR>
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ```
 
 ### Debugging Tools Reference
@@ -111,8 +111,8 @@ rm -rf <E2E_DIR>
 #### Command Line Debugging
 ```bash
 node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand -t "{test}"
-npm run test:e2e -- -t "{test}" --verbose > <E2E_DIR>/debug.log 2>&1
-DEBUG=* npm run test:e2e -- -t "{test}" > <E2E_DIR>/debug.log 2>&1
+npm run test:e2e -- -t "{test}" --verbose > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
+DEBUG=* npm run test:e2e -- -t "{test}" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
 ```
 
 ## Begin

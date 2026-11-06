@@ -20,7 +20,7 @@ docker compose -f docker-compose.e2e.yml down
 ### 2. Delete Tracking Files
 
 ```bash
-rm -rf <E2E_DIR>
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ```
 
 ### 3. Review and Commit Fixes

@@ -17,15 +17,15 @@ All commands redirect to temp files only (no console):
 ### 1. Run Test Alone
 
 ```bash
-npm run test:e2e -- -t "{exact test name}" > <E2E_DIR>/isolation.log 2>&1
-tail -30 <E2E_DIR>/isolation.log
+npm run test:e2e -- -t "{exact test name}" > /tmp/e2e-${E2E_SESSION}-isolation.log 2>&1
+tail -30 /tmp/e2e-${E2E_SESSION}-isolation.log
 ```
 
 ### 2. Run Multiple Times
 
 ```bash
 for i in {1..5}; do
-  npm run test:e2e -- -t "{test name}" > <E2E_DIR>/run$i.log 2>&1
+  npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1
   if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
 ```
@@ -34,12 +34,12 @@ done
 
 ```bash
 # Just this file
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts > <E2E_DIR>/isolation.log 2>&1
-tail -50 <E2E_DIR>/isolation.log
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts > /tmp/e2e-${E2E_SESSION}-isolation.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-isolation.log
 
 # With the test before it
-npm run test:e2e -- -t "{prev test name}" -t "{failing test name}" > <E2E_DIR>/isolation.log 2>&1
-tail -30 <E2E_DIR>/isolation.log
+npm run test:e2e -- -t "{prev test name}" -t "{failing test name}" > /tmp/e2e-${E2E_SESSION}-isolation.log 2>&1
+tail -30 /tmp/e2e-${E2E_SESSION}-isolation.log
 ```
 
 ### 4. Append to Output

@@ -18,32 +18,32 @@ All commands redirect to temp file only (no console):
 
 ```bash
 # Standard run
-npm run test:e2e {scope} > <E2E_DIR>/output.log 2>&1
+npm run test:e2e {scope} > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 
 # Verbose output
-npm run test:e2e {scope} -- --verbose > <E2E_DIR>/output.log 2>&1
+npm run test:e2e {scope} -- --verbose > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 
 # With coverage
-npm run test:e2e {scope} -- --coverage > <E2E_DIR>/output.log 2>&1
+npm run test:e2e {scope} -- --coverage > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 
 # Force sequential (if not in config)
-npm run test:e2e {scope} -- --runInBand > <E2E_DIR>/output.log 2>&1
+npm run test:e2e {scope} -- --runInBand > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 
 # With specific timeout
-npm run test:e2e {scope} -- --testTimeout=60000 > <E2E_DIR>/output.log 2>&1
+npm run test:e2e {scope} -- --testTimeout=60000 > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
 ```
 
 ### 2. Read Results
 
 ```bash
 # Get summary (last 50 lines)
-tail -50 <E2E_DIR>/output.log
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # If failures exist, get failure details
-grep -B 2 -A 15 "FAIL\|✕" <E2E_DIR>/output.log > <E2E_DIR>/failures.log && cat <E2E_DIR>/failures.log
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log > /tmp/e2e-${E2E_SESSION}-failures.log && cat /tmp/e2e-${E2E_SESSION}-failures.log
 
 # Count passed/failed
-grep -c "✓\|✕" <E2E_DIR>/output.log
+grep -c "✓\|✕" /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 ### 3. Append to Output
@@ -54,7 +54,7 @@ Append to the output document:
 ## Step 4: Execution
 
 **Command**: {{command}}
-**Output File**: <E2E_DIR>/output.log
+**Output File**: /tmp/e2e-${E2E_SESSION}-output.log
 **Result Summary**: {{summary from tail -50}}
 ```
 
@@ -65,7 +65,7 @@ Running Tests
 
 Command: {command}
 Scope: {scope description}
-Output: <E2E_DIR>/output.log
+Output: /tmp/e2e-${E2E_SESSION}-output.log
 
 Test execution complete. Reading results...
 

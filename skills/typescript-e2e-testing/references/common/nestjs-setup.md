@@ -93,26 +93,26 @@ export default config;
 
 ### Running Tests (Context Efficient)
 
-**ALWAYS redirect output to temp files in a per-session temp directory:**
+**ALWAYS redirect output to temp files with unique session ID:**
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
+# Initialize session (once at start)
+export E2E_SESSION=$(date +%s)-$$
 
 # Run all E2E tests (no console output)
-npm run test:e2e > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run specific test (no console output)
-npm run test:e2e -- -t "test name" > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log
+npm run test:e2e -- -t "test name" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Get failure details
-grep -B 2 -A 15 "FAIL\|✕" <E2E_DIR>/output.log
+grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
 
 # Debug mode (requires console for interactive debugging)
 npm run test:e2e:debug
 
 # Cleanup when done
-rm -rf <E2E_DIR>
+rm -f /tmp/e2e-${E2E_SESSION}-*.log
 ```
 
 ## Test Setup Pattern

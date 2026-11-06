@@ -13,30 +13,30 @@
 
 **CRITICAL**: Always redirect E2E test output to temp files. E2E output is verbose and bloats agent context.
 
-**IMPORTANT**: Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
+**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
+# Initialize session (once at start of debugging)
+export E2E_SESSION=$(date +%s)-$$
 
 # Standard pattern - redirect to temp file only (no console output)
-npm run test:e2e -- -t "{test name}" > <E2E_DIR>/debug.log 2>&1
+npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
 
 # Read summary only
-tail -50 <E2E_DIR>/debug.log
+tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
 
 # Get failure details
-grep -B 5 -A 20 "FAIL\|Error:" <E2E_DIR>/debug.log
+grep -B 5 -A 20 "FAIL\|Error:" /tmp/e2e-${E2E_SESSION}-debug.log
 
 # Cleanup when done
-rm -rf <E2E_DIR>
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ```
 
-**Temp File Locations** (inside `<E2E_DIR>`, created once per session):
-- `<E2E_DIR>/debug.log` - Debug runs
-- `<E2E_DIR>/output.log` - General test output
-- `<E2E_DIR>/verify.log` - Verification runs
-- `<E2E_DIR>/failures.md` - Tracking file
+**Temp File Locations** (with `${E2E_SESSION}` unique per agent):
+- `/tmp/e2e-${E2E_SESSION}-debug.log` - Debug runs
+- `/tmp/e2e-${E2E_SESSION}-output.log` - General test output
+- `/tmp/e2e-${E2E_SESSION}-verify.log` - Verification runs
+- `/tmp/e2e-${E2E_SESSION}-failures.md` - Tracking file
 
 ---
 
@@ -128,27 +128,27 @@ Open Chrome → `chrome://inspect` to connect.
 
 ```bash
 # Verbose output - redirect then read summary (no console output)
-npm run test:e2e -- --verbose > <E2E_DIR>/debug.log 2>&1
-tail -100 <E2E_DIR>/debug.log
+npm run test:e2e -- --verbose > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
+tail -100 /tmp/e2e-${E2E_SESSION}-debug.log
 
-npm run test:e2e -- --verbose --expand > <E2E_DIR>/debug.log 2>&1
-tail -100 <E2E_DIR>/debug.log
+npm run test:e2e -- --verbose --expand > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
+tail -100 /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 ### Single Test Execution
 
 ```bash
 # Run specific file (no console output)
-npm run test:e2e -- test/e2e/user.e2e-spec.ts > <E2E_DIR>/output.log 2>&1
-tail -50 <E2E_DIR>/output.log
+npm run test:e2e -- test/e2e/user.e2e-spec.ts > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run tests matching pattern
-npm run test:e2e -- -t "should create user" > <E2E_DIR>/output.log 2>&1
-tail -50 <E2E_DIR>/output.log
+npm run test:e2e -- -t "should create user" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
 # Run single describe block
-npm run test:e2e -- -t "User API" > <E2E_DIR>/output.log 2>&1
-tail -50 <E2E_DIR>/output.log
+npm run test:e2e -- -t "User API" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 ---
@@ -162,10 +162,10 @@ tail -50 <E2E_DIR>/output.log
 tail -100 logs/e2e-test.log
 
 # Search for errors in test output
-grep -i "error\|fail\|exception" <E2E_DIR>/output.log
+grep -i "error\|fail\|exception" /tmp/e2e-${E2E_SESSION}-output.log
 
 # Search with context (5 lines before/after)
-grep -B5 -A5 "FAIL" <E2E_DIR>/output.log
+grep -B5 -A5 "FAIL" /tmp/e2e-${E2E_SESSION}-output.log
 
 # Find specific request in app logs
 grep "POST /users" logs/e2e-test.log | tail -20
@@ -303,7 +303,7 @@ const order = await waitFor(() =>
 List ALL failing tests from the initial run. Work through them one by one.
 
 ```markdown
-<!-- <E2E_DIR>/failures.md -->
+<!-- /tmp/e2e-${E2E_SESSION}-failures.md -->
 # E2E Test Failures
 
 ## Test 1: "should create user and publish event"
@@ -324,11 +324,11 @@ List ALL failing tests from the initial run. Work through them one by one.
 
 ```bash
 # Run only the failing test (no console output)
-npm run test:e2e -- -t "should create user and publish event" > <E2E_DIR>/debug.log 2>&1
-tail -50 <E2E_DIR>/debug.log
+npm run test:e2e -- -t "should create user and publish event" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-debug.log
 
 # Check for errors in output
-grep -i "error\|fail" <E2E_DIR>/debug.log
+grep -i "error\|fail" /tmp/e2e-${E2E_SESSION}-debug.log
 ```
 
 ### Step 3: Analyze Root Cause
@@ -346,7 +346,7 @@ grep -i "error\|fail" <E2E_DIR>/debug.log
 ```bash
 # Run the fixed test multiple times (no console output)
 for i in {1..5}; do
-  npm run test:e2e -- -t "should create user" > <E2E_DIR>/run$i.log 2>&1
+  npm run test:e2e -- -t "should create user" > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1
   if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
 ```
@@ -367,13 +367,13 @@ done
 **Only after ALL individual tests pass:**
 
 ```bash
-npm run test:e2e > <E2E_DIR>/output.log 2>&1
-tail -50 <E2E_DIR>/output.log
+npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 ```
 
 ### Step 7: Clean Up
 
 ```bash
-rm <E2E_DIR>/failures.md
+rm /tmp/e2e-${E2E_SESSION}-failures.md
 rm -f /tmp/e2e-*.log
 ```

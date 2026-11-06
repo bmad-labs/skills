@@ -17,27 +17,27 @@ All commands redirect to temp files only (no console):
 ### 1. Run Full Suite with Timing
 
 ```bash
-{ time npm run test:e2e > <E2E_DIR>/baseline.log 2>&1 ; } 2>> <E2E_DIR>/baseline.log
-tail -50 <E2E_DIR>/baseline.log
+{ time npm run test:e2e > /tmp/e2e-${E2E_SESSION}-baseline.log 2>&1 ; } 2>> /tmp/e2e-${E2E_SESSION}-baseline.log
+tail -50 /tmp/e2e-${E2E_SESSION}-baseline.log
 ```
 
 ### 2. Capture Metrics
 
 ```bash
 # Extract timing summary
-grep -E "Time:|Tests:|passed|failed|Duration|real|user|sys" <E2E_DIR>/baseline.log
+grep -E "Time:|Tests:|passed|failed|Duration|real|user|sys" /tmp/e2e-${E2E_SESSION}-baseline.log
 ```
 
 ### 3. Identify Bottlenecks
 
 ```bash
 # Run with verbose timing (no console output)
-npm run test:e2e -- --verbose > <E2E_DIR>/baseline.log 2>&1
-tail -100 <E2E_DIR>/baseline.log
+npm run test:e2e -- --verbose > /tmp/e2e-${E2E_SESSION}-baseline.log 2>&1
+tail -100 /tmp/e2e-${E2E_SESSION}-baseline.log
 
 # Profile specific file
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts --verbose > <E2E_DIR>/timing.log 2>&1
-tail -50 <E2E_DIR>/timing.log
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts --verbose > /tmp/e2e-${E2E_SESSION}-timing.log 2>&1
+tail -50 /tmp/e2e-${E2E_SESSION}-timing.log
 ```
 
 ### 4. Append to Output
