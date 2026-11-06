@@ -32,7 +32,9 @@ const only = (flag('--only', null)?.split(',').map((s) => s.trim())) || null; //
   const { dep } = makeDeckRequire(deckDir);
   const srv = await serveDir(dsRoot);                          // { url, close } — serves design-system/
   const browser = await launchBrowser(dep);                    // returns the browser directly
-  const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 2 });
+  // Scale 1: previews are reference thumbnails that ship inside the skill; 2x would double
+  // their size on disk with no gain for layout picking.
+  const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
   let files = readdirSync(slidesDir).filter((f) => f.endsWith('.html'));
   if (only) files = files.filter((f) => only.some((n) => f.startsWith(n + '-') || f.startsWith(n)));
   files.sort();
