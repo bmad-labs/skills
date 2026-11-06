@@ -20,9 +20,22 @@ Remaining: <Story ids in order>
 Branch / head: <branch> @ <sha>
 Blockers: <none | blocker and owner>
 Open decisions: <none | question and who decides>
+Open for the user to confirm: <none | detail decisions taken while the user was away>
+Agents alive: <session name — id — role — current round>
 Next: <what happens after the current Story>
 Updated: <date> at <sha>
+
+## Environment
+Skill version: <commit or hash of bmad-leader>
+Host: <stays awake how; network; user timezone>
+Shell and tools: <shell, tool family, commands that differ from the usual form, commands the harness blocks>
+Credentials: <how each one loads, per command; never printed>
+In use: <ports, devices, fixed paths taken by other programs, and what to use instead>
+Missing tools: <tool — workaround>
+Shared resources: <resource — owner — when>
 ```
+
+The Environment block is written once per epic at Activate and corrected when a subagent finds a new fact. Every brief links it.
 
 ## Test level confirmation
 
@@ -56,6 +69,24 @@ Every AC names the lowest level that proves it. Each mark carries its exact comm
 `RUN` requires the tool, the access and an observation method. For web use `playwright-cli` or a browser MCP; for desktop use `cua-driver` or a computer MCP. Capture a screenshot and inspect it for visual targets.
 
 If the highest applicable level is `NOT RUN`, tell the user to run the `close-loop-dev-setup` skill and name the missing tool.
+
+## Common rules block
+
+Add this block to every brief, for every role. Replace the brackets.
+
+```markdown
+Common rules:
+- Environment: read <current-situation note>#Environment before you run commands. Use the forms it gives for this shell and these tools.
+- Shared resources you may touch: <resource — owner>. Use a private path where the code allows it. Do not touch any other fixed path, port, device or evidence folder.
+- Work at commit <sha>. Read files from that commit when another agent may be changing the working tree.
+- Edit files with the edit tools, not with shell scripts, so every change is visible. Cut long command output with a tail or write it to a log file.
+- Write your full report to <report path>. Reply in chat with at most <n> lines: the path, the counts, and any blocker.
+- A permission denial is final. Do not reach the same effect another way; report it.
+- Leave nothing running when you report: no process, container, watch loop or temp file of yours. Do not end a report with a menu of options; state what you did and what remains.
+- When you get a shutdown request, reply with the structured object
+  {"type": "shutdown_response", "request_id": "<id from the request>", "approve": true}
+  as the message, not as a text string.
+```
 
 ## Subagent brief
 
@@ -185,6 +216,9 @@ Deliver:
 - Plan: files, tasks, tests, AC-to-test map, open questions.
 - Contract check: each task cites its `FR-n`, `AD-n` and design file; no out-of-scope work.
 - Test plan: each AC mapped to a pyramid level, with command and any `NOT RUN` harness.
+- Proof that each planned break-once run and each planned mutant can fail: a scratch run, or a `file:line` argument. A planned check that cannot go red is not a check.
+- Platform differences that change behaviour or tests (operating system, shell, tool versions), with how the plan covers each one.
+- Brief check: every claim in this brief, checked against the design documents. Report a mismatch; do not follow the brief over the design.
 - Deferred items this Story unlocks, with their ids.
 - Risks: intent gaps, irreversible actions, footprint.
 
@@ -214,6 +248,19 @@ Run the project gates for this Story:
 - UAT: <command, or the missing harness>
 
 For each gate, run it once, then break it once and confirm it fails.
+Run every mutant in an exported copy or a separate worktree, never in the tree
+the builder edits, and never restore with a checkout over that tree. Name the
+copy's location in the report. Treat the builder's mutant and coverage claims
+as hypotheses; re-run a sample.
+
+Before you hand UAT cases to a runner: check that the commit and evidence folder
+in the case file match this round, that every tool the cases need exists, how
+each exit code is captured, and that the run has its own evidence folder.
+Any case that needs a product edit (a break-once run) is yours, not the runner's.
+
+CI, when asked: watch the run in the background and check its status; never
+hold a foreground loop. Stop the watch before you report. A job that runs past
+its usual time is NOT RUN, with the elapsed time.
 
 Return:
 - Command, full output, counts, and the SHA tested.
@@ -233,7 +280,9 @@ Fresh context: you have not run this Story before.
 Do not edit product code or test cases.
 
 Run only: <case ids or path>.
-Capture observed output to: <evidence dir>.
+Capture observed output to: <evidence dir, unique to this run>.
+Write temp files only under <scratch path>. If a case cannot run as written,
+mark it and say why; do not change the case or the product.
 
 Return:
 - Per case: id, PASS / FAIL / BLOCKED, command, observed output, evidence path.
@@ -272,12 +321,44 @@ Review only through your lens:
 Context: Story AC, cited design files, decision log <path>.
 Do not edit product code.
 Do not review unrelated pre-existing code unless the diff touches it.
+Read files at <head> (for example `git show <head>:<path>`); the working tree may
+hold another agent's change. Run tests only in your own exported copy.
+In round 2 or later, review the fix diff <previous head>...<head>; repeat an old
+finding only when its fix is wrong or incomplete.
+
+Severity:
+- high: breaks an acceptance criterion or the contract.
+- medium: a product defect, or a test that gives a false pass of a product check.
+- low: everything else (test-helper robustness, wording, ids, plan text).
 
 Return:
 - Findings: severity, file:line, quoted line, what is wrong, suggested fix.
 - Which findings block the Story and which can be deferred, with a blocker.
 - Verdict: PASS or FAIL.
 ```
+
+## Triage file
+
+The leader writes one per round when it triages findings itself, and sends the builder its path.
+
+```markdown
+# Story <id> round <n>: leader triage
+
+Base: <sha>. Reports: <paths>.
+Each non-doc fix needs a test that fails first, or a mutant that the new test kills.
+
+| # | Source | Finding | Required fix |
+| --- | --- | --- | --- |
+| <prefix><n> | <lens and its finding id; lenses that found the same defect> | <defect, file:line> | <the fix; for a behaviour change, the regression risk and the neighbouring test> |
+
+## Not fixed, with the reason
+- <id>: <kept, deferred with blocker and unblock condition, or rejected, and why>
+
+## After the fixes
+<gates to re-run; whether a new review round follows (see the convergence rule)>
+```
+
+Use a new id prefix per round, so a row id names its round.
 
 ## Research brief
 
@@ -386,7 +467,8 @@ A subagent's "done" is a hypothesis until the leader checks it. Require:
 
 ```markdown
 Story: <id>
-Commit state: uncommitted
+Report file: <path>
+Commit state: <uncommitted | sha on the Story branch>
 Sessions: planner=<id>, builder=<id>, verifier=<id>; reviewers: r1=<ids>, r2=<ids>; uat: r1=<id>, r2=<id>; rounds=<n>
 Skills used: <loaded skills, or "none beyond bmad-build">
 Gates: <command> -> <N passed>, <command> -> <N passed>
