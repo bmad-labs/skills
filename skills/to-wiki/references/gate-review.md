@@ -1,6 +1,6 @@
 # Gate: one reviewer per dimension
 
-Run after your own review pass and after lint. Every reviewer is read-only, runs on `opus`, gets
+Run after your own review pass and after lint. Every reviewer is read-only, runs on the strongest available model, gets
 the checklist below for its dimension, and all are dispatched in one message. Whoever wrote a page
 cannot review it. You wrote or approved every page, so you review none.
 
@@ -100,7 +100,7 @@ Output: compact report, max ~<N> lines. Per check: `CHECK n — PASS|FAIL (x iss
 
 ## After the gate: editors
 
-Two `opus` editors on disjoint folders (`sources/ + syntheses/ + index.md`, and
+Two editors on the strongest available model, on disjoint folders (`sources/ + syntheses/ + index.md`, and
 `concepts/ + entities/`). Give each the full finding list for its folders plus these hard rules:
 
 - Never change a fact, number, unit, symbol, equation, link target, anchor, heading, table
