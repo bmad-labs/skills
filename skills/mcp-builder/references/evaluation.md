@@ -1,5 +1,26 @@
 # MCP Server Evaluation Guide
 
+## Contents
+
+- [Overview](#overview)
+- [Quick Reference](#quick-reference)
+- [Purpose of Evaluations](#purpose-of-evaluations)
+- [Evaluation Overview](#evaluation-overview)
+- [Question Guidelines](#question-guidelines)
+- [Answer Guidelines](#answer-guidelines)
+- [Evaluation Process](#evaluation-process)
+- [Output Format](#output-format)
+- [Evaluation Examples](#evaluation-examples)
+- [Verification Process](#verification-process)
+- [Tips for Creating Quality Evaluations](#tips-for-creating-quality-evaluations)
+- [Setup](#setup)
+- [Evaluation File Format](#evaluation-file-format)
+- [Running Evaluations](#running-evaluations)
+- [Command-Line Options](#command-line-options)
+- [Output](#output)
+- [Complete Example Workflow](#complete-example-workflow)
+- [Troubleshooting](#troubleshooting)
+
 ## Overview
 
 This document provides guidance on creating comprehensive evaluations for MCP servers. Evaluations test whether LLMs can effectively use your MCP server to answer realistic, complex questions using only the tools provided.
@@ -415,6 +436,8 @@ Evaluation files use XML format with `<qa_pair>` elements:
 </evaluation>
 ```
 
+A runnable starter file ships with the skill: `scripts/example_evaluation.xml`. Copy it as the skeleton for your own evaluation file, or pass it to `scripts/evaluation.py` to check your setup end to end before writing real questions.
+
 ## Running Evaluations
 
 The evaluation script (`scripts/evaluation.py`) supports three transport types:
@@ -485,7 +508,7 @@ positional arguments:
 optional arguments:
   -h, --help            Show help message
   -t, --transport       Transport type: stdio, sse, or http (default: stdio)
-  -m, --model           Claude model to use (default: claude-3-7-sonnet-20250219)
+  -m, --model           Claude model to use (default: claude-sonnet-5-5)
   -o, --output          Output file for report (default: print to stdout)
 
 stdio options:
@@ -596,7 +619,7 @@ If many evaluations fail:
 ### Timeout Issues
 
 If tasks are timing out:
-- Use a more capable model (e.g., `claude-3-7-sonnet-20250219`)
+- Use a more capable model (e.g., `claude-opus-5-5`)
 - Check if tools are returning too much data
 - Verify pagination is working correctly
 - Consider simplifying complex questions
