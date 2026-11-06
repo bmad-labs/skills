@@ -1,5 +1,18 @@
 # Test Quality Criteria
 
+## Contents
+
+- [Good Test Case Characteristics](#good-test-case-characteristics)
+- [Bad Test Case Anti-Patterns](#bad-test-case-anti-patterns)
+- [Test Plan Evaluation Rubric](#test-plan-evaluation-rubric)
+- [LLM / AI Agent Test Evaluation](#llm--ai-agent-test-evaluation)
+- [Checkpoint Writing Guide](#checkpoint-writing-guide)
+- [Test Data Quality](#test-data-quality)
+- [Exploratory Testing](#exploratory-testing)
+- [Deep Quality Review — 4 Dimensions (from BMAD TEA)](#deep-quality-review--4-dimensions-from-bmad-tea)
+- [Testability Assessment (from BMAD Test Design)](#testability-assessment-from-bmad-test-design)
+- [Risk Assessment Matrix (from BMAD Test Design)](#risk-assessment-matrix-from-bmad-test-design)
+
 ## Good Test Case Characteristics
 
 A good test case is one that another person (or agent) can execute without asking questions and get a definitive pass/fail result.
@@ -15,36 +28,36 @@ A good test case is one that another person (or agent) can execute without askin
 | 5   | **Traceable**    | Links to a design doc, requirement, or story            | No design reference — why does this test exist?     |
 | 6   | **Realistic**    | Uses domain-appropriate data, not "test content"        | `{"name": "test"}` instead of real data             |
 | 7   | **Cleanable**    | Restores state after execution                          | No cleanup — pollutes next test run                 |
-| 8   | **Prioritized**  | Has Critical/High/Medium rating based on risk           | All tests are "Critical" — no triage possible       |
+| 8   | **Prioritized**  | Has a P0–P3 rating based on risk                        | All tests are P0 — no triage possible               |
 | 9   | **Minimal**      | Tests exactly what's needed, nothing extra              | 20 checkpoints per test — hard to diagnose failures |
 | 10  | **Documented**   | Preconditions, steps, and expected results are explicit | Assumes knowledge the reader doesn't have           |
 
 ### Good Test Case Example
 
 ```markdown
-### TC-02-03: Resumed Session After 60s — is_continuation=true
+### TC-02-03: Order Resubmitted After 60s Idempotency Window — New Order Created
 
-**Priority**: Critical
-**Design Ref**: data-flow.md Section 6, Conversation Chains
+**Priority**: P0
+**Design Ref**: order-flow.md Section 6, Idempotency Keys
 
 **Preconditions**:
 
 - [ ] Server running on localhost:8000
-- [ ] No existing transcripts for session_id `tc02-chain`
+- [ ] No existing orders for idempotency key `tc02-retry`
 
 **Steps**:
 
-1. Submit first transcript
+1. Submit an order with idempotency key `tc02-retry`
 2. Wait 65 seconds: `sleep 65`
-3. Submit second transcript with same session_id
+3. Submit the same order again with the same idempotency key
 
 **Checkpoints**:
 
 - [ ] CP1: Second response has `duplicate: false`
-- [ ] CP2: Second row has `is_continuation = true` — verify: `psql -c "..."`
+- [ ] CP2: Second row has `is_resubmission = true` — verify: `psql -c "..."`
 - [ ] CP3: Two rows total — verify: count = 2
 
-**Cleanup**: `psql -c "DELETE FROM jarvis.transcripts WHERE session_id='tc02-chain';"`
+**Cleanup**: `psql -c "DELETE FROM app.orders WHERE idempotency_key='tc02-retry';"`
 ```
 
 ## Bad Test Case Anti-Patterns
@@ -58,7 +71,7 @@ A good test case is one that another person (or agent) can execute without askin
 | **No cleanup**                                      | Leaves state that affects next test      | Add DELETE/rm commands for all created state           |
 | **Tests implementation, not behavior**              | Breaks when code refactors               | Test observable outcomes (API responses, file content) |
 | **Too many assertions per test** (20+ CPs)          | Hard to diagnose which failed            | Split into focused test cases with 3-8 CPs each        |
-| **No priority**                                     | Can't triage when time is limited        | Assign Critical/High/Medium based on risk              |
+| **No priority**                                     | Can't triage when time is limited        | Assign P0–P3 based on risk                             |
 | **Hardcoded timestamps**                            | Fails tomorrow                           | Use relative dates or `$(date +%Y-%m-%d)`              |
 | **Ignoring error messages**                         | Hides root cause on failure              | Capture and report actual error vs expected            |
 | **Testing only happy path**                         | Misses real-world failures               | Add error path, edge case, and boundary tests          |
@@ -79,14 +92,14 @@ A good test case is one that another person (or agent) can execute without askin
 
 A well-balanced test plan has:
 
-- **25-30% Critical** — must-pass for the system to function
-- **40-45% High** — important for reliability, security, and data integrity
-- **25-30% Medium** — edge cases, performance, nice-to-have
+- **25-30% P0** — must-pass for the system to function
+- **40-45% P1** — important for reliability, security, and data integrity
+- **25-30% P2/P3** — edge cases, performance, nice-to-have, exploratory
 
 Red flags:
 
-- > 50% "Medium" → probably missing important failure cases
-- > 60% "Critical" → everything can't be critical, reassess
+- > 50% P2/P3 → probably missing important failure cases
+- > 60% P0 → everything can't be P0, reassess
 - 0% security tests → check test-categories.md Security section
 
 ### Realism Assessment
@@ -128,7 +141,7 @@ AI agents should be tested at three layers with different approaches:
 
 ### What to Verify (Structural — Deterministic)
 
-- Required sections are present (Context, Key Exchanges, Decisions, Lessons, Memory, Action Items)
+- Required sections are present (whatever the prompt requires, e.g. Summary, Decisions, Action Items)
 - Code references use backticks
 - Decisions include reasoning ("because", "over", "instead of")
 - Lessons include impact ("Why this matters", "Watch for")
@@ -138,7 +151,7 @@ AI agents should be tested at three layers with different approaches:
 ### What NOT to Verify (Content — Non-Deterministic)
 
 - Exact wording of extracted insights (LLM generates different text each run)
-- Exact number of memories extracted (varies by run)
+- Exact number of items extracted (varies by run)
 - Specific ordering of sections within a category
 - Exact token counts or durations
 
@@ -149,7 +162,7 @@ AI agents should be tested at three layers with different approaches:
 | **Multiple runs**     | LLM-dependent output | Run 3 times, pass if 2/3 produce correct structure    |
 | **Score averaging**   | Quality evaluation   | Average quality scores across 3+ runs                 |
 | **Structural checks** | Format compliance    | Check section headers, not content                    |
-| **Threshold pass**    | Quantitative metrics | "At least 3 memories extracted" not "exactly 5"       |
+| **Threshold pass**    | Quantitative metrics | "At least 3 items extracted" not "exactly 5"       |
 | **Human review**      | Subjective quality   | Present output to reviewer for qualitative assessment |
 
 ### LLM Test Case Quality Rubric
@@ -173,31 +186,31 @@ AI agents should be tested at three layers with different approaches:
 
 # Content presence check
 
-- [ ] CP2: Daily log contains session_id comment — verify: `grep -c "session_id:" dailys/*.md` > 0
+- [ ] CP2: Report contains order_id comment — verify: `grep -c "order_id:" reports/*.md` > 0
 
 # Count check
 
-- [ ] CP3: Exactly 2 transcript rows — verify: `psql -c "SELECT count(*) ..."` returns 2
+- [ ] CP3: Exactly 2 order rows — verify: `psql -c "SELECT count(*) ..."` returns 2
 
 # Absence check
 
-- [ ] CP4: No memu_add tool calls — verify: conversation_history does not contain "memu_add"
+- [ ] CP4: No delete_record tool calls — verify: the agent's tool-call log does not contain "delete_record"
 
 # Pattern check (regex)
 
-- [ ] CP5: Decisions include reasoning — verify: `grep -ci "because\|revisit\|over" dailys/*.md` > 0
+- [ ] CP5: Decisions include reasoning — verify: `grep -ci "because\|revisit\|over" reports/*.md` > 0
 
 # Timing check
 
-- [ ] CP6: Dream completed within 60s — verify: `duration_ms < 60000`
+- [ ] CP6: Report job completed within 60s — verify: `duration_ms < 60000`
 
 # JSON field check
 
-- [ ] CP7: Response has transcriptId — verify: `echo $RESP | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['transcriptId'])"`
+- [ ] CP7: Response has orderId — verify: `echo $RESP | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['orderId'])"`
 
 # Database state check
 
-- [ ] CP8: Dream status = completed — verify: `psql -t -c "SELECT status FROM jarvis.dreams WHERE id=$ID;"`
+- [ ] CP8: Job status = completed — verify: `psql -t -c "SELECT status FROM app.jobs WHERE id=$ID;"`
 
 # File structure check
 
