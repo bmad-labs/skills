@@ -2,7 +2,7 @@
 
 Validate the RCA against this rubric **before** declaring it done. If a rubric item fails, fix it — don't ship a half-RCA.
 
-The Debezium RCA (`debezium-rca-2026-05-05.md`) is the reference. If your output is meaningfully thinner than that on any axis, dig deeper.
+This rubric is the bar. If your output is thin on any axis below, dig deeper. Examples in this file come from sample incidents (a database CDC pipeline, an auth web service) — translate them to your domain.
 
 ---
 
@@ -10,7 +10,7 @@ The Debezium RCA (`debezium-rca-2026-05-05.md`) is the reference. If your output
 
 | # | Requirement | How to check |
 |---|---|---|
-| 1 | Title is one specific line, not generic | "RCA: Debezium CDC Pipeline Failure After Database Restore" ✅ — "RCA: Production Issue" ❌ |
+| 1 | Title is one specific line, not generic | "RCA: CDC Pipeline Failure After Database Restore" ✅ — "RCA: auth-service 500s After Token Cache Change" ✅ — "RCA: Production Issue" ❌ |
 | 2 | Impact is quantified across all four dimensions | User-visible / System / Data / Financial-SLA — each has a concrete value or an explicit "N/A" with reason. "Some users affected" ❌ — "38% of /token requests for 52 minutes" ✅ |
 | 3 | Every timeline entry has a UTC timestamp | Skim the timeline. Any "later that day" / "the next morning" without a time? Fail. |
 | 4 | Infrastructure table has *exact* identifiers | Connector name, slot name, topic name, host, port — copyable into commands. No "the prod cluster". |
@@ -50,7 +50,7 @@ The Debezium RCA (`debezium-rca-2026-05-05.md`) is the reference. If your output
 - **No blame language.** Focus on system gaps, not people. "The developer dropped the database" is fine — that's an event. "The developer should have known better" is not.
 - **No corporate filler.** Skip "we are committed to learning from this incident." The doc itself is the evidence of learning.
 - **Lead with the answer.** Each section opens with the conclusion, then the supporting evidence — not the journey to the conclusion.
-- **Match the operator voice.** Technical, terse, evidence-first. The Debezium RCA is the calibration point.
+- **Match the operator voice.** Technical, terse, evidence-first.
 
 ---
 

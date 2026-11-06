@@ -71,7 +71,7 @@ The exact resources involved. Anyone investigating a recurrence should be able t
 [The trigger — what action or condition initiated the failure. Be specific: not "the database was unavailable" but "the developer dropped and restored the database, rolling back the WAL timeline to an earlier LSN".]
 
 ### Why it appeared healthy
-[**This is usually the most valuable section.** What masked the failure? Why didn't the existing health checks / status / alerts catch it? In the Debezium incident this was: connector reconnected, reported `RUNNING`, but its stored offset pointed to a no-longer-existing WAL position so it silently scanned forever. Explain the mechanism precisely.]
+[**This is usually the most valuable section.** What masked the failure? Why didn't the existing health checks / status / alerts catch it? Example (CDC pipeline incident): the connector reconnected, reported `RUNNING`, but its stored offset pointed to a no-longer-existing WAL position so it silently scanned forever. Explain the mechanism precisely.]
 
 ### Secondary mechanisms
 [Internal gates, retries, caches, or state that contributed. Example: "Debezium's flush gate only opens after the first event streams in a session — so the offset commit warnings were emitted forever because the streaming phase was never reached." If there's no secondary mechanism, write "N/A".]
@@ -148,7 +148,7 @@ The actual fix, with **ordering rationale**. Each step explains *why this order*
 [Why now and not earlier. What state this changes.]
 
 ### Step 3 — [Action]
-[Repeat as needed. If a step has a precondition or interacts oddly with an earlier step, call it out explicitly. Example from Debezium RCA: "This must happen *after* the offset reset — restarting the container without resetting the offset first leaves the stale value in the config topic."]
+[Repeat as needed. If a step has a precondition or interacts oddly with an earlier step, call it out explicitly. Example (CDC pipeline incident): "This must happen *after* the offset reset — restarting the container without resetting the offset first leaves the stale value in the config topic."]
 
 ### Final state after resolution
 
