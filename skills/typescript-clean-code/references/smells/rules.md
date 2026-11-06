@@ -14,6 +14,21 @@ tool already decides. `SKILL.md` lists all four and when each loads.
 
 ---
 
+## Contents
+
+- [Review posture — apply before reporting anything](#review-posture--apply-before-reporting-anything)
+- [The false-positive economics — why restraint is the rule](#the-false-positive-economics--why-restraint-is-the-rule)
+- [Severity vocabulary](#severity-vocabulary)
+- [Entry schema](#entry-schema)
+- [Comments (C1-C5)](#comments-c1-c5)
+- [Environment (E1-E2)](#environment-e1-e2)
+- [Functions (F1-F4)](#functions-f1-f4)
+- [General (G1-G36)](#general-g1-g36)
+- [Names (N1-N7)](#names-n1-n7)
+- [Tests (T1-T9)](#tests-t1-t9)
+- [Quick Detection Table](#quick-detection-table)
+- [Before you finish a review](#before-you-finish-a-review)
+
 ## Review posture — apply before reporting anything
 
 **Approve when the change improves code health.** The standard is not perfection.

@@ -14,6 +14,8 @@ Set up the PR review session: identify the target PR, set the output path for th
 
 ### 1. Ask the User
 
+**Fast path**: for a small PR (one file or a short diff), skip the output-path question, use `./pr-review-report-{{date}}.md`, and skip the `[C]` gates (see `workflow.md` → Fast Path).
+
 Ask the user:
 - **Which PR to review?** (PR URL, branch name, or diff)
 - **Output path** for the review report (suggest a default: `./pr-review-report-{{date}}.md`)

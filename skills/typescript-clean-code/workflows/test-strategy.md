@@ -2,6 +2,15 @@
 
 Planning test coverage for a feature or system.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Prerequisites](#prerequisites)
+- [The Test Pyramid](#the-test-pyramid)
+- [Workflow Steps](#workflow-steps)
+- [Test Type Quick Reference](#test-type-quick-reference)
+- [Exit Criteria](#exit-criteria)
+
 ## When to Use
 
 - Starting a new project/feature
