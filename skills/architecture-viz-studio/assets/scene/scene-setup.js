@@ -28,10 +28,10 @@
  *   amateur tell. Tune the numbers to your scene; keep the structure.
  *
  * NON-OBVIOUS GOTCHAS / WHY THESE NUMBERS
- *   - setPixelRatio(min(devicePixelRatio, 1.75)): the DPR cap. On 3x phones an
- *     uncapped renderer quadruples the pixel count for ~zero visible gain on a
- *     soft pastel scene. 1.75 keeps edges crisp while roughly halving fragment
- *     work on hi-DPI displays. This was a measured win — do not raise it casually.
+ *   - setPixelRatio(min(devicePixelRatio, 2)): the DPR cap. On 3x phones an
+ *     uncapped renderer more than doubles the pixel count for ~zero visible gain.
+ *     2 keeps edges crisp on hi-DPI displays; drop to 1.5–1.75 if a weak GPU drops
+ *     frames. Do not remove the cap.
  *   - ACESFilmic tone mapping + exposure ~1.05: gives the palette a gentle filmic
  *     roll-off so emissive highlights and bloom don't clip. SRGB output color space pairs
  *     with SRGB canvas textures (set in primitives.js).
@@ -46,8 +46,9 @@
  *     deliberately asymmetric (left -160 / right 200) because the world is a long
  *     horizontal strip, not a cube. If your world is a different shape, resize the
  *     frustum to JUST cover it — a tighter frustum = sharper shadows per texel.
- *   - fog(bg, 110, 290): near/far in world units; it hides the ground plane edge
- *     and fuses distant geometry into the background colour. Tied to camera.far=600.
+ *   - FogExp2(PALETTE.fog, 0.016): exponential density; it hides the ground plane
+ *     edge and fuses distant geometry into the background colour. Raise the density
+ *     for a smaller world, lower it for a larger one. Tied to camera.far=600.
  * ========================================================================== */
 
 import * as THREE from 'three';

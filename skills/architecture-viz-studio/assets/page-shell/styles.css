@@ -49,9 +49,8 @@ body {
   margin: 0;
   font-family: var(--font-primary);
   color: var(--neutral-900);
-  background: #dfe8f2;                 /* shows before the canvas paints. NOTE: scene-setup.js PALETTE.bg defaults
-                                          to deep navy (0x0b1424) — set this to your scene's bg, and use light
-                                          hero text if the scene is dark */
+  background: #0b1424;                 /* shows before the canvas paints; matches scene-setup.js PALETTE.bg.
+                                          For the pale variant use #dfe8f2, dark hero text, and drop .dark from the nav */
   -webkit-font-smoothing: antialiased;
 }
 
@@ -112,18 +111,18 @@ body.modal-open .nav { opacity: 0; transform: translateY(-12px); pointer-events:
 .hero-title {
   margin: 0;
   font: 700 clamp(56px, 8.2vw, 118px)/1.02 var(--font-primary);
-  letter-spacing: -.035em; color: #16202c;
+  letter-spacing: -.035em; color: #f3f7fd;
 }
 .hero-sub {
   margin: 28px auto 0; max-width: 560px;
   font: 400 clamp(16px, 1.45vw, 20px)/1.55 var(--font-primary);
-  color: #2c3a4a;
+  color: #c2d2e8;
 }
 .hero-scroll {
   position: absolute; bottom: 4.5vh; left: 50%; transform: translateX(-50%);
   font: var(--weight-semibold) 11px/1 var(--font-primary);
-  letter-spacing: .18em; text-transform: uppercase; color: #2c3a4a;
-  padding-bottom: 8px; border-bottom: 1.5px solid #2c3a4a;
+  letter-spacing: .18em; text-transform: uppercase; color: #9fb3cf;
+  padding-bottom: 8px; border-bottom: 1.5px solid #9fb3cf;
   will-change: opacity;
 }
 
