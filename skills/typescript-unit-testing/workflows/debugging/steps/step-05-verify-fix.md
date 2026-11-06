@@ -17,9 +17,9 @@ Verify that the applied fix resolves the failing test consistently and does not 
 Run the fixed test 3-5 times to confirm it passes consistently (output to temp files only, no console):
 
 ```bash
-rm -f <UT_DIR>/verify.log
+rm -f /tmp/ut-${UT_SESSION}-verify.log
 for i in {1..5}; do
-  npm test -- -t "[test name]" > <UT_DIR>/run$i.log 2>&1
+  npm test -- -t "[test name]" > /tmp/ut-${UT_SESSION}-run$i.log 2>&1
   if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
 ```
@@ -31,8 +31,8 @@ If any run fails, the fix is incomplete -- go back to Step 3 to re-analyze.
 Run all tests in the same file to check for regressions:
 
 ```bash
-npm test -- [path/to/file.spec.ts] > <UT_DIR>/output.log 2>&1
-tail -50 <UT_DIR>/output.log
+npm test -- [path/to/file.spec.ts] > /tmp/ut-${UT_SESSION}-output.log 2>&1
+tail -50 /tmp/ut-${UT_SESSION}-output.log
 ```
 
 If related tests fail, analyze whether the fix introduced a regression. If so, go back to Step 4 to adjust the fix.
@@ -42,8 +42,8 @@ If related tests fail, analyze whether the fix introduced a regression. If so, g
 Run the full test suite **only after** all individual tests pass. This is a final regression check:
 
 ```bash
-npm test > <UT_DIR>/output.log 2>&1
-tail -50 <UT_DIR>/output.log
+npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1
+tail -50 /tmp/ut-${UT_SESSION}-output.log
 ```
 
 ### 4. Update Tracking File

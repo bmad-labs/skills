@@ -138,7 +138,7 @@ Append the quick-reference table:
 ### 5. Cleanup Temp Files
 
 ```bash
-rm -rf <UT_DIR>
+rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
 ```
 
 ## PRESENT FINDINGS

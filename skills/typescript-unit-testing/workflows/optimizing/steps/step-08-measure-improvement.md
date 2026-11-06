@@ -17,8 +17,8 @@ Re-run the full test suite with performance measurement and open handle detectio
 Capture the optimized run to a temp file:
 
 ```bash
-npm test -- --verbose --detectOpenHandles > <UT_DIR>/optimized.log 2>&1
-tail -50 <UT_DIR>/optimized.log
+npm test -- --verbose --detectOpenHandles > /tmp/ut-${UT_SESSION}-optimized.log 2>&1
+tail -50 /tmp/ut-${UT_SESSION}-optimized.log
 ```
 
 ### 2. Verify Clean Exit
@@ -26,8 +26,8 @@ tail -50 <UT_DIR>/optimized.log
 Run without `--forceExit` to confirm tests exit cleanly:
 
 ```bash
-npm test -- --verbose > <UT_DIR>/output.log 2>&1
-tail -30 <UT_DIR>/output.log
+npm test -- --verbose > /tmp/ut-${UT_SESSION}-output.log 2>&1
+tail -30 /tmp/ut-${UT_SESSION}-output.log
 # Should exit cleanly without hanging
 ```
 
@@ -36,8 +36,8 @@ tail -30 <UT_DIR>/output.log
 Extract timing data from both runs:
 
 ```bash
-echo "=== BASELINE ===" && grep -E "Time:|passed|failed" <UT_DIR>/baseline.log
-echo "=== OPTIMIZED ===" && grep -E "Time:|passed|failed" <UT_DIR>/optimized.log
+echo "=== BASELINE ===" && grep -E "Time:|passed|failed" /tmp/ut-${UT_SESSION}-baseline.log
+echo "=== OPTIMIZED ===" && grep -E "Time:|passed|failed" /tmp/ut-${UT_SESSION}-optimized.log
 ```
 
 ### 4. Document Comparison
@@ -68,12 +68,12 @@ Confirm that optimizations did not break anything:
 
 ```bash
 # Verify no open handles remain
-grep -c "open handle" <UT_DIR>/optimized.log
+grep -c "open handle" /tmp/ut-${UT_SESSION}-optimized.log
 # Expected: 0
 
 # Verify test counts match
-grep -E "Tests:.*passed" <UT_DIR>/baseline.log
-grep -E "Tests:.*passed" <UT_DIR>/optimized.log
+grep -E "Tests:.*passed" /tmp/ut-${UT_SESSION}-baseline.log
+grep -E "Tests:.*passed" /tmp/ut-${UT_SESSION}-optimized.log
 ```
 
 ## PRESENT FINDINGS

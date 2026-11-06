@@ -63,13 +63,13 @@ RIGHT: Run full suite -> See 5 failures -> Fix test 1 only -> Verify -> Fix test
 
 **Why**: Test output can be verbose. Direct terminal output bloats agent context.
 
-**IMPORTANT**: Redirect output to temp files only (NO console output). Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID to prevent conflicts.
 
-**Temp File Locations** (inside `<UT_DIR>`, created once per session):
-- `<UT_DIR>/debug.log` - Debug runs
-- `<UT_DIR>/output.log` - General test output
-- `<UT_DIR>/verify.log` - Verification runs
-- `<UT_DIR>/failures.md` - Tracking file
+**Temp File Locations** (with `${UT_SESSION}` unique per agent):
+- `/tmp/ut-${UT_SESSION}-debug.log` - Debug runs
+- `/tmp/ut-${UT_SESSION}-output.log` - General test output
+- `/tmp/ut-${UT_SESSION}-verify.log` - Verification runs
+- `/tmp/ut-${UT_SESSION}-failures.md` - Tracking file
 
 ## Begin
 

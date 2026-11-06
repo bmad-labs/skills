@@ -41,34 +41,34 @@ If starting fresh:
 Set up the temp file session for capturing test output without bloating agent context:
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
+# Initialize session (once at start of optimization)
+export UT_SESSION=$(date +%s)-$$
 ```
 
-**Temp File Locations** (inside `<UT_DIR>`, created once per session):
-- `<UT_DIR>/baseline.log` — Baseline run
-- `<UT_DIR>/optimized.log` — Optimized run
-- `<UT_DIR>/timing.log` — Timing data
+**Temp File Locations** (with `${UT_SESSION}` unique per agent):
+- `/tmp/ut-${UT_SESSION}-baseline.log` — Baseline run
+- `/tmp/ut-${UT_SESSION}-optimized.log` — Optimized run
+- `/tmp/ut-${UT_SESSION}-timing.log` — Timing data
 
 ### 5. Measure Baseline Performance
 
 Run tests with timing and open handle detection (output to temp file):
 
 ```bash
-npm test -- --verbose --detectOpenHandles --forceExit > <UT_DIR>/baseline.log 2>&1
-tail -50 <UT_DIR>/baseline.log
+npm test -- --verbose --detectOpenHandles --forceExit > /tmp/ut-${UT_SESSION}-baseline.log 2>&1
+tail -50 /tmp/ut-${UT_SESSION}-baseline.log
 ```
 
 Check for open handles specifically:
 
 ```bash
-grep -A 20 "open handle" <UT_DIR>/baseline.log
+grep -A 20 "open handle" /tmp/ut-${UT_SESSION}-baseline.log
 ```
 
 Identify slow tests (use Jest's built-in timing):
 
 ```bash
-grep -E "^\s*\d+.*ms$" <UT_DIR>/baseline.log
+grep -E "^\s*\d+.*ms$" /tmp/ut-${UT_SESSION}-baseline.log
 ```
 
 ### 6. Document Baseline Metrics

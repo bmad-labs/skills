@@ -24,30 +24,30 @@ Open handles are resources (files, network sockets, database connections, timers
 
 ## Detection Commands
 
-**IMPORTANT**: Always output to temp files to avoid context bloat. Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
+**IMPORTANT**: Always output to temp files to avoid context bloat. Use unique session ID.
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
+# Initialize session (once at start)
+export UT_SESSION=$(date +%s)-$$
 ```
 
 ### Basic Detection
 
 ```bash
 # Detect open handles (runs tests serially, no console output)
-npm test -- --detectOpenHandles > <UT_DIR>/handles.log 2>&1
-tail -100 <UT_DIR>/handles.log
+npm test -- --detectOpenHandles > /tmp/ut-${UT_SESSION}-handles.log 2>&1
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Detect with force exit (for debugging)
-npm test -- --detectOpenHandles --forceExit > <UT_DIR>/handles.log 2>&1
-tail -100 <UT_DIR>/handles.log
+npm test -- --detectOpenHandles --forceExit > /tmp/ut-${UT_SESSION}-handles.log 2>&1
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Single file detection
-npm test -- --detectOpenHandles path/to/file.spec.ts > <UT_DIR>/handles.log 2>&1
-tail -100 <UT_DIR>/handles.log
+npm test -- --detectOpenHandles path/to/file.spec.ts > /tmp/ut-${UT_SESSION}-handles.log 2>&1
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Extract handle details
-grep -A 10 "open handles" <UT_DIR>/handles.log
+grep -A 10 "open handles" /tmp/ut-${UT_SESSION}-handles.log
 ```
 
 ### Understanding the Output
@@ -324,12 +324,12 @@ export default {
 
 ```bash
 # Run single file (no console output)
-npm test -- --detectOpenHandles path/to/suspect.spec.ts > <UT_DIR>/handles.log 2>&1
-tail -100 <UT_DIR>/handles.log
+npm test -- --detectOpenHandles path/to/suspect.spec.ts > /tmp/ut-${UT_SESSION}-handles.log 2>&1
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Run single test (no console output)
-npm test -- --detectOpenHandles -t "test name" > <UT_DIR>/handles.log 2>&1
-tail -100 <UT_DIR>/handles.log
+npm test -- --detectOpenHandles -t "test name" > /tmp/ut-${UT_SESSION}-handles.log 2>&1
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 ```
 
 ### 2. Add Logging

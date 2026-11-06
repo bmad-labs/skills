@@ -8,7 +8,7 @@ nextStepFile: './step-02-run-tests.md'
 
 ## STEP GOAL
 
-Set up the test execution session: determine test scope, create the session temp directory, set the output path for the execution report, and check for an existing report to resume.
+Set up the test execution session: determine test scope, initialize the temp file session with a unique `UT_SESSION` ID, set the output path for the execution report, and check for an existing report to resume.
 
 ## EXECUTION
 
@@ -39,20 +39,20 @@ If starting fresh:
    - `date`: current date
 3. Write the initialized report to the output path
 
-### 4. Create the Session Temp Directory
+### 4. Initialize UT_SESSION
 
 Set up the temp file session for all test output:
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
+# Initialize session (once at start)
+export UT_SESSION=$(date +%s)-$$
 ```
 
-**Temp File Locations** (inside `<UT_DIR>`, created once per session):
-- `<UT_DIR>/output.log` - Full test output
-- `<UT_DIR>/failures.md` - Tracking file for one-by-one fixing
-- `<UT_DIR>/debug.log` - Debug runs
-- `<UT_DIR>/coverage.log` - Coverage output
+**Temp File Locations** (with `${UT_SESSION}` unique per session):
+- `/tmp/ut-${UT_SESSION}-output.log` - Full test output
+- `/tmp/ut-${UT_SESSION}-failures.md` - Tracking file for one-by-one fixing
+- `/tmp/ut-${UT_SESSION}-debug.log` - Debug runs
+- `/tmp/ut-${UT_SESSION}-coverage.log` - Coverage output
 
 ### 5. Determine Test Scope
 
@@ -73,7 +73,7 @@ Present the determined scope:
 **Test Scope:**
 - Running: [description]
 - Command: [command to execute]
-- Temp dir: <UT_DIR>
+- Session: UT_SESSION=${UT_SESSION}
 ```
 
 ## FRONTMATTER UPDATE
@@ -87,7 +87,7 @@ Update the output document frontmatter:
 Show the user:
 - Confirmation of test scope and command
 - Output path for the report
-- Session temp directory (`<UT_DIR>`)
+- Session ID for temp files
 
 Then ask: **[C] Continue to Step 2: Run Tests**
 

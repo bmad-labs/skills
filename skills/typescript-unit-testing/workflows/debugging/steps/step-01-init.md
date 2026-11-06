@@ -43,20 +43,20 @@ If starting fresh:
 Initialize the temp file session and run the failing test in isolation:
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
+# Initialize session (once at start of debugging)
+export UT_SESSION=$(date +%s)-$$
 
 # Run the failing test in isolation (output to temp file only, no console)
-npm test -- -t "[exact test name]" > <UT_DIR>/debug.log 2>&1
+npm test -- -t "[exact test name]" > /tmp/ut-${UT_SESSION}-debug.log 2>&1
 
 # Read only summary
-tail -50 <UT_DIR>/debug.log
+tail -50 /tmp/ut-${UT_SESSION}-debug.log
 ```
 
 Extract error details:
 
 ```bash
-grep -B 5 -A 20 "FAIL\|Error:" <UT_DIR>/debug.log
+grep -B 5 -A 20 "FAIL\|Error:" /tmp/ut-${UT_SESSION}-debug.log
 ```
 
 ### 5. Document Failure in Tracking File
@@ -64,7 +64,7 @@ grep -B 5 -A 20 "FAIL\|Error:" <UT_DIR>/debug.log
 Create the tracking file to record the failure:
 
 ```bash
-cat > <UT_DIR>/failures.md << 'EOF'
+cat > /tmp/ut-${UT_SESSION}-failures.md << 'EOF'
 # Unit Test Failures
 
 ## Test 1: "[test name]"
@@ -102,7 +102,7 @@ Update the output document frontmatter:
 Show the user:
 - Confirmation of the failing test and output path
 - The reproduced failure details (error message, expected vs received)
-- Session temp directory (`<UT_DIR>`) for temp file tracking
+- Session ID for temp file tracking
 
 Then ask: **[C] Continue to Step 2: Classify the Failure Type**
 

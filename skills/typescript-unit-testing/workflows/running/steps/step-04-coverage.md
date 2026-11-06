@@ -21,8 +21,8 @@ Ask the user if they want to run coverage analysis. If not requested, skip to pr
 Run the coverage command with output to temp file only (no console):
 
 ```bash
-npm run test:cov -- [path/to/file.spec.ts] > <UT_DIR>/coverage.log 2>&1
-tail -50 <UT_DIR>/coverage.log
+npm run test:cov -- [path/to/file.spec.ts] > /tmp/ut-${UT_SESSION}-coverage.log 2>&1
+tail -50 /tmp/ut-${UT_SESSION}-coverage.log
 ```
 
 ### 3. Parse Coverage Output

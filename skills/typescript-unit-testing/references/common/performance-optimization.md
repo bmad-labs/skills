@@ -344,11 +344,11 @@ npm install --save-dev jest-slow-test-reporter
 
 ```bash
 # Verbose output includes timing (no console output)
-npm test -- --verbose > <UT_DIR>/timing.log 2>&1
-tail -50 <UT_DIR>/timing.log
+npm test -- --verbose > /tmp/ut-${UT_SESSION}-timing.log 2>&1
+tail -50 /tmp/ut-${UT_SESSION}-timing.log
 
 # Find slowest tests
-sort -t'(' -k2 -rn <UT_DIR>/timing.log | head -20
+sort -t'(' -k2 -rn /tmp/ut-${UT_SESSION}-timing.log | head -20
 ```
 
 ## Performance Checklist
@@ -379,29 +379,29 @@ sort -t'(' -k2 -rn <UT_DIR>/timing.log | head -20
 
 ## Quick Diagnosis
 
-**Redirect to temp files only (no console output).** Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
+**Redirect to temp files only (no console output).** Use unique session ID.
 
 ```bash
-# Create the session temp directory (once at start)
-mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
+# Initialize session (once at start)
+export UT_SESSION=$(date +%s)-$$
 
 # Check overall timing (no console output)
-npm test -- --verbose > <UT_DIR>/perf.log 2>&1
-tail -50 <UT_DIR>/perf.log
+npm test -- --verbose > /tmp/ut-${UT_SESSION}-perf.log 2>&1
+tail -50 /tmp/ut-${UT_SESSION}-perf.log
 
 # Check for slow tests
-grep -E "^\s+✓.*\(\d+.*ms\)" <UT_DIR>/perf.log | sort -t'(' -k2 -rn | head -10
+grep -E "^\s+✓.*\(\d+.*ms\)" /tmp/ut-${UT_SESSION}-perf.log | sort -t'(' -k2 -rn | head -10
 
 # Check for open handles (no console output)
-npm test -- --detectOpenHandles > <UT_DIR>/handles.log 2>&1
-tail -100 <UT_DIR>/handles.log
+npm test -- --detectOpenHandles > /tmp/ut-${UT_SESSION}-handles.log 2>&1
+tail -100 /tmp/ut-${UT_SESSION}-handles.log
 
 # Check memory usage (no console output)
-node --expose-gc node_modules/.bin/jest --runInBand --logHeapUsage > <UT_DIR>/memory.log 2>&1
-tail -50 <UT_DIR>/memory.log
+node --expose-gc node_modules/.bin/jest --runInBand --logHeapUsage > /tmp/ut-${UT_SESSION}-memory.log 2>&1
+tail -50 /tmp/ut-${UT_SESSION}-memory.log
 
 # Cleanup
-rm -rf <UT_DIR>
+rm -f /tmp/ut-${UT_SESSION}-*.log
 ```
 
 ## References

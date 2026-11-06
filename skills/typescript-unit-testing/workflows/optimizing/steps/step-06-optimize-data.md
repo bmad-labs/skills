@@ -100,8 +100,8 @@ For each test file:
 3. Trim mock return values to only required fields
 4. Verify tests still pass:
    ```bash
-   npm test -- [path/to/file.spec.ts] > <UT_DIR>/data-check.log 2>&1
-   tail -20 <UT_DIR>/data-check.log
+   npm test -- [path/to/file.spec.ts] > /tmp/ut-${UT_SESSION}-data-check.log 2>&1
+   tail -20 /tmp/ut-${UT_SESSION}-data-check.log
    ```
 
 ## PRESENT FINDINGS

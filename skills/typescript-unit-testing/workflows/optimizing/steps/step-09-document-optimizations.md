@@ -91,7 +91,7 @@ Append the anti-pattern reference:
 Remove all temp files created during the optimization session:
 
 ```bash
-rm -rf <UT_DIR>
+rm -f /tmp/ut-${UT_SESSION}-*.log
 ```
 
 ## PRESENT FINDINGS
