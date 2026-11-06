@@ -46,9 +46,8 @@ Unit testing Redis cache operations, health checks, and pub/sub by mocking the R
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { LoggerService } from '@nestjs/common';
-// Import RedisService from the Redis wrapper the project uses (e.g. @liaoliaots/nestjs-redis)
-import { RedisService } from '@liaoliaots/nestjs-redis';
+import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
+import { RedisService } from '@ocean-network-express/om-lib-nestjs-redis';
 
 describe('CacheService', () => {
   let target: CacheService;
@@ -77,7 +76,7 @@ describe('CacheService', () => {
         { provide: RedisService, useValue: mockRedisService },
       ],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = module.get<CacheService>(CacheService);

@@ -63,7 +63,7 @@ rm -rf <UT_DIR>
 | Mock type | `DeepMocked<T>` |
 | Pattern | Arrange-Act-Assert with comments |
 | Coverage | 80%+ for new code |
-| Logger | `.setLogger(createMock<LoggerService>())`, or the project's existing logger mock |
+| Logger | `.setLogger(new MockLoggerService())` |
 
 ## What NOT to Unit Test
 
@@ -160,7 +160,7 @@ beforeEach(async () => {
       { provide: UserRepository, useValue: mockRepository },
     ],
   })
-    .setLogger(createMock<LoggerService>())  // REQUIRED
+    .setLogger(new MockLoggerService())  // REQUIRED
     .compile();
 
   // 3. Get target
@@ -220,7 +220,7 @@ expect(mockRepository.save).toHaveBeenCalledWith(
 - [ ] Use `target` for system under test
 - [ ] Use `mock` prefix for all mocks
 - [ ] Use `DeepMocked<T>` type
-- [ ] Silence the Nest logger with `.setLogger()`: the project's existing logger mock if it has one, otherwise `createMock<LoggerService>()`
+- [ ] Include `.setLogger(new MockLoggerService())`
 - [ ] Follow AAA pattern with comments
 - [ ] Direct mock methods, not `jest.spyOn()`
 - [ ] Reset mocks in `afterEach`

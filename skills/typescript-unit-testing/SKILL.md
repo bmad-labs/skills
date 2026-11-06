@@ -242,7 +242,7 @@ const mongoServer = await createMongoMemoryServer();
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { LoggerService } from '@nestjs/common';
+import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
 
 describe('UserService', () => {
   let target: UserService;
@@ -258,7 +258,7 @@ describe('UserService', () => {
         { provide: UserRepository, useValue: mockRepository },
       ],
     })
-      .setLogger(createMock<LoggerService>()) // or the project's own logger mock
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = module.get<UserService>(UserService);
@@ -396,7 +396,7 @@ Only test files containing **executable logic** (classes with methods, functions
 - [ ] Use `target` for system under test
 - [ ] Use `mock` prefix for all mocks
 - [ ] Use `DeepMocked<T>` type
-- [ ] Silence the Nest logger with `.setLogger()`: the project's existing logger mock if it has one, otherwise `createMock<LoggerService>()`
+- [ ] Include `.setLogger(new MockLoggerService())`
 - [ ] Follow AAA pattern with comments
 - [ ] Reset mocks in `afterEach`
 

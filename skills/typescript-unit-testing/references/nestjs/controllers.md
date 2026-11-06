@@ -16,7 +16,7 @@
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { LoggerService } from '@nestjs/common';
+import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
 
 describe('UserController', () => {
   let target: UserController;
@@ -31,7 +31,7 @@ describe('UserController', () => {
         { provide: UserService, useValue: mockUserService },
       ],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = module.get<UserController>(UserController);

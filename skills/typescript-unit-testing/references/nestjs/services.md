@@ -15,7 +15,7 @@
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { LoggerService } from '@nestjs/common';
+import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
 
 describe('UserService', () => {
   let target: UserService;
@@ -33,7 +33,7 @@ describe('UserService', () => {
         { provide: EventEmitter2, useValue: mockEventEmitter },
       ],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = module.get<UserService>(UserService);
@@ -300,7 +300,7 @@ describe('UserService with Auto-Mocking', () => {
       providers: [UserService],
     })
       .useMocker(createMock)  // Auto-mock all dependencies
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = module.get<UserService>(UserService);

@@ -120,8 +120,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { createPgMemDataSource, PgMockTestHelper } from 'test/helpers/pgmock.helper';
-import { LoggerService } from '@nestjs/common';
-import { createMock } from '@golevelup/ts-jest';
+import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
 import { DBConnections } from '../utils/constaint';
 
 describe('BlogRepositoryImpl', () => {
@@ -145,7 +144,7 @@ describe('BlogRepositoryImpl', () => {
         },
       ],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = moduleRef.get<BlogRepositoryImpl>(BlogRepositoryImpl);

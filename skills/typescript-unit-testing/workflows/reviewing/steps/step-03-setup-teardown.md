@@ -33,7 +33,7 @@ Cite specific rules when reporting findings.
 Check that:
 - All mocks are created fresh in each `beforeEach` (not shared across tests)
 - `TestingModule` is built with proper providers
-- `.setLogger()` is called with a logger mock (the project's own, or `createMock<LoggerService>()`)
+- `.setLogger(new MockLoggerService())` is called on the target
 - The SUT (`target`) is retrieved from the module via `module.get()`
 
 ### 2. Verify afterEach Cleanup

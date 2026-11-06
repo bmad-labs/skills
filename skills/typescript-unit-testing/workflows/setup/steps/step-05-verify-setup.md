@@ -8,7 +8,7 @@ nextStepFile: './step-06-npm-scripts.md'
 
 ## STEP GOAL
 
-Create and run a verification test that exercises the core testing infrastructure — `@nestjs/testing` module creation, logger mocking, and `@golevelup/ts-jest` deep mocking — to confirm the setup is working correctly.
+Create and run a verification test that exercises the core testing infrastructure — `@nestjs/testing` module creation, `MockLoggerService`, and `@golevelup/ts-jest` deep mocking — to confirm the setup is working correctly.
 
 ## EXECUTION
 
@@ -20,14 +20,14 @@ Create `test/setup.spec.ts` with the following content (skip if the file already
 // test/setup.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { LoggerService } from '@nestjs/common';
+import { MockLoggerService } from './helpers/mock-logger.service';
 
 describe('Test Setup Verification', () => {
   it('should create testing module successfully', async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     expect(module).toBeDefined();

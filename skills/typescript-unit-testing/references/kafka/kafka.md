@@ -51,7 +51,7 @@ Unit testing Kafka producers and consumers using `@nestjs/microservices` ClientK
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { ClientKafka } from '@nestjs/microservices';
-import { LoggerService } from '@nestjs/common';
+import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
 import { of } from 'rxjs';
 
 describe('EventProducerService', () => {
@@ -67,7 +67,7 @@ describe('EventProducerService', () => {
         { provide: 'KAFKA_CLIENT', useValue: mockKafkaClient },
       ],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = module.get<EventProducerService>(EventProducerService);
@@ -221,7 +221,7 @@ describe('send', () => {
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { LoggerService } from '@nestjs/common';
+import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
 
 describe('UserMessageHandler', () => {
   let target: UserMessageHandler;
@@ -236,7 +236,7 @@ describe('UserMessageHandler', () => {
         { provide: UserService, useValue: mockUserService },
       ],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = module.get<UserMessageHandler>(UserMessageHandler);
@@ -305,7 +305,7 @@ describe('EventHandler', () => {
         { provide: NotificationService, useValue: mockNotificationService },
       ],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = module.get<OrderEventHandler>(OrderEventHandler);

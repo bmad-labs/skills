@@ -67,8 +67,7 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { createMongoMemoryServer, getMongooseTestModule } from 'test/helpers/mongodb-test.helper';
-import { LoggerService } from '@nestjs/common';
-import { createMock } from '@golevelup/ts-jest';
+import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
 
 describe('UserRepository', () => {
   let target: UserRepository;
@@ -89,7 +88,7 @@ describe('UserRepository', () => {
       ],
       providers: [UserRepository],
     })
-      .setLogger(createMock<LoggerService>())
+      .setLogger(new MockLoggerService())
       .compile();
 
     target = moduleRef.get<UserRepository>(UserRepository);
