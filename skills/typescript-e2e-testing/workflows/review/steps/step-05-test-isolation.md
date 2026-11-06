@@ -42,9 +42,9 @@ const userId = `user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 beforeEach(async () => {
   await repository.clear();
 });
-// ✅ With wait for in-flight
+// ✅ Poll until in-flight work drains (waitFor helper in SKILL.md)
 beforeEach(async () => {
-  await new Promise(r => setTimeout(r, 500));
+  await waitFor(() => isIdle());
   await repository.clear();
 });
 

@@ -241,7 +241,7 @@ afterAll(async () => {
 ```typescript
 // Cause: Shared state between tests
 beforeEach(async () => {
-  await new Promise(r => setTimeout(r, 500));
+  await waitFor(() => isIdle()); // poll, do not sleep (helper in SKILL.md)
   await userRepository.clear();
   await orderRepository.clear();
   jest.clearAllMocks();
