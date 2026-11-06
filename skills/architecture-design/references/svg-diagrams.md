@@ -1,7 +1,7 @@
 # Hand-Written SVG Diagrams
 
 Adapted from `slide-maker/references/diagrams.md` for standalone design files. Use for C4 views, pipelines,
-workflows, concepts, and timelines with ≤ ~10 boxes, when you run on a frontier model (SKILL.md §Diagrams).
+workflows, concepts, and timelines with ≤ ~10 boxes (SKILL.md §Diagrams).
 
 A diagram is **layout as meaning**: a lane means an owner, a dashed box means "a wait" or "someone else builds
 this", a drop line means "this also fires". Auto-layout cannot say that; you place it.

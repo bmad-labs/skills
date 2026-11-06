@@ -3,6 +3,19 @@
 Use for sequence, class, state, ERD, activity, and
 any graph past ~10 nodes, or whenever hand SVG is not the pick (SKILL.md §Diagrams).
 
+## Contents
+
+- [Decompose, don't cram](#decompose-dont-cram)
+- [Shared style file](#shared-style-file)
+- [C4 container](#c4-container)
+- [Component (module map)](#component-module-map)
+- [ERD](#erd)
+- [Class (one per module)](#class-one-per-module)
+- [Sequence](#sequence)
+- [State](#state)
+- [Activity (main flow, workflow)](#activity-main-flow-workflow)
+- [Render and check](#render-and-check)
+
 ## Decompose, don't cram
 
 One diagram makes **one thing** obvious in about five seconds. Past ~10 nodes or ~15 arrows it fails.
