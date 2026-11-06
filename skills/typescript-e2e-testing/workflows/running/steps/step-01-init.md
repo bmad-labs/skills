@@ -25,6 +25,8 @@ Before starting, load and read:
 
 ### 1. Ask the User
 
+**Fast path**: if the user only wants the tests run, do not ask for an output path or write a run log — follow `workflow.md` → Fast Path.
+
 Ask the user:
 - **What tests to run?** (all, specific file, specific test, pattern)
 - **Output path** for the run log (suggest a default: `./e2e-run-log-{{date}}.md`)
@@ -47,10 +49,10 @@ If starting fresh:
    - `date`: current date
 3. Write the initialized log to the output path
 
-### 4. Initialize Session
+### 4. Create the Session Temp Directory
 
 ```bash
-export E2E_SESSION=$(date +%s)-$$
+mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
 ```
 
 ### 5. Append to Output
@@ -61,7 +63,7 @@ Append to the output document:
 ## Step 1: Session Setup
 
 **Test Scope**: {{testScope}}
-**Session ID**: {{E2E_SESSION}}
+**Temp Directory**: {{E2E_DIR}}
 **References Loaded**: {{list of loaded references}}
 ```
 

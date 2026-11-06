@@ -17,23 +17,23 @@ All commands redirect to temp files only (no console):
 ### 1. Run Full Suite
 
 ```bash
-npm run test:e2e > /tmp/e2e-${E2E_SESSION}-optimized.log 2>&1
-tail -50 /tmp/e2e-${E2E_SESSION}-optimized.log
+npm run test:e2e > <E2E_DIR>/optimized.log 2>&1
+tail -50 <E2E_DIR>/optimized.log
 ```
 
 ### 2. Compare Performance
 
 ```bash
 # Extract timing from both logs
-echo "=== BASELINE ===" && grep -E "Time:|Duration:|real|user|sys" /tmp/e2e-${E2E_SESSION}-baseline.log
-echo "=== OPTIMIZED ===" && grep -E "Time:|Duration:|real|user|sys" /tmp/e2e-${E2E_SESSION}-optimized.log
+echo "=== BASELINE ===" && grep -E "Time:|Duration:|real|user|sys" <E2E_DIR>/baseline.log
+echo "=== OPTIMIZED ===" && grep -E "Time:|Duration:|real|user|sys" <E2E_DIR>/optimized.log
 ```
 
 ### 3. Run Multiple Times for Stability
 
 ```bash
 for i in {1..3}; do
-  npm run test:e2e > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1
+  npm run test:e2e > <E2E_DIR>/run$i.log 2>&1
   if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
 ```
@@ -43,7 +43,7 @@ done
 ```bash
 # Run 10 times to detect intermittent failures
 for i in {1..10}; do
-  npm run test:e2e > /tmp/e2e-${E2E_SESSION}-flaky$i.log 2>&1
+  npm run test:e2e > <E2E_DIR>/flaky$i.log 2>&1
   if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
 ```

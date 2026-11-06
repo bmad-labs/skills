@@ -48,9 +48,9 @@ Duration: {time}
 ⚠️ STOP: Do NOT run full suite again!
 
 Next Steps:
-1. Create /tmp/e2e-${E2E_SESSION}-failures.md with ALL failing tests listed
+1. Create <E2E_DIR>/failures.md with ALL failing tests listed
 2. Select FIRST failing test
-3. Run ONLY that test: npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-debug.log 2>&1
+3. Run ONLY that test: npm run test:e2e -- -t "{test name}" > <E2E_DIR>/debug.log 2>&1
 4. Fix and verify with 3-5 runs
 5. Move to next test
 6. Run full suite ONLY ONCE after all individual tests pass

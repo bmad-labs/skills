@@ -1,5 +1,27 @@
 # External API Mocking
 
+## Contents
+
+- [MSW (Mock Service Worker)](#msw-mock-service-worker)
+  - [Setup](#setup)
+  - [Basic Mocking](#basic-mocking)
+  - [Error Responses](#error-responses)
+  - [Conditional Responses](#conditional-responses)
+- [Nock](#nock)
+  - [Setup](#setup-1)
+  - [Basic Mocking](#basic-mocking-1)
+  - [Multiple Responses](#multiple-responses)
+  - [Query Parameters](#query-parameters)
+  - [Headers](#headers)
+- [Complete Test Examples](#complete-test-examples)
+  - [Payment Gateway Integration](#payment-gateway-integration)
+  - [Exchange Rate API](#exchange-rate-api)
+  - [Email Service](#email-service)
+- [Best Practices](#best-practices)
+  - [1. Always Clean Up](#1-always-clean-up)
+  - [2. Use Error Mode for Unhandled Requests](#2-use-error-mode-for-unhandled-requests)
+  - [3. Capture Requests for Verification](#3-capture-requests-for-verification)
+
 ## MSW (Mock Service Worker)
 
 ### Setup

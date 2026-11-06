@@ -14,13 +14,13 @@ Clean up after test run.
 ### 1. Stop Docker if Not Needed
 
 ```bash
-docker-compose -f docker-compose.e2e.yml down
+docker compose -f docker-compose.e2e.yml down
 ```
 
 ### 2. Delete Tracking Files
 
 ```bash
-rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
+rm -rf <E2E_DIR>
 ```
 
 ### 3. Review and Commit Fixes

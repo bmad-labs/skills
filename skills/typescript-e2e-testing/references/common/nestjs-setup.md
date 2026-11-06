@@ -1,5 +1,23 @@
 # NestJS E2E Test Setup
 
+## Contents
+
+- [Project Structure](#project-structure)
+- [Jest Configuration](#jest-configuration)
+  - [jest-e2e.config.ts](#jest-e2econfigts)
+  - [package.json Scripts](#packagejson-scripts)
+  - [Running Tests (Context Efficient)](#running-tests-context-efficient)
+- [Test Setup Pattern](#test-setup-pattern)
+  - [Global Setup (setup.ts)](#global-setup-setupts)
+  - [Test App Bootstrap Helper](#test-app-bootstrap-helper)
+- [Complete Test Suite Example](#complete-test-suite-example)
+- [Common Issues and Solutions](#common-issues-and-solutions)
+  - [Issue: Tests hang after completion](#issue-tests-hang-after-completion)
+  - [Issue: Port conflicts between test runs](#issue-port-conflicts-between-test-runs)
+  - [Issue: Database state pollution](#issue-database-state-pollution)
+  - [Issue: Kafka consumer lag](#issue-kafka-consumer-lag)
+  - [Issue: Tests fail intermittently (flaky)](#issue-tests-fail-intermittently-flaky)
+
 ## Project Structure
 
 ```
@@ -50,9 +68,9 @@ const config: Config = {
   resetMocks: true,
   restoreMocks: true,
 
-  // Prevent hanging connections
-  forceExit: true,
+  // Report handles that keep Jest alive, then close them in afterAll
   detectOpenHandles: true,
+  // forceExit: true only as a last resort — it hides open handles instead of fixing them
 };
 
 export default config;
@@ -66,8 +84,8 @@ export default config;
     "test:e2e": "jest --config test/jest-e2e.config.ts --runInBand",
     "test:e2e:watch": "jest --config test/jest-e2e.config.ts --runInBand --watch",
     "test:e2e:debug": "node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand",
-    "e2e:infra:up": "docker-compose -f docker-compose.e2e.yml up -d",
-    "e2e:infra:down": "docker-compose -f docker-compose.e2e.yml down -v",
+    "e2e:infra:up": "docker compose -f docker-compose.e2e.yml up -d",
+    "e2e:infra:down": "docker compose -f docker-compose.e2e.yml down -v",
     "e2e:logs": "tail -f logs/e2e-test.log"
   }
 }
@@ -75,26 +93,26 @@ export default config;
 
 ### Running Tests (Context Efficient)
 
-**ALWAYS redirect output to temp files with unique session ID:**
+**ALWAYS redirect output to temp files in a per-session temp directory:**
 
 ```bash
-# Initialize session (once at start)
-export E2E_SESSION=$(date +%s)-$$
+# Create the session temp directory (once at start)
+mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
 
 # Run all E2E tests (no console output)
-npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+npm run test:e2e > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log
 
 # Run specific test (no console output)
-npm run test:e2e -- -t "test name" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+npm run test:e2e -- -t "test name" > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log
 
 # Get failure details
-grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log
+grep -B 2 -A 15 "FAIL\|✕" <E2E_DIR>/output.log
 
 # Debug mode (requires console for interactive debugging)
 npm run test:e2e:debug
 
 # Cleanup when done
-rm -f /tmp/e2e-${E2E_SESSION}-*.log
+rm -rf <E2E_DIR>
 ```
 
 ## Test Setup Pattern
@@ -260,9 +278,9 @@ describe('Feature E2E', () => {
 ### Issue: Tests hang after completion
 
 ```typescript
-// Solution 1: Force exit in jest config
-forceExit: true,
+// Solution 1: Find the open handle, then close it (see Solution 2)
 detectOpenHandles: true,
+// forceExit: true is a last resort only — it hides the handle instead of fixing it
 
 // Solution 2: Proper cleanup in afterAll
 afterAll(async () => {

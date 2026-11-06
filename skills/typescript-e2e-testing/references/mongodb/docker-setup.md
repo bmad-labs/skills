@@ -37,7 +37,7 @@ volumes:
 #!/bin/bash
 # scripts/wait-for-mongodb.sh
 
-until docker-compose -f docker-compose.e2e.yml exec mongodb-e2e mongosh --eval "db.adminCommand('ping')"; do
+until docker compose -f docker-compose.e2e.yml exec mongodb-e2e mongosh --eval "db.adminCommand('ping')"; do
   echo "Waiting for MongoDB..."
   sleep 1
 done

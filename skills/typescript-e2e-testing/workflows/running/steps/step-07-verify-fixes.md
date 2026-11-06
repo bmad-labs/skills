@@ -17,7 +17,7 @@ Confirm fixes are stable.
 ```bash
 # Run 5 times to verify stability (no console output)
 for i in {1..5}; do
-  npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-run$i.log 2>&1
+  npm run test:e2e -- -t "{test name}" > <E2E_DIR>/run$i.log 2>&1
   if [ $? -eq 0 ]; then echo "Run $i: PASS"; else echo "Run $i: FAIL"; fi
 done
 ```
@@ -26,15 +26,15 @@ done
 
 ```bash
 # Run the entire file (no console output)
-npm run test:e2e -- {file} > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
-tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+npm run test:e2e -- {file} > <E2E_DIR>/output.log 2>&1
+tail -50 <E2E_DIR>/output.log
 ```
 
 ### 3. Run Full Suite (Only When All Individual Tests Pass)
 
 ```bash
-npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
-tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+npm run test:e2e > <E2E_DIR>/output.log 2>&1
+tail -50 <E2E_DIR>/output.log
 ```
 
 ### 4. Append to Output

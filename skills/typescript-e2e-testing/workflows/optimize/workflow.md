@@ -62,23 +62,23 @@ This workflow uses a **step-file architecture** for context-safe execution:
 
 ### Context Efficiency: Temp File Output
 
-**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
 
 ```bash
-# Initialize session (once at start of optimization)
-export E2E_SESSION=$(date +%s)-$$
+# Create the session temp directory (once at start)
+mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
 
 # Capture timing data (no console output)
-{ time npm run test:e2e > /tmp/e2e-${E2E_SESSION}-timing.log 2>&1 ; } 2>> /tmp/e2e-${E2E_SESSION}-timing.log
+{ time npm run test:e2e > <E2E_DIR>/timing.log 2>&1 ; } 2>> <E2E_DIR>/timing.log
 
 # Read summary only
-tail -50 /tmp/e2e-${E2E_SESSION}-timing.log
+tail -50 <E2E_DIR>/timing.log
 
 # Extract timing info
-grep -E "Time:|Duration:|passed|failed|real|user|sys" /tmp/e2e-${E2E_SESSION}-timing.log
+grep -E "Time:|Duration:|passed|failed|real|user|sys" <E2E_DIR>/timing.log
 
 # Cleanup when done
-rm -f /tmp/e2e-${E2E_SESSION}-*.log
+rm -rf <E2E_DIR>
 ```
 
 ### Quick Wins Checklist

@@ -21,6 +21,14 @@ Execute E2E tests reliably with proper infrastructure setup, environment configu
 
 Have E2E tests written and Docker infrastructure configured.
 
+## Fast Path
+
+For a plain "run the tests" request, skip the run log and the `[C]` gates: create the
+session temp directory, confirm the Docker infrastructure is up (step 2's checks), run
+the requested scope with output redirected to `<E2E_DIR>/output.log`, read the summary
+and failures from that file, and summarise the result in chat. Use the full step flow
+below only when the user asks for a run log or wants failures worked through.
+
 ## Step-File Architecture
 
 This workflow uses a **step-file architecture** for context-safe execution:
@@ -47,7 +55,7 @@ This workflow uses a **step-file architecture** for context-safe execution:
 
 1. **Load one step at a time** - Read the step file, execute it, then load the next
 2. **Update frontmatter after each step** - Add the step number to `stepsCompleted`
-3. **Wait for user confirmation** - Present findings and wait for `[C]` before proceeding
+3. **Wait for user confirmation** - Present findings and wait for `[C]` before proceeding (skipped on the fast path)
 4. **Load reference files** - Each step specifies which reference files to load before action
 
 ### Mandatory Execution Rules
@@ -61,31 +69,31 @@ This workflow uses a **step-file architecture** for context-safe execution:
 
 ### Context Efficiency: Temp File Output
 
-**IMPORTANT**: Redirect output to temp files only (NO console output). Use unique session ID to prevent conflicts.
+**IMPORTANT**: Redirect output to temp files only (NO console output). Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
 
 ```bash
-# Initialize session (once at start of E2E work)
-export E2E_SESSION=$(date +%s)-$$
+# Create the session temp directory (once at start)
+mktemp -d /tmp/e2e-XXXXXX   # prints e.g. /tmp/e2e-a1B2c3 — paste that literal path wherever <E2E_DIR> appears
 
 # Standard pattern for all test runs
-npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1
+npm run test:e2e > <E2E_DIR>/output.log 2>&1
 
 # Then read only what's needed
-tail -50 /tmp/e2e-${E2E_SESSION}-output.log
+tail -50 <E2E_DIR>/output.log
 
 # Cleanup when done
-rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
+rm -rf <E2E_DIR>
 ```
 
 ### Quick Command Reference
 
 ```bash
 npm run docker:e2e                                                                    # Start infrastructure
-npm run test:e2e > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log  # Run all
-npm run test:e2e -- test/e2e/{file}.e2e-spec.ts > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log  # Run file
-npm run test:e2e -- -t "{test name}" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log  # Run test
-grep -B 2 -A 15 "FAIL\|✕" /tmp/e2e-${E2E_SESSION}-output.log                        # Get failures
-docker-compose -f docker-compose.e2e.yml down                                         # Stop infrastructure
+npm run test:e2e > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log  # Run all
+npm run test:e2e -- test/e2e/{file}.e2e-spec.ts > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log  # Run file
+npm run test:e2e -- -t "{test name}" > <E2E_DIR>/output.log 2>&1 && tail -50 <E2E_DIR>/output.log  # Run test
+grep -B 2 -A 15 "FAIL\|✕" <E2E_DIR>/output.log                        # Get failures
+docker compose -f docker-compose.e2e.yml down                                         # Stop infrastructure
 ```
 
 ### Common Issues and Solutions
@@ -95,7 +103,7 @@ docker-compose -f docker-compose.e2e.yml down                                   
 | Connection refused | Docker not running | `npm run docker:e2e` |
 | Test timeout | Slow infrastructure | Increase timeout or check service health |
 | Flaky tests | Race condition | Add wait in beforeEach, use polling |
-| Port conflict | Another service | Change E2E ports in docker-compose |
+| Port conflict | Another service | Change E2E ports in docker-compose.e2e.yml |
 | Memory issues | Too many containers | Restart Docker, increase memory |
 
 ## Begin

@@ -146,7 +146,7 @@ PORT=${3:-9094}
 
 echo "Waiting for Redpanda at $HOST:$PORT..."
 for i in $(seq 1 $TIMEOUT); do
-  if docker-compose -f docker-compose.e2e.yml exec redpanda \
+  if docker compose -f docker-compose.e2e.yml exec redpanda \
     rpk cluster health 2>/dev/null | grep -q "Healthy"; then
     echo "Redpanda is ready!"
     exit 0
@@ -168,7 +168,7 @@ PORT=${3:-9092}
 
 echo "Waiting for Kafka at $HOST:$PORT..."
 for i in $(seq 1 $TIMEOUT); do
-  if docker-compose -f docker-compose.e2e.yml exec kafka \
+  if docker compose -f docker-compose.e2e.yml exec kafka \
     kafka-broker-api-versions --bootstrap-server localhost:9092 2>/dev/null; then
     echo "Kafka is ready!"
     exit 0

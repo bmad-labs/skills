@@ -43,7 +43,7 @@ Append to the output document:
 ### 2. Clean Up Temp Files
 
 ```bash
-rm -f /tmp/e2e-${E2E_SESSION}-*.log
+rm -rf <E2E_DIR>
 ```
 
 ## PRESENT TO USER
