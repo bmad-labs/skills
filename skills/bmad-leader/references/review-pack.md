@@ -9,14 +9,13 @@ document: it carries colour, tooltips, and a review state per item.
 Template: `assets/review-pack.template.html`. Copy it, then replace every `{{PLACEHOLDER}}` and
 every `Example:` block. Keep the CSS and the script.
 
-Worked example: `assets/review-pack.example.html`, a real 14-clause batch (Epic 4, Celestia
-Factory, 2026-11-03). Read it before filling the template: it shows the length of a card, the
+Worked example: `assets/review-pack.example.html`, a 14-clause batch for a fictional notes API. Read it before filling the template: it shows the length of a card, the
 amount of colour per row, and how much prose each section holds.
 
 ## File pair
 
 Every correct course writes two files with the same basename, in
-`.ai-aftifacts/planning-artifacts/`:
+`<planning-artifacts>/`:
 
 | File | Reader | Purpose |
 | --- | --- | --- |
@@ -126,7 +125,7 @@ Write the rule you used in the chat report, one line, so the next reader knows w
 2. Sort into behaviour changes (the User decides) and document-only changes (no decision).
 3. Count: clauses, applied, proposed, behaviour items. Those numbers go into the Overview.
 4. Copy the template beside its proposal:
-   `.ai-aftifacts/planning-artifacts/sprint-change-proposal-<date>[-<slug>].html`.
+   `<planning-artifacts>/sprint-change-proposal-<date>[-<slug>].html`.
 5. Fill the sections in order. Build the appendix table first if the counts are unclear.
 6. Add a tooltip at each specialist term's first use. The tooltip is the only definition.
 7. Open the file in a browser. Hover every term. Tick one review box and reload to prove the

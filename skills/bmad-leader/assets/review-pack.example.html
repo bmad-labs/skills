@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Correct-course change record — Celestia Factory</title>
+<title>Correct-course change record — Acme Notes</title>
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
@@ -90,7 +90,7 @@
 
 <header>
   <h1>Correct-course change record</h1>
-  <p class="meta">Celestia Factory · 2026-11-03 · 14 text clauses in one batch · source tree <code>6fc8008</code></p>
+  <p class="meta">Acme Notes · 2026-05-12 · 14 text clauses in one batch · source tree <code>3f9e2c1</code></p>
   <nav class="nav">
     <a href="#overview">Overview</a>
     <a href="#purpose">Purpose</a>
@@ -117,13 +117,13 @@
 <table>
   <tbody>
     <tr><td style="width:170px"><b>Scope</b></td>
-        <td><b>14 clauses</b>: <b>2</b> in the architecture spine, <b>12</b> in the design package, build plan and one tool. <b>0 applied</b>, <b>14 proposed</b>.</td></tr>
+        <td><b>14 clauses</b>: <b>2</b> in the architecture document, <b>12</b> in the design package, build plan and one tool. <b>0 applied</b>, <b>14 proposed</b>.</td></tr>
     <tr><td><b>Reason</b></td>
         <td>Epic 3 closed. Epic 4 has <b>six gaps</b> that stop a Story from being built.</td></tr>
     <tr><td><b>Effect on the user's work</b></td>
         <td><b class="v-ok">No change.</b> The same three tasks remain: merge releases, answer questions, approve proposals.</td></tr>
     <tr><td><b>Status</b></td>
-        <td>Epic 4 batch <span class="badge open">not applied</span> · the applied Epic 3 batch is its own pack: <code>sprint-change-proposal-2026-11-03-epic-3-close.html</code></td></tr>
+        <td>Epic 4 batch <span class="badge open">not applied</span> · the applied Epic 3 batch is its own pack: <code>sprint-change-proposal-2026-05-12-epic-3-close.html</code></td></tr>
   </tbody>
 </table>
 
@@ -132,8 +132,8 @@
 <p>The design documents are read as <span class="term" data-tip="The design package is the build contract. Agents follow it as their task description.">instructions</span> by three readers:</p>
 
 <ul>
-  <li>the <b><span class="term" data-tip="The Agent that writes the Factory's own code from these documents.">builder Agent</span></b>, which decides what to implement and what to leave alone;</li>
-  <li>the <b><span class="term" data-tip="The one Agent that runs all Labs, picks the next Story and reports finished Features.">Delivery Manager</span></b>, which plans the next Story;</li>
+  <li>the <b><span class="term" data-tip="The Agent that writes the product's code from these documents.">builder Agent</span></b>, which decides what to implement and what to leave alone;</li>
+  <li>the <b><span class="term" data-tip="The Agent that picks the next Story to build and tracks each Epic's progress.">planner Agent</span></b>, which plans the next Story;</li>
   <li>the <b>tests</b>, which check what a sentence promises.</li>
 </ul>
 
@@ -144,10 +144,10 @@
   <tbody>
     <tr><td><b>A sentence describes work that is not done</b></td>
         <td><span class="term" data-tip="An Agent or a test that follows this document and expects what it promises.">The reader</span> checks for <b>an output that does not exist</b>. A later builder assumes the work is present, so it is <b>omitted or duplicated</b>.</td>
-        <td>The <span class="term" data-tip="Copying main into staging when main changes.">sync</span> note claimed it <span class="del">marks finished setup work as done and lists Stories affected by a Blueprint change</span>. <b>It does neither.</b></td></tr>
+        <td>The <span class="term" data-tip="A nightly task that removes stale records.">cleanup job</span> note claimed it <span class="del">deletes expired invitations and notifies their senders</span>. <b>It does neither.</b></td></tr>
     <tr><td><b>A sentence omits a fact that is needed</b></td>
         <td>The reader has <b>no answer</b> and must infer one. Two readers can <b>infer differently</b>.</td>
-        <td>No document stated where a Story's status is read from, so <b>the rule "wait until earlier Stories are done" had no input</b>.</td></tr>
+        <td>No document stated where a notebook's sharing state is read from, so <b>the rule "hide notes in a revoked share" had no input</b>.</td></tr>
   </tbody>
 </table>
 
@@ -156,57 +156,58 @@
 <p class="progress">Reviewed <span id="reviewed">0</span> of 4</p>
 
 <div class="card" id="item-31">
-  <h3>3.1 The Delivery Manager can join a Lab chat <span class="badge need">your decision</span> <span class="badge open">clauses 6, 8, 10</span></h3>
+  <h3>3.1 The workspace admin can join a shared notebook <span class="badge need">your decision</span> <span class="badge open">clauses 6, 8, 10</span></h3>
   <dl>
-    <dt>Current</dt><dd><span class="term" data-tip="The channel where a Lab's two members talk and ask for help.">Lab chat</span> holds the Lab's two members. The membership rule requires <span class="chg">every member to belong to that Lab</span>, and the Delivery Manager belongs to none, so <span class="chg">the runner refuses the chat</span>.</dd>
-    <dt>After</dt><dd>The rule reads: <span class="add">every Lab member is in the Lab, and the Delivery Manager may join as an extra member</span>. The chat holds <span class="add">three members</span>.</dd>
-    <dt>Reason</dt><dd>The help ladder requires the Lab to ask for help in its own chat and the Delivery Manager to answer there. <strong class="hl">Without this clause, Story 4.1 cannot create the Lab chat.</strong></dd>
-    <dt>Observed by</dt><dd><b>Delivery Manager</b>, <b>both Lab members</b>.</dd>
+    <dt>Current</dt><dd>A <span class="term" data-tip="A notebook that more than one account can open. Its member list says who.">shared notebook</span> holds its owner and invited collaborators. The membership rule requires <span class="chg">every member to hold an invitation</span>, and the <span class="term" data-tip="The account that manages a workspace's members and answers access requests.">workspace admin</span> holds none, so <span class="chg">the API refuses the share</span>.</dd>
+    <dt>After</dt><dd>The rule reads: <span class="add">every invited collaborator holds an invitation, and the workspace admin may join without one</span>. The member list holds <span class="add">three members</span>.</dd>
+    <dt>Reason</dt><dd>The support process requires collaborators to ask for access help in the notebook's own thread and the admin to answer there. <strong class="hl">Without this clause, Story 4.1 cannot create a shared notebook.</strong></dd>
+    <dt>Observed by</dt><dd><b>Workspace admin</b>, <b>both collaborators</b>.</dd>
   </dl>
   <div class="diagram">
   <div class="pair">
     <div>
       <p class="label">Before</p>
-      <pre>Epic starts
+      <pre>Owner shares a notebook
    │
    ▼
-DM creates Lab
+API creates the share
    │
    ▼
-runner opens lab-1/general
-with [dev, validator, DM]
+API writes notebook-7/members
+with [owner, editor, admin]
    │
    ▼
 <span class="del">rule: every member must</span>
-<span class="del">be in Lab 1</span>
+<span class="del">hold an invitation</span>
    │
    ▼
 <span class="del">REFUSED  ✗</span>
    │
    ▼
-<span class="del">Lab cannot start</span></pre>
+<span class="del">share is not created,</span>
+<span class="del">notebook stays private</span></pre>
     </div>
     <div>
       <p class="label">After</p>
-      <pre>Epic starts
+      <pre>Owner shares a notebook
    │
    ▼
-DM creates Lab
+API creates the share
    │
    ▼
-runner opens lab-1/general
-with [dev, validator, DM]
+API writes notebook-7/members
+with [owner, editor, admin]
    │
    ▼
-<span class="add">rule: every Lab member is in</span>
-<span class="add">Lab 1, DM may join</span>
+<span class="add">rule: every invitee holds an</span>
+<span class="add">invitation, admin may join</span>
    │
    ▼
-<span class="add">chat created  ✓</span>
+<span class="add">share created  ✓</span>
    │
    ▼
-<span class="add">Lab starts, asks for help</span>
-<span class="add">in its own chat</span></pre>
+<span class="add">access requests answered</span>
+<span class="add">in the notebook thread</span></pre>
     </div>
   </div>
 </div>
@@ -224,43 +225,42 @@ with [dev, validator, DM]
 </div>
 
 <div class="card" id="item-32">
-  <h3>3.2 A claim records the commit the Story starts from <span class="badge need">your decision</span> <span class="badge open">clauses 14, 15</span></h3>
+  <h3>3.2 An edit lock records the revision the edit starts from <span class="badge need">your decision</span> <span class="badge open">clauses 14, 15</span></h3>
   <dl>
-    <dt>Current</dt><dd>The <span class="term" data-tip="The record written when the Delivery Manager takes a Story to build. It holds the Lab and, after the change, the start commit.">claim record</span> holds <span class="chg">the Lab name only</span>. At the end of a build the runner must compare the final commit with the <span class="term" data-tip="Called the start commit: the point a Story's work is measured from.">commit the Story started from</span>, and <span class="chg">no record holds that commit</span>.</dd>
-    <dt>After</dt><dd>The claim also records <span class="add">the <span class="term" data-tip="The branch where approved PRs merge. Never main."><code>origin/staging</code></span> commit the worktree starts from</span>. The runner can then <span class="add">name the commits and files that belong to the Story</span>.</dd>
-    <dt>Reason</dt><dd><strong class="hl">The build result cannot be read without a start point</strong>, and a Story cannot move to validation without that result. The change adds one value to each claim.</dd>
-    <dt>Observed by</dt><dd><b>Runner</b>, <b>Review Lead</b> through the PR, <b>Delivery Manager</b>.</dd>
+    <dt>Current</dt><dd>The <span class="term" data-tip="The record written when a user opens a note for editing. It holds the user and, after the change, the base revision.">edit lock</span> holds <span class="chg">the user id only</span>. When a save arrives the API must compare the note's current revision with the <span class="term" data-tip="Called the base revision: the version a save is compared against.">revision the edit started from</span>, and <span class="chg">no record holds that revision</span>.</dd>
+    <dt>After</dt><dd>The lock also records <span class="add">the <span class="term" data-tip="A note's revision number. It increases by one on every save."><code>rev</code></span> the edit starts from</span>. The API can then <span class="add">name the changes that belong to this edit</span>.</dd>
+    <dt>Reason</dt><dd><strong class="hl">A save cannot be checked for conflicts without a start point</strong>, and a shared note cannot accept a second editor without that check. The change adds one value to each lock.</dd>
+    <dt>Observed by</dt><dd><b>API</b>, <b>API clients</b> through the save response, <b>planner Agent</b>.</dd>
   </dl>
   <div class="diagram">
   <div class="pair">
     <div>
       <p class="label">Before</p>
-      <pre>DM claims Story 3.2
-record: lab_id = lab-1
-<span class="del">        (no start commit)</span>
+      <pre>User opens note 42
+lock: user_id = u-17
+<span class="del">      (no base revision)</span>
    │
    ▼
-Dev builds in worktree
+Client edits offline
    │
    ▼
-runner reads result:
-compare HEAD vs <span class="del">???  → no start</span>
-<span class="del">commit anywhere  ✗</span></pre>
+API receives the save:
+compare rev vs <span class="del">???  → no base</span>
+<span class="del">revision anywhere  ✗</span></pre>
     </div>
     <div>
       <p class="label">After</p>
-      <pre>DM claims Story 3.2
-record: lab_id = lab-1
-<span class="add">        sha   = start commit</span>
+      <pre>User opens note 42
+lock: user_id = u-17
+<span class="add">      base    = rev 8</span>
    │
    ▼
-Dev builds in worktree
+Client edits offline
    │
    ▼
-runner reads result:
-compare HEAD vs <span class="add">start commit</span>
-<span class="add">→ commits and files of this</span>
-<span class="add">Story  ✓</span></pre>
+API receives the save:
+compare rev vs <span class="add">base rev 8</span>
+<span class="add">→ changes of this edit  ✓</span></pre>
     </div>
   </div>
 </div>
@@ -278,45 +278,45 @@ compare HEAD vs <span class="add">start commit</span>
 </div>
 
 <div class="card" id="item-33">
-  <h3>3.3 A refused claim names the check that failed <span class="badge need">your decision</span> <span class="badge open">clauses 11, 12, 18</span></h3>
+  <h3>3.3 A refused share names the check that failed <span class="badge need">your decision</span> <span class="badge open">clauses 11, 12, 18</span></h3>
   <dl>
-    <dt>Current</dt><dd>Seven checks gate a claim. Three return a message. <span class="chg">Four — missing approval, unfinished dependency, overlapping file area, another Lab holds the Story — return none</span>, so the Agent <span class="chg">cannot tell what to fix</span>. The written order also lists <span class="chg">the money check before the pause check</span>, while the machine checks pause first.</dd>
-    <dt>After</dt><dd><span class="add">One message names the failing check.</span> The written order <span class="add">matches the machine</span>.</dd>
-    <dt>Reason</dt><dd><strong class="hl">A refused Agent needs the reason to act on it.</strong> A written order that contradicts a tested order causes the next builder to break that test.</dd>
-    <dt>Observed by</dt><dd><b>Dev Agent</b>, <b>Delivery Manager</b>, <b>tests</b>.</dd>
+    <dt>Current</dt><dd>Seven checks gate a share request. Three return a message. <span class="chg">Four — unverified invitee, existing member, archived notebook, blocked invitee — return none</span>, so the client <span class="chg">cannot tell what to fix</span>. The written order also lists <span class="chg">the <span class="term" data-tip="The number of member accounts the workspace's plan allows.">seat-limit</span> check before the suspension check</span>, while the code checks suspension first.</dd>
+    <dt>After</dt><dd><span class="add">One message names the failing check.</span> The written order <span class="add">matches the code</span>.</dd>
+    <dt>Reason</dt><dd><strong class="hl">A refused client needs the reason to act on it.</strong> A written order that contradicts a tested order causes the next builder to break that test.</dd>
+    <dt>Observed by</dt><dd><b>API clients</b>, <b>workspace admin</b>, <b>tests</b>.</dd>
   </dl>
   <div class="diagram">
   <div class="pair">
     <div>
       <p class="label">Before</p>
-      <pre>claim → 7 checks
+      <pre>share → 7 checks
    │
-   ├─ plan membership     → CF411
-   ├─ approval owed       → <span class="del">(no code)</span>
-   ├─ dependency not done → <span class="del">(no code)</span>
-   ├─ file-area overlap   → <span class="del">(no code)</span>
-   ├─ another Lab holds   → <span class="del">(no code)</span>
-   ├─ paused              → CF410
-   └─ money limit         → CF408/CF409
+   ├─ notebook exists     → AN411
+   ├─ invitee verified    → <span class="del">(no code)</span>
+   ├─ already a member    → <span class="del">(no code)</span>
+   ├─ notebook archived   → <span class="del">(no code)</span>
+   ├─ invitee blocked     → <span class="del">(no code)</span>
+   ├─ workspace suspended → AN410
+   └─ seat limit          → AN408/AN409
    │
    ▼
-<span class="del">Agent receives a refusal</span>
+<span class="del">client receives a refusal</span>
 <span class="del">with no failing check</span></pre>
     </div>
     <div>
       <p class="label">After</p>
-      <pre>claim → 7 checks, <span class="add">in order</span>
+      <pre>share → 7 checks, <span class="add">in order</span>
    │
-   ├─ plan membership     → CF411
-   ├─ approval owed       → <span class="add">CF413 names it</span>
-   ├─ dependency not done → <span class="add">CF413 names it</span>
-   ├─ file-area overlap   → <span class="add">CF413 names it</span>
-   ├─ another Lab holds   → <span class="add">CF413 names it</span>
-   ├─ paused              → CF410
-   └─ money limit         → CF408/CF409
+   ├─ notebook exists     → AN411
+   ├─ invitee verified    → <span class="add">AN413 names it</span>
+   ├─ already a member    → <span class="add">AN413 names it</span>
+   ├─ notebook archived   → <span class="add">AN413 names it</span>
+   ├─ invitee blocked     → <span class="add">AN413 names it</span>
+   ├─ workspace suspended → AN410
+   └─ seat limit          → AN408/AN409
    │
    ▼
-<span class="add">Agent receives the check</span>
+<span class="add">client receives the check</span>
 <span class="add">that failed</span></pre>
     </div>
   </div>
@@ -335,44 +335,44 @@ compare HEAD vs <span class="add">start commit</span>
 </div>
 
 <div class="card" id="item-34">
-  <h3>3.4 A session that attempted a <span class="term" data-tip="A holdout scenario: an acceptance check only the App Validator runs. The Dev Agent never sees it.">hidden-test</span> read is not resumed <span class="badge need">your decision</span> <span class="badge open">clauses 7, 16</span></h3>
+  <h3>3.4 A token that requested a <span class="term" data-tip="A share the owner has withdrawn. Its former members must not read the notebook.">revoked share</span> is not renewed <span class="badge need">your decision</span> <span class="badge open">clauses 7, 16</span></h3>
   <dl>
-    <dt>Current</dt><dd>The <span class="term" data-tip="The hook that blocks a forbidden read and records an alert.">guard</span> denies the read and writes an alert. <span class="chg">No record marks the session</span>, so <span class="chg">the next restart resumes it</span>.</dd>
-    <dt>After</dt><dd>The denial also <span class="add">sets a yes/no mark on the session record</span>. The next restart <span class="add">refuses to resume that session</span> for any Role except the App Validator and starts a new one.</dd>
-    <dt>Reason</dt><dd>The rule "a conversation that saw hidden tests is never resumed" <strong class="hl">has no record to read, so it cannot be enforced or tested</strong>. Story 4.6 needs the mark for its test.</dd>
-    <dt>Observed by</dt><dd><b>Runner</b>. The Agent <b>starts a new conversation</b> at the next restart.</dd>
+    <dt>Current</dt><dd>The <span class="term" data-tip="The middleware that blocks a forbidden request and writes an audit entry.">access check</span> denies the request and writes an audit entry. <span class="chg">No record marks the token</span>, so <span class="chg">the next <span class="term" data-tip="The call that exchanges an expiring access token for a new one.">refresh</span> renews it</span>.</dd>
+    <dt>After</dt><dd>The denial also <span class="add">sets a yes/no mark on the token record</span>. The next refresh <span class="add">refuses to renew that token</span> and asks the client to sign in again.</dd>
+    <dt>Reason</dt><dd>The rule "a token that touched a revoked share is never renewed" <strong class="hl">has no record to read, so it cannot be enforced or tested</strong>. Story 4.6 needs the mark for its test.</dd>
+    <dt>Observed by</dt><dd><b>API</b>. The client <b>signs in again</b> at the next refresh.</dd>
   </dl>
   <div class="diagram">
   <div class="pair">
     <div>
       <p class="label">Before</p>
-      <pre>Agent writes a holdout path
+      <pre>Client requests a revoked notebook
    │
    ▼
-guard denies, writes an alert
+access check denies, writes an audit entry
    │
    ▼
-next restart: <span class="del">session resumed</span>
-<span class="del">with its previous conversation</span>
+next refresh: <span class="del">token renewed</span>
+<span class="del">with its previous scopes</span>
    │
    ▼
-<span class="del">conversation continues,</span>
+<span class="del">session continues,</span>
 <span class="del">no record of the attempt</span></pre>
     </div>
     <div>
       <p class="label">After</p>
-      <pre>Agent writes a holdout path
+      <pre>Client requests a revoked notebook
    │
    ▼
-guard denies, writes an alert
-   │  <span class="add">+ marks the session</span>
+access check denies, writes an audit entry
+   │  <span class="add">+ marks the token</span>
    ▼
-next restart: <span class="add">non-Validator</span>
-<span class="add">session NOT resumed</span>
+next refresh: <span class="add">marked token</span>
+<span class="add">NOT renewed</span>
    │
    ▼
-<span class="add">a new session starts,</span>
-<span class="add">previous conversation dropped</span></pre>
+<span class="add">client signs in again,</span>
+<span class="add">previous token dropped</span></pre>
     </div>
   </div>
 </div>
@@ -391,37 +391,37 @@ next restart: <span class="add">non-Validator</span>
 
 <h2 id="documents">4. Document-only changes</h2>
 
-<p>Four clauses. No step moves and no Agent behaves differently. Each removes a statement the code does not support, or adds a fact the code needs. <b>No decision is needed from you in this section.</b></p>
+<p>Five clauses. No step moves and no endpoint behaves differently. Each removes a statement the code does not support, or adds a fact the code needs. <b>No decision is needed from you in this section.</b></p>
 
 <div class="scroll">
 <table>
   <thead><tr><th>#</th><th>Where</th><th>Stated before</th><th>Actual</th><th>Effect if unchanged</th></tr></thead>
   <tbody>
-    <tr><td>9</td><td><code>designs/README.md:102</code><br>record writer table</td>
-        <td><span class="del">One way</span> to create a chat record</td>
-        <td><span class="add">Three: create a chat, post a message, runner opens the default at start</span></td>
+    <tr><td>9</td><td><code>docs/design/README.md:102</code><br>record writer table</td>
+        <td><span class="del">One way</span> to create a share record</td>
+        <td><span class="add">Three: share a notebook, accept an invitation, the API writes the owner's entry when a notebook is created</span></td>
         <td><b>One record has no named writer</b>, against the one-writer rule</td></tr>
-    <tr><td>11</td><td><code>designs/README.md:163</code><br>claim rule</td>
+    <tr><td>11</td><td><code>docs/design/README.md:163</code><br>share rule</td>
         <td><span class="del">Three of seven checks</span></td>
         <td><span class="add">All seven, in order, with their messages</span></td>
-        <td>An implementer builds a gate that <b>admits what it should refuse</b></td></tr>
-    <tr><td>13</td><td><code>shared-domain.md:14</code><br>Story entry</td>
-        <td>Status is held <span class="del">somewhere in the Story</span></td>
-        <td><span class="add">It is read from the Story file, never from the <span class="term" data-tip="factory-plan.yaml: every work unit and Story in one build order. It holds no status.">plan index</span></span></td>
-        <td>The plan index becomes <b>a second source of status</b></td></tr>
-    <tr><td>17</td><td><code>P_HEALTH.schema.json:32</code><br>health report types</td>
+        <td>An implementer builds a check that <b>admits what it should refuse</b></td></tr>
+    <tr><td>13</td><td><code>docs/design/shared-domain.md:14</code><br>notebook entry</td>
+        <td>Sharing state is held <span class="del">somewhere in the notebook</span></td>
+        <td><span class="add">It is read from the share table, never from the <span class="term" data-tip="The full-text index built from note bodies. It holds no permissions.">search index</span></span></td>
+        <td>The search index becomes <b>a second source of permissions</b></td></tr>
+    <tr><td>17</td><td><code>schemas/health-report.schema.json:32</code><br>health report types</td>
         <td><span class="del">Six problem types</span></td>
-        <td><span class="add">Seven, including another Story's problem</span></td>
+        <td><span class="add">Seven, including an orphaned share</span></td>
         <td>Problems are <b>omitted from the daily report</b> without a message</td></tr>
-    <tr><td>19</td><td><code>designs/tools/render_api.py:135-141</code><br>page generator</td>
-        <td><span class="del">Every merge must name a work unit</span></td>
-        <td><span class="add">Only a plan merge must</span></td>
+    <tr><td>19</td><td><code>tools/render_api.py:135-141</code><br>reference page generator</td>
+        <td><span class="del">Every save must name a base revision</span></td>
+        <td><span class="add">Only a save on a shared notebook must</span></td>
         <td>The generated page <b>misleads Epic 5</b>, and a hand edit is <b>overwritten on the next render</b></td></tr>
   </tbody>
 </table>
 </div>
 
-<p class="note">Clauses 6, 8, 10, 12, 14, 15 and 18 also appear under behaviour changes.</p>
+<p class="note">Clause 11 also appears under behaviour change 3.3. Clauses 6, 7, 8, 10, 12, 14, 15, 16 and 18 appear only there.</p>
 
 <h2 id="impact">5. Impact</h2>
 
@@ -431,55 +431,56 @@ next restart: <span class="add">non-Validator</span>
   <tbody>
     <tr><td>User's work</td><td><span class="v-ok">No change.</span> Three tasks remain: merge releases, answer questions, approve proposals. No new setting and no new screen.</td></tr>
     <tr><td>Intent and PRD</td><td><span class="v-ok">No clause.</span> <b>No feature, success measure or promise</b> changes.</td></tr>
-    <tr><td>Architecture</td><td><span class="v-watch">Two clauses.</span> Clause 6 changes <b>one membership rule</b>. Clause 7 states <b>where one safety fact is stored</b>. Both make an existing rule implementable.</td></tr>
-    <tr><td>Agent behaviour</td><td><span class="v-watch">Four changes:</span> the Delivery Manager can join a Lab chat; a claim carries its start commit; a refusal names the failing check; a session is marked after a denied hidden-test read.</td></tr>
-    <tr><td>Stored data</td><td><span class="v-watch">Two additions.</span> The session record gains <b>an optional yes/no mark</b>. The claim record gains <b>a required start commit</b>. Existing session files remain valid. The claim change applies to Stories built after it lands.</td></tr>
+    <tr><td>Architecture</td><td><span class="v-watch">Two clauses.</span> Clause 6 changes <b>one membership rule</b>. Clause 7 states <b>where one security fact is stored</b>. Both make an existing rule implementable.</td></tr>
+    <tr><td>API behaviour</td><td><span class="v-watch">Four changes:</span> the workspace admin can join a shared notebook; an edit lock carries its base revision; a refusal names the failing check; a token is marked after a denied request on a revoked share.</td></tr>
+    <tr><td>Stored data</td><td><span class="v-watch">Two additions.</span> The token record gains <b>an optional yes/no mark</b>. The edit lock gains <b>a required base revision</b>. Existing token records remain valid. The lock change applies to edits opened after it lands.</td></tr>
     <tr><td>Rollback</td><td><span class="v-ok">One commit.</span> <b>Documents only</b>; no data migration and no schema field is removed. Reverting restores the previous text.</td></tr>
-    <tr><td>If not applied</td><td><span class="v-watch">Epic 4 stops.</span> <b>Story 4.1</b> cannot create the Lab chat. <b>Story 4.2</b> cannot report a refusal reason. <b>Story 4.5</b> cannot read a build result. <b>Story 4.6</b> cannot test the safety rule. <b>Story 4.11</b> omits problems. <b>Epic 5</b> can reverse the tested pause-before-money order.</td></tr>
+    <tr><td>If not applied</td><td><span class="v-watch">Epic 4 stops.</span> <b>Story 4.1</b> cannot create a shared notebook. <b>Story 4.2</b> cannot report a refusal reason. <b>Story 4.5</b> cannot detect an edit conflict. <b>Story 4.6</b> cannot test the revoked-share rule. <b>Story 4.11</b> omits problems. <b>Epic 5</b> can reverse the tested suspension-before-seat-limit order.</td></tr>
   </tbody>
 </table>
 </div>
 
 <h2 id="process">6. Process before and after</h2>
 
-<p>The four behaviour diagrams sit with their items in section 3. Two flows remain here: the full Story journey, and how the batch is applied.</p>
+<p>The four behaviour diagrams sit with their items in section 3. Two flows remain here: the full journey of an edit on a shared notebook, and how the batch is applied.</p>
 
-<h3>6.1 A Story's journey</h3>
+<h3>6.1 A shared edit's journey</h3>
 
 <p>Two complete diagrams. The left one is the journey as it stands. The right one is the journey after the batch. Both show all ten steps; colour marks the difference.</p>
 
 <div class="pair">
 <div>
 <p class="label">Before</p>
-<pre>1  CLAIM
-   DM picks the Story
-   record: lab_id only
+<pre>1  SHARE
+   owner shares notebook
+   members: invitees only
    <span class="del">refusal: no reason</span>
         │
-2  DISPATCH
-   runner launches
-   a Dev session
+2  OPEN
+   collaborator opens a note
+   lock: user_id
+   <span class="del">no base revision</span>
         │
-3  BUILD
-   Dev builds,
-   stops in-review
+3  EDIT
+   client edits,
+   sends a save
         │
-4  READ RESULT
-   <span class="del">HEAD vs ???  ✗</span>
+4  COMPARE
+   <span class="del">rev vs ???  ✗</span>
         │
-5  VALIDATE
+5  MERGE
    <span class="del">not reached  ✗</span>
         │
-6  STORY PR
+6  SAVE
    <span class="del">not reached  ✗</span>
         │
-7  REVIEW
+7  INDEX
    <span class="del">not reached  ✗</span>
         │
-8  GRADE
+8  NOTIFY
    <span class="del">not reached  ✗</span>
         │
-9  MERGE
+9  SYNC
    <span class="del">not reached  ✗</span>
         │
 10 DONE
@@ -487,51 +488,50 @@ next restart: <span class="add">non-Validator</span>
 </div>
 <div>
 <p class="label">After</p>
-<pre>1  CLAIM
-   DM picks the Story
-   record: lab_id
-   <span class="add">+ start commit</span>
+<pre>1  SHARE
+   owner shares notebook
+   members: invitees <span class="add">+ admin</span>
    <span class="add">refusal: names the check</span>
         │
-2  DISPATCH
-   runner launches
-   a Dev session
+2  OPEN
+   collaborator opens a note
+   lock: user_id
+   <span class="add">+ base revision</span>
         │
-3  BUILD
-   Dev builds,
-   stops in-review
+3  EDIT
+   client edits,
+   sends a save
         │
-4  READ RESULT
-   <span class="add">HEAD vs start commit ✓</span>
+4  COMPARE
+   <span class="add">rev vs base revision ✓</span>
         │
-5  VALIDATE
-   <span class="add">App Validator runs</span>
-   <span class="add">AC + holdouts</span>
+5  MERGE
+   <span class="add">API merges the changes</span>
         │
-6  STORY PR
-   <span class="add">opened for the Story</span>
+6  SAVE
+   <span class="add">new revision written</span>
         │
-7  REVIEW
-   <span class="add">Review Lead verdict</span>
+7  INDEX
+   <span class="add">search index updated</span>
         │
-8  GRADE
-   <span class="add">Gold / Silver / Bronze</span>
+8  NOTIFY
+   <span class="add">collaborators notified</span>
         │
-9  MERGE
-   <span class="add">Gate merges to staging</span>
+9  SYNC
+   <span class="add">other clients pull it</span>
         │
 10 DONE
-   <span class="add">status-only done commit</span></pre>
+   <span class="add">lock released</span></pre>
 </div>
 </div>
 <h3>6.2 How the batch is applied</h3>
 <pre>PROPOSAL          USER APPROVAL     EDIT SOURCES        REGENERATE        VERIFY            COMMIT
-9 clauses    ───▶ all or part  ───▶ 9 hand files  ───▶ 3 renderers  ───▶ design checks ───▶ 1 commit,
-with before/                      designs/ +         pages, record      API 44/0          then
-after + reason                    epics.md line      docs, catalog      records 438/0     Story 4.1
-                                                                        data 12/0
-                                                                        pytest &gt;2840
-                                                                        installer 36</pre>
+14 clauses   ───▶ all or part  ───▶ 10 files      ───▶ 2 renderers  ───▶ design checks ───▶ 1 commit,
+with before/                      docs/design/ +     API reference      API 38/0          then
+after + reason                    epics.md line      schema docs        schemas 112/0     Story 4.1
+                                                                        examples 9/0
+                                                                        pytest &gt;1200
+                                                                        lint 0</pre>
 
 <h2 id="enables">7. What it enables</h2>
 
@@ -539,12 +539,12 @@ after + reason                    epics.md line      docs, catalog      records 
 <table>
   <thead><tr><th>Story</th><th>Requires</th><th>Without the clause</th></tr></thead>
   <tbody>
-    <tr><td><b>4.1</b> Create and close named Labs</td><td>Clauses 6, 8, 10</td><td>The Lab chat <b>cannot be created</b>, so the Lab cannot start</td></tr>
-    <tr><td><b>4.2</b> Claim the next ready Story</td><td>Clauses 11, 12, 13, 18, and 15's writer</td><td><b>Four checks have no code</b>; "dependencies are done" has no status source; the claim records no start commit</td></tr>
-    <tr><td><b>4.5</b> Read the build result</td><td>Clauses 14, 15, 19</td><td>No value to compare against, so <b>the result cannot be read</b></td></tr>
-    <tr><td><b>4.6</b> Hide hidden tests</td><td>Clauses 7, 16</td><td><b>No place to store the fact</b>, so the rule cannot be tested</td></tr>
-    <tr><td><b>4.11</b> Health check</td><td>Clause 17</td><td>Another Story's problems are <b>omitted from the report</b></td></tr>
-    <tr><td><b>5.x</b> Review and merge</td><td>Clauses 2, 3, 18</td><td>A plan PR message and a tested pause order would <b>contradict the builder's instructions</b></td></tr>
+    <tr><td><b>4.1</b> Share a notebook with collaborators</td><td>Clauses 6, 8, 10</td><td>A share that includes the admin <b>cannot be created</b>, so access requests have no thread</td></tr>
+    <tr><td><b>4.2</b> Validate a share request</td><td>Clauses 11, 12, 13, 18</td><td><b>Four checks have no code</b>; "hide notes in a revoked share" has no permission source; the written check order contradicts the code</td></tr>
+    <tr><td><b>4.5</b> Detect an edit conflict</td><td>Clauses 14, 15, 19</td><td>No revision to compare against, so <b>the conflict cannot be detected</b></td></tr>
+    <tr><td><b>4.6</b> Block access after revocation</td><td>Clauses 7, 16</td><td><b>No place to store the fact</b>, so the rule cannot be tested</td></tr>
+    <tr><td><b>4.11</b> Health check</td><td>Clause 17</td><td>Orphaned shares are <b>omitted from the report</b></td></tr>
+    <tr><td><b>5.x</b> Public API reference and rate limits</td><td>Clauses 12, 18, 19</td><td>The generated reference page and a tested check order would <b>contradict the builder's instructions</b></td></tr>
   </tbody>
 </table>
 </div>
@@ -552,10 +552,10 @@ after + reason                    epics.md line      docs, catalog      records 
 <h2 id="decisions">8. Decisions</h2>
 
 <ol>
-  <li><span class="badge need">decision</span> <b>Apply the nine proposed clauses?</b> All nine, the six that block a Story, or none.</li>
-  <li><span class="badge need">decision</span> <b>Lab chat.</b> May the Delivery Manager join a Lab chat? If not, the build plan changes instead and Story 4.1 reads differently.</li>
-  <li><span class="badge need">decision</span> <b>Start commit.</b> May a claim record the commit the Story starts from? One value per claim.</li>
-  <li><span class="badge need">decision</span> <b>Hidden-test mark.</b> Two options: set the mark on any denied attempt, so that session is not resumed at the next restart; or leave the mark unset until a detector is built as its own Story.</li>
+  <li><span class="badge need">decision</span> <b>Apply the fourteen proposed clauses?</b> All fourteen, the ones that block a Story, or none.</li>
+  <li><span class="badge need">decision</span> <b>Admin in a shared notebook.</b> May the workspace admin join a shared notebook without an invitation? If not, the support process changes instead and Story 4.1 reads differently.</li>
+  <li><span class="badge need">decision</span> <b>Base revision.</b> May an edit lock record the revision the edit starts from? One value per lock.</li>
+  <li><span class="badge need">decision</span> <b>Revoked-share mark.</b> Two options: set the mark on any denied request, so that token is not renewed at the next refresh; or leave the mark unset until an abuse detector is built as its own Story.</li>
 </ol>
 
 <h2 id="appendix">Appendix — full clause list</h2>
@@ -570,23 +570,23 @@ after + reason                    epics.md line      docs, catalog      records 
   <tbody>
     <tr>
       <td class="num">6</td>
-      <td><code>ARCHITECTURE-SPINE.md:602</code> — Lab folder rule</td>
-      <td><span class="del">Only that Lab's two members</span></td>
-      <td>Both members, <span class="add">and the Delivery Manager may join</span></td>
+      <td><code>docs/ARCHITECTURE.md:602</code> — notebook membership rule</td>
+      <td><span class="del">Only invited collaborators</span></td>
+      <td>Invited collaborators, <span class="add">and the workspace admin may join</span></td>
       <td>Membership changed</td>
-      <td>The build plan places the DM in the Lab chat; the code refuses, so Story 4.1 cannot start</td>
+      <td>The support process places the admin in the notebook thread; the code refuses, so Story 4.1 cannot start</td>
     </tr>
     <tr>
       <td class="num">7</td>
-      <td><code>ARCHITECTURE-SPINE.md:321</code> — hidden-test rule</td>
+      <td><code>docs/ARCHITECTURE.md:321</code> — revoked-share rule</td>
       <td><span class="del">No record of the fact</span></td>
-      <td><span class="add">A yes/no mark on the session</span></td>
+      <td><span class="add">A yes/no mark on the token</span></td>
       <td>The rule gains a record</td>
       <td>A rule without a record cannot be enforced or tested</td>
     </tr>
     <tr>
       <td class="num">8</td>
-      <td><code>designs/README.md:233</code> — decision D24</td>
+      <td><code>docs/design/README.md:233</code> — decision D24</td>
       <td>Same <span class="del">strict</span> rule</td>
       <td>Same <span class="add">change</span> as 6</td>
       <td>Mirror of 6</td>
@@ -594,87 +594,87 @@ after + reason                    epics.md line      docs, catalog      records 
     </tr>
     <tr>
       <td class="num">9</td>
-      <td><code>designs/README.md:102</code> — record writer table</td>
-      <td>Names <span class="del">one way</span> to create a chat record</td>
+      <td><code>docs/design/README.md:102</code> — record writer table</td>
+      <td>Names <span class="del">one way</span> to create a share record</td>
       <td><span class="add">All three ways</span></td>
       <td>Every writer named</td>
       <td>One record had no named writer</td>
     </tr>
     <tr>
       <td class="num">10</td>
-      <td><code>06-data-modeling/README.md:78</code> — folder map comment</td>
-      <td><span class="del">members</span> are all in this Lab</td>
-      <td><span class="add">Lab members</span>, <span class="add">DM may join</span></td>
+      <td><code>docs/design/data-model.md:78</code> — table map comment</td>
+      <td><span class="del">members</span> are all invitees</td>
+      <td><span class="add">invitees</span>, <span class="add">admin may join</span></td>
       <td>Comment follows 6</td>
-      <td>The map would contradict the folder the Story creates</td>
+      <td>The map would contradict the table the Story creates</td>
     </tr>
     <tr>
       <td class="num">11</td>
-      <td><code>designs/README.md:163</code> — claim rule</td>
+      <td><code>docs/design/README.md:163</code> — share rule</td>
       <td><span class="del">Three of seven checks, no messages</span></td>
       <td><span class="add">All seven, in order</span></td>
-      <td>Claim rule completed</td>
-      <td>It is the only rule for starting a Story</td>
+      <td>Share rule completed</td>
+      <td>It is the only rule for granting access</td>
     </tr>
     <tr>
       <td class="num">12</td>
-      <td><code>error-codes.md:40</code> — after <code>CF412</code>; page from <code>_api.json:2420</code></td>
+      <td><code>docs/design/error-codes.md:40</code> — after <code>AN412</code>; page from <code>api-reference.json:2420</code></td>
       <td><span class="del">No message for four failures</span></td>
       <td><span class="add">One message naming the check</span></td>
       <td>One refusal message</td>
-      <td>Agents and tests need a value to assert</td>
+      <td>Clients and tests need a value to assert</td>
     </tr>
     <tr>
       <td class="num">13</td>
-      <td><code>shared-domain.md:14</code> — Story entry</td>
+      <td><code>docs/design/shared-domain.md:14</code> — notebook entry</td>
       <td><span class="del">No source named</span></td>
-      <td><span class="add">Story file, never the plan index</span></td>
+      <td><span class="add">Share table, never the search index</span></td>
       <td>Source stated</td>
-      <td>"Wait for earlier Stories" needs a status</td>
+      <td>"Hide notes in a revoked share" needs a permission source</td>
     </tr>
     <tr>
       <td class="num">14</td>
-      <td><code>P_RUN_STATE.schema.json:38</code> — commit meaning</td>
-      <td><span class="del">Only from validation onward</span></td>
-      <td><span class="add">On claim, the Story's start commit</span></td>
+      <td><code>schemas/edit-lock.schema.json:38</code> — revision meaning</td>
+      <td><span class="del">Only from the save onward</span></td>
+      <td><span class="add">On open, the edit's base revision</span></td>
       <td>Meaning defined</td>
-      <td>The work is measured against that commit</td>
+      <td>The save is compared against that revision</td>
     </tr>
     <tr>
       <td class="num">15</td>
-      <td><code>P_RUN_STATE.schema.json:58-73</code> — claim record; example at <code>_catalog.json:1133</code></td>
-      <td><span class="del">Lab name only</span></td>
-      <td><span class="add">Lab name and start commit</span></td>
+      <td><code>schemas/edit-lock.schema.json:58-73</code> — lock record; example at <code>examples/edit-lock.json:12</code></td>
+      <td><span class="del">User id only</span></td>
+      <td><span class="add">User id and base revision</span></td>
       <td>One required value</td>
-      <td>The start point must exist before the Agent begins</td>
+      <td>The start point must exist before the edit begins</td>
     </tr>
     <tr>
       <td class="num">16</td>
-      <td><code>registry-sessions.schema.json:87</code> — session record; example at <code>.jsonc:17</code></td>
+      <td><code>schemas/token.schema.json:87</code> — token record; example at <code>examples/token.jsonc:17</code></td>
       <td><span class="del">No field</span></td>
       <td><span class="add">Optional yes/no mark</span></td>
       <td>One optional field</td>
-      <td>Optional keeps existing session files valid</td>
+      <td>Optional keeps existing token records valid</td>
     </tr>
     <tr>
       <td class="num">17</td>
-      <td><code>P_HEALTH.schema.json:32</code> — problem types</td>
-      <td><span class="del">Ended at "hung session"</span></td>
-      <td><span class="add">Adds "another Story's problem"</span></td>
+      <td><code>schemas/health-report.schema.json:32</code> — problem types</td>
+      <td><span class="del">Ended at "stale lock"</span></td>
+      <td><span class="add">Adds "orphaned share"</span></td>
       <td>One allowed value</td>
       <td>Otherwise the problem is omitted from the report without a message</td>
     </tr>
     <tr>
       <td class="num">18</td>
-      <td><code>epics.md:1256</code> — Story 4.2 check order</td>
-      <td><span class="del">Money before pause</span>; no messages</td>
-      <td><span class="add">Pause before money</span>; with messages</td>
+      <td><code>docs/planning/epics.md:1256</code> — Story 4.2 check order</td>
+      <td><span class="del">Seat limit before suspension</span>; no messages</td>
+      <td><span class="add">Suspension before seat limit</span>; with messages</td>
       <td>Order and messages</td>
-      <td>The code checks pause first and a test pins that order</td>
+      <td>The code checks suspension first and a test pins that order</td>
     </tr>
     <tr>
       <td class="num">19</td>
-      <td><code>designs/tools/render_api.py:135-141</code> — page generator</td>
+      <td><code>tools/render_api.py:135-141</code> — reference page generator</td>
       <td><span class="del">Dropped a condition</span></td>
       <td><span class="add">Writes it too</span></td>
       <td>Tool corrected</td>
@@ -689,9 +689,9 @@ after + reason                    epics.md line      docs, catalog      records 
 <table>
   <tbody>
     <tr><td style="width:200px">Epics 1, 2, 3</td><td><b class="v-ok">Done.</b> Epic 3 closed after its retrospective and the first batch</td></tr>
-    <tr><td>Epic 4 context</td><td><b class="v-ok">Compiled</b>, 629 lines, at <code>6fc8008</code></td></tr>
-    <tr><td>Epic 4 Stories</td><td>4.1–4.11, <b>none started</b>; <b>six blocked</b></td></tr>
-    <tr><td>Epic 4 code</td><td><b>No <code>modules/story</code></b>; <b>four Agent commands unserved</b>; two settings templates missing</td></tr>
+    <tr><td>Epic 4 context</td><td><b class="v-ok">Compiled</b>, 412 lines, at <code>3f9e2c1</code></td></tr>
+    <tr><td>Epic 4 Stories</td><td>4.1–4.11, <b>none started</b>; <b>five blocked</b></td></tr>
+    <tr><td>Epic 4 code</td><td><b>No <code>src/sharing</code></b>; <b>four endpoints unserved</b>; two config templates missing</td></tr>
     <tr><td>Decisions</td><td>Section 8, four items</td></tr>
   </tbody>
 </table>
@@ -699,15 +699,16 @@ after + reason                    epics.md line      docs, catalog      records 
 </details>
 
 <footer>
-  Sources: <code>sprint-change-proposal-2026-11-03-epic-3-close.md</code>, <code>sprint-change-proposal-2026-11-03-epic-4-open.md</code>,
-  <code>epic-3-retro-2026-11-03.md</code>, <code>epic-4-context.md</code>.
+  Sources: <code>sprint-change-proposal-2026-05-12-epic-3-close.md</code>, <code>sprint-change-proposal-2026-05-12-epic-4-open.md</code>,
+  <code>epic-3-retro-2026-05-12.md</code>, <code>epic-4-context.md</code>.
   Colour marks the difference; layout is unchanged.
 </footer>
 
 
+
 <script>
 (function () {
-  var KEY = 'celestia-correct-course-review-2026-11-03';
+  var KEY = 'acme-notes-correct-course-review';
   var state = {};
   try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
   var boxes = Array.prototype.slice.call(document.querySelectorAll('.review input[type="checkbox"]'));

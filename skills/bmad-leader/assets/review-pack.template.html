@@ -142,8 +142,8 @@
 
 <p>The design documents are read as <span class="term" data-tip="The design package is the build contract. Agents follow it as their task description.">instructions</span> by three readers:</p>
 <ul>
-  <li>the <b><span class="term" data-tip="The Agent that writes the Factory's own code from these documents.">builder Agent</span></b>, which decides what to implement and what to leave alone;</li>
-  <li>the <b><span class="term" data-tip="The one Agent that runs all Labs, picks the next Story and reports finished Features.">Delivery Manager</span></b>, which plans the next Story;</li>
+  <li>the <b><span class="term" data-tip="The Agent that writes the product's code from these documents.">builder Agent</span></b>, which decides what to implement and what to leave alone;</li>
+  <li>the <b><span class="term" data-tip="The Agent that picks the next Story to build and tracks each Epic's progress.">planner Agent</span></b>, which plans the next Story;</li>
   <li>the <b>tests</b>, which check what a sentence promises.</li>
 </ul>
 
@@ -185,14 +185,14 @@
              On Opus 5.5, replace the <pre> with inline SVG:
 
              <svg viewBox="0 0 420 320" width="100%" role="img" aria-labelledby="b1-title b1-desc">
-               <title id="b1-title">Start a Lab, before the change</title>
-               <desc id="b1-desc">The membership rule refuses the third member, so the chat is not created.</desc>
+               <title id="b1-title">Share a notebook, before the change</title>
+               <desc id="b1-desc">The membership rule refuses the third member, so the share is not created.</desc>
                <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
                               markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                  <path d="M0,0 L10,5 L0,10 z" fill="#23231f"/></marker></defs>
                <rect x="8" y="8" width="200" height="40" rx="6" fill="#fff" stroke="#e3e3e0"/>
-               <text x="18" y="26" font-family="ui-monospace, Menlo, monospace" font-size="13">1 CLAIM</text>
-               <text x="18" y="42" font-family="ui-monospace, Menlo, monospace" font-size="12">lab_id only</text>
+               <text x="18" y="26" font-family="ui-monospace, Menlo, monospace" font-size="13">1 SHARE</text>
+               <text x="18" y="42" font-family="ui-monospace, Menlo, monospace" font-size="12">invitees only</text>
                <path d="M108,48 L108,72" stroke="#23231f" fill="none" marker-end="url(#arrow)"/>
                (one rect + two tspans per step; same coordinates in the After panel)
              </svg>

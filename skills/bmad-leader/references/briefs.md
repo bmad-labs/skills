@@ -4,7 +4,7 @@ Name the skills; never paste or paraphrase their steps. The subagent loads each 
 
 Every brief carries a context pack. A brief without one is incomplete.
 
-Keep one session per persistent role per Story: builder and verifier, plus the planner on OpenCode. Fix rounds continue in those sessions. Reviewers are fresh every round; the UAT Runner is fresh every run.
+Keep one session per persistent role per Story: builder and verifier, plus the planner on a Phase split harness. Fix rounds continue in those sessions. Reviewers are fresh every round; the UAT Runner is fresh every run.
 
 ## Current situation note
 
@@ -113,7 +113,7 @@ Deliver:
 
 ## Builder brief (Full build)
 
-Claude Code and Copilot CLI. One builder runs the whole `bmad-build`.
+Claude Code and Copilot (CLI, app, VS Code Copilot harness). One builder runs the whole `bmad-build`.
 
 ```markdown
 You are the builder for Story <id>. Model <model>, effort <effort>.
@@ -124,7 +124,7 @@ Load <domain skills, for example `cpp-embedded`> before you write code in that d
 Follow <CLAUDE.md / AGENTS.md> and <standards path>.
 
 The leader is your user. At every `bmad-build` question or gate — intent gap,
-plan approval, reject, defer — message the leader and wait for the answer. (Copilot CLI: end your turn with
+plan approval, reject, defer — message the leader and wait for the answer. (Copilot: end your turn with
 the question; the leader answers with write_agent.)
 Send the plan for approval before you write code.
 
@@ -149,7 +149,7 @@ Report when `bmad-build` presents:
 
 ## Builder brief (Phase split)
 
-OpenCode. Implement phase only, from the approved plan.
+OpenCode and VS Code Local. Implement phase only, from the approved plan. On VS Code Local every round is a new subagent: include the previous report.
 
 ```markdown
 You are the builder for Story <id>. Model <model>, effort <effort>.
@@ -163,13 +163,14 @@ Commit only on <branch or worktree>. Do not merge and do not push.
 Context pack: <paths>.
 
 On a fix round, continue this session and close the findings at <path> through `bmad-build`'s Patch phase.
+(VS Code Local: this is a new subagent. Read the previous report at <path> first; nothing else carries over.)
 
 Report: files changed, commit SHA, tests run with counts, open questions.
 ```
 
 ## Planner brief
 
-At epic start on every harness; per Story on OpenCode only.
+At epic start on every harness; per Story on a Phase split harness only.
 
 ```markdown
 You are planning Story <id>. Do not write product code and do not implement.
@@ -197,7 +198,7 @@ You are the verifier for Story <id>. Do not edit product code.
 Load `manual-testing` when the Story has UAT cases.
 
 Context: AC <FR-n/AD-n>, branch <head>, base <sha>, UAT cases <path>.
-If this is a re-run after a fix, continue this session.
+If this is a re-run after a fix, continue this session. (VS Code Local: this is a new subagent; the previous report is at <path>.)
 
 You own the UAT cases. If a case is wrong, fix the case or harness, then ask a
 new UAT Runner to rerun the failed cases. If the product is wrong, do not edit

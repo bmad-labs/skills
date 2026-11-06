@@ -22,7 +22,7 @@ The project-root file `.leader.json` fixes the model, effort and context window 
 | `version` | `1` |
 | `preset` | The preset id it came from, or `custom` after a hand edit |
 | `vendor` | `anthropic`, `openai`, `deepseek`, `google` |
-| `harness` | `claude-code`, `copilot-cli` or `opencode`; the harness the leader runs in |
+| `harness` | `claude-code`, `copilot-cli`, `copilot-app`, `vscode-copilot`, `vscode-local` or `opencode`; the harness the leader runs in |
 | `agents[].name` | One of the 9 required roles: `leader`, `planner`, `builder`, `verifier`, `uat-runner`, `reviewer`, `research`, `retrospective`, `correct-course`; or one of the 3 optional `bmad-build` review lenses: `blind-hunter`, `edge-cases-hunter`, `verification-gap-finder` |
 | `agents[].model` | Vendor model id, without a provider prefix |
 | `agents[].effort` | `low`, `medium`, `high`, `xhigh`, `max` |
@@ -80,7 +80,9 @@ The `Agent` `name` allows no dots: write the Story id with a hyphen, `plan-1-1`,
 
 Claude Code dispatches only Anthropic models. A non-Anthropic preset under `harness: claude-code` is invalid: tell the user and offer an Anthropic preset or OpenCode.
 
-**Copilot CLI** — models are the ids Copilot lists in `/model`, written with dots: `claude-sonnet-5-5` in the file is `claude-sonnet-5.5` in Copilot. Only models your Copilot plan offers can run; a preset model it does not list is invalid under `harness: copilot-cli`. Set per-agent models with `/subagents` or a custom agent's `model:` field. Effort is `--reasoning-effort` for the session; subagents follow the model and effort named in their instructions (Copilot CLI 1.0.85+), so name both in every brief.
+**Copilot (CLI, app, VS Code Copilot harness)** — models are the ids Copilot lists in `/model`, written with dots: `claude-sonnet-5-5` in the file is `claude-sonnet-5.5` in Copilot. Only models your Copilot plan offers can run; a preset model it does not list is invalid under a Copilot harness. Set per-agent models with `/subagents`, the `subagents.agents.<name>` setting (model, effort level, context tier), or a custom agent's `model:` and `reasoning-effort:` fields. Effort is `--reasoning-effort` for the session; subagents follow the model and effort named in their instructions (Copilot CLI 1.0.85+), so name both in every brief.
+
+**VS Code Local** — same model ids as Copilot. A subagent's model comes from the model passed to `runSubagent`, else the custom agent's `model:` (a list means first available), else the parent's model. `reasoning-effort:` applies only to the Copilot harness; name the effort in the brief.
 
 **OpenCode** — model is `<vendor>/<model>`, for example `openai/gpt-6.1-sol`, `deepseek/deepseek-v4.1-flash`, `google/gemini-4-argon`. Set effort through the provider option (`reasoningEffort`) or a named variant.
 
@@ -95,7 +97,7 @@ Effort per vendor, when the vendor does not accept a value:
 
 ## Leader entry
 
-The leader cannot change its own model mid-session. At Activate, compare the `leader` entry with the running model. On a mismatch, say so in one line and tell the user to restart on the configured model (`/model` in Claude Code and Copilot CLI, `--model` in OpenCode). Do not block the build for it.
+The leader cannot change its own model mid-session. At Activate, compare the `leader` entry with the running model. On a mismatch, say so in one line and tell the user to restart on the configured model (`/model` in Claude Code, Copilot and VS Code, `--model` in OpenCode). Do not block the build for it.
 
 ## Context window
 
