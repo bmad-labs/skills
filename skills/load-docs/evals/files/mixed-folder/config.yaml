@@ -1,0 +1,9 @@
+service: payments-handler
+retry:
+  max_attempts: 4
+  backoff_seconds: [1, 5, 30, 120]
+timeouts:
+  provider_call_ms: 2500
+  db_query_ms: 800
+feature_flags:
+  use_new_ledger: false

@@ -1,0 +1,1 @@
+hidden cache file - should be skipped by load-docs folder filtering
