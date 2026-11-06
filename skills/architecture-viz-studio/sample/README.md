@@ -44,7 +44,7 @@ scratch, and copy its patterns.
 # from the skill root, with edit-mode assets reachable:
 cp -r assets/edit-mode sample/edit-mode      # the sample's index.html includes edit-mode/*
 ./scripts/serve.sh sample                    # starts the page (8800) + feedback-bridge (8910) together
-# open http://localhost:8800/  — toggle edit mode with the ✎ button or `e`.
+# open http://127.0.0.1:8800/  — toggle edit mode with the ✎ button or `e`.
 # "Copy for AI" copies the markdown AND saves snips to /tmp/viz-edit (bridge is up via serve.sh).
 ```
 

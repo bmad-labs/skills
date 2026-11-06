@@ -32,8 +32,8 @@
  *     uncapped renderer quadruples the pixel count for ~zero visible gain on a
  *     soft pastel scene. 1.75 keeps edges crisp while roughly halving fragment
  *     work on hi-DPI displays. This was a measured win — do not raise it casually.
- *   - ACESFilmic tone mapping + exposure 1.06: gives the pale palette its gentle
- *     filmic roll-off so bright whites don't clip. SRGB output color space pairs
+ *   - ACESFilmic tone mapping + exposure ~1.05: gives the palette a gentle filmic
+ *     roll-off so emissive highlights and bloom don't clip. SRGB output color space pairs
  *     with SRGB canvas textures (set in primitives.js).
  *   - PMREM + RoomEnvironment: free image-based lighting (no downloaded HDRI). It
  *     gives every MeshStandardMaterial correct soft fill + faint reflections, which

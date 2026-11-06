@@ -49,7 +49,9 @@ body {
   margin: 0;
   font-family: var(--font-primary);
   color: var(--neutral-900);
-  background: #dfe8f2;                 /* matches the 3D scene background colour */
+  background: #dfe8f2;                 /* shows before the canvas paints. NOTE: scene-setup.js PALETTE.bg defaults
+                                          to deep navy (0x0b1424) — set this to your scene's bg, and use light
+                                          hero text if the scene is dark */
   -webkit-font-smoothing: antialiased;
 }
 
