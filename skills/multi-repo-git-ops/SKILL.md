@@ -1,6 +1,6 @@
 ---
 name: multi-repo-git-ops
-description: Manages git operations (branching, committing, pushing) across multi-repo systems with git submodules. Use this skill whenever the user wants to create a feature branch, commit changes, push code, sync submodules, or manage branches across the parent repo and service repos. Also use when implementing BMAD stories that touch one or more services, or when the user asks about git workflow in a multi-repo project. Triggers on phrases like "create branch", "commit changes", "push to remote", "sync submodules", "start working on story", "update service branch", or any git operation that spans parent and submodule repos.
+description: Manages git operations (branching, committing, pushing, syncing) in multi-repo systems — a parent repo with git submodules or multiple service repos. Use this skill when, in such a project, the user wants to create a feature branch, commit or push changes, sync submodules, update submodule pointers, or manage branches across the parent repo and its service repos. Also use when implementing BMAD stories that touch one or more services of a submodule-based project, or when the user asks about git workflow in a multi-repo project. Triggers on phrases like "create branch across services", "commit changes in the services", "sync submodules", "update submodule pointers", "start working on story", "update service branch", or any git operation that spans parent and submodule repos. Not for ordinary git work in a single repo without submodules.
 ---
 
 # Multi-Repo Git Operations
@@ -23,17 +23,29 @@ git config -f .gitmodules --get-regexp '\.path$'
 ### Step 2: Identify each submodule's tracked branch
 
 ```bash
-# List all submodule branch mappings
+# List all submodule branch mappings (keyed by submodule *name*)
 git config -f .gitmodules --get-regexp '\.branch$'
-
-# Get a specific service's default branch
-git config -f .gitmodules submodule."{submodule-path}".branch
 ```
 
-If a submodule has no branch configured in `.gitmodules`, check the remote:
+`.gitmodules` sections are keyed by submodule **name**, which may differ from its path (`[submodule "auth"]` with `path = services/auth-service`). To look up a submodule's branch from its path, resolve the name first. Define this helper once per shell session and use it everywhere below:
+
 ```bash
-cd {submodule-path}
-git remote show origin | grep 'HEAD branch'
+# usage: sub_branch <submodule-path>  → prints that submodule's default branch
+sub_branch() {
+  local name
+  name=$(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' \
+    | awk -v p="$1" '$2==p {n=$1; sub(/^submodule\./,"",n); sub(/\.path$/,"",n); print n}')
+  # Fall back to the submodule remote's HEAD when .gitmodules has no branch
+  git config -f .gitmodules "submodule.$name.branch" \
+    || git -C "$1" symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||'
+}
+```
+
+If the fallback fails because `origin/HEAD` is not set locally, run `git -C {submodule-path} remote set-head origin --auto` or read it with `git -C {submodule-path} remote show origin | grep 'HEAD branch'`.
+
+Also record the **parent repo's** default branch — never assume `main`:
+```bash
+PARENT_DEFAULT=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||')
 ```
 
 ### Step 3: Detect project methodology
@@ -46,6 +58,7 @@ git remote show origin | grep 'HEAD branch'
 After discovery, the agent knows:
 - All submodule names and paths
 - Each submodule's default branch
+- The parent repo's default branch
 - Whether BMAD is in use
 - The submodule directory prefix (commonly `services/`)
 
@@ -75,8 +88,8 @@ A typical multi-repo project looks like this:
 Services may track different default branches — always look up the correct one before branching:
 
 ```bash
-# Get a service's default branch (always use this — never assume)
-git config -f .gitmodules submodule."{submodule-path}".branch
+# Get a service's default branch (always use this — never assume; see sub_branch in Discovery Step 2)
+sub_branch {submodule-path}
 ```
 
 Different services in the same project often use different default branches (e.g., `develop`, `dev`, `main`). The only reliable source of truth is `.gitmodules`.
@@ -151,17 +164,17 @@ BRANCH_NAME="feat/${STORY_KEY}"
 
 **Step 3: Create branches in all affected services**
 ```bash
-# For each affected service (replace with actual discovered service names):
-for SERVICE in auth-service scheduler-service; do
-  DEFAULT_BRANCH=$(git config -f .gitmodules submodule."services/$SERVICE".branch)
-  cd services/$SERVICE
-  git checkout $DEFAULT_BRANCH
-  git pull origin $DEFAULT_BRANCH
-  git checkout -b $BRANCH_NAME
-  git push -u origin $BRANCH_NAME
-  cd ../..
+# Loop over the affected submodule *paths* discovered in Step 1
+# (the two paths below are placeholders — substitute the real ones):
+for SUB_PATH in services/auth-service services/scheduler-service; do
+  DEFAULT_BRANCH=$(sub_branch "$SUB_PATH")
+  git -C "$SUB_PATH" checkout "$DEFAULT_BRANCH"
+  git -C "$SUB_PATH" pull origin "$DEFAULT_BRANCH"
+  git -C "$SUB_PATH" checkout -b "$BRANCH_NAME"
 done
 ```
+
+Branches are created **locally only**. Push them when the user asks or when the work is ready for review (see Completing a Story) — pushing an empty branch can trigger CI and clutters the remote.
 
 Use the **same branch name** across all affected services for traceability. This makes it easy to find all changes related to a story across the system.
 
@@ -173,28 +186,25 @@ git submodule foreach --quiet 'BRANCH=$(git branch --show-current); echo "$(base
 
 ### During Story Implementation
 
-**Committing changes** — always commit inside the service directory:
+**Committing changes** — always commit inside the service repo, not the parent:
 ```bash
-cd services/{service-name}
-git add {specific-files}
-git commit -m "feat({scope}): add validation for booking dates
+git -C {submodule-path} add {specific-files}
+git -C {submodule-path} commit -m "feat({scope}): add validation for booking dates
 
 Story: {story-key}"
 ```
 
-**Working across multiple services** — commit in each separately:
+**Working across multiple services** — commit in each separately (paths are examples; use the discovered ones):
 ```bash
 # Service A
-cd services/auth-service
-git add src/auth/jwt.service.ts src/auth/jwt.service.spec.ts
-git commit -m "feat(auth): add JWT validation endpoint
+git -C services/auth-service add src/auth/jwt.service.ts src/auth/jwt.service.spec.ts
+git -C services/auth-service commit -m "feat(auth): add JWT validation endpoint
 
 Story: 1-2-user-authentication"
 
 # Service B
-cd ../bff-service
-git add src/middleware/auth.middleware.ts
-git commit -m "feat(middleware): add JWT auth middleware
+git -C services/bff-service add src/middleware/auth.middleware.ts
+git -C services/bff-service commit -m "feat(middleware): add JWT auth middleware
 
 Story: 1-2-user-authentication"
 ```
@@ -206,19 +216,13 @@ All commits must follow the **Commit Message Format** section below — this is 
 When story is ready for review:
 
 **Step 1: Run quality checks in each affected service**
-```bash
-cd services/{service-name}
-npm run lint
-npm run format
-npm run typecheck
-npm test
-```
+
+Run each repo's **own** lint / format / typecheck / test commands — services in one project often use different stacks. Find them in the service's `package.json` scripts, `Makefile`, `pyproject.toml`, or its CI workflow (`.github/workflows/*.yml`), and run them from inside `{submodule-path}`. Don't guess commands the repo doesn't define.
 
 **Step 2: Push each service's feature branch**
 ```bash
 # Push services first — always before parent
-cd services/{service-name}
-git push origin feat/{story-key}
+git -C {submodule-path} push -u origin feat/{story-key}
 ```
 
 **Step 3: Create PR per service**
@@ -230,13 +234,12 @@ PR body should reference the story: `Story: {epic_num}.{story_num} - {title}`
 **Step 4: After PRs are merged, update parent**
 ```bash
 # For each merged service:
-cd services/{service-name}
-git checkout {default-branch}
-git pull origin {default-branch}
-cd ../..
+DEFAULT_BRANCH=$(sub_branch {submodule-path})
+git -C {submodule-path} checkout "$DEFAULT_BRANCH"
+git -C {submodule-path} pull origin "$DEFAULT_BRANCH"
 
-# Update parent pointers (use actual discovered service paths)
-git add services/auth-service services/bff-service
+# Update parent pointers (use the actual discovered submodule paths)
+git add {submodule-path-1} {submodule-path-2}
 git commit -m "chore: update submodule pointers after story {story-key}
 
 Services updated:
@@ -454,20 +457,20 @@ Services updated:
 For ad-hoc work not tied to a BMAD story:
 
 ```bash
-DEFAULT_BRANCH=$(git config -f .gitmodules submodule."{submodule-path}".branch)
-cd {submodule-path}
-git checkout $DEFAULT_BRANCH
-git pull origin $DEFAULT_BRANCH
-git checkout -b feat/{TICKET-ID}-{description}
-git push -u origin feat/{TICKET-ID}-{description}
+DEFAULT_BRANCH=$(sub_branch {submodule-path})
+git -C {submodule-path} checkout "$DEFAULT_BRANCH"
+git -C {submodule-path} pull origin "$DEFAULT_BRANCH"
+git -C {submodule-path} checkout -b feat/{TICKET-ID}-{description}
+# Local only — push with `git -C {submodule-path} push -u origin <branch>`
+# when the user asks or the work is ready for review.
 ```
 
 ### Sync All Submodules
 
 ```bash
-# Pull parent and update all submodule pointers
-git pull origin main
-git submodule update --recursive
+# Pull parent (its own default branch, from Discovery) and update all submodule pointers
+git pull origin "$PARENT_DEFAULT"
+git submodule update --init --recursive
 
 # OR: Pull latest from each submodule's tracked branch
 git submodule foreach 'git pull origin $(git config -f $toplevel/.gitmodules submodule.$name.branch)'
@@ -484,10 +487,9 @@ git submodule foreach --quiet \
 ### Switch Service Back to Default Branch
 
 ```bash
-DEFAULT_BRANCH=$(git config -f .gitmodules submodule."{submodule-path}".branch)
-cd {submodule-path}
-git checkout $DEFAULT_BRANCH
-git pull origin $DEFAULT_BRANCH
+DEFAULT_BRANCH=$(sub_branch {submodule-path})
+git -C {submodule-path} checkout "$DEFAULT_BRANCH"
+git -C {submodule-path} pull origin "$DEFAULT_BRANCH"
 ```
 
 ## CI/CD Awareness
@@ -517,3 +519,4 @@ These rules prevent common mistakes in multi-repo systems:
 8. **Update sprint-status.yaml** when git operations change story state (branch created → `in-progress`, pushed for review → `review`) — only if using BMAD
 9. **Never add `Co-Authored-By` trailers for AI agents** in commit messages — no Claude, Copilot, or any AI attribution. These pollute changelogs and git history. Commit messages must contain only the conventional commit structure (type, scope, description, body, footers for breaking changes/story refs)
 10. **All commit messages must be Conventional Commits format** — release-please depends on this for automated versioning and changelog generation. A malformed commit message can cause missed releases or incorrect version bumps
+11. **Create branches locally; push only when asked or ready for review** — never push a new branch as part of branch creation
