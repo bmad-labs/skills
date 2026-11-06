@@ -15,9 +15,10 @@ run brainstorm first** — generating from a fuzzy idea produces slides nobody a
 
 **First, resolve the design system** (if brainstorm didn't already). Run this flow **in
 order**, stop at the first branch that applies:
-1. **User's own design system / brand tokens** → map colors/type/spacing into
-   `design-system/themes/clean-light.css` (or a new theme the entry point imports). Layouts
-   never change; only the theme's token *values* do.
+1. **User's own design system / brand tokens** → map colors/type/spacing into the deck's
+   own copy, `./slides/<deck-name>/design-system/themes/clean-light.css` (or a new theme that
+   copy's `styles.css` imports), after the copy step below. Never edit the skill's
+   `<skill>/design-system/`. Layouts never change; only the theme's token *values* do.
 2. **Else, a design-system skill already installed** (for example `ui-ux-pro-max`) → invoke
    it to suggest a best-fit design system, then map that into the theme file.
 3. **Else, use the bundled `clean-light` theme** — the guaranteed floor. Never clone,
@@ -28,12 +29,17 @@ values into it, never hardcode a hex/font into a layout.
 
 **Then, confirm where the deck should live.** Default output dir `./slides/<deck-name>/`
 in the user's project, exports under `.../export/`. **Copy the `deck-template/` scaffold to
-that location — NOT into the skill directory** (the skill's `deck-template/` is a pristine
-template; the working copy lives in the user's project, so decks coexist and the install
-stays clean). The scripts travel inside the copy; you never hand-build the harness.
+that location — NOT into the skill directory — together with the design system** (the
+skill's `deck-template/` and `design-system/` are pristine; the working copies live in the
+user's project, so decks coexist, each with its own theme, and the install stays clean).
+The scripts travel inside the copy; you never hand-build the harness. The deck's
+`src/index.css` imports `@ds/styles.css`, and `vite.config.js` points `@ds` at the deck's
+own `./design-system/`.
 
 ```bash
-cp -r <skill>/deck-template ./slides/<deck-name> && cd ./slides/<deck-name> && npm install
+cp -r <skill>/deck-template ./slides/<deck-name>
+cp -r <skill>/design-system ./slides/<deck-name>/design-system
+cd ./slides/<deck-name> && npm install
 npx playwright install chromium      # once, for review + export
 ```
 Full template tour: [deck-template.md](../deck-template.md).

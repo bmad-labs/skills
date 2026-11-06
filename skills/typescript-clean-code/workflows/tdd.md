@@ -108,7 +108,7 @@ class Stack {
 - [ ] Run tests after EVERY change
 - [ ] All tests still pass
 
-**Reference**: `refactoring.md` workflow
+**Reference**: `workflows/refactoring/workflow.md`
 
 **Common Mistakes**:
 - Refactoring without running tests

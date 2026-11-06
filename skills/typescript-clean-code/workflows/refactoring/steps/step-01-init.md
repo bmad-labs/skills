@@ -14,6 +14,8 @@ Set up the refactoring session: identify the target code, verify tests pass, set
 
 ### 1. Ask the User
 
+**Fast path**: for a small refactoring (one function or one file), skip the output-path question, use `./refactoring-log-{{date}}.md`, and skip the `[C]` gates (see `workflow.md` → Fast Path).
+
 Ask the user:
 - **What code to refactor?** (file path, module, or class)
 - **What's the improvement goal?** (what smell to fix, what to clean up)

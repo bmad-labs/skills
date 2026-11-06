@@ -31,7 +31,7 @@ volumes:
 #!/bin/bash
 # scripts/wait-for-redis.sh
 
-until docker-compose -f docker-compose.e2e.yml exec redis-e2e redis-cli ping; do
+until docker compose -f docker-compose.e2e.yml exec redis-e2e redis-cli ping; do
   echo "Waiting for Redis..."
   sleep 1
 done

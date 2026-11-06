@@ -1,5 +1,28 @@
 # Node/TypeScript MCP Server Implementation Guide
 
+## Contents
+
+- [Overview](#overview)
+- [Quick Reference](#quick-reference)
+- [MCP TypeScript SDK](#mcp-typescript-sdk)
+- [Server Naming Convention](#server-naming-convention)
+- [Project Structure](#project-structure)
+- [Tool Implementation](#tool-implementation)
+- [Zod Schemas for Input Validation](#zod-schemas-for-input-validation)
+- [Response Format Options](#response-format-options)
+- [Pagination Implementation](#pagination-implementation)
+- [Character Limits and Truncation](#character-limits-and-truncation)
+- [Error Handling](#error-handling)
+- [Shared Utilities](#shared-utilities)
+- [Async/Await Best Practices](#asyncawait-best-practices)
+- [TypeScript Best Practices](#typescript-best-practices)
+- [Package Configuration](#package-configuration)
+- [Complete Example](#complete-example)
+- [Advanced MCP Features](#advanced-mcp-features)
+- [Code Best Practices](#code-best-practices)
+- [Building and Running](#building-and-running)
+- [Quality Checklist](#quality-checklist)
+
 ## Overview
 
 This document provides Node/TypeScript-specific best practices and examples for implementing MCP servers using the MCP TypeScript SDK. It covers project structure, server setup, tool registration patterns, input validation with Zod, error handling, and complete working examples.

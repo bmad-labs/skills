@@ -7,4 +7,5 @@ document_output_language: English
 user_skill_level: intermediate
 planning_artifacts: "{project-root}/docs"
 output_folder: "{project-root}/docs"
+project_knowledge: "{project-root}/docs"
 date: "auto"

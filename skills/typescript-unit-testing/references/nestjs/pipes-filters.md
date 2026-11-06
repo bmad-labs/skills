@@ -1,5 +1,19 @@
 # Pipe and Filter Testing Patterns
 
+## Contents
+
+- [Pipe Testing](#pipe-testing)
+  - [Standard Pipe Test Template](#standard-pipe-test-template)
+  - [Testing Validation Pipe](#testing-validation-pipe)
+  - [Testing Parse Pipes](#testing-parse-pipes)
+  - [Testing Transformation Pipe](#testing-transformation-pipe)
+- [Exception Filter Testing](#exception-filter-testing)
+  - [Standard Filter Test Template](#standard-filter-test-template)
+  - [Testing HTTP Exception Filter](#testing-http-exception-filter)
+  - [Testing Custom Exception Filter](#testing-custom-exception-filter)
+  - [Testing All Exceptions Filter](#testing-all-exceptions-filter)
+  - [Testing WebSocket Exception Filter](#testing-websocket-exception-filter)
+
 ## Pipe Testing
 
 ### Standard Pipe Test Template

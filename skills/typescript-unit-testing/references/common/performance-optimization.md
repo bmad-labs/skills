@@ -1,5 +1,21 @@
 # Jest Performance Optimization
 
+## Contents
+
+- [Quick Wins](#quick-wins)
+- [Worker Configuration](#worker-configuration)
+- [Jest Configuration](#jest-configuration)
+- [Barrel File Optimization](#barrel-file-optimization)
+- [Test Isolation Optimization](#test-isolation-optimization)
+- [Timer Optimization](#timer-optimization)
+- [Transform Optimization](#transform-optimization)
+- [CI Optimization](#ci-optimization)
+- [Memory Optimization](#memory-optimization)
+- [Identifying Slow Tests](#identifying-slow-tests)
+- [Performance Checklist](#performance-checklist)
+- [Quick Diagnosis](#quick-diagnosis)
+- [References](#references)
+
 ## Quick Wins
 
 | Optimization | Typical Improvement | Effort |

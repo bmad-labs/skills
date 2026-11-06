@@ -78,9 +78,9 @@ Based on results, recommend next workflow:
 | Result | Recommended Workflow |
 |--------|---------------------|
 | All pass | None required |
-| Failures found | `debugging-unit-test.md` |
-| Low coverage | `writing-unit-test.md` |
-| Slow tests | `optimizing-unit-test.md` |
+| Failures found | `workflows/debugging/workflow.md` |
+| Low coverage | `workflows/writing/workflow.md` |
+| Slow tests | `workflows/optimizing/workflow.md` |
 
 ### 4. Troubleshooting Quick Reference
 

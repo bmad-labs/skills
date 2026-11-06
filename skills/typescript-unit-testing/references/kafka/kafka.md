@@ -1,5 +1,24 @@
 # NestJS Kafka Unit Testing Patterns
 
+## Contents
+
+- [Overview](#overview)
+- [When to Use](#when-to-use)
+- [Key Libraries](#key-libraries)
+- [Standard Producer Service Test Template](#standard-producer-service-test-template)
+- [Testing Producer emit() (Fire-and-Forget)](#testing-producer-emit-fire-and-forget)
+- [Testing Producer send() (Request-Response)](#testing-producer-send-request-response)
+- [Testing @MessagePattern Handlers](#testing-messagepattern-handlers)
+- [Testing @EventPattern Handlers](#testing-eventpattern-handlers)
+- [Testing with @Payload and @Ctx Decorators](#testing-with-payload-and-ctx-decorators)
+- [Testing ClientProxy (Custom Kafka Client)](#testing-clientproxy-custom-kafka-client)
+- [Testing Batch Operations](#testing-batch-operations)
+- [Testing Serialization](#testing-serialization)
+- [Testing Error Handling](#testing-error-handling)
+- [Testing Module Registration](#testing-module-registration)
+- [Best Practices](#best-practices)
+- [Common Patterns Quick Reference](#common-patterns-quick-reference)
+
 ## Overview
 
 Unit testing Kafka producers and consumers using `@nestjs/microservices` ClientKafka/ClientProxy by mocking the Kafka client without real connections.

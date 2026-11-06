@@ -110,6 +110,5 @@ API E2E testing focuses on verifying HTTP endpoints, request/response handling, 
 |------|---------|
 | [rules.md](rules.md) | API-specific testing rules |
 | [test-helper.md](test-helper.md) | AuthTestHelper implementation |
-| [rest-examples.md](rest-examples.md) | REST API test examples |
-| [graphql-examples.md](graphql-examples.md) | GraphQL test examples |
+| [examples.md](examples.md) | REST and GraphQL test examples (GraphQL under "GraphQL Testing") |
 | [mocking.md](mocking.md) | External API mocking examples |

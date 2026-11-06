@@ -141,12 +141,12 @@
     {
       "id": 11,
       "prompt": "Pull PROJ-123, then set its status to Done since I've finished it.",
-      "expected_output": "Should pull, then decline the transition and route to atlassian-rest. This skill only reads.",
+      "expected_output": "Should pull, then decline the transition and say this skill only reads.",
       "files": [],
       "expectations": [
         "Completes the pull",
         "Declines to transition the issue",
-        "Names atlassian-rest as the skill for writes",
+        "Declines the write and says this skill only reads",
         "Does not attempt a POST or PUT to any Jira endpoint",
         "States the boundary in a sentence without moralising"
       ]

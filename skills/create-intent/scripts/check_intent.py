@@ -1,7 +1,13 @@
 """Consistency checks for an intent document set.
 
 Usage: python3 check_intent.py <doc-folder>
-Exit 0 when clean, 1 when any finding is printed.
+       python3 check_intent.py -h | --help
+
+Checks intent.md, fr.md, nfr.md and memlog.md (plus confirm-po.md,
+confirm-tech.md and states.md when present) for consistency.
+
+Exit 0 when clean, 1 when any finding is printed, 2 on a usage error or a
+folder that does not exist.
 """
 import re
 import sys
@@ -120,10 +126,20 @@ def check_duplicate_headings(docs):
 
 
 def main():
-    if len(sys.argv) != 2:
-        print(__doc__)
+    args = sys.argv[1:]
+    if any(arg in ("-h", "--help") for arg in args):
+        print(__doc__.strip())
+        return 0
+    if len(args) != 1:
+        print(__doc__.strip(), file=sys.stderr)
         return 2
-    folder = Path(sys.argv[1])
+    folder = Path(args[0])
+    if not folder.exists():
+        print(f"ERROR: doc folder not found: {folder}", file=sys.stderr)
+        return 2
+    if not folder.is_dir():
+        print(f"ERROR: not a folder: {folder}", file=sys.stderr)
+        return 2
     names = ["intent.md", "fr.md", "nfr.md", "memlog.md", "confirm-po.md", "confirm-tech.md", "states.md"]
     docs = {name: read(folder, name) for name in names}
     for required in ("intent.md", "fr.md", "nfr.md", "memlog.md"):

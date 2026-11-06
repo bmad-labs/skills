@@ -1,5 +1,25 @@
 # Python MCP Server Implementation Guide
 
+## Contents
+
+- [Overview](#overview)
+- [Quick Reference](#quick-reference)
+- [MCP Python SDK and FastMCP](#mcp-python-sdk-and-fastmcp)
+- [Server Naming Convention](#server-naming-convention)
+- [Tool Implementation](#tool-implementation)
+- [Pydantic v2 Key Features](#pydantic-v2-key-features)
+- [Response Format Options](#response-format-options)
+- [Pagination Implementation](#pagination-implementation)
+- [Error Handling](#error-handling)
+- [Shared Utilities](#shared-utilities)
+- [Async/Await Best Practices](#asyncawait-best-practices)
+- [Type Hints](#type-hints)
+- [Tool Docstrings](#tool-docstrings)
+- [Complete Example](#complete-example)
+- [Advanced FastMCP Features](#advanced-fastmcp-features)
+- [Code Best Practices](#code-best-practices)
+- [Quality Checklist](#quality-checklist)
+
 ## Overview
 
 This document provides Python-specific best practices and examples for implementing MCP servers using the MCP Python SDK. It covers server setup, tool registration patterns, input validation with Pydantic, error handling, and complete working examples.

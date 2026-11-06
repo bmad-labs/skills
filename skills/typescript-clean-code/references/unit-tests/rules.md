@@ -2,6 +2,9 @@
 
 Rules for writing clean, maintainable unit tests that enable confident refactoring.
 
+These rules are framework-neutral. For Jest/NestJS mechanics and naming conventions,
+see the typescript-unit-testing skill.
+
 ## Core Rules
 
 ### 1. Three Laws of TDD
@@ -78,8 +81,8 @@ Test one concept per test function.
 
 Keep assertions focused on the concept being tested.
 
-- One assert per test is a good guideline (not strict rule)
-- Multiple asserts are acceptable if testing same concept
+- Verify one behaviour per test, not one `expect` per test
+- Multiple asserts are fine when they check the same behaviour (e.g. the result and the call it caused)
 - Avoid unrelated assertions in same test
 - Create domain-specific assertion helpers
 
@@ -102,8 +105,7 @@ Less strict recommendations:
 - Build a domain-specific testing language over time
 - Refactor tests to be more expressive as patterns emerge
 - Efficiency trade-offs are acceptable in test code
-- Use Given-When-Then naming convention for clarity
-- Name tests to describe the behavior being verified
+- Name tests to describe the behavior being verified and the condition it holds under
 
 ## Exceptions
 

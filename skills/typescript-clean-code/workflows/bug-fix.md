@@ -2,6 +2,16 @@
 
 Debugging and fixing bugs cleanly with test coverage.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Prerequisites](#prerequisites)
+- [The Golden Rule](#the-golden-rule)
+- [Workflow Steps](#workflow-steps)
+- [Quick Checklist](#quick-checklist)
+- [Debugging Tips](#debugging-tips)
+- [Exit Criteria](#exit-criteria)
+
 ## When to Use
 
 - Fixing reported bugs
@@ -14,7 +24,7 @@ Debugging and fixing bugs cleanly with test coverage.
 - Access to the codebase
 - Test framework available
 
-**Reference**: `tdd/rules.md`, `coding-practices/rules.md`, `refactoring.md`
+**Reference**: `tdd/rules.md`, `coding-practices/rules.md`, `workflows/refactoring/workflow.md`
 
 ---
 
@@ -213,7 +223,7 @@ it('should handle special characters in CSV export', () => {
 
 **Goal**: Clean up while tests are green.
 
-**Reference**: `refactoring.md` workflow
+**Reference**: `workflows/refactoring/workflow.md`
 
 - [ ] Is the fix clean?
 - [ ] Could the code be clearer?

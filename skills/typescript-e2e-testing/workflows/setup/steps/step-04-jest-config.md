@@ -30,8 +30,7 @@ Create `test/jest-e2e.config.ts` with:
 - `testTimeout: 25000`
 - `maxWorkers: 1` (CRITICAL for E2E isolation)
 - `setupFilesAfterEnv` if needed
-- `forceExit: true`
-- `detectOpenHandles: true`
+- `detectOpenHandles: true` (do not add `forceExit: true` by default — it hides open handles instead of fixing them)
 
 ### 2. Update package.json
 

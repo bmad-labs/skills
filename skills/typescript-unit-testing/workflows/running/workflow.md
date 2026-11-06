@@ -16,6 +16,14 @@ Execute unit tests effectively with proper configuration, filtering, and result 
 - Checking test coverage against thresholds
 - Diagnosing setup failures and timeouts
 
+## Fast Path
+
+For a plain "run the tests" request, skip the report and the `[C]` gates: set the
+session ID (`export UT_SESSION=$(date +%s)-$$`), run the requested scope with output redirected to
+`/tmp/ut-${UT_SESSION}-output.log`, read the summary and failures from that file, and summarise the
+result in chat. Use the full step flow below only when the user asks for an execution
+report.
+
 ## Step-File Architecture
 
 This workflow uses a **step-file architecture** for context-safe execution:
@@ -40,7 +48,7 @@ This workflow uses a **step-file architecture** for context-safe execution:
 
 1. **Load one step at a time** - Read the step file, execute it, then load the next
 2. **Update frontmatter after each step** - Add the step number to `stepsCompleted`
-3. **Wait for user confirmation** - Present findings and wait for `[C]` before proceeding
+3. **Wait for user confirmation** - Present findings and wait for `[C]` before proceeding (skipped on the fast path)
 4. **NEVER run full suite repeatedly** - When debugging failures, fix one test at a time using `-t "test name"`
 5. **ALWAYS output to temp files** - Redirect all test output to `/tmp/ut-${UT_SESSION}-*.log` files, never to console directly
 

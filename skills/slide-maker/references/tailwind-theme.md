@@ -103,11 +103,15 @@ export default {
 ## Fonts
 
 On-screen the deck uses a **system font stack** (`--font-sans` — no network fetch).
-Link the design system's stylesheet so the tokens (including `--font-*`) are in scope:
+Link the design system's stylesheet so the tokens (including `--font-*`) are in scope.
+The deck template does this in `src/index.css` through the `@ds` Vite alias (the deck's
+own `./design-system/`, see `vite.config.js`):
 
 ```css
-@import url('../design-system/styles.css');   /* pulls tokens + the active theme */
+@import "@ds/styles.css";   /* pulls tokens + the active theme */
 ```
+
+Outside the deck template, use a relative path to wherever `design-system/` lives.
 
 If the active design system supplies its own webfont, add its `@import` (or `<link>`)
 and point `--font-sans` / `--font-display` at it inside the theme file — never in the

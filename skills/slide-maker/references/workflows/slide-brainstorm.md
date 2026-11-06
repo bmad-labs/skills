@@ -22,8 +22,10 @@ from hardcoded values. Before brainstorming content, resolve which design system
 those tokens. Run this flow **in order** and stop at the first branch that applies:
 
 1. **Ask the user if they have their own design system / brand tokens.** If yes → map its
-   colors/type/spacing into `design-system/themes/clean-light.css` (or a new theme file the
-   entry point imports). Layouts never change; only the theme's token *values* do.
+   colors/type/spacing onto the token contract and record the mapping. It is written into
+   the deck's own copy, `./slides/<deck-name>/design-system/themes/clean-light.css`, when
+   [slide-generate](slide-generate.md) scaffolds the deck — never into the skill's
+   `<skill>/design-system/`. Layouts never change; only the theme's token *values* do.
 2. **Else, if a design-system skill is already installed** (for example `ui-ux-pro-max`),
    invoke it to suggest the best-fit design system for the deck's content/idea, then map
    that into the theme file.

@@ -1,6 +1,6 @@
 # Lint one-liners and tooling pitfalls
 
-Run from `docs/wiki/`. These are checks, not generators. Do not commit them inside the wiki.
+Run from the wiki root (default `docs/wiki/`; paths below assume raw at `../references/`). These are checks, not generators. Do not commit them inside the wiki.
 
 ```bash
 # counts
@@ -29,9 +29,11 @@ grep -c '→' concepts/*.md sources/*.md syntheses/*.md index.md | grep -v ':0'
 ext_block() { awk '/^ *\$\$.*\$\$ *$/{next} /^ *\$\$/{if(in_){print blk; in_=0; blk=""} else {in_=1}; next} in_{gsub(/[ \t]+/,""); blk=blk $0}' "$1"; }
 ext_line()  { grep -E '^ *\$\$.*\$\$ *$' "$1" | tr -d ' \t'; }   # tr, not sed: macOS sed reads [ \t] as space, backslash, t
 ext() { ext_block "$1"; ext_line "$1"; }
-for r in ../references/<source-folder>/0*.md; do ext "$r"; done | sort -u > /tmp/raw_eq.txt
-for f in */*.md; do ext "$f"; done | sort -u > /tmp/wiki_eq.txt
-comm -13 /tmp/raw_eq.txt /tmp/wiki_eq.txt     # must be empty
+raw_eq=$(mktemp); wiki_eq=$(mktemp)
+for r in ../references/<source-folder>/0*.md; do ext "$r"; done | sort -u > "$raw_eq"
+for f in */*.md; do ext "$f"; done | sort -u > "$wiki_eq"
+comm -13 "$raw_eq" "$wiki_eq"     # must be empty
+rm -f "$raw_eq" "$wiki_eq"
 
 # every copy of a source table: grep a distinctive cell, count rows per file
 grep -l '<distinctive cell value>' */*.md | while read f; do grep -c '<cell1>\|<cell2>\|<cell3>' "$f" | xargs printf "  %s %s\n" "$f"; done

@@ -25,7 +25,7 @@ Before starting, load and read:
 
 ```bash
 # Check infrastructure
-docker-compose -f docker-compose.e2e.yml ps
+docker compose -f docker-compose.e2e.yml ps
 
 # Check specific service logs (limited output)
 docker logs postgres-e2e --tail 50

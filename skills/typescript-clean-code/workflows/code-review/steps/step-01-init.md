@@ -14,6 +14,8 @@ Set up the code review session: identify the target code, set the output path fo
 
 ### 1. Ask the User
 
+**Fast path**: for a small review (one file or a short diff), skip the output-path question, use `./code-review-report-{{date}}.md`, and skip the `[C]` gates (see `workflow.md` → Fast Path).
+
 Ask the user:
 - **What code to review?** (file path, module, or directory)
 - **Output path** for the review report (suggest a default: `./code-review-report-{{date}}.md`)

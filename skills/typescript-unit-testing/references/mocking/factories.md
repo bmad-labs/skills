@@ -1,5 +1,17 @@
 # Test Data Factory Patterns
 
+## Contents
+
+- [Why Use Factories?](#why-use-factories)
+- [Pattern 1: Simple Factory Functions](#pattern-1-simple-factory-functions)
+- [Pattern 2: Factory with Counter](#pattern-2-factory-with-counter)
+- [Pattern 3: Factory with Builder Pattern](#pattern-3-factory-with-builder-pattern)
+- [Pattern 4: Related Entity Factories](#pattern-4-related-entity-factories)
+- [Pattern 5: DTO Factories](#pattern-5-dto-factories)
+- [Pattern 6: Mock Response Factories](#pattern-6-mock-response-factories)
+- [Factory Organization](#factory-organization)
+- [Best Practices](#best-practices)
+
 ## Why Use Factories?
 
 - **DRY**: Avoid repeating test data creation

@@ -1,5 +1,20 @@
 # Redis Unit Testing Patterns
 
+## Contents
+
+- [Overview](#overview)
+- [When to Use](#when-to-use)
+- [Key Libraries](#key-libraries)
+- [Standard Cache Service Test Template](#standard-cache-service-test-template)
+- [Testing Cache Operations](#testing-cache-operations)
+- [Testing Graceful Degradation](#testing-graceful-degradation)
+- [Testing Health Checks](#testing-health-checks)
+- [Testing Cache Key Patterns](#testing-cache-key-patterns)
+- [Testing Cache-Aside Pattern](#testing-cache-aside-pattern)
+- [Testing TTL with Jitter](#testing-ttl-with-jitter)
+- [Testing Pub/Sub (if applicable)](#testing-pubsub-if-applicable)
+- [Best Practices](#best-practices)
+
 ## Overview
 
 Unit testing Redis cache operations, health checks, and pub/sub by mocking the Redis client without real connections.

@@ -59,7 +59,7 @@ grep -i "error\|fail\|exception" /tmp/e2e-${E2E_SESSION}-output.log
 tail -100 logs/e2e-test.log
 
 # View Docker logs (last 50 lines per service)
-docker-compose -f docker-compose.e2e.yml logs --tail=50
+docker compose -f docker-compose.e2e.yml logs --tail=50
 ```
 
 ### 4. Debug if Needed

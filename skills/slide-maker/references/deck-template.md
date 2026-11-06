@@ -43,6 +43,9 @@ It matches the `slides-generator` stack (same vite configs, `slide-page` /
 ```
 deck-template/
   package.json  vite.config.js  vite.standalone.config.js  postcss.config.js
+                                  ← vite.config.js defines the `@ds` alias: ./design-system if the
+                                    deck has its own copy (scaffolded decks), else ../design-system
+                                    (the template previewed inside the skill)
   tailwind.config.js              ← the token-driven theme (maps CSS vars: accent, ink, surface, …)
   index.html                      ← uses the system font stack (edit-mode is loaded by App.jsx, dev-only)
   public/edit-mode/                ← the feedback overlay (dev only): edit-mode.js,

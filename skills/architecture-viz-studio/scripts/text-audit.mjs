@@ -11,7 +11,7 @@
    hits "I can't select that text".
 
    USAGE
-     node text-audit.mjs <url>            (default http://localhost:8800/)
+     node text-audit.mjs <url>            (default http://127.0.0.1:8800/)
    Exits non-zero if any untagged text leaf is found.
 
    Requires Playwright (npm i -D @playwright/test && npx playwright install chromium).
@@ -19,7 +19,7 @@
 
 import { chromium } from '@playwright/test';
 
-const url = process.argv[2] || 'http://localhost:8800/';
+const url = process.argv[2] || 'http://127.0.0.1:8800/';
 
 const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader-webgl', '--enable-unsafe-swiftshader'],

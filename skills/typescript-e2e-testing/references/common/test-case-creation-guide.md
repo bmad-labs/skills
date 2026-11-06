@@ -1,5 +1,26 @@
 # E2E Test Case Creation Guide
 
+## Contents
+
+- [GWT Pattern (Given-When-Then)](#gwt-pattern-given-when-then)
+  - [GWT Rules](#gwt-rules)
+- [Test Case Templates](#test-case-templates)
+  - [REST API Success](#rest-api-success)
+  - [REST API Validation Error](#rest-api-validation-error)
+  - [REST API Not Found](#rest-api-not-found)
+  - [Database Query with Pagination](#database-query-with-pagination)
+  - [Kafka Event Processing](#kafka-event-processing)
+  - [Kafka Event with Output Topic](#kafka-event-with-output-topic)
+  - [External API Mock](#external-api-mock)
+  - [Authentication Flow](#authentication-flow)
+- [Test Naming Conventions](#test-naming-conventions)
+  - [Format](#format)
+  - [Examples by Category](#examples-by-category)
+- [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
+  - [Multiple WHEN Actions](#multiple-when-actions)
+  - [Conditional Assertions](#conditional-assertions)
+  - [Missing Specific Assertions](#missing-specific-assertions)
+
 ## GWT Pattern (Given-When-Then)
 
 **CRITICAL**: ALL E2E tests MUST follow GWT pattern with explicit comments.

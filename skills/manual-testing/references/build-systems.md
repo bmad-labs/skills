@@ -73,7 +73,7 @@ docker compose ps
 
 **When `--force-recreate` matters.** Without it, `docker compose up -d` keeps running containers whose image was just rebuilt underneath them. The stale container continues serving the old code. Always pair rebuild with `--force-recreate` for the services you rebuilt.
 
-**Shared volumes.** If your containers mount named volumes (e.g., for a vault directory), rebuilding images does not wipe the volume. That's usually correct — but if a test expects a clean slate, either add cleanup commands or use `docker compose down -v` at the start of the run.
+**Shared volumes.** If your containers mount named volumes (e.g., for a data directory), rebuilding images does not wipe the volume. That's usually correct — but if a test expects a clean slate, either add cleanup commands or use `docker compose down -v` at the start of the run.
 
 ## Plain Docker (no compose)
 

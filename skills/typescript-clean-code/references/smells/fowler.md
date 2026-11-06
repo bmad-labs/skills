@@ -2,6 +2,15 @@
 
 A second smell layer, distinct from the Martin catalog in `rules.md`.
 
+## Contents
+
+- [Why this layer exists](#why-this-layer-exists)
+- [How to use it](#how-to-use-it)
+- [Severity default](#severity-default)
+- [The twelve](#the-twelve)
+- [Quick checklist](#quick-checklist)
+- [Provenance](#provenance)
+
 ## Why this layer exists
 
 The catalog in `rules.md` is organized **per line and per function**: is this name

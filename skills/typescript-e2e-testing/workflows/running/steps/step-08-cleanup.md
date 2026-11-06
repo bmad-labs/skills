@@ -14,7 +14,7 @@ Clean up after test run.
 ### 1. Stop Docker if Not Needed
 
 ```bash
-docker-compose -f docker-compose.e2e.yml down
+docker compose -f docker-compose.e2e.yml down
 ```
 
 ### 2. Delete Tracking Files

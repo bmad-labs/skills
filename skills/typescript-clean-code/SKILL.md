@@ -63,9 +63,11 @@ demonstrated reasoning over the number:
 
 ## Workflows
 
-Load the `workflow.md`, then its step files in order. Each step names the references
-it needs and updates `stepsCompleted` in the output document's frontmatter, so a
-compacted context resumes from the last completed step via `step-01b-continue.md`.
+Load the workflow file and follow it. Only `code-review`, `pr-review`, and
+`refactoring` are folders with step files: load their `workflow.md`, then the steps in
+order. Each step names the references it needs and updates `stepsCompleted` in the
+output document's frontmatter, so a compacted context resumes from the last completed
+step via `step-01b-continue.md`. The other workflows are single files.
 
 | Workflow | For |
 |----------|-----|
@@ -97,4 +99,4 @@ the design problem it names, not the metric that pointed at it. Where a referenc
 contradicts your general knowledge, the reference wins: it carries this skill's
 TypeScript adaptations and thresholds.
 
-`guidelines.md` maps symptom → reference file and task → workflow.
+`references/index.md` maps symptom → reference file.

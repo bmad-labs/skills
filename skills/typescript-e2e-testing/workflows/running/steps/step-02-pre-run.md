@@ -19,7 +19,7 @@ Ensure environment is ready for E2E tests.
 docker info
 
 # Check if E2E services are up
-docker-compose -f docker-compose.e2e.yml ps
+docker compose -f docker-compose.e2e.yml ps
 ```
 
 ### 2. Start Infrastructure if Needed
@@ -28,10 +28,10 @@ docker-compose -f docker-compose.e2e.yml ps
 # Start E2E Docker services
 npm run docker:e2e
 # OR
-docker-compose -f docker-compose.e2e.yml up -d
+docker compose -f docker-compose.e2e.yml up -d
 
 # Wait for services to be healthy
-docker-compose -f docker-compose.e2e.yml ps
+docker compose -f docker-compose.e2e.yml ps
 ```
 
 ### 3. Verify Service Health

@@ -191,7 +191,7 @@ class UserExporter {
 
 **Goal**: Self-review before considering "done".
 
-**Reference**: `functions/checklist.md`, `code-review.md` workflow
+**Reference**: `functions/checklist.md`, `workflows/code-review/workflow.md`
 
 - [ ] All acceptance tests pass
 - [ ] Unit test coverage is adequate
@@ -208,7 +208,7 @@ class UserExporter {
 
 **Goal**: Polish the implementation.
 
-**Reference**: `refactoring.md` workflow
+**Reference**: `workflows/refactoring/workflow.md`
 
 - [ ] Remove any duplication
 - [ ] Improve any unclear names

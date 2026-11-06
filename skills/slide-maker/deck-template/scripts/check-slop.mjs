@@ -24,8 +24,9 @@ import { dirname, resolve, extname } from 'node:path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 // check-slop ships inside deck-template/scripts/, so the deck root is the parent.
-// In the skill it also has a sibling design-system/; in a clone it doesn't, and the
-// token source of truth is the deck's tailwind.config.js. Try both.
+// A scaffolded deck carries its own design-system/ copy; in the skill there is a sibling
+// design-system/; failing both, the token source of truth is the deck's
+// tailwind.config.js. Try them in that order.
 const DECK = resolve(HERE, '..');
 const SKILL = resolve(HERE, '..', '..');   // when scripts/ is at deck-template/scripts/
 
@@ -35,7 +36,7 @@ function loadAllowedHex() {
   const set = new Set();
   let found = false;
   // 1) the skill's design-system token CSS, if present (authoritative)
-  for (const base of [resolve(SKILL, 'design-system/tokens'), resolve(DECK, '../design-system/tokens')]) {
+  for (const base of [resolve(DECK, 'design-system/tokens'), resolve(SKILL, 'design-system/tokens')]) {
     for (const f of ['colors.css', 'typography.css', 'spacing.css', 'fonts.css']) {
       try {
         const css = readFileSync(resolve(base, f), 'utf8');

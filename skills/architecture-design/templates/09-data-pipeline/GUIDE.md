@@ -1,7 +1,7 @@
 # Guide — 09-data-pipeline
 
-Level: Medium. Tool: hand SVG from a generator on a frontier model (skill `references/svg-diagrams.md`); PlantUML
-activity diagram otherwise.
+Level: Medium. Tool: hand SVG from a generator (skill `references/svg-diagrams.md`) for ≤ ~10 boxes; PlantUML
+activity diagram past that.
 
 ## pipeline.svg — Pipeline of one unit of work
 

@@ -4,6 +4,26 @@ How to transform BMAD artifacts into GitHub issues, fields, labels, and mileston
 
 ---
 
+## Contents
+
+- [1. Issue Title Format](#1-issue-title-format)
+- [2. Issue Body Template](#2-issue-body-template)
+- [3. AC Summarization Rules](#3-ac-summarization-rules)
+- [4. Content Exclusion List](#4-content-exclusion-list)
+- [5. Source of Truth Table](#5-source-of-truth-table)
+- [6. Status Mapping](#6-status-mapping)
+- [7. Label Scheme](#7-label-scheme)
+- [8. Milestone Scheme](#8-milestone-scheme)
+- [9. Link-Back Strategy](#9-link-back-strategy)
+- [10. Epic Tracking Issue Template](#10-epic-tracking-issue-template)
+- [11. Story ID Derivation](#11-story-id-derivation)
+- [12. Epic Derivation](#12-epic-derivation)
+- [13. Sprint Derivation](#13-sprint-derivation)
+- [14. Sprint Field (Single-Select)](#14-sprint-field-single-select)
+- [15. Dependency Mapping](#15-dependency-mapping)
+
+---
+
 ## 1. Issue Title Format
 
 **Format:** `{story_id} {short_title}`
@@ -150,10 +170,10 @@ Each field has exactly one owner. The sync direction determines whether the fiel
 | Task list text | BMAD story files | Push to GitHub | Task 2+ only |
 | Status | GitHub Projects | Pull to BMAD | `Status: {mapped_value}` in story file |
 | Sprint | BMAD `sprint-plan.md` | Push to GitHub | Sets Sprint field + milestone + date fields |
-| Dev assignment | GitHub | Pull to BMAD | Set via issue assignee + Dev field |
+| Dev assignment | GitHub | Read-only on pull | Dev field seeded from sprint-plan.md on create; pull reports assignee differences but does not write them |
 | Epic | BMAD `epics.md` | Push to GitHub | Sets label + Epic custom field |
 | Phase | BMAD `sprint-plan.md` | Push to GitHub | Sets label only — expressed through milestone, NOT a custom field |
-| Task checkboxes (checked/unchecked) | GitHub | Pull to BMAD | Devs check off tasks in GitHub |
+| Task checkboxes (checked/unchecked) | GitHub | Read-only on pull | Devs check off tasks in GitHub; pull reports differences but does not write them |
 | Story Points | GitHub only | N/A | Not in BMAD files |
 | Priority | GitHub only | N/A | Not in BMAD files |
 | Dependencies | BMAD `sprint-plan.md` | Push to GitHub | Source is the Dependencies column in sprint-plan.md, NOT the story body |
@@ -186,7 +206,8 @@ It is NOT YAML frontmatter. Parse with: `^Status:\s*(.+)$`
 
 ## 7. Label Scheme
 
-17 labels total. Create all labels before syncing issues.
+One label per epic, one per phase, plus optional layer labels — derive the counts from the
+project's epics and sprint plan. Create all labels before syncing issues.
 
 ### Epic Labels (1 per epic)
 
@@ -198,14 +219,16 @@ Example: `epic:1-foundation`, `epic:2-navigation`, `epic:3-safety`, etc.
 Derive the slug from the epic name in `epics.md` (lowercase, hyphenated).
 Colors should be visually distinct across epics.
 
-### Phase Labels (2)
+### Phase Labels (1 per phase)
+
+Example for a plan with two phases:
 
 | Label | Hex Color | Purpose |
 |-------|-----------|---------|
 | `phase:poc` | `#0075ca` | PoC phase (Sprints 1--6) |
 | `phase:hardening` | `#d93f0b` | Hardening phase (Sprints 7--12) |
 
-### Layer Labels (3)
+### Layer Labels (optional)
 
 | Label | Hex Color | Purpose |
 |-------|-----------|---------|
@@ -221,11 +244,12 @@ The Sprint single-select field (Section 14) handles per-sprint grouping on the b
 **Milestone names are user-defined.** During onboarding, ask the user what their phase milestones
 should be called. Common patterns:
 
-- `PoC` / `Production Hardening` (this project's choice)
+- `PoC` / `Production Hardening` (used in the examples below)
 - `MVP 1` / `MVP 2` / `MVP 3`
 - `Alpha` / `Beta` / `GA`
 
-Always derive due dates and sprint ranges from the actual planning artifacts.
+Always derive due dates and sprint ranges from the actual planning artifacts. Example for a
+12-sprint, two-phase plan:
 
 | Milestone | Due Date | Sprint Range | Description |
 |-----------|----------|-------------|-------------|
@@ -236,6 +260,9 @@ Additional phase milestones (e.g., MVP 1, MVP 2) can be added if the project roa
 Always derive milestone names and due dates from the actual planning artifacts.
 
 ### Phase Derivation
+
+Read each sprint's phase from the sprint plan (the `phase` value in the parser's `sprints[]`
+output). Example:
 
 | Sprint Range | Phase | Milestone |
 |-------------|-------|-----------|
@@ -415,7 +442,8 @@ The epic slug comes from the label scheme in Section 7 (e.g., `foundation`, `nav
 
 ## 13. Sprint Derivation
 
-The sprint assignment for each story must be looked up from the Story-to-Sprint Summary table in `.artifacts/planning-artifacts/sprint-plan.md`.
+The sprint assignment for each story must be looked up from the Story-to-Sprint Summary table in the sprint plan (`paths.sprint_plan_file`, default
+`_bmad-output/planning-artifacts/sprint-plan.md`).
 
 There is no formula to derive sprint from story ID. The mapping is explicit.
 
@@ -433,6 +461,8 @@ Example format:
 | ... | ... |
 
 ### Phase Derivation from Sprint
+
+Example (phases come from the sprint plan):
 
 | Sprint Range | Phase | Label |
 |-------------|-------|-------|
@@ -459,6 +489,8 @@ The Sprint field is a SINGLE_SELECT field (not DATE) that enables board grouping
 It is separate from the Sprint Start/Sprint End DATE fields.
 
 ### Options
+
+One option per sprint in the sprint plan. Example for a 12-sprint, two-phase plan:
 
 | Option | Color | Description |
 |--------|-------|-------------|
