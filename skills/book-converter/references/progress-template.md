@@ -65,9 +65,8 @@
 
 ## Phase 4: Assembly
 
-- [ ] Merge script created (merge_book.py)
-- [ ] Merge script tested
-- [ ] Final book generated ({BOOK_NAME}-final.md)
+- [ ] merge_book.py run (reusable script shipped with the skill)
+- [ ] Final book generated (`<book-name>-book.md` next to the project directory)
 - [ ] Quality check complete
 
 ---

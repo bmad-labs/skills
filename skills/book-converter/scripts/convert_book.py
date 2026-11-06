@@ -5,14 +5,24 @@ Book Converter - Phase 1: Setup and Extraction
 Converts EPUB books to Markdown using pandoc and sets up project structure.
 
 Usage:
-    python3 convert_book.py "/path/to/book.epub"
+    python3 convert_book.py "/path/to/book.epub" [--out DIR]
+
+The project is created under --out (default: ./books in the current working
+directory), never inside the skill's install directory.
 """
 
+import argparse
 import sys
 import subprocess
 import shutil
 from pathlib import Path
 import re
+
+PANDOC_HINT = """✗ Error: pandoc not found on PATH. Install it, then re-run:
+  macOS:   brew install pandoc
+  Linux:   sudo apt install pandoc   (or dnf/pacman install pandoc)
+  Windows: winget install --id JohnMacFarlane.Pandoc   (or choco install pandoc)
+  Other:   https://pandoc.org/installing.html"""
 
 def sanitize_name(name: str) -> str:
     """Convert book name to valid directory name."""
@@ -20,6 +30,8 @@ def sanitize_name(name: str) -> str:
     name = Path(name).stem
     # Convert to lowercase
     name = name.lower()
+    # Treat dots and underscores as word separators (Effective.Java.epub)
+    name = re.sub(r'[._]', ' ', name)
     # Replace spaces and special chars with hyphens
     name = re.sub(r'[^\w\s-]', '', name)
     name = re.sub(r'[-\s]+', '-', name)
@@ -83,21 +95,17 @@ def extract_epub_with_pandoc(epub_path: Path, output_dir: Path) -> Path:
         print(f"✗ Pandoc error: {e.stderr}")
         sys.exit(1)
     except FileNotFoundError:
-        print("✗ Error: pandoc not found. Install with: brew install pandoc")
+        print(PANDOC_HINT)
         sys.exit(1)
 
 def copy_formatting_standards(project_dir: Path, skill_dir: Path):
-    """Copy formatting standards, templates, and scripts to project."""
+    """Copy formatting standards and templates to the project for subagents."""
     # Reference files
     standards_src = skill_dir / "references" / "formatting-standards.md"
     workflow_src = skill_dir / "references" / "chapter-workflow.md"
     progress_template_src = skill_dir / "references" / "progress-template.md"
     chapter_map_template_src = skill_dir / "references" / "chapter-map-template.md"
     formatting_plan_template_src = skill_dir / "references" / "formatting-plan-template.md"
-    
-    # Script files
-    merge_script_src = skill_dir / "scripts" / "merge_book.py"
-    analyze_script_src = skill_dir / "scripts" / "analyze_structure.py"
     
     references_dir = project_dir / "references"
     
@@ -121,15 +129,7 @@ def copy_formatting_standards(project_dir: Path, skill_dir: Path):
     if formatting_plan_template_src.exists():
         shutil.copy(formatting_plan_template_src, references_dir / "formatting-plan-template.md")
         print(f"✓ Copied: formatting-plan-template.md")
-    
-    # Copy scripts to project root
-    if merge_script_src.exists():
-        shutil.copy(merge_script_src, project_dir / "merge_book.py")
-        print(f"✓ Copied: merge_book.py")
-    
-    if analyze_script_src.exists():
-        shutil.copy(analyze_script_src, project_dir / "analyze_structure.py")
-        print(f"✓ Copied: analyze_structure.py")
+
 
 def create_progress_file(project_dir: Path, book_name: str, raw_file: Path):
     """Create initial progress tracking file from template."""
@@ -165,7 +165,7 @@ def create_progress_file(project_dir: Path, book_name: str, raw_file: Path):
 - [ ] Formatting in progress...
 
 ## Phase 4: Assembly
-- [ ] Merge script created
+- [ ] merge_book.py run
 - [ ] Final book generated
 
 ---
@@ -174,7 +174,7 @@ def create_progress_file(project_dir: Path, book_name: str, raw_file: Path):
 
 1. Launch subagent to analyze structure and create CHAPTER_MAP.md
 2. Launch subagents to format each chapter
-3. Create merge script and generate final book
+3. Run merge_book.py to generate the final book
 """
     
     # Get line count
@@ -195,79 +195,78 @@ def create_progress_file(project_dir: Path, book_name: str, raw_file: Path):
     print(f"✓ Created: progress.md ({line_count:,} lines in source)")
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 convert_book.py '/path/to/book.epub'")
-        sys.exit(1)
-    
-    epub_path = Path(sys.argv[1])
-    
+    parser = argparse.ArgumentParser(
+        description="Phase 1 of book-converter: extract an EPUB to Markdown with pandoc "
+                    "and set up the book project directory.")
+    parser.add_argument("epub", type=Path, help="path to the .epub file")
+    parser.add_argument("--out", type=Path, default=Path.cwd() / "books",
+                        help="directory that will hold the book project (default: ./books)")
+    args = parser.parse_args()
+
+    epub_path = args.epub
+
     # Verify input
     if not epub_path.exists():
         print(f"✗ Error: File not found: {epub_path}")
         sys.exit(1)
-    
+
     if epub_path.suffix.lower() != '.epub':
         print(f"✗ Error: Not an EPUB file: {epub_path}")
         sys.exit(1)
-    
+
+    if shutil.which('pandoc') is None:
+        print(PANDOC_HINT)
+        sys.exit(1)
+
     print("=" * 60)
     print("Book Converter - Phase 1: Setup and Extraction")
     print("=" * 60)
     print(f"\nInput: {epub_path.name}")
-    
-    # Determine base directory (books/ in project root)
-    skill_dir = Path(__file__).parent.parent
-    base_dir = skill_dir.parent.parent / "books"
-    base_dir.mkdir(exist_ok=True)
-    
+
+    skill_dir = Path(__file__).resolve().parent.parent
+    base_dir = args.out.resolve()
+    base_dir.mkdir(parents=True, exist_ok=True)
+
     # Setup project
     print("\n1. Setting up project structure...")
     dirs = setup_project_structure(epub_path, base_dir)
-    
+
     # Extract with pandoc
     print("\n2. Extracting EPUB with pandoc...")
     parsed_file = extract_epub_with_pandoc(epub_path, dirs['raw_dir'])
-    
+
     # Copy standards
     print("\n3. Copying formatting standards...")
     copy_formatting_standards(dirs['project_dir'], skill_dir)
-    
+
     # Create progress file
     print("\n4. Creating progress tracker...")
     create_progress_file(dirs['project_dir'], dirs['book_name'], parsed_file)
-    
-    # Summary
+
+    project = dirs['project_dir']
     print("\n" + "=" * 60)
     print("Phase 1 Complete!")
     print("=" * 60)
-    print(f"\nProject directory: {dirs['project_dir']}")
+    print(f"\nProject directory: {project}")
     print(f"Raw markdown: {parsed_file}")
-    print(f"Line count: {subprocess.run(['wc', '-l', str(parsed_file)], capture_output=True, text=True).stdout.strip().split()[0]}")
-    
+
     print("\n" + "=" * 60)
     print("Next Steps:")
     print("=" * 60)
     print("\n1. Run structure analysis script:")
+    print(f'\npython3 "{skill_dir / "scripts" / "analyze_structure.py"}" "{project}"\n')
+    print("2. Then spawn a general-purpose subagent with this prompt:")
     print(f"""
-python3 books/{dirs['book_name']}/analyze_structure.py books/{dirs['book_name']}
-""")
-    
-    print("2. Then launch subagent to create mapping files:")
-    print(f"""
-Task(
-  subagent_type="general",
-  description="Create chapter map and formatting plan",
-  prompt=\"\"\"Create CHAPTER_MAP.md and FORMATTING_PLAN.md:
+Create CHAPTER_MAP.md and FORMATTING_PLAN.md:
 
-1. Read books/{dirs['book_name']}/STRUCTURE_ANALYSIS.md (generated by script)
-2. Read books/{dirs['book_name']}/references/chapter-map-template.md for format
-3. Read books/{dirs['book_name']}/references/formatting-plan-template.md for format
-4. Create books/{dirs['book_name']}/CHAPTER_MAP.md based on structure analysis
-5. Create books/{dirs['book_name']}/FORMATTING_PLAN.md based on issues found
-6. Update books/{dirs['book_name']}/progress.md to mark Phase 2 complete
+1. Read {project}/STRUCTURE_ANALYSIS.md (generated by script)
+2. Read {project}/references/chapter-map-template.md for format
+3. Read {project}/references/formatting-plan-template.md for format
+4. Create {project}/CHAPTER_MAP.md based on structure analysis
+5. Create {project}/FORMATTING_PLAN.md based on issues found
+6. Update {project}/progress.md to mark Phase 2 complete
 
-Return: Summary of chapters found and major issues identified.\"\"\"
-)
+Return: Summary of chapters found and major issues identified.
 """)
 
 if __name__ == "__main__":
