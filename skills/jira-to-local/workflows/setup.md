@@ -6,6 +6,22 @@ Create `.jira.config.json` for this project. Runs once; after that
 **Reference files:** [`../references/jira-fields.md`](../references/jira-fields.md),
 [`../templates/jira.config.json`](../templates/jira.config.json)
 
+## Contents
+
+- [The five decisions](#the-five-decisions)
+- [How a decision gets settled](#how-a-decision-gets-settled) — exit codes, who may touch a box
+- [Step 1: Credentials](#step-1-credentials)
+- [Step 2: The project](#step-2-the-project)
+- [Step 3: The issue types](#step-3-the-issue-types)
+- [Step 4: The boards](#step-4-the-boards)
+- [Step 5: Find a sample issue per type](#step-5-find-a-sample-issue-per-type)
+- [Step 6: The fields, one decision per type](#step-6-the-fields-one-decision-per-type) — 6a generate, 6b hand over, 6c trim, 6d read back, 6e metadata rows, 6f checklist fields
+- [Step 7: Write the instructions](#step-7-write-the-instructions)
+- [Step 8: Output](#step-8-output)
+- [Step 9: Write the config](#step-9-write-the-config)
+- [Step 10: Trial pull](#step-10-trial-pull)
+- [Taking over a decision: what it sounds like](#taking-over-a-decision-what-it-sounds-like)
+
 The config exists so the project key, the issue types and the field list were each
 decided once, with the API's own answer on screen, rather than guessed on every
 pull. So every step asks Jira first and the user second. **Nothing is written to

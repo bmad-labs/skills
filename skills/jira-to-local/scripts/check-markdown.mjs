@@ -203,10 +203,18 @@ function checkFile(path) {
   return findings;
 }
 
-const files = process.argv.slice(2);
-if (!files.length) {
+const args = process.argv.slice(2);
+const wantsHelp = args.includes('--help') || args.includes('-h');
+const files = args.filter((a) => a !== '--help' && a !== '-h');
+
+if (wantsHelp || !files.length) {
   console.log('Usage: check-markdown.mjs <file.md> [more.md ...]');
-  process.exit(1);
+  console.log('');
+  console.log('Checks each fetched ticket document against the formatting checklist.');
+  console.log('Every finding names the rule it breaks. Skip files under assets/ —');
+  console.log('those are attachments, uploaded verbatim.');
+  console.log('Exit 0 when every file is clean, 1 when any finding is reported.');
+  process.exit(wantsHelp ? 0 : 1);
 }
 
 let total = 0;
