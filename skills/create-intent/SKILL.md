@@ -45,7 +45,7 @@ Not for: technical design (`architecture-design`), PRD writing (`bmad-prd`), spl
 6. **Apply answers.** Answers arrive in chat, in `memlog.md` (`=>` lines), or in a confirm file. Move each answer into the question table (Answer + Status columns). Add a **Decision (Q#)** line under the story AC it changes; keep the story text above it. Log user clarifications as `C#` rows. Save lasting boundary facts as memories.
 7. **Split for the audience.** Unanswered and "confirm" business items → `confirm-po.md` (self-contained: terms, AC change table "current text → new text", new rules, stories not built, gaps with proposals). Technical items → `confirm-tech.md`. Ask the user which person answers what if unclear.
 8. **Review.** When the user asks, run review skills on the doc set in parallel (`bmad-review-adversarial-general`, `bmad-review-edge-case-hunter`, `bmad-editorial-review-structure`, `bmad-editorial-review-prose`). Verify findings that cite sources. Turn gaps into `G#` (business) or `T#` (technical) rows with a proposal. Do not treat a PRD or other downstream doc as a source unless the user says so.
-9. **Verify.** Run `python3 <skill>/scripts/check_intent.py <doc-folder>` and fix every finding. Then report.
+9. **Verify.** Run `python3 <skill>/scripts/check_intent.py <doc-folder>`, where `<skill>` is the folder that holds this SKILL.md, and fix every finding. Then report.
 
 Build the documents yourself, in the main conversation. Subagents only for read-only work: code tracing, review lenses, skill tests.
 
