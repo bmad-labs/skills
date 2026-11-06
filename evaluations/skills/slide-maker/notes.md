@@ -1,11 +1,11 @@
-# Slide Maker
+# Slide Maker — notes (former skill README)
 
 Build presentation slides and export them to editable PowerPoint, image PowerPoint,
 standalone HTML, or PDF.
 
 This is a Claude skill. You don't run it by hand: ask Claude for a deck, and it loads the
 skill and does the work. This README explains what the skill contains.
-[`SKILL.md`](SKILL.md) is what the agent actually follows.
+[`SKILL.md`](../../../skills/slide-maker/SKILL.md) is what the agent actually follows.
 
 Every slide is driven by design tokens rather than hardcoded colors or fonts, so the same
 34 layouts re-skin by swapping one theme file. Bring your own design system or use the
@@ -34,7 +34,7 @@ A full run goes brainstorm, then generate, then export. You can start at any ste
 | Single self-contained HTML file that opens offline | `export-standalone-html` |
 | PDF for print or handout | `export-pdf` |
 
-Step-by-step detail for each: [`references/workflows/`](references/workflows/).
+Step-by-step detail for each: [`references/workflows/`](../../../skills/slide-maker/references/workflows/).
 
 ## Design system resolution
 
@@ -122,14 +122,14 @@ Light slides on a neutral ink scale, with one restrained accent hue (indigo in
 `clean-light`) used sparingly. One focal point per slide, generous whitespace, calm
 motion. No second typeface, no hardcoded color.
 
-Full rules: [`references/house-style.md`](references/house-style.md) and
-[`references/wow-guide.md`](references/wow-guide.md).
+Full rules: [`references/house-style.md`](../../../skills/slide-maker/references/house-style.md) and
+[`references/wow-guide.md`](../../../skills/slide-maker/references/wow-guide.md).
 
 ## Using only the design layer
 
 Another slide generator can pull the tokens, components, and patterns from here and skip
 its own theme selection, so its output uses a real design system. See
-[`references/tailwind-theme.md`](references/tailwind-theme.md).
+[`references/tailwind-theme.md`](../../../skills/slide-maker/references/tailwind-theme.md).
 
 ## Tooling prerequisites
 

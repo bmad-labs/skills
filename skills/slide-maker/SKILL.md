@@ -47,9 +47,11 @@ system supplies those tokens. Run this flow **in order** and stop at the first b
 that applies:
 
 1. **Ask the user if they have their own design system / brand tokens.** If yes → map its
-   colors/type/spacing into the token contract by writing them into
-   `design-system/themes/clean-light.css` (or a new theme file that the entry point
-   imports). Layouts never change; only the theme file's token *values* do.
+   colors/type/spacing into the token contract by writing them into the **deck's own copy**
+   of the design system — `./slides/<deck-name>/design-system/themes/clean-light.css` (or a
+   new theme file that copy's `styles.css` imports). Never edit the skill's
+   `<skill>/design-system/` — it is the pristine source. Layouts never change; only the
+   theme file's token *values* do.
 2. **Else, if a design-system skill is already installed** (for example `ui-ux-pro-max`),
    you may invoke it to suggest the best-fit design system for the deck's content/idea,
    then map that suggestion into the theme file.
@@ -69,10 +71,11 @@ let them override:
 
 - **Default output dir:** `./slides/<deck-name>/` in the user's current project.
 - **Exports:** `./slides/<deck-name>/export/`.
-- **Copy the `deck-template/` scaffold to that location — NOT into the skill directory.**
-  This keeps the skill install clean and lets multiple decks coexist side by side. The
-  skill's own `deck-template/` is a pristine template; the working copy lives in the
-  user's project.
+- **Copy the `deck-template/` scaffold to that location — NOT into the skill directory —
+  and copy `design-system/` into it** (`./slides/<deck-name>/design-system/`). This keeps
+  the skill install clean and lets multiple decks, each with its own theme, coexist side by
+  side. The skill's own `deck-template/` and `design-system/` are pristine; the working
+  copies live in the user's project.
 
 ## The other use: supply only the design layer
 
@@ -156,6 +159,3 @@ do. Method, canonical bounds, and layout recipes (no magic-pixel heights;
 | [pptx-editable.md](references/pptx-editable.md) | Editable-PPTX deep dive: measure→OOXML, the validation gate + acknowledgement system, fonts, gotchas |
 
 > To render the 34 layout previews for review, use `deck-template/scripts/shoot-layouts.mjs`.
->
-> [`research/`](research/README.md) holds dated proposals that were **evaluated but not
-> built** — read one only when deciding whether to take that change on.

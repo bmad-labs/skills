@@ -11,7 +11,7 @@
 */
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join, basename } from 'node:path';
-import { readdirSync } from 'node:fs';
+import { readdirSync, existsSync } from 'node:fs';
 import { serveDir, launchBrowser, makeDeckRequire } from './lib/deck-driver.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -19,7 +19,11 @@ const deckDir = resolve(HERE, '..');
 // Serve the design-system ROOT (not slides/) so each layout's relative
 // `../styles.css` and `../assets/...` refs resolve — serving slides/ as root
 // would make `../` escape the served tree and 404 the CSS + logos.
-const dsRoot = resolve(deckDir, '../design-system');
+// A scaffolded deck carries its own ./design-system; the template in the skill uses
+// the skill's sibling ../design-system.
+const dsRoot = existsSync(resolve(deckDir, 'design-system'))
+  ? resolve(deckDir, 'design-system')
+  : resolve(deckDir, '../design-system');
 const slidesDir = resolve(dsRoot, 'slides');
 const flag = (f, d) => { const i = process.argv.indexOf(f); return i >= 0 && process.argv[i + 1] ? process.argv[i + 1] : d; };
 const only = (flag('--only', null)?.split(',').map((s) => s.trim())) || null; // e.g. 01,02,03
