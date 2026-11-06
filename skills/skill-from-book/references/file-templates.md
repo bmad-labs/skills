@@ -2,14 +2,30 @@
 
 Copy and adapt these templates for each knowledge file type.
 
-## Required Files Per Category
+## Contents
 
-Each category MUST have these 3 basic files:
+- [Files Per Category](#files-per-category)
+- [Workflows](#workflows)
+- [Template: Knowledge File](#template-knowledge-file-required)
+- [Template: Rules File](#template-rules-file-required)
+- [Template: Examples File](#template-examples-file-when-the-section-has-examples)
+- [Template: Smells File](#template-smells-file-optional)
+- [Template: Checklist File](#template-checklist-file-optional)
+- [Template: Patterns File](#template-patterns-file-optional)
+- [Template: Principles File](#template-principles-file-optional---merge-into-knowledgemd-if-small)
+- [Template: Progress File](#template-progress-file)
+- [Template: SKILL.md (for generated skill)](#template-skillmd-for-generated-skill)
+- [Formatting Guidelines](#formatting-guidelines)
+
+## Files Per Category
+
+Every category has these 2 files:
 1. **knowledge.md** - Core concepts, definitions, foundational understanding
 2. **rules.md** - Specific guidelines, do's and don'ts
-3. **examples.md** - Good/bad code examples, before/after comparisons
 
-Optional files (add as needed):
+Add **examples.md** (good/bad code examples, before/after comparisons) when the source section contains examples. Skip it for sections that are pure principle rather than inventing examples the book doesn't have.
+
+Other optional files (add as needed):
 - **patterns.md** - Reusable solutions to common problems
 - **smells.md** - Anti-patterns and what to avoid
 - **checklist.md** - Quick reference checklists
@@ -145,7 +161,7 @@ When these rules may be relaxed:
 
 ---
 
-## Template: Examples File (REQUIRED)
+## Template: Examples File (when the section has examples)
 
 ```markdown
 # [Topic] Examples
@@ -438,9 +454,9 @@ Ask yourself:
 
 | Phase | Files | Complete |
 |-------|-------|----------|
-| Foundation | 3 | 0/3 |
-| [Category] | X | 0/X |
-| [Category] | X | 0/X |
+| Extraction: [Category] | X | 0/X |
+| Extraction: [Category] | X | 0/X |
+| Guidelines, Workflows, SKILL.md | Z | 0/Z |
 | **Total** | **Y** | **0/Y** |
 
 ## Legend
@@ -450,36 +466,40 @@ Ask yourself:
 - [x] Completed
 - [-] Skipped/Not needed
 
-## Phase 1: Foundation
+## Phase 1: Analysis
 
-- [ ] SKILL.md
-- [ ] progress.md
+- [ ] Outline extracted (`grep -n`), categories and use cases confirmed
+
+## Phase 2: Planning
+
+- [ ] File structure and extraction plan confirmed
+- [ ] progress.md created
+
+## Phase 3: Extraction
+
+### [Category Name] - Chapter X (lines N-M)
+- [ ] [category]/knowledge.md
+- [ ] [category]/rules.md
+- [ ] [category]/examples.md   (if the section has examples)
+- [ ] [category]/patterns.md   (optional)
+
+### [Category Name] - Chapter Y (lines N-M)
+- [ ] [category]/knowledge.md
+- [ ] [category]/rules.md
+- [ ] [category]/smells.md     (optional)
+
+## Phase 4: Guidelines
+
 - [ ] guidelines.md
 
-## Phase 2: [Category Name]
+## Phase 5: Workflows
 
-Source: Chapter X (lines N-M)
+- [ ] workflows/[name].md
 
-Required files:
-- [ ] [category]/knowledge.md
-- [ ] [category]/rules.md
-- [ ] [category]/examples.md
+## Phase 6: Finalization
 
-Optional files:
-- [ ] [category]/patterns.md
-- [ ] [category]/checklist.md
-
-## Phase 3: [Category Name]
-
-Source: Chapter Y (lines N-M)
-
-Required files:
-- [ ] [category]/knowledge.md
-- [ ] [category]/rules.md
-- [ ] [category]/examples.md
-
-Optional files:
-- [ ] [category]/smells.md
+- [ ] SKILL.md
+- [ ] Consistency review and sample-query testing
 
 ## Notes
 
