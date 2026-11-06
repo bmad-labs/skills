@@ -56,20 +56,20 @@ Include the reference table for future use:
 **All commands redirect output to temp files only (no console output).**
 
 ```bash
-# Initialize session (once at start)
-export UT_SESSION=$(date +%s)-$$
+# Create the session temp directory (skip if step 1 already created it)
+mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
 ```
 
 | Task | Command |
 |------|---------|
-| Run all tests | `npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1 && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
-| Run single file | `npm test -- path/to/file.spec.ts > /tmp/ut-${UT_SESSION}-output.log 2>&1 && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
-| Run single test | `npm test -- -t "should return user" > /tmp/ut-${UT_SESSION}-output.log 2>&1 && tail -50 /tmp/ut-${UT_SESSION}-output.log` |
-| Get failure details | `grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log` |
-| Coverage | `npm run test:cov > /tmp/ut-${UT_SESSION}-coverage.log 2>&1 && tail -50 /tmp/ut-${UT_SESSION}-coverage.log` |
-| Verbose output | `npm test -- --verbose > /tmp/ut-${UT_SESSION}-output.log 2>&1 && tail -100 /tmp/ut-${UT_SESSION}-output.log` |
+| Run all tests | `npm test > <UT_DIR>/output.log 2>&1 && tail -50 <UT_DIR>/output.log` |
+| Run single file | `npm test -- path/to/file.spec.ts > <UT_DIR>/output.log 2>&1 && tail -50 <UT_DIR>/output.log` |
+| Run single test | `npm test -- -t "should return user" > <UT_DIR>/output.log 2>&1 && tail -50 <UT_DIR>/output.log` |
+| Get failure details | `grep -B 2 -A 15 "FAIL\|✕" <UT_DIR>/output.log` |
+| Coverage | `npm run test:cov > <UT_DIR>/coverage.log 2>&1 && tail -50 <UT_DIR>/coverage.log` |
+| Verbose output | `npm test -- --verbose > <UT_DIR>/output.log 2>&1 && tail -100 <UT_DIR>/output.log` |
 | Clear cache | `npx jest --clearCache` |
-| Cleanup | `rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md` |
+| Cleanup | `rm -rf <UT_DIR>` |
 
 ### 3. Post-Workflow Actions
 
@@ -78,9 +78,9 @@ Based on results, recommend next workflow:
 | Result | Recommended Workflow |
 |--------|---------------------|
 | All pass | None required |
-| Failures found | `debugging-unit-test.md` |
-| Low coverage | `writing-unit-test.md` |
-| Slow tests | `optimizing-unit-test.md` |
+| Failures found | `workflows/debugging/workflow.md` |
+| Low coverage | `workflows/writing/workflow.md` |
+| Slow tests | `workflows/optimizing/workflow.md` |
 
 ### 4. Troubleshooting Quick Reference
 
@@ -104,7 +104,7 @@ Show the compiled report to the user:
 Remind the user to clean up session temp files:
 
 ```bash
-rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
+rm -rf <UT_DIR>
 ```
 
 ## FRONTMATTER UPDATE

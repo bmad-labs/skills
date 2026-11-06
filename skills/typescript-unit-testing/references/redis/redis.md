@@ -1,5 +1,20 @@
 # Redis Unit Testing Patterns
 
+## Contents
+
+- [Overview](#overview)
+- [When to Use](#when-to-use)
+- [Key Libraries](#key-libraries)
+- [Standard Cache Service Test Template](#standard-cache-service-test-template)
+- [Testing Cache Operations](#testing-cache-operations)
+- [Testing Graceful Degradation](#testing-graceful-degradation)
+- [Testing Health Checks](#testing-health-checks)
+- [Testing Cache Key Patterns](#testing-cache-key-patterns)
+- [Testing Cache-Aside Pattern](#testing-cache-aside-pattern)
+- [Testing TTL with Jitter](#testing-ttl-with-jitter)
+- [Testing Pub/Sub (if applicable)](#testing-pubsub-if-applicable)
+- [Best Practices](#best-practices)
+
 ## Overview
 
 Unit testing Redis cache operations, health checks, and pub/sub by mocking the Redis client without real connections.
@@ -31,8 +46,9 @@ Unit testing Redis cache operations, health checks, and pub/sub by mocking the R
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
-import { RedisService } from '@ocean-network-express/om-lib-nestjs-redis';
+import { LoggerService } from '@nestjs/common';
+// Import RedisService from the Redis wrapper the project uses (e.g. @liaoliaots/nestjs-redis)
+import { RedisService } from '@liaoliaots/nestjs-redis';
 
 describe('CacheService', () => {
   let target: CacheService;
@@ -61,7 +77,7 @@ describe('CacheService', () => {
         { provide: RedisService, useValue: mockRedisService },
       ],
     })
-      .setLogger(new MockLoggerService())
+      .setLogger(createMock<LoggerService>())
       .compile();
 
     target = module.get<CacheService>(CacheService);

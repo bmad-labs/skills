@@ -1,5 +1,19 @@
 # MongoDB Repository Testing with mongodb-memory-server
 
+## Contents
+
+- [Overview](#overview)
+- [When to Use](#when-to-use)
+- [Installation](#installation)
+- [Test Helper Setup](#test-helper-setup)
+- [Standard Repository Test Template](#standard-repository-test-template)
+- [Testing CRUD Operations](#testing-crud-operations)
+- [Testing Indexes and Constraints](#testing-indexes-and-constraints)
+- [Testing Aggregations](#testing-aggregations)
+- [Testing Transactions (MongoDB 4.0+)](#testing-transactions-mongodb-40)
+- [Performance Tips](#performance-tips)
+- [Timeout Configuration](#timeout-configuration)
+
 ## Overview
 
 Use `mongodb-memory-server` for repository tests to verify actual MongoDB operations with real queries, indexes, and aggregations.
@@ -53,7 +67,8 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { createMongoMemoryServer, getMongooseTestModule } from 'test/helpers/mongodb-test.helper';
-import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
+import { LoggerService } from '@nestjs/common';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('UserRepository', () => {
   let target: UserRepository;
@@ -74,7 +89,7 @@ describe('UserRepository', () => {
       ],
       providers: [UserRepository],
     })
-      .setLogger(new MockLoggerService())
+      .setLogger(createMock<LoggerService>())
       .compile();
 
     target = moduleRef.get<UserRepository>(UserRepository);

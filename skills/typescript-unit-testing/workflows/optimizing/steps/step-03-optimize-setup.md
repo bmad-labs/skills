@@ -112,8 +112,8 @@ For each test file identified in Step 2:
 2. Apply changes one technique at a time
 3. Run the specific test file after each change to verify tests still pass:
    ```bash
-   npm test -- [path/to/file.spec.ts] > /tmp/ut-${UT_SESSION}-setup-check.log 2>&1
-   tail -20 /tmp/ut-${UT_SESSION}-setup-check.log
+   npm test -- [path/to/file.spec.ts] > <UT_DIR>/setup-check.log 2>&1
+   tail -20 <UT_DIR>/setup-check.log
    ```
 
 ## PRESENT FINDINGS

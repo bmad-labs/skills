@@ -17,12 +17,12 @@ Resume a previously started test execution workflow by reading the existing repo
 - Parse the YAML frontmatter
 - Extract `stepsCompleted` array
 
-### 2. Re-initialize UT_SESSION
+### 2. Reuse the Session Temp Directory
 
-Re-establish the temp file session:
+Reuse the `<UT_DIR>` path noted in the earlier session. If it no longer exists, create a new one:
 
 ```bash
-export UT_SESSION=$(date +%s)-$$
+mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
 ```
 
 ### 3. Show Progress Summary

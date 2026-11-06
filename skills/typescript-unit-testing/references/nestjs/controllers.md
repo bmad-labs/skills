@@ -1,11 +1,22 @@
 # Controller Testing Patterns
 
+## Contents
+
+- [Standard Controller Test Template](#standard-controller-test-template)
+- [Testing Controller Methods](#testing-controller-methods)
+- [Testing with Request Context](#testing-with-request-context)
+- [Testing Response Transformation](#testing-response-transformation)
+- [Testing Pagination](#testing-pagination)
+- [Testing File Upload](#testing-file-upload)
+- [Testing with Query Decorators](#testing-with-query-decorators)
+- [Testing Error Responses](#testing-error-responses)
+
 ## Standard Controller Test Template
 
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
+import { LoggerService } from '@nestjs/common';
 
 describe('UserController', () => {
   let target: UserController;
@@ -20,7 +31,7 @@ describe('UserController', () => {
         { provide: UserService, useValue: mockUserService },
       ],
     })
-      .setLogger(new MockLoggerService())
+      .setLogger(createMock<LoggerService>())
       .compile();
 
     target = module.get<UserController>(UserController);

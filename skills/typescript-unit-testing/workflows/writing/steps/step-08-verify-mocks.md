@@ -82,7 +82,7 @@ Setup:
 - [ ] Using `target` for SUT
 - [ ] Using `mock` prefix for all mocks
 - [ ] Using `DeepMocked<T>` type
-- [ ] Including `.setLogger(new MockLoggerService())`
+- [ ] Silencing the Nest logger with `.setLogger()` (project logger mock, or `createMock<LoggerService>()`)
 - [ ] Following AAA pattern with comments
 - [ ] Resetting mocks in `afterEach`
 

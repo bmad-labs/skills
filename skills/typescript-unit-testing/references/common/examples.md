@@ -19,7 +19,7 @@ Complete example with all standard patterns:
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
+import { LoggerService } from '@nestjs/common';
 import { NotFoundException, ValidateException } from 'src/shared/exceptions';
 import { ErrorCode } from 'src/shared/constants';
 
@@ -40,7 +40,7 @@ describe('UserService', () => {
         { provide: EmailService, useValue: mockEmailService },
       ],
     })
-      .setLogger(new MockLoggerService())
+      .setLogger(createMock<LoggerService>())
       .compile();
 
     target = module.get<UserService>(UserService);

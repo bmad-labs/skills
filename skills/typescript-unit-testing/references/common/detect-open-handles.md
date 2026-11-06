@@ -1,5 +1,18 @@
 # Detecting and Fixing Open Handles
 
+## Contents
+
+- [What Are Open Handles?](#what-are-open-handles)
+- [Detection Commands](#detection-commands)
+- [CLI Flags Reference](#cli-flags-reference)
+- [Common Handle Types and Fixes](#common-handle-types-and-fixes)
+- [NestJS TestingModule Cleanup](#nestjs-testingmodule-cleanup)
+- [Cleanup Order](#cleanup-order)
+- [Configuration Options](#configuration-options)
+- [Debugging Strategies](#debugging-strategies)
+- [Anti-Patterns](#anti-patterns)
+- [Checklist](#checklist)
+
 ## What Are Open Handles?
 
 Open handles are resources (files, network sockets, database connections, timers) that remain active after tests complete. They prevent Jest from exiting cleanly and indicate resource leaks that can cause:
@@ -11,30 +24,30 @@ Open handles are resources (files, network sockets, database connections, timers
 
 ## Detection Commands
 
-**IMPORTANT**: Always output to temp files to avoid context bloat. Use unique session ID.
+**IMPORTANT**: Always output to temp files to avoid context bloat. Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
 
 ```bash
-# Initialize session (once at start)
-export UT_SESSION=$(date +%s)-$$
+# Create the session temp directory (once at start)
+mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
 ```
 
 ### Basic Detection
 
 ```bash
 # Detect open handles (runs tests serially, no console output)
-npm test -- --detectOpenHandles > /tmp/ut-${UT_SESSION}-handles.log 2>&1
-tail -100 /tmp/ut-${UT_SESSION}-handles.log
+npm test -- --detectOpenHandles > <UT_DIR>/handles.log 2>&1
+tail -100 <UT_DIR>/handles.log
 
 # Detect with force exit (for debugging)
-npm test -- --detectOpenHandles --forceExit > /tmp/ut-${UT_SESSION}-handles.log 2>&1
-tail -100 /tmp/ut-${UT_SESSION}-handles.log
+npm test -- --detectOpenHandles --forceExit > <UT_DIR>/handles.log 2>&1
+tail -100 <UT_DIR>/handles.log
 
 # Single file detection
-npm test -- --detectOpenHandles path/to/file.spec.ts > /tmp/ut-${UT_SESSION}-handles.log 2>&1
-tail -100 /tmp/ut-${UT_SESSION}-handles.log
+npm test -- --detectOpenHandles path/to/file.spec.ts > <UT_DIR>/handles.log 2>&1
+tail -100 <UT_DIR>/handles.log
 
 # Extract handle details
-grep -A 10 "open handles" /tmp/ut-${UT_SESSION}-handles.log
+grep -A 10 "open handles" <UT_DIR>/handles.log
 ```
 
 ### Understanding the Output
@@ -311,12 +324,12 @@ export default {
 
 ```bash
 # Run single file (no console output)
-npm test -- --detectOpenHandles path/to/suspect.spec.ts > /tmp/ut-${UT_SESSION}-handles.log 2>&1
-tail -100 /tmp/ut-${UT_SESSION}-handles.log
+npm test -- --detectOpenHandles path/to/suspect.spec.ts > <UT_DIR>/handles.log 2>&1
+tail -100 <UT_DIR>/handles.log
 
 # Run single test (no console output)
-npm test -- --detectOpenHandles -t "test name" > /tmp/ut-${UT_SESSION}-handles.log 2>&1
-tail -100 /tmp/ut-${UT_SESSION}-handles.log
+npm test -- --detectOpenHandles -t "test name" > <UT_DIR>/handles.log 2>&1
+tail -100 <UT_DIR>/handles.log
 ```
 
 ### 2. Add Logging

@@ -122,7 +122,7 @@ Structure:
 
 Setup:
 - [ ] Fresh mocks in beforeEach
-- [ ] `.setLogger(new MockLoggerService())`
+- [ ] `.setLogger()` with a logger mock
 - [ ] `jest.clearAllMocks()` in afterEach
 
 AAA Pattern:

@@ -8,7 +8,7 @@ nextStepFile: './step-05-verify-setup.md'
 
 ## STEP GOAL
 
-Create the test helpers directory structure and the `MockLoggerService` utility so tests can suppress logger output and have a consistent mock available.
+Create the test helpers directory and settle how tests silence the Nest logger, so every test uses the same logger mock.
 
 ## EXECUTION
 
@@ -19,33 +19,28 @@ Ensure the following directory structure exists in the project:
 ```
 test/
 └── helpers/
-    └── mock-logger.service.ts
 ```
 
-### 2. Check for Existing Logger
+### 2. Check for an Existing Logger Mock
 
-Before creating the mock:
-- Check if the project has a custom logger service (e.g., extending `LoggerService`)
-- If a custom logger exists, adapt the `MockLoggerService` to match its interface
+- Search the project for an existing logger mock (e.g. a class implementing `LoggerService` under `test/` or `src/**/mock*`)
+- If one exists, record its import path: tests pass it to `.setLogger()`
+- If the project has a custom logger with extra methods, the mock must cover those methods too
 
-### 3. Create MockLoggerService
+### 3. Default: No Helper File Needed
 
-Create `test/helpers/mock-logger.service.ts`:
+If no logger mock exists, tests create one inline with `@golevelup/ts-jest`:
 
 ```typescript
-// test/helpers/mock-logger.service.ts
 import { LoggerService } from '@nestjs/common';
+import { createMock } from '@golevelup/ts-jest';
 
-export class MockLoggerService implements LoggerService {
-  log(): void {}
-  error(): void {}
-  warn(): void {}
-  debug(): void {}
-  verbose(): void {}
-}
+const module = await Test.createTestingModule({ providers: [/* ... */] })
+  .setLogger(createMock<LoggerService>())
+  .compile();
 ```
 
-If the project has a custom logger with additional methods, extend the mock accordingly.
+Alternatively, keep Nest's `Logger` and silence it with `jest.spyOn(Logger.prototype, 'log').mockImplementation(() => undefined)` (repeat for `error`, `warn`).
 
 ### 4. Append to Report
 
@@ -55,10 +50,7 @@ Append to the output document:
 ## Step 4: Test Helpers
 
 **Directory Created**: test/helpers/
-**Files Created:**
-- `test/helpers/mock-logger.service.ts` — MockLoggerService
-
-**Custom Logger**: [Found at path — adapted mock / Not found — using standard NestJS LoggerService interface]
+**Logger Mock**: [Existing mock at path / Inline `createMock<LoggerService>()`]
 ```
 
 ## PRESENT FINDINGS
@@ -70,10 +62,7 @@ Step 4: Test Helpers
 ====================
 
 Directory: test/helpers/ [created/already existed]
-Files:
-  mock-logger.service.ts  [created/already existed]
-
-Custom Logger: [Adapted for custom logger at path / Standard NestJS interface used]
+Logger Mock: [Existing mock at path / Inline createMock<LoggerService>()]
 ```
 
 Then ask: **[C] Continue to Step 5: Verify Setup**

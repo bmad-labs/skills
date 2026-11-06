@@ -88,7 +88,7 @@ Unit Test Setup Complete
   [6] npm Scripts Configured     DONE
 
 Next Steps:
-- Use the `writing-unit-test.md` workflow to write tests
+- Use `workflows/writing/workflow.md` to write tests
 - Follow AAA pattern and naming conventions from references/common/rules.md
 - Target 80%+ coverage for new code
 ```

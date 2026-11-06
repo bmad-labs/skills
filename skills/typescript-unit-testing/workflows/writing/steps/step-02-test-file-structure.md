@@ -46,7 +46,7 @@ Create the spec file with this structure:
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
+import { LoggerService } from '@nestjs/common';
 import { ComponentName } from './component-name';
 // Import all dependencies
 
@@ -63,7 +63,7 @@ describe('ComponentName', () => {
         // Provide all mocks
       ],
     })
-      .setLogger(new MockLoggerService())
+      .setLogger(createMock<LoggerService>())
       .compile();
 
     target = module.get<ComponentName>(ComponentName);

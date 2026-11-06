@@ -30,7 +30,7 @@ Cite specific rules when reporting findings.
 | SUT variable | Named `target` | [ ] |
 | Mock variables | Prefixed with `mock` | [ ] |
 | Mock types | Using `DeepMocked<T>` | [ ] |
-| Logger | Using `MockLoggerService` | [ ] |
+| Logger | Mocked via `.setLogger()` | [ ] |
 
 ### 2. Check describe/it Structure
 
@@ -73,7 +73,7 @@ Convention Checklist:
   SUT named `target`:             [PASS/FAIL]
   Mock prefix `mock`:             [PASS/FAIL]
   DeepMocked<T> types:            [PASS/FAIL]
-  MockLoggerService:              [PASS/FAIL]
+  Logger mocked:                  [PASS/FAIL]
 
 Describe/It Structure:
   Top-level matches class name:   [PASS/FAIL]

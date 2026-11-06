@@ -48,14 +48,14 @@ WARNING: Do NOT run full suite again!
 **Critical: One-by-One Fixing Rule**
 
 **When tests fail, NEVER keep running the full suite.** Instead:
-1. Note all failing tests in `/tmp/ut-${UT_SESSION}-failures.md`
+1. Note all failing tests in `<UT_DIR>/failures.md`
 2. Fix ONE test at a time using `-t "test name"`
 3. Verify each fix with 3-5 runs of that specific test
 4. Only run full suite ONCE after ALL individual tests pass
 
 ```bash
 # Create tracking file with all failures
-cat > /tmp/ut-${UT_SESSION}-failures.md << 'EOF'
+cat > <UT_DIR>/failures.md << 'EOF'
 # Unit Test Failures
 
 ## Test 1: "[test name]"
@@ -70,11 +70,11 @@ cat > /tmp/ut-${UT_SESSION}-failures.md << 'EOF'
 EOF
 
 # Fix ONE test at a time (no console output)
-npm test -- -t "[first test name]" > /tmp/ut-${UT_SESSION}-debug.log 2>&1
-tail -50 /tmp/ut-${UT_SESSION}-debug.log
+npm test -- -t "[first test name]" > <UT_DIR>/debug.log 2>&1
+tail -50 <UT_DIR>/debug.log
 ```
 
-3. Recommend using `debugging-unit-test.md` workflow for investigation
+3. Recommend using the `workflows/debugging/workflow.md` workflow for investigation
 
 ### Scenario C: Setup Failures
 

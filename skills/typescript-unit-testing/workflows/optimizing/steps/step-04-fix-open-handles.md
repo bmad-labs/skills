@@ -208,8 +208,8 @@ Expected output should NOT contain:
 Run the full suite with detection:
 
 ```bash
-npm test -- --detectOpenHandles > /tmp/ut-${UT_SESSION}-handles-check.log 2>&1
-grep -c "open handle" /tmp/ut-${UT_SESSION}-handles-check.log
+npm test -- --detectOpenHandles > <UT_DIR>/handles-check.log 2>&1
+grep -c "open handle" <UT_DIR>/handles-check.log
 # Expected: 0
 ```
 

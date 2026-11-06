@@ -47,7 +47,7 @@ This workflow uses a **step-file architecture** for context-safe execution:
 4. **Measure before optimizing** - Always capture baseline metrics before making changes
 5. **Optimize one thing at a time** - Apply changes incrementally and verify after each
 6. **Don't sacrifice quality for speed** - Never remove assertions or reduce coverage for performance
-7. **ALWAYS output to temp files** - Redirect all test output to `/tmp/ut-${UT_SESSION}-*.log` files, never to console directly
+7. **ALWAYS output to temp files** - Redirect all test output to `<UT_DIR>/*.log` files, never to console directly
 
 ## Begin
 

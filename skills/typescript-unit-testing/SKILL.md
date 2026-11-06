@@ -9,6 +9,21 @@ Unit testing validates individual functions, methods, and classes in isolation b
 
 ---
 
+## Contents
+
+- [Workflows](#workflows)
+- [Workflow Selection Guide](#workflow-selection-guide)
+- [Knowledge Base Structure](#knowledge-base-structure)
+- [Quick Reference by Task](#quick-reference-by-task)
+- [Core Principles](#core-principles)
+- [Standard Test Template](#standard-test-template)
+- [Test Coverage Requirements](#test-coverage-requirements)
+- [Failure Resolution Protocol](#failure-resolution-protocol)
+- [Naming Conventions](#naming-conventions)
+- [What NOT to Unit Test](#what-not-to-unit-test)
+- [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
+- [Checklist](#checklist)
+
 ## Workflows
 
 For guided, step-by-step execution of unit testing tasks, use the appropriate workflow:
@@ -125,31 +140,31 @@ references/
 ### 0. Context Efficiency (Temp File Output)
 **ALWAYS redirect unit test output to temp files, NOT console**. Test output can be verbose and bloats agent context.
 
-**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+**IMPORTANT**: Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
 
 ```bash
-# Initialize session (once at start of testing session)
-export UT_SESSION=$(date +%s)-$$
+# Create the session temp directory (once at start)
+mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
 
 # Standard pattern - redirect output to temp file (NO console output)
-npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1
+npm test > <UT_DIR>/output.log 2>&1
 
 # Read summary only (last 50 lines)
-tail -50 /tmp/ut-${UT_SESSION}-output.log
+tail -50 <UT_DIR>/output.log
 
 # Get failure details
-grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log
+grep -B 2 -A 15 "FAIL\|✕" <UT_DIR>/output.log
 
 # Cleanup when done
-rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
+rm -rf <UT_DIR>
 ```
 
-**Temp Files** (with `${UT_SESSION}` unique per agent):
-- `/tmp/ut-${UT_SESSION}-output.log` - Full test output
-- `/tmp/ut-${UT_SESSION}-failures.md` - Tracking file for one-by-one fixing
-- `/tmp/ut-${UT_SESSION}-debug.log` - Debug runs
-- `/tmp/ut-${UT_SESSION}-verify.log` - Verification runs
-- `/tmp/ut-${UT_SESSION}-coverage.log` - Coverage output
+**Temp Files** (inside `<UT_DIR>`, created once per session):
+- `<UT_DIR>/output.log` - Full test output
+- `<UT_DIR>/failures.md` - Tracking file for one-by-one fixing
+- `<UT_DIR>/debug.log` - Debug runs
+- `<UT_DIR>/verify.log` - Verification runs
+- `<UT_DIR>/coverage.log` - Coverage output
 
 ### 1. AAA Pattern (Mandatory)
 ALL unit tests MUST follow Arrange-Act-Assert:
@@ -227,7 +242,7 @@ const mongoServer = await createMongoMemoryServer();
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
+import { LoggerService } from '@nestjs/common';
 
 describe('UserService', () => {
   let target: UserService;
@@ -243,7 +258,7 @@ describe('UserService', () => {
         { provide: UserRepository, useValue: mockRepository },
       ],
     })
-      .setLogger(new MockLoggerService())
+      .setLogger(createMock<LoggerService>()) // or the project's own logger mock
       .compile();
 
     target = module.get<UserService>(UserService);
@@ -302,26 +317,23 @@ describe('UserService', () => {
 
 When unit tests fail:
 
-1. **Initialize session** (once at start):
-   ```bash
-   export UT_SESSION=$(date +%s)-$$
-   ```
-2. **Create tracking file**: `/tmp/ut-${UT_SESSION}-failures.md` with all failing tests
+1. **Create the session temp directory** once, as in Core Principle 0 (Context Efficiency)
+2. **Create tracking file**: `<UT_DIR>/failures.md` with all failing tests
 3. **Select ONE failing test** - work on only this test
 4. **Run ONLY that test** (never full suite):
    ```bash
-   npm test -- -t "test name" > /tmp/ut-${UT_SESSION}-debug.log 2>&1
-   tail -50 /tmp/ut-${UT_SESSION}-debug.log
+   npm test -- -t "test name" > <UT_DIR>/debug.log 2>&1
+   tail -50 <UT_DIR>/debug.log
    ```
 5. **Fix the issue** - analyze error, make targeted fix
 6. **Verify fix** - run same test 3-5 times:
    ```bash
-   for i in {1..5}; do npm test -- -t "test name" > /tmp/ut-${UT_SESSION}-run$i.log 2>&1 && echo "Run $i: PASS" || echo "Run $i: FAIL"; done
+   for i in {1..5}; do npm test -- -t "test name" > <UT_DIR>/run$i.log 2>&1 && echo "Run $i: PASS" || echo "Run $i: FAIL"; done
    ```
 7. **Mark as FIXED** in tracking file
 8. **Move to next failing test** - repeat steps 3-7
 9. **Run full suite ONLY ONCE** after ALL individual tests pass
-10. **Cleanup**: `rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md`
+10. **Cleanup**: `rm -rf <UT_DIR>`
 
 **WHY**: Running full suite wastes time and context. Each failing test pollutes output, making debugging harder.
 
@@ -372,7 +384,7 @@ Only test files containing **executable logic** (classes with methods, functions
 | Conditional assertions | Non-deterministic | Separate test cases |
 | Test private methods | Couples to implementation | Test via public interface |
 | Share state between tests | Causes flaky tests | Fresh setup in beforeEach |
-| Mock repositories in services | Tests implementation | Mock interfaces |
+| Mock internals of the unit under test (private methods, `jest.spyOn(target, ...)`) | Tests implementation | Mock only injected dependencies (repositories, services) |
 | Skip mock verification | Doesn't validate behavior | Verify mock calls |
 | Test interfaces/enums/constants | No behavior to test | Skip these files |
 
@@ -384,7 +396,7 @@ Only test files containing **executable logic** (classes with methods, functions
 - [ ] Use `target` for system under test
 - [ ] Use `mock` prefix for all mocks
 - [ ] Use `DeepMocked<T>` type
-- [ ] Include `.setLogger(new MockLoggerService())`
+- [ ] Silence the Nest logger with `.setLogger()`: the project's existing logger mock if it has one, otherwise `createMock<LoggerService>()`
 - [ ] Follow AAA pattern with comments
 - [ ] Reset mocks in `afterEach`
 

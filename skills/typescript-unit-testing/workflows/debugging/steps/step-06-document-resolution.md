@@ -121,7 +121,7 @@ Append the quick-reference table:
 | Async not awaited | Promise object in result | Add `await` to call |
 | Mock reset missing | State from other tests | Add `jest.clearAllMocks()` |
 | Private method tested | Cannot access | Test via public interface |
-| Logger errors | Console noise | Add `MockLoggerService` |
+| Logger errors | Console noise | Pass a logger mock to `.setLogger()` |
 ```
 
 ### 4. Post-Workflow Verification Checklist
@@ -138,7 +138,7 @@ Append the quick-reference table:
 ### 5. Cleanup Temp Files
 
 ```bash
-rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
+rm -rf <UT_DIR>
 ```
 
 ## PRESENT FINDINGS

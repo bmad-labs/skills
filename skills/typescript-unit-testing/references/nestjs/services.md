@@ -1,11 +1,21 @@
 # Service/Usecase Testing Patterns
 
+## Contents
+
+- [Standard Service Test Template](#standard-service-test-template)
+- [Testing CRUD Operations](#testing-crud-operations)
+- [Testing Business Logic](#testing-business-logic)
+- [Testing External Service Integration](#testing-external-service-integration)
+- [Testing Transaction Rollback Logic](#testing-transaction-rollback-logic)
+- [Auto-Mocking with useMocker](#auto-mocking-with-usemocker)
+- [Testing with Dependency Injection Tokens](#testing-with-dependency-injection-tokens)
+
 ## Standard Service Test Template
 
 ```typescript
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { MockLoggerService } from 'src/shared/logger/services/mock-logger.service';
+import { LoggerService } from '@nestjs/common';
 
 describe('UserService', () => {
   let target: UserService;
@@ -23,7 +33,7 @@ describe('UserService', () => {
         { provide: EventEmitter2, useValue: mockEventEmitter },
       ],
     })
-      .setLogger(new MockLoggerService())
+      .setLogger(createMock<LoggerService>())
       .compile();
 
     target = module.get<UserService>(UserService);
@@ -290,7 +300,7 @@ describe('UserService with Auto-Mocking', () => {
       providers: [UserService],
     })
       .useMocker(createMock)  // Auto-mock all dependencies
-      .setLogger(new MockLoggerService())
+      .setLogger(createMock<LoggerService>())
       .compile();
 
     target = module.get<UserService>(UserService);

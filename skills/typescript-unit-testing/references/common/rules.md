@@ -4,31 +4,31 @@
 
 **ALWAYS redirect unit test output to temp files**. Test output can be verbose and bloats agent context.
 
-**IMPORTANT**: Use unique session ID in filenames to prevent conflicts when multiple agents run.
+**IMPORTANT**: Create one temp directory per session with `mktemp -d` and paste its literal path into every later command: each Bash tool call starts a fresh shell, so an exported session variable would be empty in later calls and parallel agents would collide on the same file names.
 
 ```bash
-# Initialize session (once at start of testing session)
-export UT_SESSION=$(date +%s)-$$
+# Create the session temp directory (once at start)
+mktemp -d /tmp/ut-XXXXXX   # prints e.g. /tmp/ut-a1B2c3 — paste that literal path wherever <UT_DIR> appears
 
 # Standard pattern - redirect to temp file only (no console output)
-npm test > /tmp/ut-${UT_SESSION}-output.log 2>&1
+npm test > <UT_DIR>/output.log 2>&1
 
 # Read summary only (last 50 lines)
-tail -50 /tmp/ut-${UT_SESSION}-output.log
+tail -50 <UT_DIR>/output.log
 
 # Get failure details
-grep -B 2 -A 15 "FAIL\|✕" /tmp/ut-${UT_SESSION}-output.log
+grep -B 2 -A 15 "FAIL\|✕" <UT_DIR>/output.log
 
 # Cleanup when done
-rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
+rm -rf <UT_DIR>
 ```
 
-**Temp File Locations** (with `${UT_SESSION}` unique per agent):
-- `/tmp/ut-${UT_SESSION}-output.log` - Full test output
-- `/tmp/ut-${UT_SESSION}-failures.md` - Tracking file for one-by-one fixing
-- `/tmp/ut-${UT_SESSION}-debug.log` - Debug runs
-- `/tmp/ut-${UT_SESSION}-verify.log` - Verification runs
-- `/tmp/ut-${UT_SESSION}-coverage.log` - Coverage output
+**Temp File Locations** (inside `<UT_DIR>`, created once per session):
+- `<UT_DIR>/output.log` - Full test output
+- `<UT_DIR>/failures.md` - Tracking file for one-by-one fixing
+- `<UT_DIR>/debug.log` - Debug runs
+- `<UT_DIR>/verify.log` - Verification runs
+- `<UT_DIR>/coverage.log` - Coverage output
 
 ---
 
@@ -45,7 +45,7 @@ rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
 
 ### Protocol:
 1. Run full suite ONCE to identify all failures
-2. Create tracking file `/tmp/ut-${UT_SESSION}-failures.md` listing all failing tests
+2. Create tracking file `<UT_DIR>/failures.md` listing all failing tests
 3. Fix ONE test at a time using `-t "test name"`
 4. Verify each fix with 3-5 runs of that specific test
 5. Mark as FIXED in tracking file
@@ -63,7 +63,7 @@ rm -f /tmp/ut-${UT_SESSION}-*.log /tmp/ut-${UT_SESSION}-*.md
 | Mock type | `DeepMocked<T>` |
 | Pattern | Arrange-Act-Assert with comments |
 | Coverage | 80%+ for new code |
-| Logger | `.setLogger(new MockLoggerService())` |
+| Logger | `.setLogger(createMock<LoggerService>())`, or the project's existing logger mock |
 
 ## What NOT to Unit Test
 
@@ -160,7 +160,7 @@ beforeEach(async () => {
       { provide: UserRepository, useValue: mockRepository },
     ],
   })
-    .setLogger(new MockLoggerService())  // REQUIRED
+    .setLogger(createMock<LoggerService>())  // REQUIRED
     .compile();
 
   // 3. Get target
@@ -220,7 +220,7 @@ expect(mockRepository.save).toHaveBeenCalledWith(
 - [ ] Use `target` for system under test
 - [ ] Use `mock` prefix for all mocks
 - [ ] Use `DeepMocked<T>` type
-- [ ] Include `.setLogger(new MockLoggerService())`
+- [ ] Silence the Nest logger with `.setLogger()`: the project's existing logger mock if it has one, otherwise `createMock<LoggerService>()`
 - [ ] Follow AAA pattern with comments
 - [ ] Direct mock methods, not `jest.spyOn()`
 - [ ] Reset mocks in `afterEach`

@@ -96,8 +96,8 @@ For each test file:
 3. Verify test independence for parallel execution
 4. Apply changes and verify:
    ```bash
-   npm test -- [path/to/file.spec.ts] > /tmp/ut-${UT_SESSION}-async-check.log 2>&1
-   tail -20 /tmp/ut-${UT_SESSION}-async-check.log
+   npm test -- [path/to/file.spec.ts] > <UT_DIR>/async-check.log 2>&1
+   tail -20 <UT_DIR>/async-check.log
    ```
 
 ## PRESENT FINDINGS
