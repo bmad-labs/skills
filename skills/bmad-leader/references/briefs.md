@@ -1,5 +1,13 @@
 # Leader Templates
 
+## Contents
+
+- Status and setup: [Current situation note](#current-situation-note), [Test level confirmation](#test-level-confirmation), [Common rules block](#common-rules-block)
+- Briefs: [Subagent brief](#subagent-brief), [Builder brief (Full build)](#builder-brief-full-build), [Builder brief (Phase split)](#builder-brief-phase-split), [Planner brief](#planner-brief), [Verifier brief](#verifier-brief), [UAT Runner brief](#uat-runner-brief), [Reviewer brief](#reviewer-brief), [Research brief](#research-brief), [Retrospective brief](#retrospective-brief), [Correct-course brief](#correct-course-brief)
+- Round records: [Defect report](#defect-report), [Triage file](#triage-file), [Deferred work at Story start](#deferred-work-at-story-start)
+- Contracts and routing: [Build run contract](#build-run-contract), [Skills to name in a brief](#skills-to-name-in-a-brief), [Report contract](#report-contract)
+- Epic records: [Decision log](#decision-log), [Epic close checklist](#epic-close-checklist)
+
 Name the skills; never paste or paraphrase their steps. The subagent loads each skill and follows it. If the brief and the skill disagree, the skill wins.
 
 Every brief carries a context pack. A brief without one is incomplete.
@@ -441,25 +449,26 @@ One Story per builder. `bmad-build-auto` is one Story per run and never orchestr
 
 ## Skills to name in a brief
 
-`bmad-build` is always required. Add every supporting skill the Story needs:
+`bmad-build` is always required for a Story. Add every supporting skill the Story needs. This is the one work-to-skill table; `SKILL.md` (Skill routing) points here.
 
-A planned Story uses `bmad-build`, which writes the Story file. `bmad-spec` is only for a requirement that is not in the plan.
-
-| Story needs | Skill |
-| --- | --- |
-| The build workflow | `bmad-build` |
-| Plan or re-slice Stories | `bmad-create-epics-and-stories` |
-| Sequence and status | `bmad-sprint-planning` |
-| Write an unplanned requirement spec | `bmad-spec` |
-| Retrospective | `bmad-retrospective` |
-| Correct-course proposal | `bmad-correct-course` |
-| Library, CLI, framework or API docs | `context7-mcp` |
-| UAT cases or a manual test plan | `manual-testing` |
-| Browser automation | `playwright-cli` |
-| Generated API or e2e tests | `bmad-qa-generate-e2e-tests` |
-| A change to the design package | `architecture-design` |
-| Two failed fixes, cause unknown | `ultrathink-protocol` |
-| External research | `bmad-deep-recon` |
+| Work | Skill | Produces |
+| --- | --- | --- |
+| Planned Story from `epics.md` | `bmad-build` | Story file, plan, code, tests, review |
+| Requirement not in the plan | `bmad-spec` first, then `bmad-build` | Spec, then the build |
+| Epic and Story breakdown, or a re-slice | `bmad-create-epics-and-stories` | Epics and Stories |
+| Order and status | `bmad-sprint-planning` | Sprint status |
+| UAT cases or a manual test plan | `manual-testing` | Test plan and cases |
+| Generated API or e2e tests | `bmad-qa-generate-e2e-tests` | Automated tests |
+| Independent review | `bmad-code-review` | Findings |
+| External research | `bmad-deep-recon` | Cited findings |
+| Epic close | `bmad-retrospective` | Retro and actions |
+| Planning-document change | `bmad-correct-course` | Proposal |
+| A change to the design package | `architecture-design` | Updated design files |
+| Library, CLI, framework or API docs | `context7-mcp` | Usage answers |
+| Two failed fixes, cause unknown | `ultrathink-protocol` | Root cause |
+| Browser or web UI validation | `playwright-cli` | Driven page and screenshots |
+| Desktop validation | `cua-driver` | Driven app and screenshots |
+| Missing close-loop harness | `close-loop-dev-setup` | Working validation loop |
 
 ## Report contract
 
