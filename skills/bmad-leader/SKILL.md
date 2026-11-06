@@ -54,14 +54,14 @@ Ask for exactly three things if the user did not say: **scope**, **document loca
 | State | Action |
 | --- | --- |
 | Present and valid | Load it. Report `Agent config: <preset>` in the scan. Never ask the preset question again. |
-| Missing | Show the 12 presets from `assets/leader-presets.json` as one table: id, then the leader, builder and uat-runner models. Recommend `<vendor>-balanced`, where vendor is `anthropic` on Claude Code and the running model's vendor on OpenCode. Ask once, batched with scope, docs and test level. Write `./.leader.json` from the chosen preset, with `preset`, `vendor`, `harness`. |
+| Missing | Show the 12 presets from `assets/leader-presets.json` as one table: id, then the leader, builder and uat-runner models. Recommend `<vendor>-balanced`, where vendor is `anthropic` on Claude Code and the running model's vendor on OpenCode and Copilot CLI. Ask once, batched with scope, docs and test level. Write `./.leader.json` from the chosen preset, with `preset`, `vendor`, `harness`. |
 | Invalid | Name the bad field and role. Offer to fill it from the file's `preset` (or the recommended preset if `preset` is `custom` or unknown). Do not invent a value. |
 
 The file wins over its preset: values that differ from the named preset are hand edits, not errors.
 
 If the user said "don't ask", "keep moving" or gives no answer: for a missing file, write the recommended preset; for an invalid one, fill only the bad fields as above. Record the assumption in the report and continue. Never dispatch without a valid config.
 
-Every dispatch passes the role's `model` and `effort` from the file. On Claude Code, map the id to the `Agent` alias (`opus`, `sonnet`, `haiku`, `fable`) and always pass `effort`; the tool sets none by default. Name the role's model and effort in the brief header.
+Every dispatch passes the role's `model` and `effort` from the file. On Claude Code, map the id to the `Agent` alias (`opus`, `sonnet`, `haiku`, `fable`) and always pass `effort`; the tool sets none by default. On Copilot CLI, use its model id (dots, not hyphens: `claude-sonnet-5.5`). Name the role's model and effort in the brief header.
 
 The leader cannot switch its own model. If the `leader` entry differs from the running model, say so once and tell the user how to restart on it. Do not block the build.
 
@@ -141,7 +141,7 @@ No build starts before a plan is approved.
 2. If a requirement is not in the plan, dispatch a `bmad-spec` subagent first.
 3. The leader reviews the plan against the intent, PRD, architecture spine and design package. Approval needs evidence, not optimism.
 4. The leader checks deferred work and answers or queues open questions.
-5. Only then build, one planned Story at a time, by harness: **Full build** on Claude Code, **Phase split** on OpenCode. Either way the Story plan is approved by the leader before any code.
+5. Only then build, one planned Story at a time, by harness: **Full build** on Claude Code and Copilot CLI, **Phase split** on OpenCode. Either way the Story plan is approved by the leader before any code.
 
 Planning is delegated; approval is not.
 
@@ -227,7 +227,7 @@ The leader keeps the current-situation note fresh after every Story. A stale sta
 
 | Harness | Builder runs | Story plan from | Review lenses run by |
 | --- | --- | --- | --- |
-| Claude Code | the whole `bmad-build`: clarify, plan, implement, review, patch, present (**Full build**) | the builder's own Plan phase, approved by the leader | the builder, inside `bmad-build` |
+| Claude Code, Copilot CLI | the whole `bmad-build`: clarify, plan, implement, review, patch, present (**Full build**) | the builder's own Plan phase, approved by the leader | the builder, inside `bmad-build` |
 | OpenCode | `bmad-build` Implement phase only, from the approved plan (**Phase split**) | the planner | three reviewers the leader dispatches |
 
 The same builder session fixes review, verifier and UAT findings.
@@ -236,7 +236,7 @@ The same builder session fixes review, verifier and UAT findings.
 
 **UAT Runner subagent:** runs the UAT cases exactly as written and returns observed output and evidence. Every run gets a fresh session; it is never reused. The verifier spawns it when the harness allows nested agents; otherwise the leader dispatches it. It does not edit product code or test cases.
 
-**Reviewer subagents (three per round):** on OpenCode, and on Claude Code only when the builder's `bmad-build` review did not run its lenses in fresh subagents. Each loads `bmad-code-review` with one lens: Blind Hunter, Edge Cases Hunter, or Verification Gap Finder. Every review round gets three fresh sessions; reviewers are never reused. They do not edit product code. Each lens dispatches with its lens entry from `.leader.json`, else the `reviewer` entry.
+**Reviewer subagents (three per round):** on OpenCode, and on a Full build harness only when the builder's `bmad-build` review did not run its lenses in fresh subagents. Each loads `bmad-code-review` with one lens: Blind Hunter, Edge Cases Hunter, or Verification Gap Finder. Every review round gets three fresh sessions; reviewers are never reused. They do not edit product code. Each lens dispatches with its lens entry from `.leader.json`, else the `reviewer` entry.
 
 **Research subagent:** loads `bmad-deep-recon` for a decision the evidence cannot settle. Returns cited findings.
 
@@ -258,7 +258,7 @@ The leader may do a trivial edit. Anything that needs a plan is delegated.
 
 `bmad-build` owns its sequence, its plan gate and its review lenses. Read that skill for them; this playbook does not restate them.
 
-The leader stands in for the human at `bmad-build`'s checkpoints. On Claude Code the builder runs the sequence and messages the leader at each checkpoint, then waits; on OpenCode the leader owns each checkpoint between phases. The leader handles only the checkpoints:
+The leader stands in for the human at `bmad-build`'s checkpoints. On Claude Code and Copilot CLI the builder runs the sequence and messages the leader at each checkpoint, then waits; on OpenCode the leader owns each checkpoint between phases. The leader handles only the checkpoints:
 
 - approve the plan when `bmad-build` asks;
 - answer an intent gap through the decision ladder;
@@ -282,7 +282,7 @@ Write the Story id with hyphens in a session name: `builder-2-3`, not `builder-2
 | Verifier | `verifier-<story>` | Yes |
 | UAT Runner | `uat-r<n>-<story>` | **No. Fresh every run** |
 
-The Claude Code loop (Full build):
+The Full build loop (Claude Code, Copilot CLI):
 
 1. The builder runs `bmad-build` from Clarify. At its plan gate it sends the plan to the leader and waits; the leader approves it or returns `bad_plan`.
 2. The builder implements, runs `bmad-build`'s three review lenses in fresh subagents, patches, and presents.
@@ -324,6 +324,7 @@ Session reuse differs by harness. Use the one that applies.
 | --- | --- | --- | --- |
 | OpenCode | `subagent` tool; save the returned `sessionID` | call `subagent` again with that `sessionID` | no explicit stop; the session idles and is reused when needed |
 | Claude Code | start an agent-team teammate for the role | send the next instruction to the same teammate; it stays awake between turns | shut the teammate down manually when the Story passes |
+| Copilot CLI | `task` tool with `mode: "background"`; keep the returned agent id | `write_agent` to that id; `read_agent` for its output | the agent ends with the leader's session; do not carry it into the next Story |
 
 OpenCode rules:
 
@@ -341,6 +342,15 @@ Claude Code rules:
 - Hand the next instruction to the same teammate; do not respawn it.
 - Shut each teammate down when the Story passes or is abandoned. Do not carry teammates into the next Story.
 
+Copilot CLI rules:
+
+- Use the Full build, as on Claude Code. Subagents can start their own subagents (default depth limit 4, setting `subagents.maxDepth`); leader → builder → lens uses two levels. Verified on Copilot CLI 1.0.105.
+- Start the builder and verifier with `task` in `mode: "background"`, so fix rounds continue through `write_agent`. A synchronous `task` call returns no reusable id and starts fresh each time.
+- Set per-role models with `/subagents` or a custom agent's `model:` field (`.github/agents/*.agent.md`), and name model and effort in every brief; the builder names each lens's model the same way in the lens prompt.
+- Put the session name (`builder-2-3`) in the `task` description, and record the returned agent id next to it.
+- A background agent cannot message the leader mid-turn. At each `bmad-build` gate the builder ends its turn with the question or plan; the leader reads it with `read_agent` and answers with `write_agent`.
+- A `GH_TOKEN` or `GITHUB_TOKEN` without the Copilot Requests permission overrides the Copilot login and fails authentication; unset it for the leader's session.
+
 Nested agents:
 
 - If the verifier can spawn a subagent, it spawns the UAT Runner and keeps its id.
@@ -349,9 +359,9 @@ Nested agents:
 
 No reuse support: fall back to fresh agents per round, and say so in the report.
 
-## Full build (Claude Code)
+## Full build (Claude Code, Copilot CLI)
 
-On Claude Code one builder runs `bmad-build` end to end, as its docs describe. The leader does not split it. `bmad-build`'s review works best when the builder can spawn subagents; when it cannot, the fallback rule below applies.
+On Claude Code and Copilot CLI one builder runs `bmad-build` end to end, as its docs describe. The leader does not split it. `bmad-build`'s review works best when the builder can spawn subagents; when it cannot, the fallback rule below applies.
 
 | `bmad-build` step | Who | Leader does |
 | --- | --- | --- |
@@ -524,8 +534,8 @@ Per Story:
 2. **Build complete** — one subagent, one Story, no shared tree.
 3. **Gates run by the verifier subagent** — independent of the builder. It pastes counts, not exit codes, and falsifies: remove a guard or delete the tests and confirm red.
 4. **AC check by the verifier** — every criterion maps to a named test. The leader reads the mapping and spot-checks one row.
-5. **Review ran** — on Claude Code this happens inside the builder, before the verifier's gates. Three fresh reviewers, one lens each: Blind Hunter, Edge Cases Hunter, Verification Gap Finder. On Claude Code they are the lenses `bmad-build` spawned, with their session ids in the builder's report. On OpenCode, or when `bmad-build` ran fewer than three lenses or ran them in its own context, the leader dispatches three fresh reviewer subagents in parallel (`bmad-code-review`). No review means no close. If no independent review is possible, label it `review unavailable`; do not call it reviewed.
-6. **Fix loop** — findings go back to the same builder session. The same verifier re-runs gates. After a fix, the review runs again with **three new reviewers**: `bmad-build`'s lenses on Claude Code, leader-dispatched on OpenCode. Repeat until pass.
+5. **Review ran** — on a Full build harness this happens inside the builder, before the verifier's gates. Three fresh reviewers, one lens each: Blind Hunter, Edge Cases Hunter, Verification Gap Finder. On a Full build harness they are the lenses `bmad-build` spawned, with their session ids in the builder's report. On OpenCode, or when `bmad-build` ran fewer than three lenses or ran them in its own context, the leader dispatches three fresh reviewer subagents in parallel (`bmad-code-review`). No review means no close. If no independent review is possible, label it `review unavailable`; do not call it reviewed.
+6. **Fix loop** — findings go back to the same builder session. The same verifier re-runs gates. After a fix, the review runs again with **three new reviewers**: `bmad-build`'s lenses on a Full build harness, leader-dispatched on OpenCode. Repeat until pass.
 7. **UAT** — the verifier prepares the cases from the AC and design; a fresh UAT Runner session runs them. Triage a failure:
    - **Case wrong** — the verifier fixes the case or harness, then a new UAT Runner session reruns the failed cases.
    - **Product wrong** — the verifier records a defect report and sends it to the leader. The leader dispatches the builder to fix it; a new UAT Runner session reruns afterwards. The verifier never edits product code.
@@ -595,7 +605,7 @@ Stop and ask only for the five reasons in the Decision ladder: an approval tier,
 - Leaving a test VM or Factory running.
 - Dispatching a role without the `model` and `effort` from `.leader.json`.
 - Asking the preset question when a valid `.leader.json` exists.
-- On Claude Code, briefing the builder for one `bmad-build` phase, or telling it to skip review.
+- On Claude Code or Copilot CLI, briefing the builder for one `bmad-build` phase, or telling it to skip review.
 
 ## References
 

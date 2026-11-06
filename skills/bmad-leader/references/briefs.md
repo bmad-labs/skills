@@ -113,7 +113,7 @@ Deliver:
 
 ## Builder brief (Full build)
 
-Claude Code. One builder runs the whole `bmad-build`.
+Claude Code and Copilot CLI. One builder runs the whole `bmad-build`.
 
 ```markdown
 You are the builder for Story <id>. Model <model>, effort <effort>.
@@ -124,12 +124,17 @@ Load <domain skills, for example `cpp-embedded`> before you write code in that d
 Follow <CLAUDE.md / AGENTS.md> and <standards path>.
 
 The leader is your user. At every `bmad-build` question or gate — intent gap,
-plan approval, reject, defer — message the leader and wait for the answer.
+plan approval, reject, defer — message the leader and wait for the answer. (Copilot CLI: end your turn with
+the question; the leader answers with write_agent.)
 Send the plan for approval before you write code.
 
 Review: spawn the three `bmad-build` lenses as fresh subagents, one lens each,
-with these models from `.leader.json`: Blind Hunter <model/effort>,
+named review-<lens>-r<n>-s<story>, with these models from `.leader.json`
+(name the model and effort in each lens prompt): Blind Hunter <model/effort>,
 Edge Cases Hunter <model/effort>, Verification Gap Finder <model/effort>.
+
+On a fix round, continue this session: close the findings at <path> through
+`bmad-build`'s patch loop, then run the three lenses again as new subagents.
 
 Commit only on <branch or worktree>. Do not merge and do not push.
 
