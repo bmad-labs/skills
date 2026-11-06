@@ -22,7 +22,7 @@ release-please handles version determination, changelog generation, and git tagg
 When a user asks for help writing a commit message (not setting up a pipeline):
 
 1. **Ask what changed** — "What did you change and why?" (skip if already described)
-2. **Suggest the type** — Pick from the type table below, explain why that type fits
+2. **Suggest the type** — Pick from the type table in the Commit Message Guide below, explain why that type fits
 3. **Draft the message** — Write the full commit message (header + body if needed + footers)
 4. **Confirm** — Present it for the user to approve or adjust
 
@@ -110,10 +110,6 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: write
-  pull-requests: write
-
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
@@ -121,6 +117,9 @@ concurrency:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -135,7 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      id-token: write # required for npm --provenance
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -166,75 +165,31 @@ For **other ecosystems**, see `references/workflow-templates.md` for complete te
 
 ## Configuration Quick Reference
 
+The options you will set most often (all go under `packages.<path>` in `release-please-config.json`):
+
 | Option | Default | Purpose |
 |--------|---------|---------|
 | `release-type` | — | Package ecosystem (required) |
-| `bump-minor-pre-major` | `false` | Treat `feat` as patch when < 1.0.0 |
-| `changelog-path` | `CHANGELOG.md` | Where to write the changelog |
+| `bump-minor-pre-major` | `false` | While < 1.0.0, breaking changes bump minor instead of major |
+| `bump-patch-for-minor-pre-major` | `false` | While < 1.0.0, `feat` bumps patch instead of minor |
 | `include-v-in-tag` | `true` | Tag as `v1.2.3` vs `1.2.3` |
-| `separate-pull-requests` | `false` | One PR per package (monorepo) |
-| `draft` | `false` | Create release PRs as drafts |
 | `extra-files` | `[]` | Additional files with version strings to update |
-| `changelog-sections` | (defaults) | Customize which types appear in changelog |
 
-### Monorepo Quick Setup
+For monorepos, add one entry per package path under `packages` (each with a `component` name), list every path in the manifest, and use the component name as the commit scope.
 
-```json
-// release-please-config.json
-{
-  "packages": {
-    "packages/core": { "release-type": "node", "component": "core" },
-    "packages/cli": { "release-type": "node", "component": "cli" }
-  }
-}
-```
-
-```json
-// .release-please-manifest.json
-{ "packages/core": "0.0.0", "packages/cli": "0.0.0" }
-```
-
-Use component names as commit scopes: `feat(core): add streaming support`
-
-For full configuration options, see `references/config-options.md`.
+For every option, release types, monorepo setup, and Action inputs/outputs, see `references/config-options.md`.
 
 ## Commit Message Guide
 
-release-please reads commit messages to determine version bumps and generate changelogs. Every commit to the default branch must follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+release-please reads commit messages on the default branch to decide the version bump and build the changelog. Commits must follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/): `<type>(<scope>): <description>`, imperative, lowercase, no trailing period.
 
-### Format
+| Type | Bump |
+|------|------|
+| `feat` | Minor |
+| `fix`, `deps` | Patch |
+| `refactor`, `perf`, `test`, `docs`, `style`, `chore`, `build`, `ci` | None (no release on their own) |
 
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-- Use imperative present tense: "add" not "added"
-- Do not capitalize the first letter of the description
-- Do not end with a period
-
-### Type → Version Bump
-
-| Type | Bump | Triggers Release? |
-|------|------|-------------------|
-| `feat` | Minor | Yes |
-| `fix` | Patch | Yes |
-| `deps` | Patch | Yes |
-| `refactor` | — | No |
-| `perf` | — | No |
-| `test` | — | No |
-| `docs` | — | No |
-| `style` | — | No |
-| `chore` | — | No |
-| `build` | — | No |
-| `ci` | — | No |
-
-**Breaking changes** (any type with `!` or `BREAKING CHANGE:` footer) → **Major** bump.
-
-### Breaking Change Examples
+Any type with `!` or a `BREAKING CHANGE:` footer bumps **major** (minor while < 1.0.0 if `bump-minor-pre-major` is set). A `Release-As: x.x.x` footer forces a specific version.
 
 ```
 feat(api)!: redesign authentication flow
@@ -242,34 +197,11 @@ feat(api)!: redesign authentication flow
 BREAKING CHANGE: /auth/login now requires OAuth2 tokens instead of API keys.
 ```
 
-```
-refactor(database): migrate from MongoDB to PostgreSQL
-
-BREAKING CHANGE: all database connection strings must be updated.
-```
-
-### Special Footers
-
-| Footer | Purpose |
-|--------|---------|
-| `BREAKING CHANGE: <desc>` | Triggers major version bump |
-| `Release-As: x.x.x` | Force a specific version number |
-
-### Quick Examples
-
-```
-feat(booking): add search by date range endpoint
-fix(auth): resolve token refresh race condition
-deps: upgrade @nestjs/core to v11.0.0
-test(scheduler): add unit tests for cron parser
-chore: update .gitignore
-```
+For the full spec, decision tree, scope guidance, 15+ examples, and anti-patterns, see `references/commit-conventions.md`.
 
 ### No AI Co-Author Trailers
 
 **NEVER add `Co-Authored-By` trailers for AI agents** in commit messages. These pollute changelogs and git history.
-
-For the complete commit conventions reference with 15+ examples, scopes guide, and anti-patterns, see `references/commit-conventions.md`.
 
 ## Best Practices
 
