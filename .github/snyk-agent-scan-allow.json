@@ -16,7 +16,8 @@
     "third_party_content_exposure": "Web research for options is the skill's job; results are evidence, not instructions."
   },
   "skills/mcp-builder": {
-    "secret_detection": "False positive: Snyk's own redaction of placeholders such as ANTHROPIC_API_KEY=your_api_key_here in reference/evaluation.md."
+    "secret_detection": "False positive: Snyk's own redaction of placeholders such as ANTHROPIC_API_KEY=your_api_key_here in references/evaluation.md.",
+    "third_party_content_exposure": "Reading the target service's API docs is the skill's job; SKILL.md step 1.4 treats fetched pages as reference, not instructions."
   },
   "skills/typescript-clean-code": {
     "secret_detection": "False positive: Snyk's own redaction of a checkPassword example in references/functions/examples.md."
