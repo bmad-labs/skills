@@ -64,7 +64,9 @@ For more than one issue, use [`bulk-pull.md`](bulk-pull.md) instead: the failure
 that matter at 80 issues are not the ones that matter at one.
 
 Give it: the issue key, the output folder, the output mode, the instructions text
-from steps 1 and 2, and the whole of
+from steps 1 and 2, whether to pull change history (`no`, `yes`, or `only` for an
+issue already on disk — see [Change history is opt-in](../SKILL.md#change-history-is-opt-in)), and
+the whole of
 [`../templates/subagent-instruction.md`](../templates/subagent-instruction.md).
 
 ### The loop
@@ -85,7 +87,9 @@ The parts, in this order:
 | 3 | `fetch-issue.mjs <KEY> --part tasks` | `tasks.md` | Skipped when the issue has no subtasks |
 | 4 | `fetch-issue.mjs <KEY> --part worklogs` | `worklogs.md` | Reads the issue **and every subtask** |
 | 5 | `fetch-issue.mjs <KEY> --part development` | `development.md` | Skipped when the issue has no development activity |
-| 6 | `fetch-confluence.mjs --issue <KEY>` | `confluence/*.md` | Only when the issue links a page |
+| 6 | `fetch-issue.mjs <KEY> --part history` | `history.md` | Only when the user asked for change history. Reads the issue **and every subtask** |
+| 7 | `fetch-confluence.mjs --issue <KEY>` | `confluence/*.md` | Only when the issue links a page |
+| 8 | `fetch-github.mjs --issue <KEY>` | `github/<slug>/` | Only when a design field links GitHub |
 
 Each pass through the loop:
 
@@ -115,6 +119,13 @@ Then the next part.
 
 ### Part notes
 
+**`history`** — pulled only when the user asked for it. The changelog of the issue
+and of every subtask, each paged to its
+own `total`. A short value sits in its table cell. A long or multi-line value — a
+description or an Acceptance Criteria edit — is a numbered text edit, written as a
+unified diff under the table. The diff is the record: never edit inside its fence.
+The format pass on this file is a read-through, not a rewrite.
+
 **`confluence`** — sources are `/issue/{key}/remotelink`, plus any wiki URL in the
 description or a comment, including an `inlineCard` smart link. Depth comes from
 `confluence.maxDepth`. `--list` reports what it found without writing anything.
@@ -125,6 +136,31 @@ heading, so the reader finds it without being told it exists. That edit re-opens
 
 A pulled page is markdown in every output mode, so `check-json.mjs` never runs on
 it.
+
+**`github`** — the fields read are the description plus whatever
+`github.sourceFields` names, which on a real project is the technical design and
+technical solution custom fields. A GitHub link in a comment is a passing
+reference rather than the design, so it is left alone.
+
+Each link writes one folder under `github/`: a metadata document naming what the
+link points at, and the file contents under `files/`. A pull request writes every
+changed text file, so the design is readable without opening a browser; a
+directory writes its files; a bare repository writes its readme.
+
+**Keep the GitHub URL and add the local link after it.** The URL as the issue
+wrote it is the record of what the author linked, and a local path is not a
+substitute for it — a reader needs the source to go and comment on the pull
+request. Append the local link to the same line:
+
+```markdown
+- [https://github.com/org/repo/pull/84](https://github.com/org/repo/pull/84) — [local copy of pull request 84](github/pull-84-repo/pull-84-repo.md)
+```
+
+That edit re-opens `content.md`, so re-run its gates.
+
+`gh` must be installed and authenticated. When it is not, the part exits 1 and
+names why, and nothing is written — the issue keeps its GitHub links either way,
+so this is a part to re-run rather than a pull to abandon.
 
 **`development`** — the panel comes from `/rest/dev-status/1.0/`, which Atlassian
 does not document. Unlike every other part, a gap here is **not** a failed part: the
@@ -158,8 +194,8 @@ formatting pass changed no words, and the files match Jira.
 norm() { sed -e 's/!\[[^]]*\]/![]/g' -e 's/^#\{1,6\} //' -e 's/\*\*//g' \
   -e 's/^[-*+] //' -e 's/^|//' -e 's/|$//' "$1" \
   | tr '|' '\n' | sed 's/:$//' | tr -s '[:space:]' '\n' | grep -v '^$' | sort; }
-for f in content comments tasks worklogs development; do
-  [ -f <folder>/$f.md ] || continue
+for f in content comments tasks worklogs development history; do
+  [ -f <scratchpad>/$f.fetched.md ] || continue
   diff <(norm <scratchpad>/$f.fetched.md) <(norm <folder>/$f.md) | grep '^>' \
     && echo "^ $f.md added words"
 done
@@ -181,6 +217,9 @@ node <skill-path>/scripts/jira-api.mjs get /rest/api/3/issue/<KEY>/properties/ch
 - worklog entry count and time total in `worklogs.md` equal the sum over the issue
   and every subtask
 - subtask count in `tasks.md` equals the issue's own subtask count
+- when history was pulled: `history.md`'s `total` equals the changelog `total`
+  summed over the issue and every subtask, and `issues` equals one plus the subtask
+  count
 - summary, status and assignee in `content.md` match the issue
 - the checklist line in `content.md` matches the count in that `checklist` property.
   The boxes stay unticked whatever it says — only the count is checkable
@@ -188,6 +227,9 @@ node <skill-path>/scripts/jira-api.mjs get /rest/api/3/issue/<KEY>/properties/ch
   name any gap the endpoint left
 - every page in `confluence/` is linked from `content.md`. A page on disk that
   nothing points at is invisible to the reader, and no gate can see it missing
+- every folder in `github/` is linked from `content.md`, on the same line as the
+  GitHub URL it came from, and that URL is still there. A local link that replaced
+  the original is a lost record, not a formatted one
 
 **Both gates clean, across the folder:**
 
@@ -198,9 +240,13 @@ node <skill-path>/scripts/jira-api.mjs get /rest/api/3/issue/<KEY>/properties/ch
 # -not -path '*/assets/*': those .md files are issue attachments, uploaded
 # verbatim. Gating them reports findings on a correct folder and invites an
 # agent to reformat someone else's file.
+# -not -path '*/github/*/files/*': the same, for source files copied out of a
+# repository. A finding there is a finding against the repository, and editing
+# one makes the local copy disagree with what GitHub actually holds.
 node <skill-path>/scripts/check-markdown.mjs \
-  $(find <folder> -name '*.md' -not -path '*/assets/*')
-node <skill-path>/scripts/check-json.mjs $(find <folder> -name '*.json' -not -path '*/assets/*')
+  $(find <folder> -name '*.md' -not -path '*/assets/*' -not -path '*/github/*/files/*')
+node <skill-path>/scripts/check-json.mjs \
+  $(find <folder> -name '*.json' -not -path '*/assets/*' -not -path '*/github/*/files/*')
 ```
 
 Any count mismatch, or either gate non-zero, is a failed pull. Re-run that part.
@@ -218,6 +264,8 @@ Tell the user:
   anything the development endpoints would not return
 - assets downloaded, and anything listed but deliberately not downloaded, with why
 - Confluence pages pulled, if any
+- GitHub links fetched, what each one is, and how many files came down with it;
+  plus any link left unfetched and why
 - both gates' final exit state
 - anything left unfixed because fixing it would have changed words
 

@@ -58,7 +58,7 @@ _No time logged on this ticket{ or its subtasks}._
 |---|---|
 | `Ticket` column | The issue the time was logged against — usually a subtask, not the fetched issue |
 | Row order | Oldest first, by `started`, so the table reads as the history of the work |
-| Duration format | Jira's own: `2h`, `30m`, `1d 4h`. A day is 8 hours |
+| Duration format | Jira's own: `2h`, `30m`, `1d 4h`. A day is the site's working day, `jira.hoursPerDay` (Jira's default is 8) |
 | `Hours` column | The same duration as a decimal, so a reader can add it up |
 | Both totals | Each sums to the header total. A mismatch means a parse or fetch bug, not a rounding difference |
 | "across this ticket and its subtasks" | Present only when the issue has subtasks |

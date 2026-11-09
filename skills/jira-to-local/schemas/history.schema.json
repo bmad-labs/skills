@@ -1,0 +1,78 @@
+{
+  "$id": "jira-to-local/history-v1",
+  "title": "The change history of a fetched issue and its subtasks",
+  "description": "Every changelog entry on the issue and on each subtask, oldest first per issue. Each issue's `changes` must hold its `total`. A file with fewer is a truncated fetch, not a quieter ticket.",
+  "type": "object",
+  "required": ["$schema", "key", "url", "total", "issues"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "jira-to-local/history-v1" },
+    "key": {
+      "type": "string",
+      "description": "The issue this file was fetched for."
+    },
+    "url": { "type": "string" },
+    "summary": { "type": ["string", "null"] },
+    "readOnly": {
+      "const": true,
+      "description": "History is written by Jira as the issue changes, never by editing this file."
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Changelog entries summed over every issue below."
+    },
+    "issues": {
+      "type": "array",
+      "description": "The fetched issue first, then each subtask in the parent's order.",
+      "items": {
+        "type": "object",
+        "required": ["key", "readable", "total", "changes"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string" },
+          "summary": { "type": ["string", "null"] },
+          "readable": {
+            "type": "boolean",
+            "description": "False when the account cannot read this issue. `changes` is then empty and says nothing about the issue."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "The count Jira reported for this issue's changelog."
+          },
+          "changes": {
+            "type": "array",
+            "description": "Oldest first. One entry per edit; one edit can change several fields.",
+            "items": {
+              "type": "object",
+              "required": ["id", "author", "created", "items"],
+              "additionalProperties": false,
+              "properties": {
+                "id": { "type": "string" },
+                "author": { "type": "string" },
+                "created": { "type": "string" },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["field", "from", "to"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "field": { "type": "string" },
+                      "from": {
+                        "type": ["string", "null"],
+                        "description": "The display value Jira's History tab shows, or the raw id when Jira gives no display value."
+                      },
+                      "to": { "type": ["string", "null"] }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

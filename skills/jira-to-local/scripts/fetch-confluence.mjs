@@ -24,7 +24,7 @@
 
 import { writeFileSync, mkdirSync, existsSync, realpathSync } from 'node:fs';
 import { join, resolve, dirname, extname, basename } from 'node:path';
-import { connect, apiGet, apiGetSoft } from './jira-api.mjs';
+import { connect, apiGet, apiGetSoft, downloadAttachment } from './jira-api.mjs';
 import { outputDirFor } from './config.mjs';
 import { storageToMarkdown } from './confluence-format.mjs';
 
@@ -162,15 +162,12 @@ async function downloadAttachments(cred, pageId, assetsDir, markdown, { skip }) 
     const downloadPath = att._links?.download;
     if (!filename || !downloadPath) continue;
 
-    const res = await fetch(`https://${cred.domain}/wiki${downloadPath}`, {
-      headers: { Authorization: cred.auth },
-      redirect: 'follow',
-    });
-    if (!res.ok) continue;
-
     mkdirSync(assetsDir, { recursive: true });
     const name = safeAssetName(filename);
-    writeFileSync(join(assetsDir, name), Buffer.from(await res.arrayBuffer()));
+    const failed = await downloadAttachment(
+      cred, 'confluence', { id: att.id, restPath: `/wiki${downloadPath}` }, join(assetsDir, name),
+    );
+    if (failed) continue;
     saved += 1;
 
     const rel = `assets/${name}`;
@@ -334,7 +331,8 @@ async function main() {
     if (!page) { skipped.push(`page ${pageId} could not be read`); return; }
 
     mkdirSync(outDir, { recursive: true });
-    let body = storageToMarkdown(page.body?.storage?.value || '');
+    // twg serves the page already as markdown; REST serves storage XML to convert.
+    let body = page.body?.markdown?.value ?? storageToMarkdown(page.body?.storage?.value || '');
     const result = await downloadAttachments(cred, pageId, join(outDir, 'assets'), body, {
       skip: !!flags['no-assets'],
     });

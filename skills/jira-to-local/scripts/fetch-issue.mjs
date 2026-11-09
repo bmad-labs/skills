@@ -8,7 +8,7 @@
  * whoever has to check it.
  *
  * Usage:
- *   fetch-issue.mjs <ISSUE-KEY> --part content|comments|tasks|worklogs|development
+ *   fetch-issue.mjs <ISSUE-KEY> --part content|comments|tasks|worklogs|development|history
  *
  * Options:
  *   --out DIR         Override the output folder (default: from the config)
@@ -27,14 +27,15 @@
 import { writeFileSync, mkdirSync, existsSync, copyFileSync, realpathSync } from 'node:fs';
 import { join, resolve, dirname, extname, basename } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { connect, apiGet, apiGetSoft, getAllPages } from './jira-api.mjs';
+import { connect, apiGet, apiGetSoft, getAllPages, downloadAttachment } from './jira-api.mjs';
 import { issueTypeConfig, outputDirFor, outputModes } from './config.mjs';
 import { adfToMarkdown, renderValue, parseDevelopment, formatSeconds, cell } from './adf.mjs';
 import { fetchDevStatus, groupByRepository } from './dev-status.mjs';
+import { fetchHistory, isTextEdit, lineDiff, fenceFor } from './history.mjs';
 
 const SCRIPT_DIR = dirname(new URL(import.meta.url).pathname);
 
-const PARTS = ['content', 'comments', 'tasks', 'worklogs', 'development'];
+const PARTS = ['content', 'comments', 'tasks', 'worklogs', 'development', 'history'];
 const IMAGE_TYPES = /^image\//;
 
 /** File types nothing in this workspace should ever run. Listed, never fetched. */
@@ -269,23 +270,20 @@ async function downloadAssets(cred, attachments, assetsDir, opts) {
       continue;
     }
 
-    const res = await fetch(`https://${cred.domain}/rest/api/3/attachment/content/${att.id}`, {
-      headers: { Authorization: cred.auth },
-      redirect: 'follow',
-    });
-    if (!res.ok) {
+    mkdirSync(assetsDir, { recursive: true });
+    const name = safeAssetName(att.filename);
+    const failed = await downloadAttachment(
+      cred, 'jira', { id: att.id, restPath: `/rest/api/3/attachment/content/${att.id}` }, join(assetsDir, name),
+    );
+    if (failed) {
       report.push({
         filename: att.filename,
         size: att.size || 0,
         mimeType: att.mimeType || '',
-        skipped: `download failed with ${res.status}`,
+        skipped: failed,
       });
       continue;
     }
-
-    mkdirSync(assetsDir, { recursive: true });
-    const name = safeAssetName(att.filename);
-    writeFileSync(join(assetsDir, name), Buffer.from(await res.arrayBuffer()));
     const rel = `assets/${name}`;
 
     byName.set(att.filename, rel);
@@ -1014,7 +1012,7 @@ function buildDevelopmentMarkdown(cred, issue, dev) {
 // worklogs
 // ---------------------------------------------------------------------------
 
-function buildWorklogsMarkdown(cred, issue, entries, hasSubtasks) {
+export function buildWorklogsMarkdown(cred, issue, entries, hasSubtasks, secondsPerDay) {
   const out = [];
   const totalSeconds = entries.reduce((a, e) => a + e.seconds, 0);
 
@@ -1036,7 +1034,7 @@ function buildWorklogsMarkdown(cred, issue, entries, hasSubtasks) {
   const scope = hasSubtasks ? ' across this ticket and its subtasks' : '';
   out.push(
     `${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}${scope}. ` +
-    `**Total logged: ${formatSeconds(totalSeconds)}** (${(totalSeconds / 3600).toFixed(2)}h).`,
+    `**Total logged: ${formatSeconds(totalSeconds, secondsPerDay)}** (${(totalSeconds / 3600).toFixed(2)}h).`,
     ''
   );
 
@@ -1060,7 +1058,7 @@ function buildWorklogsMarkdown(cred, issue, entries, hasSubtasks) {
   out.push('---', '', '## Total by person', '');
   out.push('| Author | Time | Hours |', '| --- | --- | --- |');
   for (const [author, secs] of sumBy((e) => e.author)) {
-    out.push(`| ${cell(author)} | ${formatSeconds(secs)} | ${(secs / 3600).toFixed(2)} |`);
+    out.push(`| ${cell(author)} | ${formatSeconds(secs, secondsPerDay)} | ${(secs / 3600).toFixed(2)} |`);
   }
   out.push('');
 
@@ -1072,9 +1070,95 @@ function buildWorklogsMarkdown(cred, issue, entries, hasSubtasks) {
     const summaryOf = new Map(entries.map((e) => [e.issueKey, e.issueSummary]));
     for (const [k, secs] of byIssue) {
       const title = summaryOf.get(k) ? ` — ${cell(summaryOf.get(k))}` : '';
-      out.push(`| [${k}](${browseUrl(cred, k)})${title} | ${formatSeconds(secs)} | ${(secs / 3600).toFixed(2)} |`);
+      out.push(`| [${k}](${browseUrl(cred, k)})${title} | ${formatSeconds(secs, secondsPerDay)} | ${(secs / 3600).toFixed(2)} |`);
     }
     out.push('');
+  }
+
+  return out.join('\n').replace(/\n{3,}/g, '\n\n');
+}
+
+/**
+ * The change history of the issue and every subtask, one section per issue. A
+ * short value sits in its table cell; a long or multi-line one is a text edit,
+ * written as a diff under the table, because the changelog holds the whole value
+ * before and after and the one changed line would be lost in it.
+ */
+export function buildHistoryMarkdown(cred, issue, histories) {
+  const out = [];
+  const total = histories.reduce((a, h) => a + h.changes.length, 0);
+  const items = histories.reduce((a, h) => a + h.changes.reduce((b, c) => b + c.items.length, 0), 0);
+  const subtaskCount = histories.length - 1;
+
+  out.push(frontmatter([
+    'schema: jira-to-local/history-v1',
+    `jira_key: ${issue.key}`,
+    `jira_url: ${browseUrl(cred, issue.key)}`,
+    `total: ${total}`,
+    `items: ${items}`,
+    `issues: ${histories.length}`,
+    `fetched: ${today()}`,
+  ]));
+  out.push(...documentHeader(cred, issue, 'Change History'));
+
+  const scope = subtaskCount
+    ? ` across this ticket and its ${subtaskCount} subtask${subtaskCount === 1 ? '' : 's'}`
+    : '';
+  out.push(
+    `${total} change${total === 1 ? '' : 's'}${scope}, holding ${items} field change${items === 1 ? '' : 's'}. ` +
+    'Each section lists one ticket, oldest change first.',
+    '',
+    'A long or multi-line value is a text edit. Its table row names the edit, and the edit ' +
+    'is a diff under the table: a `-` line was removed, a `+` line was added, and an ' +
+    'unmarked line is unchanged context.',
+    ''
+  );
+
+  let editNo = 0;
+  for (const h of histories) {
+    out.push(`## [${h.key}](${browseUrl(cred, h.key)}) — ${h.summary}`, '');
+    if (!h.readable) {
+      out.push('_This account cannot read the history of this ticket._', '');
+      continue;
+    }
+    if (!h.changes.length) {
+      out.push('_No changes recorded._', '');
+      continue;
+    }
+
+    const edits = [];
+    out.push('| Date | Author | Field | From | To |', '| --- | --- | --- | --- | --- |');
+    for (const c of h.changes) {
+      for (const it of c.items) {
+        let from = cell(it.from);
+        let to = cell(it.to);
+        if (isTextEdit(it.from) || isTextEdit(it.to)) {
+          editNo++;
+          edits.push({ no: editNo, change: c, item: it });
+          from = to = `Text edit ${editNo}`;
+        }
+        out.push(`| ${formatDateTime(c.created)} | ${cell(c.author)} | ${cell(it.field)} | ${from} | ${to} |`);
+      }
+    }
+    out.push('');
+
+    if (edits.length) {
+      out.push('### Text edits', '');
+      for (const e of edits) {
+        const diff = lineDiff(e.item.from, e.item.to).join('\n');
+        const fence = fenceFor(diff);
+        out.push(
+          `#### Text edit ${e.no} — ${e.item.field}`,
+          '',
+          `${formatDateTime(e.change.created)}, ${e.change.author}.`,
+          '',
+          `${fence}diff`,
+          diff,
+          fence,
+          ''
+        );
+      }
+    }
   }
 
   return out.join('\n').replace(/\n{3,}/g, '\n\n');
@@ -1238,6 +1322,7 @@ async function main() {
 
   const { config, root, cred } = connect();
   const modes = outputModes(config);
+  const secondsPerDay = (config.jira?.hoursPerDay ?? 8) * 3600;
   if (flags.mode && flags.mode !== true) {
     if (!['markdown', 'json', 'both'].includes(flags.mode)) {
       console.error(`--mode must be markdown, json or both, got: ${flags.mode}`);
@@ -1508,7 +1593,7 @@ async function main() {
           assignee: s.fields?.assignee?.displayName || null,
           originalEstimate: s.fields?.timetracking?.originalEstimate || null,
           // Jira's own second counts, alongside its display strings. "7h" hides
-          // that Jira's working day is 8 hours, so summing the strings gives the
+          // the site's working day (8 hours by default), so summing the strings gives the
           // wrong answer; the seconds add up correctly.
           originalEstimateSeconds: s.fields?.timetracking?.originalEstimateSeconds ?? null,
           timeSpent: s.fields?.timetracking?.timeSpent || null,
@@ -1577,7 +1662,7 @@ async function main() {
     const { entries, sources } = await fetchWorklogs(cred, issue, subtaskRefs, pageSize);
     const totalSeconds = entries.reduce((a, e) => a + e.seconds, 0);
 
-    if (modes.markdown) write('worklogs.md', buildWorklogsMarkdown(cred, issue, entries, subtaskKeys.length > 0));
+    if (modes.markdown) write('worklogs.md', buildWorklogsMarkdown(cred, issue, entries, subtaskKeys.length > 0, secondsPerDay));
     if (modes.json) {
       const sumBy = (keyFn) => {
         const m = new Map();
@@ -1613,19 +1698,51 @@ async function main() {
           comment: (e.comment ? adfToMarkdown(e.comment, null).trim() : '') || null,
         })),
         byPerson: sumBy((e) => e.author).map(([author, secs]) => ({
-          author, seconds: secs, timeSpent: formatSeconds(secs),
+          author, seconds: secs, timeSpent: formatSeconds(secs, secondsPerDay),
         })),
         // With one issue this only restates the header total.
         ...(byIssue.length > 1
-          ? { byIssue: byIssue.map(([k, secs]) => ({ issueKey: k, seconds: secs, timeSpent: formatSeconds(secs) })) }
+          ? { byIssue: byIssue.map(([k, secs]) => ({ issueKey: k, seconds: secs, timeSpent: formatSeconds(secs, secondsPerDay) })) }
           : {}),
         sources,
       });
     }
 
     const carrying = sources.filter((s) => s.total > 0).map((s) => `${s.issueKey}:${s.total}`);
-    log(`${key} worklogs — ${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}, ${formatSeconds(totalSeconds) || '0m'}`);
+    log(`${key} worklogs — ${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}, ${formatSeconds(totalSeconds, secondsPerDay) || '0m'}`);
     log(`  read ${sources.length} issue(s); time on: ${carrying.length ? carrying.join(' ') : 'none'}`);
+  }
+
+  // -------------------------------------------------------------------------
+  if (part === 'history') {
+    const subtaskRefs = (issue.fields?.subtasks || [])
+      .map((s) => ({ key: s.key, summary: s.fields?.summary || '' }));
+    const histories = await fetchHistory(cred, issue, subtaskRefs, pageSize);
+    const total = histories.reduce((a, h) => a + h.changes.length, 0);
+
+    if (modes.markdown) write('history.md', buildHistoryMarkdown(cred, issue, histories));
+    if (modes.json) {
+      writeJson('history.json', {
+        $schema: 'jira-to-local/history-v1',
+        key,
+        url: browseUrl(cred, key),
+        summary: issue.fields?.summary || null,
+        readOnly: true,
+        total,
+        issues: histories.map((h) => ({
+          key: h.key,
+          summary: h.summary || null,
+          readable: h.readable,
+          total: h.total,
+          changes: h.changes,
+        })),
+      });
+    }
+
+    const unreadable = histories.filter((h) => !h.readable).map((h) => h.key);
+    log(`${key} history — ${total} change(s) across ${histories.length} issue(s)`);
+    log(`  per issue: ${histories.map((h) => `${h.key}:${h.changes.length}/${h.total}`).join(' ')}`);
+    if (unreadable.length) log(`  unreadable: ${unreadable.join(' ')}`);
   }
 
   // Validate every JSON file before claiming the part is done, so an invalid

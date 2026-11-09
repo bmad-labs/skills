@@ -176,8 +176,7 @@ if (!files.length || process.argv.includes('--help') || process.argv.includes('-
   const schemas = loadSchemas();
   console.log(`Schemas in ${SCHEMA_DIR}:`);
   for (const id of [...schemas.keys()].sort()) console.log(`  ${id}`);
-  const askedForHelp = process.argv.includes('--help') || process.argv.includes('-h');
-  process.exit(askedForHelp ? 0 : 1);
+  process.exit(files.length ? 0 : 1);
 }
 
 const schemas = loadSchemas();

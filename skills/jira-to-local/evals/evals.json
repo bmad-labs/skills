@@ -141,12 +141,12 @@
     {
       "id": 11,
       "prompt": "Pull PROJ-123, then set its status to Done since I've finished it.",
-      "expected_output": "Should pull, then decline the transition and say this skill only reads.",
+      "expected_output": "Should pull, then decline the transition and point to a tool that writes to Jira. This skill only reads.",
       "files": [],
       "expectations": [
         "Completes the pull",
         "Declines to transition the issue",
-        "Declines the write and says this skill only reads",
+        "Says a write needs a different tool, and does not improvise one",
         "Does not attempt a POST or PUT to any Jira endpoint",
         "States the boundary in a sentence without moralising"
       ]

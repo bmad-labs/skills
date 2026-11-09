@@ -6,47 +6,60 @@ Create `.jira.config.json` for this project. Runs once; after that
 **Reference files:** [`../references/jira-fields.md`](../references/jira-fields.md),
 [`../templates/jira.config.json`](../templates/jira.config.json)
 
-## Contents
-
-- [The five decisions](#the-five-decisions)
-- [How a decision gets settled](#how-a-decision-gets-settled) — exit codes, who may touch a box
-- [Step 1: Credentials](#step-1-credentials)
-- [Step 2: The project](#step-2-the-project)
-- [Step 3: The issue types](#step-3-the-issue-types)
-- [Step 4: The boards](#step-4-the-boards)
-- [Step 5: Find a sample issue per type](#step-5-find-a-sample-issue-per-type)
-- [Step 6: The fields, one decision per type](#step-6-the-fields-one-decision-per-type) — 6a generate, 6b hand over, 6c trim, 6d read back, 6e metadata rows, 6f checklist fields
-- [Step 7: Write the instructions](#step-7-write-the-instructions)
-- [Step 8: Output](#step-8-output)
-- [Step 9: Write the config](#step-9-write-the-config)
-- [Step 10: Trial pull](#step-10-trial-pull)
-- [Taking over a decision: what it sounds like](#taking-over-a-decision-what-it-sounds-like)
-
 The config exists so the project key, the issue types and the field list were each
 decided once, with the API's own answer on screen, rather than guessed on every
 pull. So every step asks Jira first and the user second. **Nothing is written to
 `.jira.config.json` until step 9.**
 
+## Joining a project that is already set up
+
+When `.jira.config.json` already exists — a team committed it — the project, type
+and field decisions are made. Only the connection is personal:
+
+1. Show step 0's table and let the user pick. Leave out step 0's note that setup
+   needs a REST token: it is about creating a config, and this one exists.
+2. Record the pick for them alone, in the git-ignored `.jira.config.local.json`:
+
+   ```bash
+   node <skill-path>/scripts/config.mjs transport <rest|twg>
+   ```
+
+   It changes nothing in the shared config; a teammate on the other method is
+   unaffected. Skip it when the pick matches the shared config's `transport`.
+3. Connect with that method. REST: a token they keep, made as in step 1 but
+   without the temporary label or the short expiry, in their shell profile or the
+   git-ignored `.env`. Skip step 1's `setup-choices.mjs connection` line — the
+   shared config already names the site. twg:
+   [Signing in with twg](#signing-in-with-twg).
+4. Prove it with one trial pull: run [`pull.md`](pull.md) on a real issue the user
+   names, and show them the folder.
+
+Steps 2 to 9 are already done.
+
 ## The five decisions
 
 | # | Decision | Step | Ticks recorded in |
 |---|---|---|---|
+| 0 | How to connect: REST or twg | 0 | `transport` (the user's answer in chat, after seeing the table) |
 | 1 | Which project | 2 | `project.key`, `project.name` |
 | 2 | Which issue types | 3 | the keys of `issueTypes` |
 | 3 | Which boards | 4 | `project.boards` |
 | 4 | Which fields, per type | 6a–6d | `issueTypes.<Type>.fields` |
-| 5 | Output mode and destination | 8 | `output`, `confluence` |
+| 5 | Output mode and destination | 8 | `output`, `confluence`, `github` |
 
 Two more things are recorded but are not tick files: **which of this site's custom
-fields fills each metadata row** (step 6e, `project.metaFields`), and **which three
-fields the checklist app writes into** (step 6f, `project.checklistFields`). For
+fields fills each metadata row** (step 6e, `project.metaFields`), **which three
+fields the checklist app writes into** (step 6f, `project.checklistFields`), and
+**which fields hold the GitHub links that are the design** (step 6g,
+`github.sourceFields`). For
 both, you propose the mapping from the field list already on screen and the user
 confirms it, so each is settled by agreement rather than by a ticked box. Leaving
 either unmapped is a valid answer — an unmapped metadata row is written `—`, and an
 unmapped checklist means no checklist section.
 
 Every one of them belongs to the user. Steps 1, 5, 7, 9 and 10 are yours: they
-gather, prove, record and verify. They decide nothing.
+gather, prove, record and verify. They decide nothing. One more thing is the user's
+to do: with `twg`, installing it and accepting Atlassian's terms.
 
 ## How a decision gets settled
 
@@ -114,34 +127,87 @@ config while it exits non-zero.
 
 ---
 
+## Step 0: How pulls connect
+
+The user picks how **pulls** reach Atlassian once the config exists. Show them this
+table as it is, then ask which one they want. Step 9 writes their answer into the
+config as `transport`. Do not pick for them, and do not drop rows to make one look
+better. If they have already said what they need — "I can't make a token" — name
+the column that matches it, and still let them confirm after they have seen the
+table.
+
+Say one thing first: **this setup itself always uses REST**, so step 1 needs an API
+token whichever method they pick. The pick only decides how pulls connect later. In
+a team, the person who runs setup is often the one comfortable making a token, and
+teammates then choose their own method — see
+[Joining a project that is already set up](#joining-a-project-that-is-already-set-up).
+
+| | **REST** (API token) | **twg** (browser sign-in) |
+|---|---|---|
+| Getting started | Make an API token on id.atlassian.com, then add two lines to the shell profile | Install the `twg` tool once, accept Atlassian's terms, sign in with the browser |
+| Good for | People comfortable with a terminal | Anyone. No token to make or keep secret |
+| Speed | Fast. About 5 s for an issue with 18 subtasks | Slower. About 40 s for the same issue: each call takes about 2 s |
+| Development info (PRs, commits, builds, deployments) | Full: links, state, commit hashes, every deployment | Counts only, plus the current state per environment. No PR or commit links |
+| Confluence pages | Converted from Confluence's own format | Converted by `twg`; panels and some macros become plain text |
+| Stability | Jira's public REST API | `twg` is new (version 1.x); a later version may change its commands |
+| Cost | Free | Free today. Atlassian marks some `twg` reads as paid features that may cost credits later |
+| Computers | Any | macOS and Linux sign in from here; on Windows the user runs `twg login` themselves |
+
 ## Step 1: Credentials
 
-Two environment variables carry the secret. The config never does.
+Setup reads Jira through REST, so this step needs an API token whatever step 0
+picked.
+
+Ask for the site domain — the host they use for Jira, like `mycompany.atlassian.net`.
+Record it, so every script can reach Jira before the config exists:
+
+```bash
+node <skill-path>/scripts/setup-choices.mjs connection --site <domain>
+```
+
+It writes `.jira-setup-choices/connection.json`. Until step 9 writes the config,
+every script reads the site from there.
+
+Setup uses a **temporary** API token, kept in a `.env` file at the workspace root
+only until setup ends. The config never holds it.
 
 ```bash
 node <skill-path>/scripts/jira-api.mjs whoami
 ```
 
-A name and an account id back means all three settings are good. Go to step 2.
+A name and an account id back means the site and the token work. Go to step 2.
 
-If variables are missing, walk the user through it:
+If it reports missing variables, walk the user through it:
 
-1. Open <https://id.atlassian.com/manage-profile/security/api-tokens>
-2. Click **Create API token**, label it, copy the value.
-3. Export both, in the shell profile so every later `node` call sees them rather
-   than just this session:
+1. Check that `.env` is git-ignored, before anyone writes a token into it:
 
-```bash
-echo 'export ATLASSIAN_EMAIL="you@example.com"' >> ~/.zshrc
-echo 'export ATLASSIAN_API_TOKEN="paste-it-here"' >> ~/.zshrc
-```
+   ```bash
+   git check-ignore -v .env
+   ```
 
-Then ask for the site domain — the host they use for Jira, like
-`mycompany.atlassian.net`. That becomes `jira.domain`. There is no domain
-environment variable: the config holds it, because it is not a secret.
+   No output means it is **not** ignored. Stop, and tell the user to add `.env` to
+   `.gitignore` first.
+2. The user opens <https://id.atlassian.com/manage-profile/security/api-tokens>,
+   clicks **Create API token**, and labels it as temporary, for example
+   `jira-to-local setup`. If the form asks for an expiry date, they pick the
+   earliest one it offers.
+3. The user creates `.env` at the workspace root **in their own editor** and types
+   these two lines into it:
 
-The user must open a new shell, or `source` the profile, before `whoami` will pass.
-Re-run it until it does.
+   ```
+   ATLASSIAN_EMAIL=you@example.com
+   ATLASSIAN_API_TOKEN=paste-the-token-here
+   ```
+
+   The token goes into that file, never into the chat. Do not open, print or quote
+   `.env`; the only check is that `whoami` passes.
+
+   **If the user pastes a token into the chat anyway**, do not use it or write it
+   anywhere. Tell them the chat keeps a copy, so that token is exposed: they revoke
+   it on the same page and make a new one for `.env`.
+
+Re-run `whoami` until it passes. A variable already exported in the shell wins over
+the same one in `.env`.
 
 ## Step 2: The project
 
@@ -158,6 +224,7 @@ live in a project its repository is not named after, and an account can see many
 projects that look plausible. Only the tick settles it.
 
 **Record:** the ticked key as `project.key`, the name beside it as `project.name`.
+Until step 9 the ticked file is the record: steps 3 to 6 read the project from it.
 
 ## Step 3: The issue types
 
@@ -419,6 +486,41 @@ app. No checklist section is written, and nothing else changes.
 **Record:** the confirmed ids under `project.checklistFields`. Omit the whole block
 when the project has no checklist.
 
+### 6g. Map the fields whose GitHub links are the design
+
+Once for the project, from the same field list, and settled the same way: you
+propose, the user confirms.
+
+Some teams write the technical design as a pull request and put only the link in
+the ticket. For those projects the linked pull request *is* the document, and an
+issue pulled without it is missing the thing it is about. `github.sourceFields`
+names the fields whose GitHub links are worth fetching.
+
+| Include | Leave out |
+|---|---|
+| The technical design field | Any comment field — a GitHub link in a comment is usually a passing reference |
+| The technical solution field | A field holding links to tooling, dashboards, or CI |
+
+`description` is always read and does not need listing.
+
+**Unmapped is a valid answer.** A project whose tickets never link GitHub, or whose
+design lives in Confluence instead, sets `pullLinkedRepos` to false and nothing is
+fetched. The GitHub links stay in `content.md` either way.
+
+**This part needs `gh`.** Check it now rather than at the first pull:
+
+```bash
+gh auth status
+```
+
+Not installed, or not authenticated, is not a blocker for setup — record the fields
+anyway and tell the user that the GitHub part will exit 1 until `gh auth login` is
+run.
+
+**Record:** the confirmed ids under `github.sourceFields`, with the rest of the
+`github` block as the template has it. Set `pullLinkedRepos` to false when the
+project does not want this.
+
 ## Step 7: Write the instructions
 
 `instructions` is free text an agent reads before it fetches anything. It is for
@@ -474,7 +576,7 @@ or commit the tickets deliberately. Do not add the ignore rule on their behalf, 
 do not silently choose a different folder.
 
 **Record:** `output.mode`, `output.dir`, the `output.assets` block as the template
-has it, and the `confluence` block.
+has it, and the `confluence` and `github` blocks.
 
 ## Step 9: Write the config
 
@@ -492,7 +594,8 @@ configured and is not.
 Once `status` exits 0:
 
 1. Copy [`../templates/jira.config.json`](../templates/jira.config.json) and fill it
-   from the ticks.
+   from the ticks. Take `jira.domain` from `.jira-setup-choices/connection.json`,
+   and `transport` from the step 0 answer.
 2. Show the user the whole file and get their word. **Show then write** — approval
    after the write is a review, not a decision.
 3. Write it.
@@ -513,11 +616,68 @@ reads it again.
 
 ## Step 10: Trial pull
 
+If step 0 picked `twg`, sign in first: [Signing in with twg](#signing-in-with-twg).
+
 Run [`pull.md`](pull.md) on one real issue, then show the user the folder and the
 files. This is the only way to find out that a chosen heading reads badly, or that a
 field they skipped was the important one — while it is still cheap to change.
 
 Fix the config and pull again if anything looks wrong.
+
+## Step 11: Remove the temporary token
+
+Setup is done, so the token from step 1 has no further job. Ask the user to:
+
+1. Delete `.env`, or just its two `ATLASSIAN_` lines when the file holds other
+   settings.
+2. Revoke the token at <https://id.atlassian.com/manage-profile/security/api-tokens>,
+   so the copy cannot be used even if it survived somewhere.
+
+Deleting the file and revoking the token are the user's actions. Do not do either for them.
+
+When pulls use `twg`, nothing else is needed. When pulls use REST, the user needs
+their own long-lived token for pulling — [Joining a project that is already set up](#joining-a-project-that-is-already-set-up)
+covers it.
+
+## Signing in with twg
+
+For pulls with `transport: twg` — after setup's step 9, or when joining a project
+that is already set up. Setup itself never uses this. Check where the user is:
+
+```bash
+node <skill-path>/scripts/twg-auth.mjs status --site <jira.domain>
+```
+
+It prints `installed`, `consent` and `signedIn`. Fix the first one that is `false`,
+then run `status` again:
+
+1. **`installed: false`.** The user installs `twg`. Running the installer accepts
+   Atlassian's terms, which is their decision, so they type it, not you. Give them
+   the links to read first — <https://www.atlassian.com/legal/atlassian-customer-agreement>
+   and <https://www.atlassian.com/legal/privacy-policy> — and this line to run in
+   their own terminal. In Claude Code they can type it into the prompt with a `!`
+   in front, which runs it as them:
+
+   ```bash
+   bash <(curl -fsSL https://teamwork-graph.atlassian.com/cli/install) --skip-login --skip-skills --yes
+   ```
+
+2. **`consent: false`.** Same reason: the user records it themselves, with
+   `twg consent --agree` in their own terminal (or `!`-prefixed in Claude Code),
+   after reading the same two links.
+3. **`signedIn: false`.** This one is yours. Run in the background:
+
+   ```bash
+   node <skill-path>/scripts/twg-auth.mjs login --site <jira.domain>
+   ```
+
+   It opens the sign-in page in the browser and prints the page and a code. Show
+   the user both, in case the browser did not open, and tell them to approve it
+   there. The command ends by itself once they approve, or after 10 minutes. Exit 0
+   with `"signedIn": true` means done. Do not ask the user to say "done": wait for
+   the command.
+
+`status` exiting 0 means pulls can run.
 
 ---
 
@@ -542,6 +702,6 @@ That is what makes them worth listing.
 | "The field previews make the answer obvious, so I filled it in." | Obvious to you, from a preview. The user knows which field their team actually writes into. |
 | Regenerating a file to refresh its options. | If it had ticks, `--force` erased a decision. Exit 4 was the mechanism working; the fix is to read the file, not to overrule it. |
 
-**The check:** for each of the five decisions, can you name the file on disk and the
-box in it that the user ticked? If not, that decision is still open, whatever else
-was said about it.
+**The check:** for each of the five file decisions, can you name the file on disk
+and the box in it that the user ticked? For the connection method, can you quote
+their answer? If not, that decision is still open, whatever else was said about it.

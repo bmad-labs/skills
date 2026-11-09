@@ -1,7 +1,9 @@
 {
   "$schema": "jira-to-local/config-v1",
+  "transport": "rest",
   "jira": {
-    "domain": "REPLACE.atlassian.net"
+    "domain": "REPLACE.atlassian.net",
+    "hoursPerDay": 8
   },
   "auth": {
     "source": "env",
@@ -21,12 +23,22 @@
   },
   "instructions": "Write down what an agent cannot learn from the API. Example: 'Time is logged on the subtask, never on the story, so a story showing zero hours is normal. The acceptance criteria live in a custom field, not in the description. The story-format field ships as a blank template and is almost never filled in; treat it as boilerplate. Tickets are written in more than one language; never translate.' Leave this empty if there is nothing to say yet, and add to it as you learn.",
   "output": {
-    "dir": ".ai-artifacts/jira",
+    "dir": "jira-issues",
     "mode": "markdown",
     "assets": {
       "maxMb": 10,
       "imagesOnly": false
     }
+  },
+  "github": {
+    "pullLinkedRepos": true,
+    "subdir": "github",
+    "sourceFields": [
+      "description",
+      "customfield_00000"
+    ],
+    "fetchFileContents": true,
+    "maxFileKb": 512
   },
   "confluence": {
     "pullLinkedPages": true,

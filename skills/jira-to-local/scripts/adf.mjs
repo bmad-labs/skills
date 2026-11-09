@@ -130,6 +130,10 @@ export function adfToMarkdown(node, mediaResolver, depth = 0) {
     }
     case 'inlineCard':
       return `<${node.attrs?.url || ''}>`;
+    // Block-level smart links carry no children, so the default case would drop them.
+    case 'blockCard':
+    case 'embedCard':
+      return `<${node.attrs?.url || ''}>\n\n`;
     case 'mention':
       return `@${node.attrs?.text?.replace(/^@/, '') || 'user'}`;
     case 'emoji':
@@ -261,11 +265,14 @@ export function parseDevelopment(raw) {
   };
 }
 
-/** Jira's own duration format. Its working day is 8 hours, not 24. */
-export function formatSeconds(secs) {
+/**
+ * Jira's own duration format. A day is the site's working day, which Jira
+ * defaults to 8 hours but each site can change (`jira.hoursPerDay`).
+ */
+export function formatSeconds(secs, secondsPerDay = 28800) {
   if (!secs || !Number.isFinite(secs)) return '';
-  const d = Math.floor(secs / 28800);
-  const h = Math.floor((secs % 28800) / 3600);
+  const d = Math.floor(secs / secondsPerDay);
+  const h = Math.floor((secs % secondsPerDay) / 3600);
   const m = Math.round((secs % 3600) / 60);
   return [d ? `${d}d` : '', h ? `${h}h` : '', m ? `${m}m` : ''].filter(Boolean).join(' ') || '0m';
 }

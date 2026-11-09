@@ -23,6 +23,7 @@ paraphrase does not cover. Do not tidy one of the two away in favour of the othe
 Pull it into `{FOLDER}`, one part at a time.
 
 - Output mode is `{MODE}`.
+- Change history: `{HISTORY}`.
 - Skill scripts are at `{SKILL_PATH}/scripts/`.
 - Snapshots go in `{SCRATCHPAD}/`.
 
@@ -35,6 +36,7 @@ Read the one a step names, when that step needs it.
 | `{SKILL_PATH}/references/format-guide.md` | Every checker rule, its defect, its fix |
 | `{SKILL_PATH}/references/refactor-guide.md` | The formatting/wording line, case by case |
 | `{SKILL_PATH}/references/confluence-links.md` | The Confluence part only |
+| `{SKILL_PATH}/references/github-links.md` | The GitHub part only |
 | `{SKILL_PATH}/references/output-json.md` | `json` or `both` mode only |
 
 ## What this project expects
@@ -51,8 +53,17 @@ unformatted, and never save the formatting to the end. One part at a time is the
 point: each file gets checked while it is still small enough to check.
 
 The parts, in this order. Skip 3 if the issue has no subtasks, skip 5 if it has no
-development activity, skip 6 if it links no Confluence page. Each part that writes
-nothing says so and exits 0 — that is a skip, not a failure.
+development activity, skip 7 if it links no Confluence page, skip 8 if no design
+field links GitHub. Each part that writes nothing says so and exits 0 — that is a
+skip, not a failure.
+
+Part 6, `history`, depends on Change history:
+
+| Change history | Parts to run |
+|---|---|
+| `no` | 1–5, 7, 8. Do not run part 6: it is out of scope for this pull, not a skip |
+| `yes` | 1–8 |
+| `only` | Part 6 alone. The other files are already on disk; do not re-fetch or re-format them |
 
 ```bash
 node {SKILL_PATH}/scripts/fetch-issue.mjs {KEY} --part content
@@ -60,7 +71,9 @@ node {SKILL_PATH}/scripts/fetch-issue.mjs {KEY} --part comments
 node {SKILL_PATH}/scripts/fetch-issue.mjs {KEY} --part tasks
 node {SKILL_PATH}/scripts/fetch-issue.mjs {KEY} --part worklogs
 node {SKILL_PATH}/scripts/fetch-issue.mjs {KEY} --part development
+node {SKILL_PATH}/scripts/fetch-issue.mjs {KEY} --part history   # only when Change history is yes or only
 node {SKILL_PATH}/scripts/fetch-confluence.mjs --issue {KEY}
+node {SKILL_PATH}/scripts/fetch-github.mjs --issue {KEY}
 ```
 
 ### 1. Fetch
@@ -179,15 +192,15 @@ content — that one stops a run dead otherwise.
 
 ## Run every part yourself, to the end
 
-All five `fetch-issue.mjs` parts run, in order, before you report. A part that
-writes nothing exits 0 — that is a skip, and you still RUN it.
+Every part the Change history table gives you runs, in order, before you report. A
+part that writes nothing exits 0 — that is a skip, and you still RUN it.
 
 Run every command with your own Bash tool. Do NOT dispatch a subagent for any of
 it: a delegated run leaves the folder empty and reports success anyway.
 
 Do not stop to checkpoint, summarise progress, or hand back mid-loop. If you are
 about to report with parts still unrun, keep going instead. Your report is the last
-thing you do, after part 6.
+thing you do, after the last part your Change history row names.
 
 | Excuse | Reality |
 |---|---|
@@ -202,6 +215,30 @@ The reader cannot open Jira, has not read the code, and does not know the projec
 shorthand. Where an unexplained ticket key, field name, or file path would cost them
 a lookup they cannot make, name what it is in a short clause. That clause is the
 only new prose you write, besides alt text.
+
+## After the GitHub part
+
+A GitHub link in a design field is usually the design itself — the ticket says
+"see the pull request" and the pull request holds the document. `fetch-github.mjs`
+writes each one into `github/<slug>/`.
+
+**Keep the GitHub URL, and add the local link after it.** Do not replace the URL:
+it is what the issue's author wrote, and a reader needs it to open the pull request
+and comment there. Append to the same line:
+
+```markdown
+- [https://github.com/org/repo/pull/84](https://github.com/org/repo/pull/84) — [local copy of pull request 84](github/pull-84-repo/pull-84-repo.md)
+```
+
+Write link text that names what the local copy is, so it passes `WCAG-2.4.4` — the
+text `local copy` alone does not say what of. That edit re-opens `content.md`, so
+re-run its gates.
+
+The fetched documents are markdown in every output mode, so `check-json.mjs` never
+runs on them. Gate them with `check-markdown.mjs` like any other file, but leave
+the files under `github/<slug>/files/` alone: those are someone else's source code
+and documents, copied verbatim, and reformatting them would make the local copy
+disagree with the repository.
 
 ## After the Confluence part
 
@@ -222,12 +259,13 @@ Report, in this order:
 3. Both gates' final exit state.
 4. Anything left unfixed because fixing it would have changed words.
 5. **Confluence — one of exactly two lines:**
-   - `No Confluence page linked.` — part 6 wrote nothing, or
+   - `No Confluence page linked.` — part 7 wrote nothing, or
    - `Linked N page(s) from content.md under ## Linked Documents.` — naming each
      link text you wrote.
 
    There is no third answer. A file in `confluence/` with no link in `content.md`
-   is an unfinished pull, and no gate can see it.
+   is an unfinished pull, and no gate can see it. When Change history is `only`,
+   part 7 did not run: leave line 5 out.
 
 Never the file contents.
 ````
@@ -241,6 +279,7 @@ Never the file contents.
 | `{KEY}` | The issue key, uppercase |
 | `{FOLDER}` | The issue's output folder — `output.dir` plus the key |
 | `{MODE}` | `output.mode`: `markdown`, `json`, or `both` |
+| `{HISTORY}` | `yes` only when the user's request asks how the issue changed — who changed a field, when the AC, estimate, sprint, status or assignee changed, an audit or a timeline. `only` when the issue is already on disk and the user now asks for its history. Otherwise `no`. See `SKILL.md`, "Change history is opt-in" |
 | `{SKILL_PATH}` | This skill's directory |
 | `{SCRATCHPAD}` | A temporary directory for the snapshots |
 | `{MODEL}` | The model to dispatch with. **`sonnet`** — this agent follows a fixed procedure (fetch, format, gate) rather than making open-ended judgements, and an 80-issue pull is dominated by cost and latency, not reasoning depth |

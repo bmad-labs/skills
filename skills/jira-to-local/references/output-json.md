@@ -16,7 +16,7 @@ image files by the same relative paths.
 **Confluence pages have no JSON form.** A wiki page is one prose body, so there is
 nothing to structure. Those files stay markdown in every mode.
 
-## The five documents
+## The six documents
 
 | File | `$schema` | Holds |
 |---|---|---|
@@ -25,6 +25,7 @@ nothing to structure. Those files stay markdown in every mode.
 | `tasks.json` | `jira-to-local/tasks-v2` | Every subtask in full |
 | `worklogs.json` | `jira-to-local/worklogs-v2` | Every worklog entry, plus totals per person and per issue |
 | `development.json` | `jira-to-local/development-v1` | Pull requests, commits and builds grouped by repository, plus every deployment and the state per environment |
+| `history.json` | `jira-to-local/history-v1` | Every changelog entry on the issue and on each subtask, with the full value before and after each field change. Written only when history was asked for |
 
 `$schema` is the first key in every file. It names the layout, and
 `check-json.mjs` resolves it to the matching file in `schemas/`.
@@ -79,19 +80,20 @@ That pattern is not contrived. A story routinely reports `timetracking: {}` — 
 time at all — while its subtasks hold the hours. A parent-only read would report the
 story as untouched.
 
-## Conventions across all five
+## Conventions across all six
 
 - **A missing value is `null`**, never `""` and never an absent key. The fixed
   metadata block always carries all 20 keys, so an empty field is visibly empty
   rather than indistinguishable from one the fetch missed.
 - **A count is what the server reported**, in its own key: `total` on comments,
-  tasks and worklogs. Row arrays hold exactly that many. Anything else is a failed
+  tasks and worklogs, and per issue in history. Row arrays hold exactly that many. Anything else is a failed
   pull, not a shorter document. `development.json` is the one exception and carries
   no `total`: its endpoints publish none, so it reports `counts` from what it read
   and names anything it could not in `degraded`.
 - **`additionalProperties: false` everywhere**, so a typo in a key is a validation
   failure rather than a field that silently vanishes.
-- **`readOnly: true`** on `tasks.json`, `worklogs.json` and `development.json`. They
+- **`readOnly: true`** on `tasks.json`, `worklogs.json`, `development.json` and
+  `history.json`. They
   record what other issues, or a repository integration, say; editing them reaches
   nothing.
 - **Text is markdown**, already converted from ADF. The JSON is a structured

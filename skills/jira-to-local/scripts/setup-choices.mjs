@@ -33,7 +33,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
-import { findConfigPath } from './config.mjs';
+import { findConfigPath, connectionRecord, setupConnectionPath } from './config.mjs';
 import { connect, apiGet, apiGetSoft } from './jira-api.mjs';
 
 const KINDS = ['project', 'issue-types', 'fields', 'board', 'output'];
@@ -100,6 +100,26 @@ function parseTicked(path) {
     if (m[1] !== ' ') ticked.push(m[2]);
   }
   return { ticked, total };
+}
+
+// Before step 9 writes the config, the project decision file is the record of
+// which project was ticked.
+function tickedProject() {
+  return parseTicked(fileFor('project'))?.ticked[0];
+}
+
+// Step 1's record of the site, for every call made before the config exists.
+// Those calls always go through REST.
+function recordConnection() {
+  let record;
+  try {
+    record = connectionRecord(argValue('--site'));
+  } catch (err) {
+    fail(err.message);
+  }
+  const path = setupConnectionPath(dirname(choicesDir()));
+  writeFileSync(path, JSON.stringify(record, null, 2) + '\n');
+  process.stdout.write(`Wrote ${path}\nSetup reaches ${record.jira.domain} through REST.\n`);
 }
 
 // Reads a flag's value out of argv, so generate can take --sample.
@@ -191,7 +211,7 @@ async function generate(kind, type) {
 
   if (kind === 'issue-types') {
     const { config, cred } = connect();
-    const key = config.project?.key;
+    const key = config.project?.key ?? tickedProject();
     if (!key) fail('project.key is not set yet. Settle the project decision first.');
     const meta = await apiGet(cred, `/rest/api/3/project/${encodeURIComponent(key)}`);
     const types = meta.issueTypes ?? [];
@@ -222,7 +242,7 @@ async function generate(kind, type) {
   if (kind === 'fields') {
     if (!type) fail('--type is required for the fields decision.');
     const { config } = connect();
-    const key = config.project?.key;
+    const key = config.project?.key ?? tickedProject();
     if (!key) fail('project.key is not set yet. Settle the project decision first.');
     // The sample issue decides which fields count as populated, so an unpinned
     // sample makes the option list drift: regenerate, land on a different issue,
@@ -334,7 +354,7 @@ async function generate(kind, type) {
 
   if (kind === 'board') {
     const { config, cred } = connect();
-    const key = config.project?.key;
+    const key = config.project?.key ?? tickedProject();
     if (!key) fail('project.key is not set yet. Settle the project decision first.');
     const res = await apiGetSoft(
       cred,
@@ -378,7 +398,7 @@ async function generate(kind, type) {
       'Write the path on the line below, replacing the example. Relative to the',
       'workspace root. One subfolder per issue key is created inside it.',
       '',
-      '    .ai-artifacts/jira',
+      '    jira-issues',
       '',
       'Check whether that path is gitignored before you settle on it: pulled tickets',
       'are Jira content, and committing them duplicates the source of truth.',
@@ -449,13 +469,15 @@ if (!command || command === '--help' || command === '-h') {
       `  generate <kind> [--type TYPE]   write the file, every option unticked\n` +
       `  read <kind> [--type TYPE]       report ticked lines; exit 2 if none, 3 if absent\n` +
       `  generate ... --force            redo a decision that already has ticks (erases them)\n` +
-      `  status                          which decisions are settled\n\n` +
+      `  status                          which decisions are settled\n` +
+      `  connection --site HOST            record the site until the config exists\n\n` +
       `  kind: ${KINDS.join(' | ')}   (--type required for "fields")\n`,
   );
   process.exit(0);
 }
 
 if (command === 'status') status();
+else if (command === 'connection') recordConnection();
 else if (command === 'generate') {
   const r = await generate(kind, type);
   process.stdout.write(
