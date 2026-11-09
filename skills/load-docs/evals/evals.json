@@ -4,16 +4,27 @@
     {
       "id": 0,
       "name": "single-file",
-      "prompt": "Use the load-docs skill to load this file: /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/single-file/notes.md",
+      "prompt": "Use the load-docs skill to load this file: evaluations/skills/load-docs/files/single-file/notes.md",
       "expected_output": "Agent reads the file completely with the Read tool, then responds 'DONE'.",
-      "files": []
+      "files": [
+        "evaluations/skills/load-docs/files/single-file/notes.md"
+      ]
     },
     {
       "id": 1,
       "name": "folder-recursive-with-filter",
-      "prompt": "Use the load-docs skill to load every document in this folder: /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/mixed-folder",
-      "expected_output": "Agent recursively reads README.md, config.yaml, changelog.md, subdir/oncall-runbook.md, subdir/handler.py. Agent SKIPS node_modules/, .git/, and package-lock.json. Agent ends with 'DONE'.",
-      "files": []
+      "prompt": "Use the load-docs skill to load every document in this folder: evaluations/skills/load-docs/files/mixed-folder",
+      "expected_output": "Agent recursively reads README.md, config.yaml, changelog.md, subdir/oncall-runbook.md, subdir/handler.py. Agent SKIPS vendor/, .cache/, and package-lock.json. Agent ends with 'DONE'.",
+      "files": [
+        "evaluations/skills/load-docs/files/mixed-folder/README.md",
+        "evaluations/skills/load-docs/files/mixed-folder/config.yaml",
+        "evaluations/skills/load-docs/files/mixed-folder/changelog.md",
+        "evaluations/skills/load-docs/files/mixed-folder/subdir/oncall-runbook.md",
+        "evaluations/skills/load-docs/files/mixed-folder/subdir/handler.py",
+        "evaluations/skills/load-docs/files/mixed-folder/package-lock.json",
+        "evaluations/skills/load-docs/files/mixed-folder/vendor/leftpad/index.js",
+        "evaluations/skills/load-docs/files/mixed-folder/.cache/build-state.txt"
+      ]
     },
     {
       "id": 2,
@@ -32,9 +43,13 @@
     {
       "id": 4,
       "name": "multiple-mixed",
-      "prompt": "Use the load-docs skill to load all of these:\n- /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/single-file/notes.md\n- /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/mixed-folder/README.md\n- /Users/tannt/Works/GIT/Personal/Sources/the-garden/.claude/skills/load-docs-workspace/fixtures/mixed-folder/subdir/oncall-runbook.md",
+      "prompt": "Use the load-docs skill to load all of these:\n- evaluations/skills/load-docs/files/single-file/notes.md\n- evaluations/skills/load-docs/files/mixed-folder/README.md\n- evaluations/skills/load-docs/files/mixed-folder/subdir/oncall-runbook.md",
       "expected_output": "Agent reads all three files completely, tracks them with TodoWrite, then responds 'DONE'.",
-      "files": []
+      "files": [
+        "evaluations/skills/load-docs/files/single-file/notes.md",
+        "evaluations/skills/load-docs/files/mixed-folder/README.md",
+        "evaluations/skills/load-docs/files/mixed-folder/subdir/oncall-runbook.md"
+      ]
     }
   ]
 }

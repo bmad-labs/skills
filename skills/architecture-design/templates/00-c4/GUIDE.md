@@ -18,7 +18,7 @@ Level: High. Templates: [`README.md`](README.md), [`context.puml`](context.puml)
 
 **Best practices.**
 - ≤ 9 boxes. Merge minor externals into one box when they share a purpose.
-- Use hand SVG when the model is frontier-class and the layout carries meaning (lanes, owners).
+- Use hand SVG when the view has ≤ ~10 boxes and the layout carries meaning (lanes, owners).
 
 **Check.** Renders. Every external system has a row in the README Relations table and a contract in `04-egress-api/`.
 

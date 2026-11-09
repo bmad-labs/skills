@@ -90,11 +90,11 @@ Based on the topic_type and available BMAD skills, suggest what the user can do 
 >
 > 1. **Share the analysis** — Send `{{output_file}}` to [audience from Step 2] for review and discussion
 > 2. **Inform your architecture** — Use the recommendation to guide architecture decisions
->    - If available: "Run `/bmad-bmm-create-architecture` to create a solution architecture based on this analysis"
+>    - If available: "Run `/bmad-architecture` to create a solution architecture based on this analysis"
 > 3. **Create a PRD** — If this analysis supports a product decision
->    - If available: "Run `/bmad-bmm-create-prd` to create a product requirements document"
+>    - If available: "Run `/bmad-prd` to create a product requirements document"
 > 4. **Plan implementation** — Break the recommendation into actionable work
->    - If available: "Run `/bmad-bmm-create-epics-and-stories` to create implementation epics"
+>    - If available: "Run `/bmad-create-epics-and-stories` to create implementation epics"
 > 5. **Conduct a follow-up analysis** — If the decision leads to new sub-decisions
 >    - "Run `/trade-off-analysis` again for any follow-up comparisons"
 

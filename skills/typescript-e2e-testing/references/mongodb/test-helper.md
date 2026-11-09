@@ -123,8 +123,8 @@ describe('Product API E2E', () => {
   });
 
   beforeEach(async () => {
-    // Wait for in-flight operations
-    await new Promise(r => setTimeout(r, 500));
+    // Poll until in-flight operations finish (waitFor helper in SKILL.md)
+    await waitFor(() => isIdle());
     await helper.clearCollections(['products', 'categories']);
   });
 

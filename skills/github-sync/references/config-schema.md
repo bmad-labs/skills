@@ -18,16 +18,18 @@ github:
   project_number: 0      # GitHub Project v2 number (visible in URL)
   project_id: ""         # GraphQL node ID (auto-populated, starts with "PVT_")
 
-paths:
-  stories: ".artifacts/implementation-artifacts"          # adjust per project
-  planning: ".artifacts/planning-artifacts"
-  epics_file: ".artifacts/planning-artifacts/epics.md"
-  sprint_plan_file: ".artifacts/planning-artifacts/sprint-plan.md"
+paths:                   # BMAD defaults — adjust per project
+  stories: "_bmad-output/implementation-artifacts"
+  planning: "_bmad-output/planning-artifacts"
+  epics_file: "_bmad-output/planning-artifacts/epics.md"
+  sprint_plan_file: "_bmad-output/planning-artifacts/sprint-plan.md"
+  # Standard BMAD sprint planning writes implementation-artifacts/sprint-status.yaml;
+  # parse-artifacts.py does not read it (see SKILL.md, "Artifact paths").
 
 field_ids:               # Auto-populated by onboarding (field name -> GraphQL ID)
   story_id: ""           # Custom TEXT field "Story ID"
   epic: ""               # Custom SINGLE_SELECT field "Epic"
-  sprint: ""             # Custom SINGLE_SELECT field "Sprint" (Sprint 01–12)
+  sprint: ""             # Custom SINGLE_SELECT field "Sprint" (Sprint 01..NN, one per sprint)
   dev: ""                # Custom SINGLE_SELECT field "Dev"
   sprint_start: ""       # Custom DATE field "Sprint Start"
   sprint_end: ""         # Custom DATE field "Sprint End"
@@ -41,29 +43,18 @@ field_ids:               # Auto-populated by onboarding (field name -> GraphQL I
 option_ids:              # Auto-populated by onboarding (field.option -> GraphQL ID)
   # WARNING: option IDs change whenever updateProjectV2Field is called to update colors/
   # descriptions. Always re-query and update this section after any field update mutation.
-  epic:
+  # Every option list below is derived from the project's artifacts during onboarding.
+  epic:                  # one entry per epic, names from epics.md
     "1: {Epic Name}": ""
     "2: {Epic Name}": ""
-    # ... one entry per epic, names from epics.md
-  sprint:
-    "Sprint 01": ""      # Colors: RED
-    "Sprint 02": ""      # ORANGE
-    "Sprint 03": ""      # YELLOW
-    "Sprint 04": ""      # GREEN
-    "Sprint 05": ""      # BLUE
-    "Sprint 06": ""      # PURPLE (end of PoC)
-    "Sprint 07": ""      # PINK (start of Hardening)
-    "Sprint 08": ""      # RED
-    "Sprint 09": ""      # ORANGE
-    "Sprint 10": ""      # YELLOW
-    "Sprint 11": ""      # GREEN
-    "Sprint 12": ""      # BLUE (final demo)
-  dev:
-    "All": ""
-    "Dev 1": ""
-    "Dev 2": ""
-    "Dev 3": ""
-    "Dev 1+2": ""
+    # ...
+  sprint:                # one entry per sprint in the sprint plan
+    "Sprint 01": ""      # colors cycle RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, PINK, repeat
+    "Sprint 02": ""
+    # ... through "Sprint {NN}"
+  dev:                   # the distinct values of the sprint plan's Dev column
+    "{Dev value}": ""    # e.g. "All", "Dev 1", "Dev 2"
+    # ...
   status:
     "Backlog": ""
     "Ready": ""
@@ -71,23 +62,18 @@ option_ids:              # Auto-populated by onboarding (field.option -> GraphQL
     "In Review": ""
     "Done": ""
 
-milestones:              # Milestone number -> phase name
-  "PoC": 0               # Sprints 1–6, due Sprint 6 end date
-  "Production Hardening": 0  # Sprints 7–12, due Sprint 12 end date
+milestones:              # Phase milestone name -> milestone number (one per phase in the sprint plan)
+  "{Phase Name}": 0      # due = end date of the phase's last sprint
+  # ...
 
-milestone_mapping:       # Sprint number -> milestone name
-  1: "PoC"
-  2: "PoC"
-  3: "PoC"
-  4: "PoC"
-  5: "PoC"
-  6: "PoC"
-  7: "Production Hardening"
-  8: "Production Hardening"
-  9: "Production Hardening"
-  10: "Production Hardening"
-  11: "Production Hardening"
-  12: "Production Hardening"
+milestone_mapping:       # Sprint number -> phase milestone name (every sprint listed)
+  1: "{Phase Name}"
+  # ...
+
+# Example only — a 12-sprint plan with two phases:
+#   milestones:        { "PoC": 3, "Production Hardening": 4 }
+#   milestone_mapping: { 1..6: "PoC", 7..12: "Production Hardening" }
+#   option_ids.dev:    { "All", "Dev 1", "Dev 2" }
 
 dev_mapping:             # GitHub username -> BMAD dev alias (user-configured)
   # example_user: "Dev 1"
@@ -131,8 +117,8 @@ GraphQL API. You should never need to edit them manually.
 
 ### Paths
 
-Defaults shown above use `.artifacts/`. If the project uses `_bmad-output/` (older BMAD layout),
-update all `paths.*` values accordingly.
+Defaults shown above use the standard BMAD `_bmad-output/` layout. If the project keeps its
+artifacts elsewhere (e.g. a custom `.artifacts/` folder), update all `paths.*` values accordingly.
 
 ### Critical: Option IDs After Field Updates
 

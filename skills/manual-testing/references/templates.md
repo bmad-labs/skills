@@ -1,8 +1,18 @@
 # Test Plan & Test Case Templates
 
+## Contents
+
+- [Test Plan Template](#test-plan-template)
+- [Test Case File Template — Given/When/Then (default for new suites)](#test-case-file-template--givenwhenthen-default-for-new-suites)
+- [Test Case File Template — Steps + Checkpoints (legacy)](#test-case-file-template--steps--checkpoints-legacy)
+- [Suite Layout and Run Folders](#suite-layout-and-run-folders)
+- [Test Case Naming Convention](#test-case-naming-convention)
+- [Checkpoint Writing Patterns](#checkpoint-writing-patterns)
+- [Precondition Patterns](#precondition-patterns)
+
 ## Test Plan Template
 
-Use this for new test plans. Save to the project's test directory — `tests/uat/test-plan.md` in this repo.
+Use this for new test plans. Save to the project's manual-test suite folder as `<suite-dir>/test-plan.md` (e.g. `tests/uat/`, `docs/tests/`, `test/manual/`).
 
 ````markdown
 # [Project Name] — Manual Test Plan
@@ -50,7 +60,7 @@ Use this for new test plans. Save to the project's test directory — `tests/uat
 
 | TC-ID | Name   | Priority | Category   | Design Ref    |
 | ----- | ------ | -------- | ---------- | ------------- |
-| TC-01 | [Name] | Critical | [Category] | [doc section] |
+| TC-01 | [Name] | P0       | [Category] | [doc section] |
 
 ## 6. Test Data
 
@@ -92,7 +102,7 @@ One scenario carries its own setup, actions, and assertions, so a reader never m
 
 ### TC-XX-01: [One behaviour, stated as an outcome]
 
-**Priority**: Critical | High | Medium
+**Priority**: P0 | P1 | P2 | P3
 **Design Ref**: [design doc path] Section [N]; `src/module.py:120`
 
 **Given** [starting state] — verify: `[command]`
@@ -137,7 +147,7 @@ Use only when the suite already uses this shape; don't mix the two in one suite.
 
 ### TC-XX-01: [Specific Scenario Name]
 
-**Priority**: Critical | High | Medium
+**Priority**: P0 | P1 | P2 | P3
 **Design Ref**: [design doc path] Section [N]
 
 **Preconditions**:
@@ -183,7 +193,7 @@ rm -f /path/to/temp/file
 A suite that is run repeatedly needs each run's evidence kept separately, or the second run overwrites the first and nobody can tell when something regressed.
 
 ```
-tests/uat/
+<suite-dir>/                e.g. tests/uat/, docs/tests/, test/manual/
   test-plan.md              scope, format contract, gates, env variables
   README.md                 how to execute a run
   coverage-matrix.md        feature/tool → scenario traceability
@@ -198,7 +208,8 @@ tests/uat/
 
 ```bash
 export PROJECT_ROOT="$(git rev-parse --show-toplevel)"
-export RUN_DIR="$PROJECT_ROOT/tests/uat/run/$(date +%F)-01"   # pick the next free -NN
+export SUITE_DIR="$PROJECT_ROOT/tests/uat"                     # your suite folder
+export RUN_DIR="$SUITE_DIR/run/$(date +%F)-01"                  # pick the next free -NN
 mkdir -p "$RUN_DIR/evidence"
 ```
 
@@ -210,7 +221,7 @@ Make `RUN_DIR` **absolute** when any tool under test resolves paths against its 
 
 ```bash
 # the checkout root must appear nowhere in the test cases
-grep -rn -- "$PROJECT_ROOT" testcases/          # must be empty
+grep -rn -- "${PROJECT_ROOT:?}" testcases/      # must be empty; :? aborts if unset
 # also catch the Windows spelling of the same root
 grep -rni -- "$(cygpath -w "$PROJECT_ROOT" 2>/dev/null || echo "$PROJECT_ROOT")" testcases/
 ```
@@ -278,19 +289,19 @@ TC-{category_number}-{sequence}: {descriptive_name}
 ### Timing Assertion
 
 ```markdown
-- [ ] CP6: Completed within 60 seconds — verify: `duration_ms < 60000` in dream row
+- [ ] CP6: Completed within 60 seconds — verify: `duration_ms < 60000` in the job row
 ```
 
 ### JSON Field
 
 ```markdown
-- [ ] CP7: Response has transcriptId — verify: `echo $RESPONSE | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data']['transcriptId'])"`
+- [ ] CP7: Response has orderId — verify: `echo $RESPONSE | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data']['orderId'])"`
 ```
 
 ### Database State
 
 ```markdown
-- [ ] CP8: Dream status is completed — verify: `psql -t -c "SELECT status FROM jarvis.dreams WHERE id=$DREAM_ID;"` returns "completed"
+- [ ] CP8: Job status is completed — verify: `psql -t -c "SELECT status FROM app.jobs WHERE id=$JOB_ID;"` returns "completed"
 ```
 
 ## Precondition Patterns
@@ -310,7 +321,7 @@ TC-{category_number}-{sequence}: {descriptive_name}
 ```markdown
 **Preconditions**:
 
-- [ ] No existing transcripts for session_id `test-xxx` (verify: `psql -c "SELECT count(*) FROM jarvis.transcripts WHERE session_id='test-xxx';"` returns 0)
+- [ ] No existing orders for customer `cust-test-xxx` (verify: `psql -c "SELECT count(*) FROM app.orders WHERE customer_id='cust-test-xxx';"` returns 0)
 ```
 
 ### Pre-populated State
@@ -318,9 +329,9 @@ TC-{category_number}-{sequence}: {descriptive_name}
 ```markdown
 **Preconditions**:
 
-- [ ] Vault has MEMORY.md with at least 5 entries
-- [ ] Daily log exists for today with at least 1 session block
-- [ ] Pattern file exists with `reinforcement_count >= 3`
+- [ ] Fixture dataset loaded with at least 5 customer records (verify: `[count command]`)
+- [ ] At least 1 order exists for today (verify: `[query]`)
+- [ ] Feature flag `[flag-name]` is enabled (verify: `[command]`)
 ```
 
 ### LLM Available
@@ -329,5 +340,5 @@ TC-{category_number}-{sequence}: {descriptive_name}
 **Preconditions**:
 
 - [ ] LLM API accessible (verify: server started without LLM connection errors)
-- [ ] ARQ worker running (verify: worker log shows "Starting worker for N functions")
+- [ ] Background worker running (verify: worker log shows it started and registered its jobs)
 ```

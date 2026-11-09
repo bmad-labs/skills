@@ -2,6 +2,16 @@
 
 TypeScript examples demonstrating key code smells and their fixes.
 
+## Contents
+
+- [G5: Duplication](#g5-duplication)
+- [G6: Wrong Level of Abstraction](#g6-wrong-level-of-abstraction)
+- [G14: Feature Envy](#g14-feature-envy)
+- [G23: Prefer Polymorphism to Switch](#g23-prefer-polymorphism-to-switch)
+- [G30: Functions Should Do One Thing](#g30-functions-should-do-one-thing)
+- [G31: Hidden Temporal Couplings](#g31-hidden-temporal-couplings)
+- [Refactoring Walkthrough](#refactoring-walkthrough)
+
 ## G5: Duplication
 
 ### Bad Example

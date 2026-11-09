@@ -9,6 +9,21 @@ E2E testing validates complete workflows from user perspective, using real infra
 
 ---
 
+## Contents
+
+- [Workflows](#workflows)
+- [Workflow Selection Guide](#workflow-selection-guide)
+- [Knowledge Base Structure](#knowledge-base-structure)
+- [Quick Reference by Task](#quick-reference-by-task)
+- [Core Principles](#core-principles)
+- [Project Structure](#project-structure)
+- [Essential Jest Configuration](#essential-jest-configuration)
+- [Technology-Specific Timeouts](#technology-specific-timeouts)
+- [Failure Resolution Protocol](#failure-resolution-protocol)
+- [Common Patterns](#common-patterns)
+- [Debugging Commands](#debugging-commands)
+- [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
+
 ## Workflows
 
 For comprehensive step-by-step guidance, use the appropriate workflow:
@@ -256,8 +271,8 @@ const config: Config = {
   testTimeout: 25000,
   maxWorkers: 1,           // CRITICAL: Sequential execution
   clearMocks: true,
-  forceExit: true,
-  detectOpenHandles: true,
+  detectOpenHandles: true, // Find handles that keep Jest alive and close them
+  // forceExit: true only as a last resort — it hides open handles instead of fixing them
 };
 ```
 
@@ -310,8 +325,18 @@ When E2E tests fail:
 
 ### Database Cleanup (PostgreSQL/MongoDB)
 ```typescript
+// Poll a condition instead of sleeping a fixed time
+async function waitFor(check: () => Promise<boolean>, timeoutMs = 5000, intervalMs = 50) {
+  const deadline = Date.now() + timeoutMs;
+  while (!(await check())) {
+    if (Date.now() > deadline) throw new Error('waitFor: condition not met in time');
+    await new Promise(r => setTimeout(r, intervalMs));
+  }
+}
+
 beforeEach(async () => {
-  await new Promise(r => setTimeout(r, 500)); // Wait for in-flight
+  // Wait for in-flight work to drain, e.g. consumer lag is 0 or the last write is visible
+  await waitFor(() => isIdle());
   await repository.clear();  // PostgreSQL
   // OR
   await model.deleteMany({}); // MongoDB
@@ -332,6 +357,9 @@ beforeEach(async () => {
   await redis.flushdb();
 });
 ```
+# Initialize session (once at start)
+export E2E_SESSION=$(date +%s)-$$
+
 
 ### External API Mock (MSW)
 ```typescript
@@ -350,6 +378,9 @@ const messages = await kafkaHelper.waitForMessages(outputTopic, 1, 20000);
 expect(messages[0].value).toMatchObject({ id: event.id });
 ```
 
+
+# Cleanup session files
+rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ---
 
 ## Debugging Commands
@@ -357,9 +388,6 @@ expect(messages[0].value).toMatchObject({ id: event.id });
 **All commands redirect output to temp files only (no console output).**
 
 ```bash
-# Initialize session (once at start)
-export E2E_SESSION=$(date +%s)-$$
-
 # Run specific test (no console output)
 npm run test:e2e -- -t "should create user" > /tmp/e2e-${E2E_SESSION}-output.log 2>&1 && tail -50 /tmp/e2e-${E2E_SESSION}-output.log
 
@@ -378,9 +406,6 @@ node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --run
 # View application logs (limited)
 tail -100 logs/e2e-test.log
 grep -i error logs/e2e-test.log | tail -50
-
-# Cleanup session files
-rm -f /tmp/e2e-${E2E_SESSION}-*.log /tmp/e2e-${E2E_SESSION}-*.md
 ```
 
 ---

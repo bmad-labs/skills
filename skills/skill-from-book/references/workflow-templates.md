@@ -2,6 +2,17 @@
 
 Templates and best practices for creating skill workflows.
 
+## Contents
+
+- [What Are Workflows?](#what-are-workflows)
+- [When to Create Workflows](#when-to-create-workflows)
+- [Workflow Best Practices](#workflow-best-practices)
+- [Workflow Template](#workflow-template)
+- [Example Workflows by Category](#example-workflows-by-category)
+- [Workflow Identification Guide](#workflow-identification-guide)
+- [Workflow File Naming](#workflow-file-naming)
+- [Workflow Quality Checklist](#workflow-quality-checklist)
+
 ## What Are Workflows?
 
 Workflows are step-by-step processes that guide consistent execution of common tasks. They complement reference files by providing:

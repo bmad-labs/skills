@@ -271,7 +271,7 @@ SPRINT_OVERVIEW_RE = re.compile(
     r"\s*\S+\s*\|"                           # weeks column
     r"\s*(.+?)\s*\|"                         # dates column
     r"\s*\*{0,2}(\d+)\*{0,2}.*?\|"          # working days
-    r"\s*(\S+)\s*\|"                         # phase
+    r"\s*(.+?)\s*\|"                         # phase (may contain spaces)
     r"\s*(.+?)\s*\|"                         # demo date
     r"\s*(.+?)\s*\|"                         # epics
     r"\s*(.+?)\s*\|"                         # stories count
@@ -289,8 +289,11 @@ MONTH_MAP = {
 }
 
 
-def parse_date_str(date_str: str, year: int = 2026) -> str:
-    """Convert 'Apr 1' to '2026-04-01'."""
+def parse_date_str(date_str: str, year: int = 0) -> str:
+    """Convert 'Apr 1' to 'YYYY-04-01'. The year defaults to the current year."""
+    if not year:
+        from datetime import date
+        year = date.today().year
     parts = date_str.strip().split()
     if len(parts) != 2:
         return ""
@@ -390,6 +393,7 @@ def mode_sprints(filepath: str) -> Dict[str, Any]:
                 "number": sprint_num,
                 "start": start_date,
                 "end": end_date,
+                "phase": phase,
                 "objective": objective,
                 "demo_date": demo_date,
                 "working_days": working_days,

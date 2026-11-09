@@ -1,5 +1,21 @@
 # Kafka E2E Testing Rules
 
+## Contents
+
+- [Core Rules](#core-rules)
+- [Topic Management Rules](#topic-management-rules)
+- [Isolation Rules](#isolation-rules)
+- [Consumer Configuration Rules](#consumer-configuration-rules)
+- [Producer Configuration Rules](#producer-configuration-rules)
+- [NestJS Kafka Setup Rules](#nestjs-kafka-setup-rules)
+- [Consumer Group Synchronization Rules](#consumer-group-synchronization-rules)
+- [Polling Rules](#polling-rules)
+- [Error Handling Rules](#error-handling-rules)
+- [Test File Ordering Rules](#test-file-ordering-rules)
+- [Broker Health Check Rules](#broker-health-check-rules)
+- [Kafka Container Restart Rules](#kafka-container-restart-rules)
+- [Checklist](#checklist)
+
 ## Core Rules
 
 | Rule | Requirement |

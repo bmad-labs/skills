@@ -63,18 +63,18 @@ Present the research plan:
 
 For each option, conduct technical research. There are three modes — use whichever is available, in this priority order:
 
-**Mode A — If `bmad-bmm-technical-research` skill is installed (check available skills list):**
+**Mode A — If `bmad-technical-research` skill is installed (check available skills list):**
 - Suggest the user run the technical research skill for each option
 - Provide the research topic and key questions as input
-- **IMPORTANT:** Guide the skill to store output in `{user_output_folder}/researchs/` folder (create if needed)
-- Example: "Run `/bmad-bmm-technical-research` with topic: '[Option A] technical evaluation for [use case]'. Store output at `{user_output_folder}/researchs/research-option-a-[name-slug].md`"
+- **IMPORTANT:** Guide the skill to store output in `{user_output_folder}/research/` folder (create if needed)
+- Example: "Run `/bmad-technical-research` with topic: '[Option A] technical evaluation for [use case]'. Store output at `{user_output_folder}/research/research-option-a-[name-slug].md`"
 - Wait for each research document to be completed
 
 **Mode B — If Mode A is not available, use the bundled fallback research workflow:**
 - Load `./references/bmad-technical-research/workflow.md` from THIS skill's references folder
 - Follow its workflow steps to conduct the technical research for each option
 - Use the `./references/bmad-technical-research/research.template.md` as the output template
-- **IMPORTANT:** Save each research document to `{user_output_folder}/researchs/research-option-[label]-[name-slug].md` (create folder if needed)
+- **IMPORTANT:** Save each research document to `{user_output_folder}/research/research-option-[label]-[name-slug].md` (create folder if needed)
 
 **Mode C — If neither Mode A nor Mode B is practical (no web search, minimal context):**
 - Use web search to gather detailed technical information for each option
@@ -86,7 +86,7 @@ For each option, conduct technical research. There are three modes — use which
   - **Integration**: How it fits with the user's stack
   - **Adoption**: Who uses it in production, community size
   - **Cost**: Licensing, operational, and hidden costs
-- Save each research summary to: `{user_output_folder}/researchs/research-option-[label]-[name-slug].md` (create folder if needed)
+- Save each research summary to: `{user_output_folder}/research/research-option-[label]-[name-slug].md` (create folder if needed)
 
 ### 3. Track Research Documents
 
@@ -96,11 +96,11 @@ As each research document is created or completed, record it in the frontmatter:
 researchDocuments:
   - option: 'A'
     name: '[Option Name]'
-    path: './researchs/research-option-a-[name-slug].md'
+    path: './research/research-option-a-[name-slug].md'
     status: 'complete'
   - option: 'B'
     name: '[Option Name]'
-    path: './researchs/research-option-b-[name-slug].md'
+    path: './research/research-option-b-[name-slug].md'
     status: 'complete'
 ```
 

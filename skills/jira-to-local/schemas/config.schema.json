@@ -16,6 +16,14 @@
     "$schema": {
       "const": "jira-to-local/config-v1"
     },
+    "transport": {
+      "enum": [
+        "rest",
+        "twg"
+      ],
+      "default": "rest",
+      "description": "How the scripts reach Atlassian. rest: the REST API with an API token from the environment (auth.envVars). twg: Atlassian's Teamwork Graph CLI with a browser sign-in and no token; development detail and the global field list are not available. Omitted means rest."
+    },
     "jira": {
       "type": "object",
       "required": [
@@ -26,6 +34,12 @@
         "domain": {
           "type": "string",
           "description": "Atlassian site host, without a scheme. Example: mycompany.atlassian.net"
+        },
+        "hoursPerDay": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 24,
+          "description": "The site's working day, which Jira uses to write durations such as 1d 4h. Jira defaults to 8; a site admin can change it. Read it off a worklog: 1d of 23400 seconds is 6.5. Omitted means 8."
         }
       }
     },
@@ -197,6 +211,33 @@
               "description": "When true, only image attachments are downloaded. Videos and PDFs are listed instead."
             }
           }
+        }
+      }
+    },
+    "github": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pullLinkedRepos": {
+          "type": "boolean"
+        },
+        "subdir": {
+          "type": "string",
+          "description": "Folder inside the issue folder where fetched GitHub links are written."
+        },
+        "sourceFields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Fields whose GitHub links are fetched. The description is always read; add the custom field ids that hold the technical design and technical solution."
+        },
+        "fetchFileContents": {
+          "type": "boolean",
+          "description": "False writes the metadata and the changed-file table, but not the file contents."
+        },
+        "maxFileKb": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "A file larger than this is named in the table but not written."
         }
       }
     },

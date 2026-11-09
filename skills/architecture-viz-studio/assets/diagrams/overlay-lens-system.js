@@ -119,8 +119,9 @@ export function initOverlays({ sectionId = 'architecture', overlays = OVERLAYS, 
   }
 
   // nav header colour adapts when the dark map is under it (toggles .nav.dark).
+  // A nav that starts dark (the deep default page) stays dark; only a pale page needs the switch.
   const navEl = document.querySelector('.nav');
-  if (navEl) {
+  if (navEl && !navEl.classList.contains('dark')) {
     const onScroll = () => {
       const r = archEl.getBoundingClientRect();
       // the dark section spans the top header band (≈70px) → switch to light-on-dark

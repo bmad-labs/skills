@@ -58,7 +58,7 @@
           "seconds": { "type": "integer", "minimum": 0 },
           "timeSpent": {
             "type": "string",
-            "description": "Jira's own duration format: 2h, 30m, 1d 4h. A day is 8 hours."
+            "description": "Jira's own duration format: 2h, 30m, 1d 4h. A day is the site's working day, jira.hoursPerDay in the config (Jira's default is 8)."
           },
           "comment": { "type": ["string", "null"] }
         }

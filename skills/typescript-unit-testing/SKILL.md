@@ -9,6 +9,21 @@ Unit testing validates individual functions, methods, and classes in isolation b
 
 ---
 
+## Contents
+
+- [Workflows](#workflows)
+- [Workflow Selection Guide](#workflow-selection-guide)
+- [Knowledge Base Structure](#knowledge-base-structure)
+- [Quick Reference by Task](#quick-reference-by-task)
+- [Core Principles](#core-principles)
+- [Standard Test Template](#standard-test-template)
+- [Test Coverage Requirements](#test-coverage-requirements)
+- [Failure Resolution Protocol](#failure-resolution-protocol)
+- [Naming Conventions](#naming-conventions)
+- [What NOT to Unit Test](#what-not-to-unit-test)
+- [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
+- [Checklist](#checklist)
+
 ## Workflows
 
 For guided, step-by-step execution of unit testing tasks, use the appropriate workflow:
@@ -372,7 +387,7 @@ Only test files containing **executable logic** (classes with methods, functions
 | Conditional assertions | Non-deterministic | Separate test cases |
 | Test private methods | Couples to implementation | Test via public interface |
 | Share state between tests | Causes flaky tests | Fresh setup in beforeEach |
-| Mock repositories in services | Tests implementation | Mock interfaces |
+| Mock internals of the unit under test (private methods, `jest.spyOn(target, ...)`) | Tests implementation | Mock only injected dependencies (repositories, services) |
 | Skip mock verification | Doesn't validate behavior | Verify mock calls |
 | Test interfaces/enums/constants | No behavior to test | Skip these files |
 

@@ -1,5 +1,14 @@
 # E2E Test Debugging Guide
 
+## Contents
+
+- [Context Efficiency: Temp File Output](#context-efficiency-temp-file-output)
+- [VS Code Debugging](#vs-code-debugging)
+- [Command Line Debugging](#command-line-debugging)
+- [Log Analysis](#log-analysis)
+- [Common Issues and Solutions](#common-issues-and-solutions)
+- [Systematic Failure Resolution](#systematic-failure-resolution)
+
 ## Context Efficiency: Temp File Output
 
 **CRITICAL**: Always redirect E2E test output to temp files. E2E output is verbose and bloats agent context.
@@ -232,7 +241,7 @@ afterAll(async () => {
 ```typescript
 // Cause: Shared state between tests
 beforeEach(async () => {
-  await new Promise(r => setTimeout(r, 500));
+  await waitFor(() => isIdle()); // poll, do not sleep (helper in SKILL.md)
   await userRepository.clear();
   await orderRepository.clear();
   jest.clearAllMocks();

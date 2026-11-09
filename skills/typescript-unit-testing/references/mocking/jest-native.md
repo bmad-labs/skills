@@ -1,5 +1,17 @@
 # Jest Native Mocking Patterns
 
+## Contents
+
+- [Mock vs Spy Decision Matrix](#mock-vs-spy-decision-matrix)
+- [jest.fn() - Function Mocking](#jestfn---function-mocking)
+- [jest.mock() - Module Mocking](#jestmock---module-mocking)
+- [jest.spyOn() - Method Spying](#jestspyon---method-spying)
+- [Mock Reset Methods](#mock-reset-methods)
+- [Fake Timers](#fake-timers)
+- [Mock Console](#mock-console)
+- [Manual Mocks (__mocks__ Directory)](#manual-mocks-__mocks__-directory)
+- [Common Patterns](#common-patterns)
+
 ## Mock vs Spy Decision Matrix
 
 | Scenario | Recommended | Rationale |

@@ -41,7 +41,8 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
      not Inter-everywhere, which reads as AI slop.)
    - **Logo / wordmark?** To place in the nav.
    - **Aesthetic?** The two looks that read as professional here: the **dark "blueprint"** (architecture
-     maps) and the **pale low-poly 3D world** (scroll-stories). Confirm which, or both.
+     maps) and the **low-poly 3D world** (scroll-stories; deep, moody navy palette by default — a pale
+     variant is possible, see the note in `assets/scene/scene-setup.js`). Confirm which, or both.
    - **An existing page/screenshot to match?** The fastest path to consistency — extract its palette,
      type scale, spacing, and radius and mirror them.
 
@@ -57,8 +58,9 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
 3. **Scaffold from the page shell — and study the sample first.** `sample/` is a small but **complete,
    fully-debugged** scroll-story page that applies every convention correctly (render-on-demand 3D scene,
    every text element tagged, `vizSelectable:false` on the backdrop, edit-mode + manifest wired, anti-slop
-   styling). Read it before building — it's the fastest way to see how the pieces fit, and it already
-   avoids the bugs in `references/gotchas-and-lessons.md`. Then copy `assets/page-shell/index.html` +
+   styling). Read it first — it's the fastest way to see how the pieces fit — then read
+   `references/gotchas-and-lessons.md` (the bugs the sample already avoids) before writing code.
+   Then copy `assets/page-shell/index.html` +
    `styles.css` as your skeleton (section structure, importmap, modal scaffolds, token block) and pull in
    only the modules you need:
    - 3D world → `assets/scene/scene-setup.js`, `primitives.js`, `render-loop.js`. **These ship studio-grade
@@ -125,7 +127,7 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
    A clean run is a **floor** ("nothing mechanically broken, no slop markers"), not a ceiling. The taste
    calls — does the metaphor land, does it feel premium, is the motion tasteful — still need your eyes and
    the user's. Read `references/visual-verification.md` for the exact stack and the honest human boundary.
-   (Scripts need Playwright: `npm i -D @playwright/test axe-core && npx playwright install chromium`.)
+   (Scripts need Playwright: `npm i -D @playwright/test axe-core pngjs && npx playwright install chromium`.)
 
    **If the page has a Three.js scene, TWO checklists are MANDATORY before you call it done:**
 
@@ -165,7 +167,10 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
    **Getting feedback back to you — "Copy for AI" is the one button, made smarter by the bridge:**
    - **Serve with `scripts/serve.sh` (recommended):** `./scripts/serve.sh <pageDir>` starts BOTH the page
      server (8800) and the feedback-bridge (8910) together, so the bridge is always up whenever the page
-     is — no separate process to forget. Init edit-mode with `{ bridge: 'http://127.0.0.1:8910' }`. Now
+     is — no separate process to forget. Both bind to 127.0.0.1 only. If either port is already taken, the
+     script prints the process holding it and exits non-zero (it never kills anything) — stop that process
+     or rerun with `--port <n>` / `--bridge-port <n>`. Init edit-mode with
+     `{ bridge: 'http://127.0.0.1:8910' }` (or your `--bridge-port`). Now
      **"Copy for AI"** both copies the markdown AND POSTs the batch + snip PNGs to the bridge, which writes
      them to `/tmp/viz-edit/`. The user just says "read the feedback" — you read `edit-feedback.json` (each
      comment carries an absolute `imagePath`) and the PNGs directly. If the bridge ever isn't running,
@@ -186,7 +191,8 @@ Treat this as: **brainstorm the narrative → scaffold → assemble from templat
 
 ## Operating knowledge (read on demand)
 
-- **`references/gotchas-and-lessons.md`** — ⚠️ **READ THIS FIRST.** A catalog of real bugs that each cost a
+- **`references/gotchas-and-lessons.md`** — ⚠️ **Read second, right after `sample/`, before writing any
+  code** (reading order: `sample/` → this file → the rest on demand). A catalog of real bugs that each cost a
   debugging round in a prior build: the SVG `.hidden` no-op, `[hidden]` losing to a `display` class,
   `contains(window)` throwing, DOM-over-3D hover hijacking, un-raycastable thin tubes, unregistered
   vizId objects, idle-GPU render loops, the `readPixels`-reports-black trap, the dead swiftshader flag,
@@ -233,7 +239,7 @@ especially the ERD glyph geometry, the pan/zoom cursor-anchored zoom, the camera
 render-pause loop; these are easy to get subtly wrong from scratch.
 
 ```
-sample/            ← a COMPLETE working reference page (read this first — all conventions applied correctly)
+sample/            ← a COMPLETE working reference page (read 1st; then references/gotchas-and-lessons.md)
                      includes a filled-in DESIGN-SYSTEM.md worked example
 assets/
 ├── page-shell/    index.html · styles.css · DESIGN-SYSTEM.md   ← start here: skeleton + token block + intake template
@@ -289,8 +295,8 @@ selective bloom + depth-of-field, three-point + rim lighting with soft contact s
 GSAP motion). The wow comes from **light, depth, atmosphere, and a graded final image** — not the geometry.
 Hold this bar as hard as the anti-slop one.
 
-Either way, the two professional looks here are the dark "blueprint" architecture aesthetic and the pale
-low-poly 3D world — done to the wow bar. Honoring all of this is what makes someone say "I didn't know we
+Either way, the two professional looks here are the dark "blueprint" architecture aesthetic and the
+low-poly 3D world (deep, moody palette by default) — done to the wow bar. Honoring all of this is what makes someone say "I didn't know we
 could make something this good."
 
 To catch the *mechanical* slop tells before a human has to, run `node scripts/slop-lint.mjs <url>` — it

@@ -23,8 +23,8 @@ The config file lives at the repository root and controls how release-please beh
 |--------|------|---------|-------------|
 | `release-type` | string | — | **Required.** Package ecosystem (see release types below) |
 | `changelog-path` | string | `"CHANGELOG.md"` | Path to changelog file relative to package |
-| `bump-minor-pre-major` | boolean | `false` | Treat `feat` as patch when version < 1.0.0 |
-| `bump-patch-for-minor-pre-major` | boolean | `false` | Treat `feat` as patch when version < 1.0.0 (finer control) |
+| `bump-minor-pre-major` | boolean | `false` | Breaking changes bump minor (not major) while version < 1.0.0 |
+| `bump-patch-for-minor-pre-major` | boolean | `false` | `feat` commits bump patch (not minor) while version < 1.0.0 |
 | `draft` | boolean | `false` | Create release PRs as draft |
 | `prerelease` | boolean | `false` | Create pre-release GitHub releases |
 | `versioning` | string | `"default"` | Versioning strategy (`"default"` or `"always-bump-patch"`) |

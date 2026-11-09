@@ -1,6 +1,6 @@
 ---
 name: load-docs
-description: Loads documents fully into the main agent's context so the agent can answer questions, summarize, or work with that content in subsequent turns. Use whenever the user wants to ingest, read, study, review, absorb, or pull in documents — especially when they say things like "load these docs", "read all of these", "ingest this folder", "pull in these PDFs", "load all docs in X", or paste a list of file paths/URLs and ask you to read them. Handles local files (text, code, markdown, PDFs, notebooks, images), entire folders (recursively), and remote URLs. The skill is single-turn — once the agent reports "DONE", it deactivates until the user invokes it again.
+description: Loads documents fully into the main agent's context so the agent can answer questions, summarize, or work with that content in subsequent turns. Use whenever the user wants to ingest, read, absorb, or pull in documents — especially when they say things like "load these docs", "read all of these", "ingest this folder", "pull in these PDFs", "load all docs in X", or paste a list of file paths/URLs and ask you to read them. Handles local files (text, code, markdown, PDFs, notebooks, images), entire folders (recursively), and remote URLs. To convert files into Markdown, use to-markdown instead.
 ---
 
 # Load Documents
@@ -34,7 +34,18 @@ For URLs, `WebFetch` returns the content in one shot — you don't need to chunk
 
 Before reading anything, list every document you're about to load and track them with `TodoWrite`. One todo per document. Mark each one completed only after you've finished reading the *entire* file (all chunks, all pages). This is the mechanism that prevents you from losing track and skipping documents — without the checklist, partial reads slip through.
 
-For folders: first list the folder contents (use `Glob` or `Bash ls`), apply the filtering rules below, then create one todo per file that survives the filter. The user should see the full list before you start reading so they can correct you if you've picked up the wrong scope.
+For folders: first list the folder contents (use `Glob` or `Bash ls`), apply the filtering rules below, then create one todo per file that survives the filter. Show the user that list, then start reading right away so they can still correct the scope. Stop and wait for an answer only when the count or size guard below trips.
+
+## Check the size before you read
+
+Estimate the total before the first `Read`, because a load that overflows the context window loses the earliest documents:
+
+```bash
+wc -c <files...> | tail -1        # total bytes of text files
+pdfinfo file.pdf | grep Pages     # page count per PDF (poppler)
+```
+
+If the text total is above roughly 400 KB, or the PDFs add up to more than about 100 pages, tell the user the estimate and ask whether to load it all or narrow the scope. Below that, proceed without asking. If `pdfinfo` is not installed, try `mdls -name kMDItemNumberOfPages file.pdf` on macOS; failing that, count pages as you read and check with the user when you pass 100.
 
 ## Folder filtering (sensible defaults)
 
@@ -47,7 +58,7 @@ When the user points at a folder, recursively include all files **except**:
 
 If you're unsure whether to include something, include it — better to read an extra config file than to silently skip something the user wanted.
 
-If the filtered file count is very large (say, 50+), tell the user the count *before* starting and ask if they want to narrow the scope. Loading 200 files into context is rarely what someone actually wants.
+If the filtered file count is very large (say, 50+), tell the user the count *before* starting and ask if they want to narrow the scope, then wait for the answer. Loading 200 files into context is rarely what someone actually wants. This count guard and the size guard above are the only points where you wait.
 
 ## Reading order
 

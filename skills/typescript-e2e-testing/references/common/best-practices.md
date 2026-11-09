@@ -124,7 +124,7 @@ const userId = `user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 ```typescript
 beforeEach(async () => {
-  await new Promise(r => setTimeout(r, 1000)); // Wait for in-flight
+  await waitFor(() => isIdle()); // Poll until in-flight work drains (helper in SKILL.md)
   await userModel.deleteMany({});
   await orderModel.deleteMany({});
 });

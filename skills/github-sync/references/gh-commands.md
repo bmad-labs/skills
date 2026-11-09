@@ -4,6 +4,24 @@ Quick-reference for the `gh` CLI commands and GraphQL queries needed to sync BMA
 
 ---
 
+## Contents
+
+- [1. Prerequisites](#1-prerequisites)
+- [2. Project Setup](#2-project-setup)
+- [3. Custom Field Creation](#3-custom-field-creation)
+- [4. Field and Option ID Queries](#4-field-and-option-id-queries)
+- [5. Label Management](#5-label-management)
+- [6. Milestone Management](#6-milestone-management)
+- [7. Issue CRUD](#7-issue-crud)
+- [8. Project Item Management](#8-project-item-management)
+- [9. GraphQL: Query All Items with Field Values](#9-graphql-query-all-items-with-field-values)
+- [10. GraphQL: Mutations](#10-graphql-mutations)
+- [11. Rate Limits](#11-rate-limits)
+- [12. Issue Relationships](#12-issue-relationships)
+- [13. Single-Select Field: Update Colors and Descriptions](#13-single-select-field-update-colors-and-descriptions)
+
+---
+
 ## 1. Prerequisites
 
 Verify the CLI is installed and authenticated with the required `project` scope.
@@ -58,7 +76,7 @@ gh api graphql -f query='
 gh api graphql -f query='
   mutation {
     createProjectV2(input: {ownerId: "OWNER_NODE_ID" title: "PROJECT_TITLE"}) {
-      projectV2 { id number }
+      projectV2 { id number url }
     }
   }
 '
@@ -90,6 +108,12 @@ gh api graphql -f query='
 '
 ```
 
+To get the URL of an existing project (user- or org-owned), don't build it by hand:
+
+```bash
+gh project view PROJECT_NUM --owner OWNER --format json --jq .url
+```
+
 ---
 
 ## 3. Custom Field Creation
@@ -118,23 +142,29 @@ Derive epic names from `epics.md`. Format each option as `{N}: {Short Name}`.
 ### Phase (SINGLE_SELECT)
 
 > **Note:** No longer used as a custom field. Phase is expressed through the milestone
-> (PoC / Production Hardening). Do NOT create a Phase field during onboarding.
+> (one milestone per phase in the sprint plan). Do NOT create a Phase field during onboarding.
 
 ### Sprint (SINGLE_SELECT)
 
 The Sprint field enables board grouping by sprint. It is separate from Sprint Start/Sprint End
-DATE fields. Create with 12 options then apply rainbow colors (see Section 13).
+DATE fields. Create one option per sprint in the sprint plan, then apply rainbow colors (see
+Section 13).
 
 ```bash
+# Example for a 12-sprint plan — generate the list from the parser's sprints[] output
 gh project field-create PROJECT_NUM --owner OWNER --name "Sprint" --data-type "SINGLE_SELECT" \
   --single-select-options "Sprint 01,Sprint 02,Sprint 03,Sprint 04,Sprint 05,Sprint 06,Sprint 07,Sprint 08,Sprint 09,Sprint 10,Sprint 11,Sprint 12"
 ```
 
 ### Dev (SINGLE_SELECT)
 
+Options are the distinct values of the sprint plan's Dev column (`story_dev_map` in the parser
+output), so every story's Dev value has a matching option.
+
 ```bash
+# Example — use the project's own Dev values
 gh project field-create PROJECT_NUM --owner OWNER --name "Dev" --data-type "SINGLE_SELECT" \
-  --single-select-options "All,Dev 1,Dev 2,Dev 3"
+  --single-select-options "All,Dev 1,Dev 2"
 ```
 
 ### Priority (SINGLE_SELECT)
@@ -219,12 +249,13 @@ gh label create "LABEL_NAME" --color "HEX_COLOR" --description "optional descrip
 gh label create "epic:1-foundation"       --color "0075ca"
 gh label create "epic:2-navigation"        --color "008672"
 gh label create "epic:3-safety"            --color "e4e669"
-# ... one per epic, through epic:12-testing
+# ... one per epic in epics.md (names here are examples)
 ```
 
 ### Phase Labels
 
 ```bash
+# One per phase in the sprint plan — these two are examples
 gh label create "phase:poc"        --color "0075ca"
 gh label create "phase:hardening"  --color "d73a4a"
 ```
@@ -264,19 +295,22 @@ Issues are the real work items that appear in the repository and get added to th
 ### Create an Issue
 
 ```bash
+BODY_FILE=$(mktemp "${TMPDIR:-/tmp}/issue-XXXXXX")   # unique, not a predictable /tmp name
+# ... write the issue body to "$BODY_FILE" ...
 gh issue create \
   --title "1.1 Short Story Title" \
-  --body-file /tmp/issue-1.1.md \
+  --body-file "$BODY_FILE" \
   --label "epic:1-foundation" --label "phase:poc" \
   --milestone "PoC" \
   --assignee "dev1,dev2,dev3"
+rm -f "$BODY_FILE"
 ```
 
 ### Edit an Issue
 
 ```bash
 gh issue edit 42 \
-  --body-file /tmp/issue-1.1.md \
+  --body-file "$BODY_FILE" \
   --add-label "epic:1-foundation" \
   --milestone "PoC"
 ```
@@ -551,16 +585,21 @@ GitHub issues support three native relationship types accessible via GraphQL:
 ### Get Issue Node IDs
 
 ```bash
-gh api graphql -f query='
-  query {
+gh api graphql --paginate -f query='
+  query($endCursor: String) {
     repository(owner:"{owner}", name:"{repo}") {
-      issues(first:50, orderBy:{field:CREATED_AT, direction:ASC}) {
+      issues(first:100, after:$endCursor, orderBy:{field:CREATED_AT, direction:ASC}) {
+        pageInfo { hasNextPage endCursor }
         nodes { number id title }
       }
     }
   }
-'
+' --jq '.data.repository.issues.nodes[]'
 ```
+
+`--paginate` requires the `$endCursor` variable and the `pageInfo { hasNextPage endCursor }`
+selection; it re-runs the query with each page's `endCursor` until `hasNextPage` is false.
+To page manually instead, pass `after: "<endCursor>"` and repeat until `hasNextPage` is false.
 
 ### Set Parent Issue (addSubIssue)
 
@@ -688,11 +727,14 @@ Adjust the number of options to match the actual sprint count in the project.
 
 ### Rainbow Color Schemes
 
-**Sprint field (12 options, two cycles of 6):**
+Cycle `RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, PINK` and repeat, one color per option. The
+lists below are the example for a 12-sprint, 12-epic project.
+
+**Sprint field (example: 12 options):**
 01:RED, 02:ORANGE, 03:YELLOW, 04:GREEN, 05:BLUE, 06:PURPLE,
 07:PINK, 08:RED, 09:ORANGE, 10:YELLOW, 11:GREEN, 12:BLUE
 
-**Epic field (12 options):**
+**Epic field (example: 12 options):**
 1:RED, 2:ORANGE, 3:YELLOW, 4:GREEN, 5:BLUE, 6:PURPLE,
 7:PINK, 8:RED, 9:ORANGE, 10:YELLOW, 11:GREEN, 12:BLUE
 

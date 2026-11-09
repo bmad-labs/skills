@@ -16,7 +16,7 @@
 #
 # Then init edit-mode with the matching bridge URL:
 #   EditMode.init({ bridge: 'http://127.0.0.1:8910' });
-# Open http://localhost:8800/ and use "Copy for AI" — it now also saves to /tmp/viz-edit.
+# Open http://127.0.0.1:8800/ and use "Copy for AI" — it now also saves to /tmp/viz-edit.
 # ============================================================================
 set -euo pipefail
 
@@ -39,18 +39,28 @@ done
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PAGE_DIR"
 
-# free the ports if a previous run left something behind
+# refuse to start if a port is taken — never kill a process we didn't start.
+# Show who holds it so the user can stop it (or pick other ports with --port / --bridge-port).
+busy=0
 for p in "$PORT" "$BRIDGE_PORT"; do
-  pid="$(lsof -ti tcp:"$p" 2>/dev/null || true)"
-  [ -n "$pid" ] && { echo "freeing port $p (pid $pid)"; kill "$pid" 2>/dev/null || true; }
+  holder="$(lsof -nP -iTCP:"$p" -sTCP:LISTEN 2>/dev/null | tail -n +2 || true)"
+  if [ -n "$holder" ]; then
+    echo "port $p is already in use by:" >&2
+    echo "$holder" >&2
+    busy=1
+  fi
 done
+if [ "$busy" -ne 0 ]; then
+  echo "stop that process, or rerun with --port <n> / --bridge-port <n>." >&2
+  exit 1
+fi
 
 # start the feedback bridge (writes snip images to $EDIT_DIR)
 node "$SCRIPT_DIR/feedback-bridge.mjs" --port "$BRIDGE_PORT" --dir "$EDIT_DIR" &
 BRIDGE_PID=$!
 
 # start the page server
-python3 -m http.server "$PORT" >/dev/null 2>&1 &
+python3 -m http.server "$PORT" --bind 127.0.0.1 >/dev/null 2>&1 &
 HTTP_PID=$!
 
 # shut both down together on exit / Ctrl-C
@@ -58,7 +68,7 @@ cleanup() { echo; echo "stopping (page $HTTP_PID, bridge $BRIDGE_PID)…"; kill 
 trap cleanup EXIT INT TERM
 
 echo "────────────────────────────────────────────────────────"
-echo "  page    →  http://localhost:$PORT/"
+echo "  page    →  http://127.0.0.1:$PORT/"
 echo "  bridge  →  http://localhost:$BRIDGE_PORT/  (writes to $EDIT_DIR)"
 echo "  init edit-mode with:  EditMode.init({ bridge: 'http://127.0.0.1:$BRIDGE_PORT' })"
 echo "  Ctrl-C to stop both."

@@ -51,16 +51,16 @@ Frame the research topic for the technical research skill based on what you know
 
 Use the technical research skill with this priority order:
 
-**Mode A — If `bmad-bmm-technical-research` skill is installed (check available skills list):**
-- Invoke the skill: "Run `/bmad-bmm-technical-research` with topic: '[research topic from step 1]'"
-- **IMPORTANT:** Guide the skill to store output in `{user_output_folder}/researchs/` folder (create if needed)
-- Tell the skill: "Store the research document at `{user_output_folder}/researchs/research-options-landscape-[topic-slug].md`"
+**Mode A — If `bmad-technical-research` skill is installed (check available skills list):**
+- Invoke the skill: "Run `/bmad-technical-research` with topic: '[research topic from step 1]'"
+- **IMPORTANT:** Guide the skill to store output in `{user_output_folder}/research/` folder (create if needed)
+- Tell the skill: "Store the research document at `{user_output_folder}/research/research-options-landscape-[topic-slug].md`"
 
 **Mode B — If Mode A is not available, use the bundled fallback:**
 - Load `./references/bmad-technical-research/workflow.md` from THIS skill's references folder
 - Follow its workflow to conduct the research
 - Use `./references/bmad-technical-research/research.template.md` as the output template
-- **IMPORTANT:** Save the research document to `{user_output_folder}/researchs/research-options-landscape-[topic-slug].md` (create folder if needed)
+- **IMPORTANT:** Save the research document to `{user_output_folder}/research/research-options-landscape-[topic-slug].md` (create folder if needed)
 
 **Mode C — If neither Mode A nor Mode B is practical:**
 - Conduct web research directly using 3-5 targeted search queries:
@@ -77,7 +77,7 @@ Record the research output in frontmatter:
 ```yaml
 researchDocuments:
   - type: 'options-landscape'
-    path: './researchs/research-options-landscape-[topic-slug].md'
+    path: './research/research-options-landscape-[topic-slug].md'
     status: 'complete'
 ```
 

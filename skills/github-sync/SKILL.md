@@ -25,6 +25,25 @@ markdown files and GitHub Projects v2 for visual project tracking.
 > - Config file format → `references/config-schema.md`
 > - Artifact parser script → `scripts/parse-artifacts.py`
 
+**`<skill-dir>`** in the commands below means the folder containing this `SKILL.md` (where the
+skill is installed, e.g. `.claude/skills/github-sync` or `.agents/skills/github-sync`). Resolve it
+once and use the real path in every command.
+
+**Artifact paths** come from `paths.*` in `.github-sync.yaml`. Before the config exists
+(onboarding), use the BMAD defaults and confirm them with the user:
+
+| Config key | Default |
+|------------|---------|
+| `paths.stories` | `_bmad-output/implementation-artifacts` |
+| `paths.epics_file` | `_bmad-output/planning-artifacts/epics.md` |
+| `paths.sprint_plan_file` | `_bmad-output/planning-artifacts/sprint-plan.md` |
+
+Standard BMAD sprint planning writes `_bmad-output/implementation-artifacts/sprint-status.yaml`
+(story status tracking). `parse-artifacts.py` does **not** read it — it parses a `sprint-plan.md`
+with a Story-to-Sprint Summary table and Sprint Overview table (see
+`references/content-mapping.md` section 13). If the project only has `sprint-status.yaml`, read it
+with the Read tool and ask the user for sprint numbers, dates, dev assignment and phases.
+
 ---
 
 ## Four Rules (Never Break These)
@@ -36,7 +55,10 @@ markdown files and GitHub Projects v2 for visual project tracking.
 2. **Field-level source of truth.** Each field has one owner — either BMAD files or GitHub.
    During sync, the owner side always wins. Never overwrite the owner's data.
    - **BMAD owns:** story body, acceptance criteria, tasks, sprint assignment, epic grouping, dependencies
-   - **GitHub owns:** status, dev assignment, task checkbox completion, story points, priority
+   - **GitHub owns:** status — the only field pull writes back into story files
+   - **GitHub-only (read-only on pull):** dev assignment, task checkbox completion, story points,
+     priority. Push never overwrites them after an issue exists; pull shows differences in the
+     report but does not write them to local files.
 
 3. **Idempotent operations.** Running the same sync twice produces the same result. Link-back
    identifiers (H1 title links in story files, `gh_item_url` in planning frontmatter) prevent
@@ -46,7 +68,7 @@ markdown files and GitHub Projects v2 for visual project tracking.
    story file directly with the Read tool and crafting the body manually following the template
    in `references/content-mapping.md`. Auto-parsing scripts fail silently in subtle ways:
    they strip task lists when formatting assumptions are wrong, gut dev notes by removing code
-   blocks, and produce empty section headers. One bad push contaminates all 27 issues at once.
+   blocks, and produce empty section headers. One bad push contaminates every issue at once.
    **Read the file. Write the body. No shortcuts.**
 
 ---
@@ -96,17 +118,16 @@ fields, labels, and phase-based milestones.
 Run the parser to discover what exists:
 
 ```bash
-python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode scan \
-  --stories-dir .artifacts/implementation-artifacts
+python3 <skill-dir>/scripts/parse-artifacts.py --mode scan \
+  --stories-dir {paths.stories}
 ```
 
 Also check that these files exist:
-- `.artifacts/planning-artifacts/epics.md`
-- `.artifacts/planning-artifacts/sprint-plan.md`
+- `{paths.epics_file}`
+- `{paths.sprint_plan_file}` (or `sprint-status.yaml` — see the note at the top)
 
-> **Note:** The artifacts path `.artifacts/` may differ per project. Check the actual
-> directory structure — some projects use `_bmad-output/`. Confirm the correct paths with
-> the user and use them throughout. Update `paths.*` in the config accordingly.
+> **Note:** Paths differ per project. Check the actual directory structure, confirm the
+> paths with the user, and record them in `paths.*` in the config.
 
 Report the count: "Found N story files, M epics, K sprints."
 
@@ -132,12 +153,19 @@ and 12 (Epic Derivation). You need these to build an accurate onboarding report.
 Then parse the actual artifacts:
 
 ```bash
-python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode epics \
-  --file .artifacts/planning-artifacts/epics.md
+python3 <skill-dir>/scripts/parse-artifacts.py --mode epics \
+  --file {paths.epics_file}
 
-python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode sprints \
-  --file .artifacts/planning-artifacts/sprint-plan.md
+python3 <skill-dir>/scripts/parse-artifacts.py --mode sprints \
+  --file {paths.sprint_plan_file}
 ```
+
+Derive every count and name in the report from this output — never reuse numbers from an example:
+- **Epics** (`E`): from `epics[]`
+- **Sprints** (`S`), dates, objectives, phase per sprint: from `sprints[]`
+- **Dev options**: the distinct values in `story_dev_map`
+- **Phases**: the distinct `phase` values across `sprints[]`, in sprint order; each phase's due
+  date is the end date of its last sprint
 
 ### Step 4: Generate Onboarding Report
 
@@ -152,9 +180,9 @@ Project: #{N} "{title}" (existing) OR new project "{title}"
 Will create/verify:
   Custom fields (7):
     - Story ID      (TEXT)
-    - Epic          (SINGLE_SELECT: 12 options, rainbow colors)
-    - Sprint        (SINGLE_SELECT: Sprint 01–12, rainbow colors + sprint goal descriptions)
-    - Dev           (SINGLE_SELECT: All, Dev 1, Dev 2, Dev 3, Dev 1+2)
+    - Epic          (SINGLE_SELECT: {E} options, one per epic, rainbow colors)
+    - Sprint        (SINGLE_SELECT: Sprint 01–{S}, rainbow colors + sprint goal descriptions)
+    - Dev           (SINGLE_SELECT: {distinct Dev values from the sprint plan})
     - Sprint Start  (DATE)
     - Sprint End    (DATE)
     - Story Points  (NUMBER)
@@ -163,17 +191,21 @@ Will create/verify:
     - Target date   (DATE, pre-existing)   ← same dates as Sprint End
     - Status        (single-select, pre-existing)
   {N} labels:
-    - Epic labels (one per epic, e.g., epic:1-foundation ... epic:12-testing)
-    - Phase labels (e.g., phase:poc, phase:hardening)
+    - Epic labels ({E}, one per epic, e.g., epic:1-foundation)
+    - Phase labels (one per phase, e.g., phase:{phase-slug})
     - Layer labels (optional, project-specific architecture layers)
-  {K} milestones (phase-based, NOT per-sprint):
-    - PoC              (due: {sprint_6_end})    Sprints 1–6
-    - Production Hardening (due: {sprint_12_end}) Sprints 7–12
+  {K} milestones (phase-based, NOT per-sprint), one per phase:
+    - {phase_name}     (due: {end date of the phase's last sprint})  Sprints {a}–{b}
+    - ...
 
 Note: No "Phase" custom field — the milestone covers phase membership.
 
 Proceed with onboarding? [Y/N]
 ```
+
+> **Example only:** a 12-sprint plan with phases `PoC` (Sprints 1–6) and `Production Hardening`
+> (Sprints 7–12) and Dev values `All, Dev 1, Dev 2` produces 12 Sprint options, 2 phase labels,
+> and 2 milestones due at the end of Sprint 6 and Sprint 12. Your project's values will differ.
 
 **HALT HERE. Wait for user approval.**
 
@@ -189,9 +221,10 @@ If approved, execute in this order:
 4. **Apply rainbow colors + sprint goal descriptions to Sprint and Epic fields** (section 13)
    - Sprint options: cycle RED→ORANGE→YELLOW→GREEN→BLUE→PURPLE→PINK, repeat
    - Sprint description = sprint objective from sprint-plan.md
-   - Epic options: RED→ORANGE→YELLOW→GREEN→BLUE→PURPLE→PINK→RED→ORANGE→YELLOW→GREEN→BLUE
-5. **Create labels** (section 5) — 17 labels total
-6. **Create phase-based milestones** (section 6) — PoC and Production Hardening
+   - Epic options: same cycle, one option per epic
+5. **Create labels** (section 5) — one per epic, one per phase, plus any layer labels (the
+   count shown in the onboarding report)
+6. **Create phase-based milestones** (section 6) — one per phase from the sprint plan
 
 > **Critical:** After calling `updateProjectV2Field` to set colors/descriptions, the single-select
 > option IDs CHANGE (the mutation replaces the options list). Always re-query option IDs after
@@ -206,9 +239,15 @@ Note: No `phase` field in `field_ids` or `option_ids` — Phase was replaced by 
 
 ### Step 7: Report Completion
 
+Get the project URL from GitHub rather than building it (works for user- and org-owned projects):
+
+```bash
+gh project view {project_number} --owner {owner} --format json --jq .url
+```
+
 ```
 Onboarding complete!
-  Project: https://github.com/orgs/{owner}/projects/{number}
+  Project: {url returned above}
   Config: .github-sync.yaml
 
 Next: Run "push stories to github" to create issues.
@@ -229,8 +268,8 @@ field IDs from GitHub (the IDs may have been lost).
 ### Step 2: Scan Stories
 
 ```bash
-python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode scan \
-  --stories-dir .artifacts/implementation-artifacts
+python3 <skill-dir>/scripts/parse-artifacts.py --mode scan \
+  --stories-dir {paths.stories}
 ```
 
 For each story, determine **create** vs **edit** mode:
@@ -257,7 +296,7 @@ For each story:
    - Dependencies with `#N` GitHub issue numbers
    - Collapsible dev notes: tables, config snippets, architecture patterns — NOT code skeletons,
      NOT ASCII trees, NOT "What NOT to Do" lists, NOT references
-4. **Look up sprint/dev/epic** from sprint-plan.md (NOT from the story file body)
+4. **Look up sprint/dev/epic/phase** from `{paths.sprint_plan_file}` (NOT from the story file body)
 
 ### Step 5: Generate Sync Report
 
@@ -270,8 +309,8 @@ Generated: {timestamp}
   [CREATE] {story_id} {short_title}
            File: {story_file_path}
            Epic: {epic_label} | Sprint: {sprint} | Dev: {dev} | Phase: {phase}
-           Labels: epic:{N}-{name}, phase:{phase}
-           Milestone: {PoC | Production Hardening}
+           Labels: epic:{N}-{name}, phase:{phase-slug}
+           Milestone: {phase milestone name}
 
 --- UPDATES ({count} existing issues) ---
 
@@ -293,8 +332,9 @@ Proceed? [Y/N]
 ### Step 6: Execute Push
 
 If approved, for each **CREATE**:
-1. Write issue body to a temp file (`/tmp/issue-{story_id}.md`)
-2. `gh issue create --title "..." --body-file /tmp/... --label "epic:X-name" --label "phase:poc" --milestone "{PoC|Production Hardening}"`
+1. Write issue body to a fresh temp file: `BODY_FILE=$(mktemp "${TMPDIR:-/tmp}/issue-XXXXXX")`
+   (remove it with `rm -f "$BODY_FILE"` once the issue is created)
+2. `gh issue create --title "..." --body-file "$BODY_FILE" --label "epic:X-name" --label "phase:{phase-slug}" --milestone "{phase milestone name}"`
 3. Extract issue URL from output
 4. `gh project item-add {project_number} --owner {owner} --url {issue_url} --format json`
 5. Extract item ID from JSON output
@@ -311,8 +351,8 @@ If approved, for each **CREATE**:
 7. Write link-back to local file: replace H1 with `# [Story X.X: Title](issue_url)`
 
 For each **UPDATE**:
-1. Write updated body to temp file
-2. `gh issue edit {number} --body-file /tmp/... --milestone "{phase_milestone}"`
+1. Write updated body to a fresh `mktemp` file as above
+2. `gh issue edit {number} --body-file "$BODY_FILE" --milestone "{phase_milestone}"`
 3. Update project fields if sprint/epic changed
 
 ### Step 7: Set Up Relationships
@@ -360,18 +400,23 @@ mutation {
 > **Always source dependencies from sprint-plan.md, not from story file bodies.**
 > The sprint plan is the authoritative dependency record.
 
-Get issue node IDs via:
+Get issue node IDs via (paginated — a repo can have more issues than one page):
 ```bash
-gh api graphql -f query='
-  query {
+gh api graphql --paginate -f query='
+  query($endCursor: String) {
     repository(owner:"{owner}", name:"{repo}") {
-      issues(first:50, orderBy:{field:CREATED_AT, direction:ASC}) {
+      issues(first:100, after:$endCursor, orderBy:{field:CREATED_AT, direction:ASC}) {
+        pageInfo { hasNextPage endCursor }
         nodes { number id title }
       }
     }
   }
-'
+' --jq '.data.repository.issues.nodes[]'
 ```
+
+`--paginate` keeps requesting pages, passing the previous `endCursor` as `$endCursor`, until
+`hasNextPage` is false. Without `--paginate`, loop manually: re-run with `after: "<endCursor>"`
+until `hasNextPage` is false.
 
 ### Step 8: Report Completion
 
@@ -389,7 +434,8 @@ Config updated: last_synced = {timestamp}
 
 ## Pull Workflow (GitHub → Files)
 
-Pulls status, assignees, and task completion from GitHub back into local BMAD files.
+Pulls **status** from GitHub back into local BMAD story files. Assignee and task-completion
+differences are shown in the report for information only — pull does not write them to files.
 
 ### Step 1: Load Config and Query GitHub
 
@@ -415,7 +461,7 @@ Generated: {timestamp}
 
   [UPDATE] {story_filename}.md
            Status: ready-for-dev → done (from GitHub #{issue_number})
-           Assignee: (none) → @{username}
+           [INFO, not written] Assignee on GitHub: @{username}
 
 --- NO CHANGES ({count} items) ---
 
@@ -449,8 +495,8 @@ Compare local files with GitHub state without making any changes. No approval ne
 
 ```bash
 # Scan local files
-python3 .agents/skills/github-sync/scripts/parse-artifacts.py --mode scan \
-  --stories-dir .artifacts/implementation-artifacts
+python3 <skill-dir>/scripts/parse-artifacts.py --mode scan \
+  --stories-dir {paths.stories}
 
 # Query GitHub items (full field values)
 # Use GraphQL query from references/gh-commands.md section 9

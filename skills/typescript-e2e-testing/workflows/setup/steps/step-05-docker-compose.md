@@ -37,7 +37,7 @@ Create `.env.e2e` with test-specific environment variables.
 
 ### 3. Add npm Script
 
-Add: `"docker:e2e": "docker-compose -f docker-compose.e2e.yml up -d"`
+Add: `"docker:e2e": "docker compose -f docker-compose.e2e.yml up -d"`
 
 ### 4. Append to Output
 

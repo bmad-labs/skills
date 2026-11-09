@@ -12,6 +12,7 @@ Example:
     python3 analyze_structure.py books/effective-java
 """
 
+import argparse
 import sys
 import re
 from pathlib import Path
@@ -284,13 +285,11 @@ def generate_structure_report(project_dir: Path) -> str:
     return '\n'.join(report)
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 analyze_structure.py <project-directory>")
-        print("\nExample:")
-        print("  python3 analyze_structure.py books/effective-java")
-        sys.exit(1)
-    
-    project_dir = Path(sys.argv[1])
+    parser = argparse.ArgumentParser(
+        description="Phase 2 of book-converter: scan raw/book-parsed.md and write "
+                    "STRUCTURE_ANALYSIS.md (headers, issues, suggested chapter boundaries).")
+    parser.add_argument("project_dir", type=Path, help="book project directory, e.g. books/effective-java")
+    project_dir = parser.parse_args().project_dir
     
     if not project_dir.exists():
         print(f"✗ Error: Project directory not found: {project_dir}")
@@ -322,7 +321,7 @@ def main():
     print(f"\nReport saved to: {output_file}")
     print(f"Report size: {len(report)} characters")
     print("\n✓ Use this report to create CHAPTER_MAP.md and FORMATTING_PLAN.md")
-    print("\nNext: Launch subagent with:")
+    print("\nNext: spawn a general-purpose subagent with:")
     print(f'  "Read {output_file} and create CHAPTER_MAP.md and FORMATTING_PLAN.md"')
 
 if __name__ == "__main__":

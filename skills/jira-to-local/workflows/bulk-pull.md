@@ -29,7 +29,7 @@ Then report, and get the decisions the user alone can make:
 
 ```
 2062 issues in sprints 62-66
-  885 on one team
+  885 on team BLACK
     789 subtask types  → arrive inside their parent's tasks.md
      96 top-level      → one folder each
 ```
@@ -57,6 +57,8 @@ spends its API budget on eighty of them.
 
 Dispatch **four at a time**, each on `sonnet`, each with the filled
 [`../templates/subagent-instruction.md`](../templates/subagent-instruction.md).
+`{HISTORY}` is set once, from the request, and is the same for every issue in the
+run — see [Change history is opt-in](../SKILL.md#change-history-is-opt-in).
 
 Four is a working default, not a law: enough to overlap the slow parts, few enough
 that a rate limit or a bad prompt costs one wave instead of the run.
@@ -102,7 +104,7 @@ node <skill-path>/scripts/jira-api.mjs count /rest/api/3/issue/<KEY>/comment
 node <skill-path>/scripts/jira-api.mjs get "/rest/api/3/issue/<KEY>?fields=subtasks"
 
 node <skill-path>/scripts/check-markdown.mjs \
-  $(find <folder> -name '*.md' -not -path '*/assets/*')
+  $(find <folder> -name '*.md' -not -path '*/assets/*' -not -path '*/github/*/files/*')
 ```
 
 Compare each to the `total:` in the file's own frontmatter:
@@ -112,7 +114,8 @@ Compare each to the `total:` in the file's own frontmatter:
 | `comments.md` | the `/comment` endpoint's `total` |
 | `tasks.md` | the issue's own subtask count |
 | `worklogs.md` | worklog entries summed over the issue and every subtask |
-| `content.md` | one link per file in `confluence/` |
+| `history.md` | changelog `total` summed over the issue and every subtask. Checked only when history was asked for |
+| `content.md` | one link per file in `confluence/`, and one local link per folder in `github/` |
 
 Any mismatch is a failed part. Re-run that one part — writes overwrite, so
 re-fetching is always safe — and check again before moving on.

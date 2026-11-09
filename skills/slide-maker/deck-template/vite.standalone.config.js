@@ -4,6 +4,7 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 import webfontDownload from 'vite-plugin-webfont-dl'
 import { rmSync } from 'node:fs'
 import path from 'path'
+import { designSystemDir } from './vite.config.js'
 
 // Strip every trace of the edit-mode authoring tool from the published deck:
 //  (1) remove the edit-mode <link> from index.html, and
@@ -36,7 +37,7 @@ export default defineConfig({
     webfontDownload([], { injectAsStyleTag: true, embedFonts: true }),
     viteSingleFile({ removeViteModuleLoader: true, deleteInlinedFiles: true }),
   ],
-  resolve: { alias: { '@': path.resolve(__dirname, './src') } },
+  resolve: { alias: { '@': path.resolve(__dirname, './src'), '@ds': designSystemDir } },
   build: {
     outDir: 'dist-standalone',
     assetsInlineLimit: 100000000,

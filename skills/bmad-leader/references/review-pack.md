@@ -19,7 +19,7 @@ Every correct course writes two files with the same basename, in
 
 | File | Reader | Purpose |
 | --- | --- | --- |
-| `sprint-change-proposal-<date>[-<slug>].md` | leader and record | proposal: `file:line`, exact OLD → NEW, evidence, owner |
+| `sprint-change-proposal-<date>[-<slug>].md` | leader and record | proposal: `file:line`, exact OLD → NEW, evidence, owner Story, and whether it blocks |
 | `sprint-change-proposal-<date>[-<slug>].html` | User | review pack built from the template |
 
 The `.md` is what `bmad-correct-course` writes by default; do not rename it to `correct-course-*.md`.
@@ -86,16 +86,16 @@ Keep the legend at the top in step with this table. A mark the legend does not n
 
 ## Diagram rules
 
-**Medium depends on the model.** The running model decides, not the document:
+**Medium depends on what you can draw reliably**, not on the document:
 
-| Model | Medium | Why |
+| You can | Medium | Why |
 | --- | --- | --- |
-| Opus 5.5 | Inline SVG | The model draws precise geometry reliably; the pack gets cleaner boxes, arrows and labels |
-| Any other model | ASCII inside `<pre>` | Cheaper to produce correctly; no risk of malformed paths or overlapping text |
+| produce precise inline SVG geometry | Inline SVG | Cleaner boxes, arrows and labels |
+| not produce it reliably | ASCII inside `<pre>` | Cheaper to produce correctly; no risk of malformed paths or overlapping text |
 
 Write the rule you used in the chat report, one line, so the next reader knows why a pack looks different.
 
-### SVG rules (Opus 5.5)
+### SVG rules
 
 - Inline `<svg>` in the HTML. No external file, no `<img>`, no data URI. The pack stays one file.
 - `viewBox="0 0 W H"` with a fixed width and height, and `width="100%"` so it scales. One `viewBox` unit per character cell keeps the geometry predictable.

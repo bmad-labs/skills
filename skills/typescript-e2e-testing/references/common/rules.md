@@ -63,12 +63,12 @@ NODE_ENV=test
 | `beforeAll` | 90000 | Full app + infrastructure setup |
 | `afterAll` | 30000 | Graceful cleanup |
 | Kafka waits | 8-10s | Consumer group rebalancing |
-| MongoDB cleanup wait | 1000ms | In-flight message completion |
+| MongoDB cleanup wait | poll, up to 1000ms | In-flight message completion (poll with `waitFor`, do not sleep) |
 
 ## Test Isolation Rules
 
 1. **Clean Before AND After:** Clear data in both `beforeEach` and `afterEach`
-2. **Wait Before Cleanup:** Add 1s delay before cleanup for in-flight operations
+2. **Wait Before Cleanup:** Poll until in-flight operations finish (`waitFor` in SKILL.md) before cleanup. A fixed sleep is either too short (flaky) or too long (slow). Keep fixed waits only where no signal exists, such as a Kafka consumer group join, or for poll intervals.
 3. **Unique Identifiers:** Generate unique IDs per test (e.g., `test-${Date.now()}-${uuid}`)
 4. **Sequential Execution:** Use `--runInBand` to prevent conflicts
 

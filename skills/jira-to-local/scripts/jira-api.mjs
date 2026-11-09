@@ -18,9 +18,10 @@
  *   jira-api.mjs pages /rest/api/3/issue/PROJ-123/comment comments [--page-size N]
  */
 
-import { realpathSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { loadConfig } from './config.mjs';
+import { realpathSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { resolve, join, dirname } from 'node:path';
+import { loadConfig, findConfigPath, readSetupConnection } from './config.mjs';
+import { twgGet, twgDownload } from './twg.mjs';
 
 /**
  * Jira accepts up to 100 rows per request on the endpoints used here. Asking for
@@ -33,13 +34,23 @@ const DEFAULT_PAGE_SIZE = 100;
  * are themselves in the config, so a site that uses different ones needs no code
  * change.
  */
-export function credentials(config) {
+export function credentials(config, env = process.env) {
+  // twg signs in through the browser and keeps its own session, so this mode
+  // needs no secret at all — the reason it exists.
+  if (config.transport === 'twg') {
+    if (!config.jira?.domain) {
+      console.error('The config has no jira.domain. Run the setup workflow: workflows/setup.md');
+      process.exit(1);
+    }
+    return { transport: 'twg', domain: config.jira.domain, devField: config.project?.metaFields?.development ?? null };
+  }
+
   const emailVar = config.auth?.envVars?.email || 'ATLASSIAN_EMAIL';
   const tokenVar = config.auth?.envVars?.token || 'ATLASSIAN_API_TOKEN';
   const domain = config.jira?.domain;
 
-  const email = process.env[emailVar];
-  const token = process.env[tokenVar];
+  const email = env[emailVar];
+  const token = env[tokenVar];
 
   const missing = [];
   if (!email) missing.push(emailVar);
@@ -55,25 +66,61 @@ export function credentials(config) {
       console.error('Create a token at:');
       console.error('  https://id.atlassian.com/manage-profile/security/api-tokens');
       console.error('');
-      console.error('Then export both, and add them to your shell profile so every');
-      console.error('node call sees them, not just this session:');
-      console.error(`  export ${emailVar}="you@example.com"`);
-      console.error(`  export ${tokenVar}="your-api-token"`);
+      console.error('Then put both in the git-ignored .env file at the workspace root,');
+      console.error('or export them in your shell profile:');
+      console.error(`  ${emailVar}=you@example.com`);
+      console.error(`  ${tokenVar}=your-api-token`);
     }
     process.exit(1);
   }
 
   return {
+    transport: 'rest',
     domain,
     email,
     auth: 'Basic ' + Buffer.from(`${email}:${token}`).toString('base64'),
   };
 }
 
-/** Read the config and the credentials together, the usual entry point. */
+/**
+ * `KEY=value` lines of a .env file. Quotes around a value are removed, an
+ * `export ` prefix is allowed, and blank or `#` lines are skipped.
+ */
+export function parseDotEnv(text) {
+  const env = {};
+  for (const line of text.split(/\r?\n/)) {
+    const m = line.match(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+    if (!m) continue;
+    const quoted = m[2].match(/^(['"])(.*)\1$/);
+    env[m[1]] = quoted ? quoted[2] : m[2];
+  }
+  return env;
+}
+
+/**
+ * The workspace's .env, where setup asks for a temporary API token so nobody
+ * edits a shell profile for a one-off run. Empty when there is no file.
+ */
+export function readDotEnv(root) {
+  const path = join(root, '.env');
+  return existsSync(path) ? parseDotEnv(readFileSync(path, 'utf8')) : {};
+}
+
+/**
+ * Read the config and the credentials together, the usual entry point. Before
+ * setup has written the config, the connection it recorded in step 1 stands in.
+ * A variable set in the shell wins over the same one in .env.
+ */
 export function connect(options = {}) {
+  const startDir = options.startDir ?? process.cwd();
+  const configPath = findConfigPath(startDir);
+  const env = { ...readDotEnv(configPath ? dirname(configPath) : startDir), ...process.env };
+  if (!configPath) {
+    const setup = readSetupConnection(startDir);
+    if (setup) return { config: setup, configPath: null, root: startDir, cred: credentials(setup, env) };
+  }
   const { config, path, root } = loadConfig(options);
-  return { config, configPath: path, root, cred: credentials(config) };
+  return { config, configPath: path, root, cred: credentials(config, env) };
 }
 
 function describeStatus(status, path) {
@@ -86,6 +133,14 @@ function describeStatus(status, path) {
 
 /** A GET that fails loudly. Use when the caller cannot continue without it. */
 export async function apiGet(cred, path) {
+  if (cred.transport === 'twg') {
+    try {
+      return await twgGet(path, { site: cred.domain, devField: cred.devField });
+    } catch (err) {
+      console.error(`twg read for ${path} failed: ${err.message}`);
+      process.exit(1);
+    }
+  }
   const res = await fetch(`https://${cred.domain}${path}`, {
     headers: { Authorization: cred.auth, Accept: 'application/json' },
   });
@@ -104,6 +159,9 @@ export async function apiGet(cred, path) {
  * becomes a row that says so.
  */
 export async function apiGetSoft(cred, path) {
+  if (cred.transport === 'twg') {
+    return twgGet(path, { site: cred.domain, devField: cred.devField }).catch(() => null);
+  }
   const res = await fetch(`https://${cred.domain}${path}`, {
     headers: { Authorization: cred.auth, Accept: 'application/json' },
   });
@@ -123,6 +181,8 @@ export async function apiGetSoft(cred, path) {
  * gap in the document rather than failing the part.
  */
 export async function graphqlSoft(cred, operationName, query, variables) {
+  // This internal endpoint takes the site's own session; twg's token does not reach it.
+  if (cred.transport === 'twg') return null;
   const res = await fetch(`https://${cred.domain}/jsw2/graphql?operation=${encodeURIComponent(operationName)}`, {
     method: 'POST',
     headers: {
@@ -136,6 +196,25 @@ export async function graphqlSoft(cred, operationName, query, variables) {
   const body = await res.json().catch(() => null);
   if (!body || body.errors) return null;
   return body.data ?? null;
+}
+
+/**
+ * Save one attachment's bytes to `dest`, returning null on success or a reason
+ * string when it could not be saved. `product` is `jira` or `confluence`; REST
+ * needs the URL path the listing gave, twg needs the attachment id.
+ */
+export async function downloadAttachment(cred, product, { id, restPath }, dest) {
+  if (cred.transport === 'twg') {
+    return twgDownload(product, String(id), dest, { site: cred.domain })
+      .then(() => null, (err) => `download failed: ${err.message}`);
+  }
+  const res = await fetch(`https://${cred.domain}${restPath}`, {
+    headers: { Authorization: cred.auth },
+    redirect: 'follow',
+  });
+  if (!res.ok) return `download failed with ${res.status}`;
+  writeFileSync(dest, Buffer.from(await res.arrayBuffer()));
+  return null;
 }
 
 /** Append a query parameter to a path that may or may not already have a query. */

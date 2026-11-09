@@ -2,9 +2,8 @@
 /**
  * confluence-format.mjs — Confluence storage format (XHTML) to markdown.
  *
- * Taken from the atlassian-rest skill, reduced to the pull direction only:
- * this skill never writes to Confluence, so markdownToStorage and its `marked`
- * dependency are left out and this module has no dependencies at all.
+ * Pull direction only: this skill never writes to Confluence, so there is no
+ * markdown-to-storage converter and this module has no dependencies at all.
  *
  * The regexes all tolerate arbitrary attributes, because Confluence adds
  * local-id, data-layout and breakoutWidth to most tags.

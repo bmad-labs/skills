@@ -74,7 +74,7 @@ npm test -- -t "[first test name]" > /tmp/ut-${UT_SESSION}-debug.log 2>&1
 tail -50 /tmp/ut-${UT_SESSION}-debug.log
 ```
 
-3. Recommend using `debugging-unit-test.md` workflow for investigation
+3. Recommend using the `workflows/debugging/workflow.md` workflow for investigation
 
 ### Scenario C: Setup Failures
 

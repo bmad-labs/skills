@@ -21,6 +21,15 @@ There are **three** complementary gates, all required before a slide is done:
 > margin**, it is a geometry-gate task: you are forbidden from calling it done on a
 > visual glance — assert the actual pixel inequality first (next section).
 
+## Contents
+
+- [Workflow](#workflow)
+- [The geometry gate — measure, don't eyeball](#the-geometry-gate--measure-dont-eyeball)
+- [Reviewing an EXPORT is a different job — diff it, don't browse it](#reviewing-an-export-is-a-different-job--diff-it-dont-browse-it)
+- [The visual rubric](#the-visual-rubric)
+- [When to use the labeled / inspect overlay](#when-to-use-the-labeled--inspect-overlay)
+- [Notes](#notes)
+
 ## Workflow
 
 1. **Render** the slides to PNGs:

@@ -1,6 +1,6 @@
 ---
 name: bmad-leader
-description: Use when a BMAD project has intent, PRD, architecture and optionally technical design, and the user wants one long-running session to drive implementation of stories or epics through bmad-build subagents; also when resuming a build, reporting progress, closing an epic, unblocking a subagent decision, or when the user explicitly asks for a retrospective of a leader run.
+description: Use when a BMAD project has intent, PRD, architecture and optionally technical design, and the user wants one long-running session to drive implementation of stories or epics through bmad-build subagents ("lead the build", "run epic N", "drive the stories"); also when resuming a build ("resume the leader"), reporting progress, closing an epic, unblocking a subagent decision, or when the user explicitly asks for a retrospective of a leader run.
 ---
 
 # BMAD Leader
@@ -38,8 +38,8 @@ Scan before planning:
 | Gates | exact format, lint, test, installer commands |
 | Test harness | highest runnable level and the blocked ones with their missing harness |
 | Close-loop tools | browser, desktop or VM control; screenshot capture and vision check |
-| Subagents | dispatch works; worktrees or file isolation |
-| Git | branch, dirty tree, remote, approval policy |
+| Subagents | which harness this is (then read its section in `references/harnesses.md`); dispatch works; worktrees or file isolation |
+| Git | branch, integration branch (where Story branches merge), dirty tree, remote, approval policy |
 | Environment | credentials and how they load (per command, never exported into a shared shell), VM/GUI, budget |
 | Host readiness | the host stays awake and online for an unattended run; shell and tool family (for example BSD or GNU tools); ports, devices and fixed paths already in use; tools the gates need but the host lacks, and the workaround; the user's timezone for any time you state |
 | Agent config | `./.leader.json` present and valid (see Agent config) |
@@ -59,15 +59,13 @@ Ask for exactly three things if the user did not say: **scope**, **document loca
 | Missing | Show the 12 presets from `assets/leader-presets.json` as one table: id, then the leader, builder and uat-runner models. Recommend `<vendor>-balanced`, where vendor is `anthropic` on Claude Code and the running model's vendor on OpenCode, Copilot and VS Code. Ask once, batched with scope, docs and test level. Write `./.leader.json` from the chosen preset, with `preset`, `vendor`, `harness`. |
 | Invalid | Name the bad field and role. Offer to fill it from the file's `preset` (or the recommended preset if `preset` is `custom` or unknown). Do not invent a value. |
 
-The file wins over its preset: values that differ from the named preset are hand edits, not errors.
+The file wins over its preset: values that differ from the named preset are hand edits, not errors. If the user said "don't ask", "keep moving" or gives no answer: for a missing file, write the recommended preset; for an invalid one, fill only the bad fields as above. Record the assumption in the report and continue. Never dispatch without a valid config.
 
-If the user said "don't ask", "keep moving" or gives no answer: for a missing file, write the recommended preset; for an invalid one, fill only the bad fields as above. Record the assumption in the report and continue. Never dispatch without a valid config.
-
-Every dispatch passes the role's `model` and `effort` from the file. On Claude Code, map the id to the `Agent` alias (`opus`, `sonnet`, `haiku`, `fable`) and always pass `effort`; the tool sets none by default. On Copilot and VS Code, use their model id (dots, not hyphens: `claude-sonnet-5.5`). Name the role's model and effort in the brief header.
+Every dispatch passes the role's `model` and `effort` from the file, in the harness's own form (`references/agent-config.md`, Harness mapping). On Claude Code always pass `effort`: the `Agent` tool sets none by default. Name the role's model and effort in the brief header.
 
 The leader cannot switch its own model. If the `leader` entry differs from the running model, say so once and tell the user how to restart on it. Do not block the build.
 
-Then show the marked pyramid. The Activate message contains this diagram in a code block, filled in: each `<MARK>` becomes `RUN`, `NOT RUN` or `BLOCKED`, and each `<detail>` becomes the exact command (`RUN`), what is missing (`NOT RUN`), or why the level does not apply (`BLOCKED`). A level with several harnesses (for example an emulator and a bench) gets one `<MARK> <detail>` line per harness beside the same layer. Keep the diagram in a terse or plain-language reply too: it is the shortest form of this information.
+Then show the marked pyramid. The Activate message contains this diagram in a code block, filled in: each `<MARK>` becomes `RUN`, `NOT RUN` or `BLOCKED`, and each `<detail>` becomes the exact command (`RUN`), what is missing (`NOT RUN`), or why the level does not apply (`BLOCKED`). A level with several harnesses (for example an emulator and a bench) gets one `<MARK> <detail>` line per harness beside the same layer. Keep the diagram in a terse or plain-language reply too: it is the shortest form of this information. A table of the levels may follow the diagram as extra detail; the diagram itself is always there.
 
 ```
                     /\
@@ -84,8 +82,6 @@ Then show the marked pyramid. The Activate message contains this diagram in a co
          /                      \ <detail>
         /________________________\
 ```
-
-A table of the levels may follow the diagram as extra detail; the diagram itself is always there.
 
 Use this table to choose each mark:
 
@@ -106,9 +102,7 @@ State which levels run, which test kinds each covers, and the exact command for 
 
 `BLOCKED` means one thing only: **not applicable**. It never means "setup is pending" and never means "cannot be run". A level that applies but cannot run is `NOT RUN`, so the gap stays visible and is never hidden under "not applicable".
 
-Confirm the marked pyramid with the user before the first build.
-
-Run the highest level the harness supports. A higher level never replaces a lower one: UAT does not excuse missing unit tests.
+Confirm the marked pyramid with the user before the first build. Run the highest level the harness supports. A higher level never replaces a lower one: UAT does not excuse missing unit tests.
 
 ## Close-loop development
 
@@ -128,16 +122,13 @@ Rules:
 - The product's own report is never the observation. The captured output, image or state is.
 - If the highest applicable level is `NOT RUN`, tell the user to run the `close-loop-dev-setup` skill before the build. If that skill is not installed yet, say so and name the missing tool.
 - Unit, integration and regression tests still run. Close-loop validation is added, not substituted.
-
-The leader records the current capability per level at Activate and re-checks it after any environment change.
+- Record the current capability per level at Activate and re-check it after any environment change.
 
 Then confirm the autonomy contract once:
 
-> May I commit each verified Story, merge its branch, and start the next Story without asking each time? A push or a history rewrite still needs your word; so does a scope change.
+> May I commit each verified Story, merge its branch into the integration branch, and start the next Story without asking each time? A merge to `main`, a push or a history rewrite still needs your word; so does a scope change.
 
-If the user agrees, record it and never ask again for commit, build or next-Story approval. Ask only when their help is genuinely needed: a scope change, a credential, a budget limit, a destructive external action, or a decision the evidence cannot settle.
-
-Without that agreement, fall back to the repo policy: ask before each commit or merge.
+If the user agrees, record it and never ask again for commit, Story-merge, build or next-Story approval. A merge to `main` stays a user question because it changes what everyone else builds on; once the user approves it, perform it like any other merge. Otherwise ask only for the reasons in the Decision ladder. Without that agreement, fall back to the repo policy: ask before each commit or merge.
 
 ## Planning first
 
@@ -183,23 +174,7 @@ Every subagent must load the BMAD skill that covers its job. Name the skill in t
 
 If a skill exists, use it; never hand-write an artifact a skill owns.
 
-| Work | Skill | Produces |
-| --- | --- | --- |
-| Planned Story from `epics.md` | `bmad-build` | Story file, plan, code, tests, review |
-| Requirement not in the plan | `bmad-spec` first, then `bmad-build` | Spec, then the build |
-| Epic and Story breakdown | `bmad-create-epics-and-stories` | Epics and Stories |
-| Order and status | `bmad-sprint-planning` | Sprint status |
-| UAT cases | `manual-testing` | Test plan and cases |
-| Generated e2e tests | `bmad-qa-generate-e2e-tests` | Automated tests |
-| Independent review | `bmad-code-review` | Findings |
-| Research | `bmad-deep-recon` | Cited findings |
-| Epic close | `bmad-retrospective` | Retro and actions |
-| Planning-document change | `bmad-correct-course` | Proposal |
-| Library, CLI or API docs | `context7-mcp` | Usage answers |
-| Two failed fixes, cause unknown | `ultrathink-protocol` | Root cause |
-| Browser or web UI validation | `playwright-cli` | Driven page and screenshots |
-| Desktop validation | `cua-driver` | Driven app and screenshots |
-| Missing close-loop harness | `close-loop-dev-setup` | Working validation loop |
+The work-to-skill table (Story, spec, breakdown, sprint order, UAT, e2e, review, research, retrospective, correct-course, docs, debugging, browser and desktop validation, close-loop setup) is `## Skills to name in a brief` in `references/briefs.md`. Read it before you write a brief.
 
 A planned Story does not get a hand-written spec. `bmad-build` writes the Story file, then builds and verifies it. An unplanned requirement gets a `bmad-spec` file first; `bmad-build` consumes it.
 
@@ -243,7 +218,7 @@ The same builder session fixes review, verifier and UAT findings.
 
 **Verifier subagent:** independent of the builder; loads `manual-testing` for UAT and runs the project's gate commands. It owns the UAT cases: if a case is wrong, it fixes the case or harness. If the product is wrong, it records the defect and reports it to the leader; it never edits product code. The same session re-runs after a fix.
 
-**UAT Runner subagent:** runs the UAT cases exactly as written and returns observed output and evidence. Every run gets a fresh session; it is never reused. The verifier spawns it when the harness allows nested agents; otherwise the leader dispatches it. It does not edit product code or test cases.
+**UAT Runner subagent:** runs the UAT cases exactly as written and returns observed output and evidence. Every run gets a fresh session; it is never reused. The verifier spawns it and keeps its id when the harness allows nested agents; otherwise the leader dispatches it, and the verifier sends rerun requests through the leader. Either way the verifier owns the case fix; the runner only runs cases. It does not edit product code or test cases.
 
 **Reviewer subagents (three per round):** on a Phase split harness, and on a Full build harness only when the builder's `bmad-build` review did not run its lenses in fresh subagents. Each loads `bmad-code-review` with one lens: Blind Hunter, Edge Cases Hunter, or Verification Gap Finder. Every review round gets three fresh sessions; reviewers are never reused. They do not edit product code. Each lens dispatches with its lens entry from `.leader.json`, else the `reviewer` entry.
 
@@ -284,7 +259,7 @@ When the leader triages findings itself (Phase split, a verifier defect, or a fa
 
 Every verify and review round runs against one fixed commit. Name its SHA in each brief of that round. If the builder does not commit, the leader commits the round's work on the Story branch before it dispatches the round.
 
-The builder commits only on its own Story branch or worktree, as `bmad-build` does; it never merges and never pushes. The leader merges after gates, AC check and review, under the Activate contract.
+The builder commits only on its own Story branch or worktree, as `bmad-build` does; it never merges and never pushes. The leader merges the Story branch into the integration branch after gates, AC check and review, under the Activate contract.
 
 ## Session continuity
 
@@ -300,30 +275,6 @@ Write the Story id with hyphens in a session name: `builder-2-3`, not `builder-2
 | Verifier | `verifier-<story>` | Yes |
 | UAT Runner | `uat-r<n>-<story>` | **No. Fresh every run** |
 
-The Full build loop (Claude Code, Copilot):
-
-1. The builder runs `bmad-build` from Clarify. At its plan gate it sends the plan to the leader and waits; the leader approves it or returns `bad_plan`.
-2. The builder implements, runs `bmad-build`'s three review lenses in fresh subagents, patches, and presents.
-3. The verifier runs gates and tests on the presented result.
-4. Verifier failures go back to the **same builder session**, which fixes them through `bmad-build`'s patch loop and its review again.
-5. The verifier prepares the UAT cases; a **fresh UAT Runner session** runs them. A wrong case goes to the verifier, which fixes it; a product defect goes to the builder. Each rerun is a new UAT Runner session.
-
-Repeat steps 3–5 until the Story passes.
-
-The Phase split loop (OpenCode, VS Code Local):
-
-1. Planner drafts the plan; the leader approves it.
-2. Builder implements.
-3. Verifier runs gates and tests.
-4. Three fresh reviewers review in parallel, one lens each.
-5. Findings go back to the **same builder session** to fix.
-6. The **same verifier session** re-runs the gates.
-7. A fix round starts a **new set of three reviewers** on the new diff. Close the previous three.
-8. The verifier prepares the UAT cases; a **fresh UAT Runner session** runs them.
-9. A failed case goes to the **verifier**, which fixes the case or harness, then a **new UAT Runner session** reruns the failed cases. Close the previous runner session.
-
-Repeat 5–9 until the Story passes. Close all remaining sessions when it does.
-
 Reuse is deliberate for the planner, builder and verifier: each keeps its decisions or commands. Reviewers and the UAT Runner are deliberately fresh: each run is judged on the current artifact, not on an earlier judgment.
 
 Start a fresh session mid-Story only when:
@@ -335,104 +286,9 @@ Start a fresh session mid-Story only when:
 
 Say which, and why, in the report. Record the round count and every reviewer round's session ids.
 
-## Harness mapping
+## Build modes and harnesses
 
-Session reuse differs by harness. Use the one that applies.
-
-| Harness | Start | Continue | End |
-| --- | --- | --- | --- |
-| OpenCode | `subagent` tool; save the returned `sessionID` | call `subagent` again with that `sessionID` | no explicit stop; the session idles and is reused when needed |
-| Claude Code | start an agent-team teammate for the role | send the next instruction to the same teammate; it stays awake between turns | shut the teammate down manually when the Story passes |
-| VS Code Local | `runSubagent` (tool set `agent`) | not possible: every call is fresh; send the next round to a new subagent with the previous report | ends when the call returns |
-| Copilot | `task` tool with `mode: "background"`; keep the returned agent id | `write_agent` to that id; `read_agent` for its output | the agent ends with the leader's session; do not carry it into the next Story |
-
-OpenCode rules:
-
-- One `sessionID` per persistent role: planner, builder, verifier. Reviewers and the UAT Runner are new sessions each round or run.
-- Round 2 and later reuse the id for planner, builder, verifier and UAT Runner. Reviewers are new each round.
-- A fresh subagent is correct only for a new Story, or when the session is exhausted or stale.
-- Nested dispatch is not available in OpenCode subagents (verified on v2.2.5). The leader dispatches the UAT Runner; the verifier sends rerun requests through the leader.
-- Do not rely on the builder spawning reviewers. Run `bmad-build` with its review skipped or light, then dispatch the three reviewers yourself.
-- If true nesting is unavoidable, a subagent may shell out to `opencode run --agent build --model <provider/model>`. That starts a new top-level session, not a child: it costs a second context and needs `--session` to continue. Use it only as a fallback.
-
-Claude Code rules:
-
-- Use the Full build: one builder teammate runs the whole `bmad-build`. Never brief it for a single phase.
-- Keep two persistent teammates per Story: builder and verifier. Start one UAT Runner each run, and three reviewers only for the fallback in Full build; shut each down when it finishes.
-- Hand the next instruction to the same teammate; do not respawn it.
-- Shut each teammate down when the Story passes or is abandoned. Do not carry teammates into the next Story.
-- Shutdown is a structured message (`{"type": "shutdown_request", ...}`), and the teammate answers with a structured `shutdown_response`, never with the JSON as a text string. Put the exact reply form in every brief: smaller models often send it as text and retry.
-- Do not answer idle, shutdown-approved or terminated notifications, and ignore the copy of the last report that an idle notification carries. Act only on new content: a report, a question, a failure. Tell the user only at Story events: plan approved, round result, UAT result, merge, CI result. In a long run, answering each notification took more than half of the leader's turns.
-
-Copilot rules (CLI, app, VS Code Copilot harness):
-
-- Use the Full build, as on Claude Code. Subagents can start their own subagents (default depth limit 4, setting `subagents.maxDepth`); leader → builder → lens uses two levels. Verified on Copilot CLI 1.0.105; the app and the VS Code Copilot harness run the same runtime, and the lens session ids in the builder's report confirm it per run.
-- Start the builder and verifier with `task` in `mode: "background"`, so fix rounds continue through `write_agent`. A synchronous `task` call returns no reusable id and starts fresh each time.
-- Set per-role models with `/subagents`, the `subagents.agents.<name>` setting (model, effort level, context tier), or a custom agent's `model:` and `reasoning-effort:` fields (`.github/agents/*.agent.md`), and name model and effort in every brief; the builder names each lens's model the same way in the lens prompt.
-- Put the session name (`builder-2-3`) in the `task` description, and record the returned agent id next to it.
-- One-time agents (UAT Runner, fallback reviewers) may use a synchronous `task` call.
-- Agent ids live only as long as the leader's session. Record each id in the current-situation note; after a leader restart, start fresh sessions with a handoff note.
-- A background agent cannot message the leader mid-turn. At each `bmad-build` gate the builder ends its turn with the question or plan; the leader reads it with `read_agent` and answers with `write_agent`.
-- A `GH_TOKEN` or `GITHUB_TOKEN` without the Copilot Requests permission overrides the Copilot login and fails authentication; unset it for the leader's session.
-
-VS Code Local rules:
-
-- Use the Phase split, as on OpenCode. A Local subagent is stateless: the leader cannot send it a follow-up, and it cannot ask the leader a question mid-run. A Full build needs both.
-- Every round is a fresh subagent. Pass the approved plan, the previous report and the findings in the brief; record that sessions were not reused.
-- Nesting is off by default (`chat.subagents.allowInvocationsFromSubagents`, maximum depth 5). Leave it off: the leader dispatches the reviewers and the UAT Runner itself.
-- Set models with the custom agent's `model:` field or the model passed to `runSubagent`. `reasoning-effort:` does not apply to Local subagents; name the effort in the brief anyway.
-
-Nested agents:
-
-- If the verifier can spawn a subagent, it spawns the UAT Runner and keeps its id.
-- If it cannot, the leader dispatches the UAT Runner, and the verifier sends the rerun request through the leader.
-- Either way, the verifier owns the UAT case fix; the runner only runs cases.
-
-No reuse support: fall back to fresh agents per round, and say so in the report.
-
-## Full build (Claude Code, Copilot)
-
-On Claude Code and Copilot one builder runs `bmad-build` end to end, as its docs describe. The leader does not split it. `bmad-build`'s review works best when the builder can spawn subagents; when it cannot, the fallback rule below applies.
-
-| `bmad-build` step | Who | Leader does |
-| --- | --- | --- |
-| Clarify and route | Builder | Answers an intent gap through the Decision ladder |
-| Plan, approved plan | Builder writes; leader approves | Runs the `Approve a plan` checks; returns `bad_plan` with reasons |
-| Implement | Builder | — |
-| Fits AC? | Builder | — |
-| Review: three lenses | Builder spawns three fresh subagents, one lens each, with the lens entries from `.leader.json` | Reads the findings and the lens session ids in the report |
-| Patch, reject, defer | Builder | Confirms each deferral has a blocker and goes to `deferred_work.md` |
-| Present, result | Builder presents; leader accepts | Sends the result to the verifier |
-
-Rules:
-
-- Brief the builder from `## Builder brief (Full build)` in `references/briefs.md`. Name `bmad-build`; never name a single phase, and never ask it to skip review.
-- The builder treats the leader as the user: at every `bmad-build` question or gate it messages the leader and waits.
-- The builder's report lists the three lens session ids. A review run inline in the builder's own context, or with fewer than three lenses, is not independent: the leader then dispatches the three reviewers itself, as in Phase split.
-- The verifier and UAT Runner stay separate from the builder. `bmad-build`'s own tests do not replace them.
-
-## Phase split (OpenCode, VS Code Local)
-
-OpenCode has no nested subagents, and VS Code Local subagents are stateless, so the leader runs `bmad-build` as separate phases instead of one long subagent.
-
-| `bmad-build` phase | Owner | Session |
-| --- | --- | --- |
-| Clarify and route | Leader | — |
-| Plan | Planner subagent | `plan-<story>` |
-| Approved plan | Leader | — |
-| Implement | Builder subagent | `builder-<story>` |
-| Fits AC? | Leader, using verifier evidence | — |
-| Review | Three fresh reviewer subagents, one lens each | `review-<lens>-r<n>-s<story>` |
-| Patch | Builder | `builder-<story>` |
-| Present and result | Leader | — |
-| Defer | Leader writes `deferred_work.md` | — |
-
-Rules:
-
-- Give each phase only its scope: plan-only, implement-only, one review lens.
-- Do not ask one subagent to run the whole workflow.
-- The leader keeps every checkpoint: clarify, approve, fit, route, present.
-- Other jobs — gates, UAT, research, retrospective, correct-course — go to their own subagents.
+The Builder table in Roles names each harness's build mode. At Activate, identify your harness and read only its section in `references/harnesses.md`, plus the build-mode section it names: each mode's step table and loop, how to start, continue and end a session, and the harness's limits. If the harness cannot reuse a session, fall back to fresh agents per round and say so in the report.
 
 ## Fix before defer
 
@@ -476,7 +332,7 @@ Ask only for one of these:
 | --- | --- |
 | An approval tier changes (below) | A requirement's behaviour changes |
 | Evidence genuinely conflicts, and research did not settle it | Two documents state different owners for one record |
-| An action is irreversible or destructive outside the repo | Deleting a branch, rotating a key, merging to `main` |
+| An action is irreversible, destructive outside the repo, or lands on `main` | Deleting a branch, rotating a key, merging to `main` (once approved, merge as usual) |
 | A credential, budget or access right is missing | No GitHub token, budget spent |
 | A `NOT RUN` UAT case needs a human | An OS permission prompt, a physical device |
 
@@ -520,29 +376,13 @@ Use `bmad-correct-course` for a design or planning-document correction. Use `bma
 
 Never hand-edit an approval-tier clause: it waits for the user's approval. A detail edit goes through the proposal file with its boundary citation. Never delete a requirement to unblock a diff.
 
-**Every correct-course writes its proposal where `bmad-correct-course` writes it (its planning-artifacts folder, written `<planning-artifacts>` below), plus one review copy:**
-
-| File | Reader | Holds |
-| --- | --- | --- |
-| `<planning-artifacts>/sprint-change-proposal-<date>[-<slug>].md` | The leader, and the record | The proposal: each clause with `file:line`, exact OLD → NEW text, evidence, owner Story, and whether it blocks |
-| `<planning-artifacts>/sprint-change-proposal-<date>[-<slug>].html` | The User, for review | The review pack: same clauses, readable in minutes, with before/after diagrams, impact, and the decisions marked |
-
-The `.md` is the skill's default output name; never rename it to `correct-course-*.md`. The `.html` sits beside it with the same basename. Example: `sprint-change-proposal-2026-11-03-epic-4-scope.md` and `.html`. Build the `.html` from `assets/review-pack.template.html`; the rules are in `references/review-pack.md`.
+Every correct-course writes two files with one basename in `<planning-artifacts>/` (where `bmad-correct-course` writes): its default `sprint-change-proposal-<date>[-<slug>].md` for the leader and the record, never renamed to `correct-course-*.md`, and a `.html` review pack beside it for the User. File pair rules: `references/review-pack.md`.
 
 ## Review pack
 
-A change batch the User must read gets one HTML review pack. Build it from the template, not from scratch.
+A change batch the User must read gets one HTML review pack. Build it from `assets/review-pack.template.html`, not from scratch; read the worked example `assets/review-pack.example.html` first. Structure, writing rules, mark vocabulary, diagram rules and pre-link checks: `references/review-pack.md`.
 
-- **Structure:** Overview, Purpose, Behaviour changes, Document-only changes, Impact, Process before and after, What it enables, Decisions, collapsed Appendix.
-- **Highlight is an inline mark**, never a summary: colour, bold, badge, or label on the existing sentence.
-- **Before and after are two complete diagrams** with the same steps and layout. Never one diagram annotated with only the delta.
-- **Diagram medium follows the model.** On **Opus 5.5**, draw diagrams as inline SVG. On every other model, draw them as ASCII inside `<pre>`. The SVG rules are in `references/review-pack.md`; the template carries a commented SVG skeleton.
-- **Every `Where` carries `path:line` plus a plain description.**
-- **Every item that needs the User carries a `your decision` badge** and a review row (checkbox plus accept / reject / discuss, saved in the browser).
-- **Every specialist term gets a tooltip on first use.** The tooltip is the only definition; do not add a glossary section.
-- **Neutral tone.** No pitch, no "the value is", no "smooth".
-
-Template: `assets/review-pack.template.html`. Worked example: `assets/review-pack.example.html`. Rules, mark vocabulary and pre-link checks: `references/review-pack.md`.
+**Diagram medium follows capability.** If you can produce precise inline SVG, draw before-and-after diagrams as inline SVG; otherwise draw them as ASCII inside `<pre>`. Either way, before and after are two complete diagrams with the same steps and layout.
 
 ## Route a failure
 
@@ -584,7 +424,7 @@ Per Story:
    - **Case wrong** — the verifier fixes the case or harness, then a new UAT Runner session reruns the failed cases.
    - **Product wrong** — the verifier records a defect report and sends it to the leader. The leader dispatches the builder to fix it; a new UAT Runner session reruns afterwards. The verifier never edits product code.
    Mark each case `PASS`, `FAIL`, `NOT RUN` (name what is missing) or `BLOCKED` (the case does not apply to this Story, and why). The product's own report is not the observation; the runner's captured output is.
-8. **Commit** — after gates, AC check and review pass, commit and merge the Story branch under the Activate contract. Conventional Commits; no attribution trailer; no push unasked. A squash merge keeps the user's own commits on the Story branch as separate commits: pick them first, then squash only the Story work. Then start the next Story without asking.
+8. **Commit** — after gates, AC check and review pass, commit and merge the Story branch into the integration branch under the Activate contract. Conventional Commits; no attribution trailer; no push unasked. A squash merge keeps the user's own commits on the Story branch as separate commits: pick them first, then squash only the Story work. Then start the next Story without asking.
 9. **CI** — if the user approved a push per Story, push once after step 8. The verifier reads the CI result with a background watch and a status check, never with a foreground loop, and stops the watch before it reports. A job that runs past its usual time is `NOT RUN`, with the elapsed time; it is not a failure. A CI failure routes like any other failure (`Route a failure`). Plan the next Story while CI runs.
 
 ## Epic rhythm
@@ -611,7 +451,7 @@ On "pause", every live agent stops at a safe point: it ends running processes, r
 
 These survive every deadline and every "no process theater":
 
-1. Commit and merge only after gates, AC check and review pass, under the Activate contract. Push and history rewrite need separate approval.
+1. Commit and merge into the integration branch only after gates, AC check and review pass, under the Activate contract. A merge to `main`, a push and a history rewrite need separate approval.
 2. Plan, build, verify, retrospective, correct-course and research run in subagents. The leader approves and commits.
 3. One writer per tree; one Story per subagent.
 4. Independent review, or an explicit `review unavailable`.
@@ -621,6 +461,7 @@ These survive every deadline and every "no process theater":
 8. Fix before defer: resolve what the current Story and harness can prove; defer only with a named blocker and unblock condition.
 9. Decide by default. Ask the user only for the five reasons in the Decision ladder, batched into one message.
 10. A permission denial is the user's decision. Never get the same effect through another tool or command. Report it, or ask.
+11. Leave nothing running: no test VM, emulator, process or container of yours survives a Story close or a pause.
 
 | Excuse | Reality |
 | --- | --- |
@@ -639,38 +480,6 @@ These survive every deadline and every "no process theater":
 
 Every report is a table plus three lines: what is verified, what is unverified, what needs the user.
 
-Stop and ask only for the five reasons in the Decision ladder: an approval tier, an evidence conflict research cannot settle, an irreversible external action, a missing credential or budget, or a `NOT RUN` UAT case that needs a human.
-
-## Red flags
-
-- Editing an approval-tier document without a proposal and the user's approval.
-- Asking the user to approve a detail that a cited boundary already decides.
-- Asking a question a document in the evidence already answers.
-- Committing or merging before gates, AC check and review pass.
-- Pushing or rewriting history without separate approval.
-- Asking to start the next Story after activation.
-- Accepting "done" with no counts.
-- Two subagents writing one tree.
-- Deciding before searching the evidence.
-- Slicing Stories that `bmad-create-epics-and-stories` owns.
-- Patching a diff when the plan is wrong.
-- Marking UAT PASS from the product's own output.
-- Calling a level `BLOCKED` when it lacks setup, a harness or a credential. That is `NOT RUN`.
-- An Activate message without the filled-in pyramid diagram.
-- Leaving a test VM or emulator running.
-- Dispatching a role without the `model` and `effort` from `.leader.json`.
-- Asking the preset question when a valid `.leader.json` exists.
-- On Claude Code or Copilot, briefing the builder for one `bmad-build` phase, or telling it to skip review.
-- Working around a permission denial with another tool.
-- Writing "the user accepted" without a recorded answer to cite.
-- A question option with a number or claim that nobody measured.
-- Two agents on one fixed path, port, device or evidence folder; mutants in the tree a builder edits.
-- The leader editing a file that a live builder owns.
-- Answering idle or shutdown notifications.
-- A fourth review round started by low or test-only findings.
-- Reading the leader's own transcript to rebuild state.
-- Starting a leader retrospective that the user did not ask for.
-
 ## References
 
 - Planning, Epic and Story breakdown: `bmad-prd`, `bmad-create-epics-and-stories`, `bmad-spec`
@@ -679,6 +488,6 @@ Stop and ask only for the five reasons in the Decision ladder: an approval tier,
 - Close: `bmad-retrospective`, `bmad-correct-course`
 
 Brief, report and decision-log templates: `references/briefs.md`.
-Review pack template: `assets/review-pack.template.html`; worked example: `assets/review-pack.example.html`; rules: `references/review-pack.md`.
+Harness and build-mode details: `references/harnesses.md`.
 Agent config: presets `assets/leader-presets.json`; schema and harness mapping `references/agent-config.md`.
 Why the rules exist: `references/improvements.md`, a log of past runs (what went well, what did not, what changed, and why). Read it before you remove or relax a rule. A leader retrospective adds an entry.

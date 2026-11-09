@@ -1,5 +1,18 @@
 # Detecting and Fixing Open Handles
 
+## Contents
+
+- [What Are Open Handles?](#what-are-open-handles)
+- [Detection Commands](#detection-commands)
+- [CLI Flags Reference](#cli-flags-reference)
+- [Common Handle Types and Fixes](#common-handle-types-and-fixes)
+- [NestJS TestingModule Cleanup](#nestjs-testingmodule-cleanup)
+- [Cleanup Order](#cleanup-order)
+- [Configuration Options](#configuration-options)
+- [Debugging Strategies](#debugging-strategies)
+- [Anti-Patterns](#anti-patterns)
+- [Checklist](#checklist)
+
 ## What Are Open Handles?
 
 Open handles are resources (files, network sockets, database connections, timers) that remain active after tests complete. They prevent Jest from exiting cleanly and indicate resource leaks that can cause:

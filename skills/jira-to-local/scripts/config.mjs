@@ -17,7 +17,7 @@
  *                                real project, so prefer types, type, meta or where
  */
 
-import { readFileSync, existsSync, realpathSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -25,12 +25,51 @@ const SCRIPT_DIR = dirname(new URL(import.meta.url).pathname);
 
 export const CONFIG_NAME = '.jira.config.json';
 
+/** Setup's working folder: its decision files, and the connection until the config exists. */
+export const SETUP_DIR = '.jira-setup-choices';
+
+const CONNECTION_FILE = 'connection.json';
+
 /**
- * Walk up from the working directory looking for the config, and stop at the
- * workspace root. `.ai-artifacts` is preferred over `.git` for the same reason
- * the fetch prefers it: inside a git submodule the nearest `.git` belongs to the
- * submodule, and stopping there would find the wrong project's config.
+ * One person's own settings beside a shared, committed config. It holds only
+ * `transport`, so a teammate can sign in with twg while the team's config keeps
+ * REST — or the reverse — without editing the shared file. Git-ignored.
  */
+export const LOCAL_CONFIG_NAME = '.jira.config.local.json';
+
+/** The local override file's content for `transport`. */
+export function localOverride(transport) {
+  if (transport !== 'rest' && transport !== 'twg') {
+    throw new Error(`transport must be rest or twg, not "${transport}"`);
+  }
+  return { transport };
+}
+
+/**
+ * The site setup step 1 records. Setup's API calls need it long before step 9
+ * writes the config, so it waits in the setup folder rather than in a
+ * half-written config. It holds no transport: creating the config always goes
+ * through REST, whatever the pulls will use afterwards.
+ */
+export function connectionRecord(site) {
+  const domain = String(site || '').replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+  if (!domain) throw new Error('A site domain is required, like mycompany.atlassian.net');
+  return { jira: { domain } };
+}
+
+/** The recorded connection as a minimal config, or null when setup has not recorded one. */
+export function readSetupConnection(startDir = process.cwd()) {
+  const path = join(startDir, SETUP_DIR, CONNECTION_FILE);
+  if (!existsSync(path)) return null;
+  return connectionRecord(JSON.parse(readFileSync(path, 'utf8')).jira?.domain);
+}
+
+/** Where setup records the connection, beside its decision files. */
+export function setupConnectionPath(startDir = process.cwd()) {
+  return join(startDir, SETUP_DIR, CONNECTION_FILE);
+}
+
+/** Walk up from the working directory looking for the config. */
 export function findConfigPath(startDir = process.cwd()) {
   let dir = startDir;
   for (let i = 0; i < 30; i++) {
@@ -43,19 +82,27 @@ export function findConfigPath(startDir = process.cwd()) {
   return null;
 }
 
-/** The workspace root, used as the base for a relative `output.dir`. */
+/**
+ * The workspace root, used as the base for a relative `output.dir`: the folder
+ * holding the config, else the nearest `.git`. The config wins because inside a
+ * git submodule the nearest `.git` belongs to the submodule, and a pull run from
+ * there would land in the wrong project.
+ */
 export function findWorkspaceRoot(startDir = process.cwd()) {
-  for (const marker of ['.ai-artifacts', '.git']) {
-    let dir = startDir;
-    for (let i = 0; i < 30; i++) {
-      if (existsSync(join(dir, marker))) return dir;
-      const parent = dirname(dir);
-      if (parent === dir) break;
-      dir = parent;
-    }
+  const configPath = findConfigPath(startDir);
+  if (configPath) return dirname(configPath);
+  let dir = startDir;
+  for (let i = 0; i < 30; i++) {
+    if (existsSync(join(dir, '.git'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
   }
   return startDir;
 }
+
+/** Where pulls land when the config names no `output.dir`. */
+const DEFAULT_OUTPUT_DIR = 'jira-issues';
 
 /**
  * Validate a config file by handing it to check-json.mjs, so the config is held
@@ -104,6 +151,16 @@ export function loadConfig({ startDir = process.cwd(), validate = true } = {}) {
     }
   }
 
+  const localPath = join(dirname(path), LOCAL_CONFIG_NAME);
+  if (existsSync(localPath)) {
+    try {
+      config.transport = localOverride(JSON.parse(readFileSync(localPath, 'utf8')).transport).transport;
+    } catch (err) {
+      console.error(`${localPath}: ${err.message}`);
+      process.exit(1);
+    }
+  }
+
   return { config, path, root: dirname(path) };
 }
 
@@ -138,7 +195,7 @@ export function instructionsFor(config, typeName) {
 
 /** Where this issue's folder goes. Relative `output.dir` is workspace-relative. */
 export function outputDirFor(config, key, root) {
-  const dir = config.output?.dir || '.ai-artifacts/jira';
+  const dir = config.output?.dir || DEFAULT_OUTPUT_DIR;
   const base = dir.startsWith('/') ? dir : join(root || findWorkspaceRoot(), dir);
   return join(base, key);
 }
@@ -276,7 +333,7 @@ function cmdMeta(config) {
 /** Where a pull lands, and what it writes there. */
 function cmdWhere(config, key) {
   const root = findWorkspaceRoot();
-  const dir = config.output?.dir || '.ai-artifacts/jira';
+  const dir = config.output?.dir || DEFAULT_OUTPUT_DIR;
   const modes = outputModes(config);
   const writes = modes.mode === 'both'
     ? 'writes markdown and JSON side by side'
@@ -303,9 +360,30 @@ function main() {
     console.log('  type <TYPE>       One type: its docType and its fields, in order');
     console.log('  meta              metaFields and checklistFields, role to field id');
     console.log('  where [KEY]       The output directory and mode, and KEY\'s folder');
+    console.log('  transport <T>     Use rest or twg for yourself only, in the git-ignored');
+    console.log('                    .jira.config.local.json beside the shared config');
     console.log('  show              The whole config — thousands of lines on a real');
     console.log('                    project, so prefer types, type, meta or where');
     process.exit(command ? 0 : 1);
+  }
+
+  if (command === 'transport') {
+    const p = findConfigPath();
+    if (!p) {
+      console.error(`No ${CONFIG_NAME} found. Run workflows/setup.md.`);
+      process.exit(1);
+    }
+    let local;
+    try {
+      local = localOverride(arg);
+    } catch (err) {
+      console.error(err.message);
+      process.exit(1);
+    }
+    const localPath = join(dirname(p), LOCAL_CONFIG_NAME);
+    writeFileSync(localPath, JSON.stringify(local, null, 2) + '\n');
+    console.log(`Wrote ${localPath}: transport ${local.transport}, for you only.`);
+    return;
   }
 
   if (command === 'path') {

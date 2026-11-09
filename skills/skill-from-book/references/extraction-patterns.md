@@ -2,6 +2,17 @@
 
 Patterns for extracting knowledge from book content into skill files.
 
+## Contents
+
+- [Extraction Principles](#extraction-principles)
+- [Extraction Task Format](#extraction-task-format)
+- [Pattern: Rules Extraction](#pattern-rules-extraction)
+- [Pattern: Examples Extraction](#pattern-examples-extraction)
+- [Pattern: Smells/Anti-patterns Extraction](#pattern-smellsanti-patterns-extraction)
+- [Pattern: Checklist Extraction](#pattern-checklist-extraction)
+- [Parallel Extraction Strategy](#parallel-extraction-strategy)
+- [Quality Checks](#quality-checks)
+
 ## Extraction Principles
 
 ### 1. One Concept Per File
@@ -28,6 +39,8 @@ Patterns for extracting knowledge from book content into skill files.
 - Include quick reference sections
 
 ## Extraction Task Format
+
+The full Phase 3 prompt (one subagent per topic) is in `subagent-prompt.md`. The minimal per-file form below is for one-off extractions.
 
 ### Subagent Prompt Template
 ```markdown

@@ -24,7 +24,7 @@
 
 ## QUICK TOPIC DISCOVERY
 
-"Welcome {{user_name}}! Let's get started with your **technical research**.
+"Welcome {user_name}! Let's get started with your **technical research**.
 
 **What technology, tool, or technical area do you want to research?**
 

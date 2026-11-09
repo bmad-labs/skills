@@ -25,6 +25,8 @@ Before starting, load and read:
 
 ### 1. Ask the User
 
+**Fast path**: if the user only wants the tests run, do not ask for an output path or write a run log — follow `workflow.md` → Fast Path.
+
 Ask the user:
 - **What tests to run?** (all, specific file, specific test, pattern)
 - **Output path** for the run log (suggest a default: `./e2e-run-log-{{date}}.md`)

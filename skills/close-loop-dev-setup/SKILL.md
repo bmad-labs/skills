@@ -1,6 +1,6 @@
 ---
 name: close-loop-dev-setup
-description: Use when an agent cannot validate the product the way a human would — no browser or desktop harness, no screenshots, no vision check, or bmad-leader reports a UAT level as NOT RUN; sets up a minimal drive-and-observe loop and proves it can fail.
+description: Use when an agent cannot validate the product the way a human would — no browser or desktop harness, no screenshots, no vision check, or bmad-leader reports a UAT level as NOT RUN; also when the user says "set up screenshot testing", "let the agent see the UI", "drive the app with Playwright" or asks for a visual check. Sets up a minimal drive-and-observe loop and proves it can fail.
 ---
 
 # Close-Loop Dev Setup
@@ -98,9 +98,9 @@ Use a VM when desktop validation must not touch the host, or when the app needs 
 
 ```bash
 brew install cirruslabs/cli/tart
-tart clone ghcr.io/cirruslabs/macos-sequoia-base:<tag> factory-lab   # pin a tag, never :latest
-tart run factory-lab --no-graphics     # or --vnc to click permission prompts
-tart ip factory-lab
+tart clone ghcr.io/cirruslabs/macos-sequoia-base:<tag> <vm-name>   # pin a tag, never :latest
+tart run <vm-name> --no-graphics       # or --vnc to click permission prompts
+tart ip <vm-name>
 ```
 
 Inside the guest: install `cua-driver` (see Install `cua-driver`), ask the user, then run `cua-driver permissions grant`; start the app, drive it, write screenshots to the evidence directory, then copy them out with `scp` or `rsync`.
@@ -113,10 +113,10 @@ Rules:
 - Ask the user, then grant Accessibility and Screen Recording in the guest only. Never grant them on the host without explicit confirmation. A missing grant returns no image.
 - Use synthetic data. No real account, key, token or customer data in the guest.
 - Capture evidence inside the guest; copy it out. Do not report a result you did not copy.
-- A VM has no battery and sleep may cold-boot. Mark battery and sleep cases `BLOCKED`; do not fake them.
+- A VM has no battery and sleep may cold-boot. Mark battery and sleep cases `NOT RUN` and name what is missing (a physical machine); do not fake them.
 - GPU and font rendering can differ from the host. Compare baselines only against the same guest image.
 
-`tart stop factory-lab` when done. Confirm the VM is off before writing the run result.
+`tart stop <vm-name>` when done. Confirm the VM is off before writing the run result.
 
 ## 3. Build one journey
 
@@ -192,9 +192,12 @@ Run the script. It must fail, and the failure must name the broken behavior. Res
 | `PASS` | Required assertion checked against captured evidence and held |
 | `FAIL` | Evidence checked and did not hold |
 | `UNOBSERVED` | Evidence missing; nothing proven either way |
-| `BLOCKED` | Case cannot run: environment, dependency or permission |
+| `NOT RUN` | Case applies but cannot run yet; name what is missing: environment, dependency, permission, or a human action |
+| `BLOCKED` | Case does not apply to this work; say why |
 
 `UNOBSERVED` is never `PASS`. "No error found" without the required screenshot or output is unobserved.
+
+These are the same words `bmad-leader` uses. `BLOCKED` means not applicable only; a case that applies but lacks setup is `NOT RUN`, so the gap stays visible.
 
 ## 7. Keep it safe
 
@@ -231,7 +234,7 @@ Report to the leader:
 | Level enabled | UAT, E2E, or both |
 | Tool | Name and version |
 | Command | Exact command |
-| Verdict | `PASS`, `FAIL`, `UNOBSERVED`, or `BLOCKED` |
+| Verdict | `PASS`, `FAIL`, `NOT RUN`, `BLOCKED`, or `UNOBSERVED` |
 | Evidence | Screenshot path, viewport, browser version |
 | Falsified | What broke, and the failure it produced |
 | Not proven | Missing harness, browser, viewport or permission |
@@ -273,4 +276,4 @@ If setup fails, say which step failed and what the user must do. Do not mark the
 | Editing `AGENTS.md` or design docs | Propose the change |
 | Skipping the failure test | Break one behavior and confirm red |
 | Installing system-wide permissions silently | Ask first |
-| Calling a blocked level `RUN` | Name the missing tool |
+| Calling a level `RUN` when its tool is missing | Mark it `NOT RUN` and name the missing tool |

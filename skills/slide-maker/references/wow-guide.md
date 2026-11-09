@@ -16,6 +16,19 @@ ship — this guide is the ceiling, that script is the floor.
 
 ---
 
+## Contents
+
+- [0. The wow mindset](#0-the-wow-mindset)
+- [1. Visual hierarchy — the hero treatment](#1-visual-hierarchy--the-hero-treatment)
+- [2. Data visualization on-theme](#2-data-visualization-on-theme)
+- [3. Depth & atmosphere — in the LIGHT idiom](#3-depth--atmosphere--in-the-light-idiom)
+- [4. Motion — restrained](#4-motion--restrained)
+- [5. Density & composition (word budgets)](#5-density--composition-word-budgets)
+- [6. Imagery](#6-imagery)
+- [7. Typography craft](#7-typography-craft)
+- [8. The anti-boring checklist + good-vs-bad copy](#8-the-anti-boring-checklist--good-vs-bad-copy)
+- [Snippets](#snippets)
+
 ## 0. The wow mindset
 
 - **One slide = one idea = one focal point.** If you can't name the single thing

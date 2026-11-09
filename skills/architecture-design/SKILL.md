@@ -13,8 +13,8 @@ every boundary, and the flows between them. It is a helicopter view. It never ho
 Core principle: **one canon, single-source contracts, every protocol file proven by a real tool, one folder at a
 time with the user.**
 
-**Follow 70%, create 30%.** The templates in `references/` are the default shape (the 70%). Every template has
-REQUIRED slots — keep them always. The rest (the 30%) you adapt to the use case: add a folder the system needs,
+**Follow 70%, create 30%.** The templates in `templates/` (index: `references/templates.md`) are the default
+shape (the 70%). Every template has REQUIRED slots — keep them always. The rest (the 30%) you adapt to the use case: add a folder the system needs,
 drop one it does not, split a big file, pick the protocol file that fits. Record each adaptation in one line in the
 canon's "Folders" table, so the reader knows it was deliberate.
 
@@ -84,8 +84,8 @@ Build the package yourself, folder by folder. Parallel builder agents break nami
 
 | Condition | Tool | Guide |
 | --- | --- | --- |
-| You run on a frontier model **and** the diagram is a concept, C4 view, pipeline, workflow, or timeline with ≤ ~10 boxes | Hand-written SVG, coordinates computed by a small script | [references/svg-diagrams.md](references/svg-diagrams.md) |
-| Any other model, or sequence, class, state, ERD, or a graph past ~10 nodes | PlantUML | [references/plantuml-recipes.md](references/plantuml-recipes.md) |
+| A concept, C4 view, pipeline, workflow, or timeline with ≤ ~10 boxes | Hand-written SVG, coordinates computed by a small script | [references/svg-diagrams.md](references/svg-diagrams.md) |
+| A sequence, class, state, or ERD diagram, or any graph past ~10 nodes | PlantUML | [references/plantuml-recipes.md](references/plantuml-recipes.md) |
 | The user rejected a PlantUML diagram's look twice | Switch to hand SVG | svg-diagrams.md |
 
 ## Principles that made the output good

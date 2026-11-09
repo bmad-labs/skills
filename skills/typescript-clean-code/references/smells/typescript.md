@@ -13,6 +13,21 @@ when NOT to fix · mechanically detected by.
 
 ---
 
+## Contents
+
+- [TS1: `any` Leakage](#ts1-any-leakage)
+- [TS2: Non-null Assertion as Proof](#ts2-non-null-assertion-as-proof)
+- [TS3: Assertion Instead of Validation](#ts3-assertion-instead-of-validation)
+- [TS4: Stringly-Typed Domain](#ts4-stringly-typed-domain)
+- [TS5: Non-exhaustive Union Handling](#ts5-non-exhaustive-union-handling)
+- [TS6: `enum` Where a Union Belongs](#ts6-enum-where-a-union-belongs)
+- [TS7: Strictness Assumed but Not Enabled](#ts7-strictness-assumed-but-not-enabled)
+- [TS8: Interface Bloat by Optionality](#ts8-interface-bloat-by-optionality)
+- [TS9: Structural Types Where Nominal Was Meant](#ts9-structural-types-where-nominal-was-meant)
+- [TS10: Type-Level Speculative Generality](#ts10-type-level-speculative-generality)
+- [The G23 tension — resolved](#the-g23-tension--resolved)
+- [Provenance](#provenance)
+
 ### TS1: `any` Leakage
 
 **What it is**: `any` entering at one point and spreading. Every value derived from

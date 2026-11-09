@@ -57,7 +57,7 @@
           },
           "originalEstimateSeconds": {
             "type": ["integer", "null"],
-            "description": "The same estimate in seconds, as Jira's API reports it. The display string hides that Jira's working day is 8 hours, so summing strings gives the wrong answer; these add up correctly."
+            "description": "The same estimate in seconds, as Jira's API reports it. The display string hides the site's working day (8 hours by default), so summing strings gives the wrong answer; these add up correctly."
           },
           "timeSpent": {
             "type": ["string", "null"],

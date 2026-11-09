@@ -10,8 +10,11 @@ Usage:
     
 Example:
     python3 merge_book.py books/effective-java
+
+Output: <project-directory>/../<project-name>-book.md
 """
 
+import argparse
 import sys
 import re
 from pathlib import Path
@@ -158,13 +161,11 @@ def detect_book_title(project_dir: Path) -> str:
     return book_title
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 merge_book.py <project-directory>")
-        print("\nExample:")
-        print("  python3 merge_book.py books/effective-java")
-        sys.exit(1)
-    
-    project_dir = Path(sys.argv[1])
+    parser = argparse.ArgumentParser(
+        description="Phase 4 of book-converter: merge formatted chapters (in CHAPTER_MAP.md "
+                    "order) into <project-name>-book.md next to the project directory, with a TOC.")
+    parser.add_argument("project_dir", type=Path, help="book project directory, e.g. books/effective-java")
+    project_dir = parser.parse_args().project_dir
     
     # Verify project directory
     if not project_dir.exists():

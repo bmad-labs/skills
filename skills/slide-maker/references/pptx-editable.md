@@ -11,6 +11,17 @@ This page is the **editable** path. It turns each rendered slide into native Pow
 objects — real textboxes, rounded-rect cards, lines, (and native charts) — that open
 fully editable in PowerPoint / Keynote / Google Slides.
 
+## Contents
+
+- [Why this design (the one rule that makes it work)](#why-this-design-the-one-rule-that-makes-it-work)
+- [Pipeline](#pipeline)
+- [Run it](#run-it)
+- [The quality gate — validate-pptx.mjs (always run this)](#the-quality-gate--validate-pptxmjs-always-run-this)
+- [Author for clean export — the highest-leverage half](#author-for-clean-export--the-highest-leverage-half)
+- [Fonts (Inter)](#fonts-inter)
+- [Gotchas learned (each one cost a real debugging round — don't rediscover them)](#gotchas-learned-each-one-cost-a-real-debugging-round--dont-rediscover-them)
+- [Files](#files)
+
 ## Why this design (the one rule that makes it work)
 
 pptxgenjs is a **drawing API, not a layout engine** — it has no concept of flexbox,
@@ -454,5 +465,5 @@ If yes, `export-pptx-jsx.mjs` will reconstruct the slide faithfully — then pro
 - `assets/fonts/Inter-{Regular,Bold}.otf` — vendored (SIL OFL) for embedding + LibreOffice.
 - Deps (devDeps): `@artifact-kit/pptxgenjs-jsx`, `pptx-embed-fonts`, `pixelmatch`, `pngjs`, `ssim.js`, `svgpath`.
 
-Grounding research (a **proposal**, not current behaviour):
-[../research/pptx-export-2026-06-20.md](../research/pptx-export-2026-06-20.md).
+Grounding research (a **proposal**, not current behaviour) is kept outside the installed
+skill, in this repo's `evaluations/skills/slide-maker/research/`.

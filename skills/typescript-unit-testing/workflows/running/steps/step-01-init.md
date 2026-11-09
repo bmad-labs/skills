@@ -14,6 +14,8 @@ Set up the test execution session: determine test scope, initialize the temp fil
 
 ### 1. Ask the User
 
+**Fast path**: if the user only wants the tests run, do not ask for an output path or write a report — follow `workflow.md` → Fast Path.
+
 Ask the user:
 - **What tests to run?** (all tests, specific file, pattern, or single test name)
 - **Output path** for the execution report (suggest a default: `./test-execution-report-{{date}}.md`)

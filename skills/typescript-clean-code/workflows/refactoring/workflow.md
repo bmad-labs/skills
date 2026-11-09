@@ -26,7 +26,14 @@ Safe refactoring process with tests as a safety net.
 
 > **Never refactor without tests. Never.**
 
-If tests don't exist, write them first. See `test-strategy.md` workflow.
+If tests don't exist, write them first. See `workflows/test-strategy.md`.
+
+## Fast Path
+
+For a small refactoring (one function or one file), do not ask for an output path or
+wait for `[C]`: default the log path to `./refactoring-log-{{date}}.md`, run every
+step in one pass, and present the result at the end. Use the full guided flow below
+when the user asks for it or the scope is larger.
 
 ## Step-File Architecture
 
@@ -57,7 +64,7 @@ This workflow uses a **step-file architecture** for context-safe execution:
    Each step names its own reference files and its own completion criterion
 2. **Update frontmatter after each step** — add the step number to `stepsCompleted`,
    so a compacted context resumes via `step-01b-continue.md`
-3. **Wait for `[C]`** between steps
+3. **Wait for `[C]`** between steps (skipped on the fast path)
 4. **One change at a time** — each loop iteration makes exactly one structural change
 5. **Tests stay green** — a failing test after a change means undo, then retry smaller
 

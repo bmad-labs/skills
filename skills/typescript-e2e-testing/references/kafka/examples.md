@@ -1,5 +1,19 @@
 # Kafka E2E Test Examples
 
+## Contents
+
+- [Complete Test Suite Example](#complete-test-suite-example)
+- [Basic Message Processing](#basic-message-processing)
+- [Event Updates Database](#event-updates-database)
+- [Wait for Specific Message](#wait-for-specific-message)
+- [Batch Processing](#batch-processing)
+- [Error Handling](#error-handling)
+- [Domain Event Publishing](#domain-event-publishing)
+- [Event Sourcing Pattern](#event-sourcing-pattern)
+- [Performance Testing](#performance-testing)
+- [Multi-Consumer Scenario](#multi-consumer-scenario)
+- [Helper Function: waitFor](#helper-function-waitfor)
+
 ## Complete Test Suite Example
 
 ```typescript

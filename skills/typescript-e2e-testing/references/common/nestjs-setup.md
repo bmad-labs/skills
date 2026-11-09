@@ -1,5 +1,23 @@
 # NestJS E2E Test Setup
 
+## Contents
+
+- [Project Structure](#project-structure)
+- [Jest Configuration](#jest-configuration)
+  - [jest-e2e.config.ts](#jest-e2econfigts)
+  - [package.json Scripts](#packagejson-scripts)
+  - [Running Tests (Context Efficient)](#running-tests-context-efficient)
+- [Test Setup Pattern](#test-setup-pattern)
+  - [Global Setup (setup.ts)](#global-setup-setupts)
+  - [Test App Bootstrap Helper](#test-app-bootstrap-helper)
+- [Complete Test Suite Example](#complete-test-suite-example)
+- [Common Issues and Solutions](#common-issues-and-solutions)
+  - [Issue: Tests hang after completion](#issue-tests-hang-after-completion)
+  - [Issue: Port conflicts between test runs](#issue-port-conflicts-between-test-runs)
+  - [Issue: Database state pollution](#issue-database-state-pollution)
+  - [Issue: Kafka consumer lag](#issue-kafka-consumer-lag)
+  - [Issue: Tests fail intermittently (flaky)](#issue-tests-fail-intermittently-flaky)
+
 ## Project Structure
 
 ```
@@ -50,9 +68,9 @@ const config: Config = {
   resetMocks: true,
   restoreMocks: true,
 
-  // Prevent hanging connections
-  forceExit: true,
+  // Report handles that keep Jest alive, then close them in afterAll
   detectOpenHandles: true,
+  // forceExit: true only as a last resort — it hides open handles instead of fixing them
 };
 
 export default config;
@@ -66,8 +84,8 @@ export default config;
     "test:e2e": "jest --config test/jest-e2e.config.ts --runInBand",
     "test:e2e:watch": "jest --config test/jest-e2e.config.ts --runInBand --watch",
     "test:e2e:debug": "node --inspect-brk node_modules/.bin/jest --config test/jest-e2e.config.ts --runInBand",
-    "e2e:infra:up": "docker-compose -f docker-compose.e2e.yml up -d",
-    "e2e:infra:down": "docker-compose -f docker-compose.e2e.yml down -v",
+    "e2e:infra:up": "docker compose -f docker-compose.e2e.yml up -d",
+    "e2e:infra:down": "docker compose -f docker-compose.e2e.yml down -v",
     "e2e:logs": "tail -f logs/e2e-test.log"
   }
 }
@@ -260,9 +278,9 @@ describe('Feature E2E', () => {
 ### Issue: Tests hang after completion
 
 ```typescript
-// Solution 1: Force exit in jest config
-forceExit: true,
+// Solution 1: Find the open handle, then close it (see Solution 2)
 detectOpenHandles: true,
+// forceExit: true is a last resort only — it hides the handle instead of fixing it
 
 // Solution 2: Proper cleanup in afterAll
 afterAll(async () => {
