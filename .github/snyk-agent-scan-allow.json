@@ -26,5 +26,8 @@
   },
   "skills/typescript-unit-testing": {
     "secret_detection": "False positive: Snyk's own redaction of an ApiKeyService mock in references/nestjs/guards.md."
+  },
+  "skills/ultrathink-protocol": {
+    "third_party_content_exposure": "Reading upstream source and issue trackers is part of the escalation step; SKILL.md treats that text as evidence to verify, not instructions."
   }
 }
