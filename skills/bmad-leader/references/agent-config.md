@@ -23,12 +23,12 @@ The project-root file `.leader.json` fixes the model, effort and context window 
 | `preset` | The preset id it came from, or `custom` after a hand edit |
 | `vendor` | `anthropic`, `openai`, `deepseek`, `google` |
 | `harness` | `claude-code`, `copilot-cli`, `copilot-app`, `vscode-copilot`, `vscode-local` or `opencode`; the harness the leader runs in |
-| `agents[].name` | One of the 9 required roles: `leader`, `planner`, `builder`, `verifier`, `uat-runner`, `reviewer`, `research`, `retrospective`, `correct-course`; or one of the 3 optional `bmad-build` review lenses: `blind-hunter`, `edge-cases-hunter`, `verification-gap-finder` |
+| `agents[].name` | One of the 9 required roles: `leader`, `planner`, `builder`, `verifier`, `uat-runner`, `reviewer`, `research`, `retrospective`, `correct-course`; or one of the 4 optional review entries: the `bmad-build` lenses `blind-hunter`, `edge-cases-hunter`, `verification-gap-finder`, and `red-team` |
 | `agents[].model` | Vendor model id, without a provider prefix |
 | `agents[].effort` | `low`, `medium`, `high`, `xhigh`, `max` |
 | `agents[].contextWindow` | Tokens, positive integer |
 
-Valid means: JSON parses, every field above is present with an allowed value, every required role appears exactly once, each lens appears at most once, and no other name appears. A missing required role is invalid, not a fallback.
+Valid means: JSON parses, every field above is present with an allowed value, every required role appears exactly once, each optional review entry appears at most once, and no other name appears. A missing required role is invalid, not a fallback.
 
 ## Review lenses
 
@@ -39,6 +39,7 @@ Valid means: JSON parses, every field above is present with an allowed value, ev
 | Blind Hunter | `blind-hunter`, else `reviewer` |
 | Edge Cases Hunter | `edge-cases-hunter`, else `reviewer` |
 | Verification Gap Finder | `verification-gap-finder`, else `reviewer` |
+| Red team (once per Story, leader-dispatched) | `red-team`, else `reviewer` |
 
 A file written before the lenses existed stays valid; its three lenses use `reviewer`. Do not add lens entries to an existing file unless the user asks.
 
@@ -107,7 +108,7 @@ The leader cannot change its own model mid-session. At Activate, compare the `le
 | --- | --- | --- | --- |
 | Persistent | leader, planner, builder, verifier | 1M | At about 70% used, start a fresh session with a handoff note. Record the switch in the report. |
 | One-time, wide input | uat-runner, research, retrospective, correct-course | 1M | Reads many sources: screenshots and logs, web pages and docs, or a whole epic of plans and evidence. |
-| One-time, narrow input | reviewer, the 3 lenses | 200K | Reads one Story's change. If the brief and its inputs would pass about 70% of the window, split the work, for example one review per file group. |
+| One-time, narrow input | reviewer, the 3 lenses, red team | 200K | Reads one Story's change. If the brief and its inputs would pass about 70% of the window, split the work, for example one review per file group. |
 
 ## Change the preset later
 

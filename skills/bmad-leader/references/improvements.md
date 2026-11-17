@@ -4,6 +4,48 @@ Lessons from real `bmad-leader` runs, and the skill changes they caused. Each en
 
 Keep every entry generic. Write no project, product, company or team name, no domain term, path, file name, branch, tool or service that belongs to one project, and no person. Describe the work only by its shape (for example "an epic of 6 Stories with several test layers"). This skill is shared across projects.
 
+## 2026-11 — review loop proof, OpenCode
+
+### The run
+
+| Item | Value |
+| --- | --- |
+| Work | Two epics, about 20 Stories, with several test layers |
+| Harness | OpenCode, Phase split, one smaller model for every role. The skill version had no severity rubric and no round cap yet |
+| Agents | 137 reviewer sessions: 9.97M of 36.6M child input tokens, the largest share of any role |
+| Evidence | Leader and child session logs, mined by one read-only agent; then 4 pressure scenarios, 2 runs each, before and after the change |
+
+### What did not go well
+
+| # | Problem | Evidence |
+| --- | --- | --- |
+| 1 | Rounds did not converge, and nothing measured it | One Story took 7 rounds, another 6. New blockers kept appearing; one came from an earlier fix that broke a published contract. The leader stopped by feel ("0 blockers for two rounds") |
+| 2 | The last fix batch shipped unreviewed | Several Stories went from the final fix straight to UAT, and the report still said "review passed". The current rule made this official: after a passing round, the last batch gets no new reviewers |
+| 3 | The deepest defect came from an ad hoc final pass | An "audit" round the leader invented found the worst defect of one Story; its own fix then went unreviewed |
+| 4 | Fresh reviewers, but steered | Briefs listed the leader's guesses ("hunt for defects the fix introduced: …"); later rounds said "blockers only, at most 6 lines". In the pressure scenarios, all 3 round-2 briefs written out in full listed the fixes or a guess, and kept the "find any 10 things" quota |
+| 5 | Fakes hid real defects | Test doubles skipped a validation and a field the real service has; UAT caught them, review did not |
+| 6 | Records did not match the run | A lens was dropped in about 12 Stories without a note; reports claimed "3 lenses each"; most triage logs were empty |
+| 7 | A worse round led to another round | In the pressure scenario, 2 of 2 leaders saw open findings rise from 2 to 3 and still started round 3 |
+
+### What was changed, and why
+
+| # | Change | Where | Why |
+| --- | --- | --- | --- |
+| 1 | A quality bar per Story: one testable row per AC and contract clause, written at plan approval; severity ties to it | `briefs.md` Quality bar, Reviewer brief; `SKILL.md` Verify and close step 1, 5 | "Pass" had no definition, so the stop was a feeling |
+| 2 | Proof for every high or medium finding, else low; no quota for the Blind Hunter | `briefs.md` Reviewer brief | A comment is not a defect; a quota fills itself |
+| 3 | A findings ledger per Story with a delta line per round; `fixed-unproven` counts as open; reports take their numbers from it | `briefs.md` Findings ledger; `SKILL.md` Verify and close step 6, Report | Each round must show what it closed with proof, not only what it added |
+| 4 | Stall rule: a round that does not lower open high plus product medium, or regresses as much as it closes, changes the fixer (`bad_plan` for a shared cause, else a fresh builder); the next round is the last | `SKILL.md` Verify and close step 6 | Another round of the same kind repeats the failure. The first wording ("ends the loop") split 2 runs: one reviewed the next fix, one skipped its review |
+| 5 | One red-team pass per Story on the whole diff, the unreviewed last batch first, and test doubles against the real interfaces; a claim needs a reproduction | `SKILL.md` Roles, step 6, Non-negotiables; `briefs.md` Red-team brief; `harnesses.md` loops | Closes the unreviewed-last-batch gap and makes the useful ad hoc audit a rule, at the cost of one agent |
+| 6 | Reviewer briefs from the template only: no fix list, no guesses, no "blockers only", no cap on findings | `briefs.md` Reviewer brief; `SKILL.md` step 5 | A guess points every reviewer at the same place |
+| 7 | "Repeat until the Story passes" replaced by the round rules | `harnesses.md` | "Until it passes" has no end; the cap and the stall rule do |
+
+### How to tell whether the changes worked
+
+- Rounds per Story at most 3, and at most one round after a stall.
+- Every Story has a red-team result or `red team unavailable`.
+- Defects found first by UAT that a review or red team could have reproduced: fewer than before.
+- Report review numbers match the ledger and the session logs.
+
 ## 2026-11 — one epic, six Stories, Claude Code
 
 ### The run
