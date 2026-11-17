@@ -19,7 +19,7 @@ One builder runs `bmad-build` end to end, as its docs describe. The leader does 
 | Plan, approved plan | Builder writes; leader approves | Runs the `Approve a plan` checks; returns `bad_plan` with reasons |
 | Implement | Builder | — |
 | Fits AC? | Builder | — |
-| Review: three lenses | Builder spawns three fresh subagents, one lens each, with the lens entries from `.leader.json` | Reads the findings and the lens session ids in the report |
+| Review: three lenses | Builder spawns three fresh subagents, one lens each, with the lens entries from `.leader.json` | Reads the findings and the lens session ids in the report; records them in the findings ledger |
 | Patch, reject, defer | Builder | Confirms each deferral has a blocker and goes to `deferred_work.md` |
 | Present, result | Builder presents; leader accepts | Sends the result to the verifier |
 
@@ -29,9 +29,10 @@ The loop:
 2. The builder implements, runs `bmad-build`'s three review lenses in fresh subagents, patches, and presents.
 3. The verifier runs gates and tests on the presented result.
 4. Verifier failures go back to the **same builder session**, which fixes them through `bmad-build`'s patch loop and its review again.
-5. The verifier prepares the UAT cases; a **fresh UAT Runner session** runs them. A wrong case goes to the verifier, which fixes it; a product defect goes to the builder. Each rerun is a new UAT Runner session.
+5. After the last passing round and a green verifier, the leader dispatches the **red team**: one fresh session on the whole Story diff (`## Red-team brief`). A reproduced high or product medium goes back to step 4 as a counted round.
+6. The verifier prepares the UAT cases; a **fresh UAT Runner session** runs them. A wrong case goes to the verifier, which fixes it; a product defect goes to the builder. Each rerun is a new UAT Runner session.
 
-Repeat steps 3–5 until the Story passes.
+Repeat steps 3–6 under the round rules in `SKILL.md` Verify and close step 6: at most three rounds, and after a stall only one more.
 
 Rules:
 
@@ -52,6 +53,7 @@ OpenCode has no nested subagents, and VS Code Local subagents are stateless, so 
 | Implement | Builder subagent | `builder-<story>` |
 | Fits AC? | Leader, using verifier evidence | — |
 | Review | Three fresh reviewer subagents, one lens each | `review-<lens>-r<n>-s<story>` |
+| Red team | One fresh subagent, once per Story | `redteam-<story>` |
 | Patch | Builder | `builder-<story>` |
 | Present and result | Leader | — |
 | Defer | Leader writes `deferred_work.md` | — |
@@ -65,10 +67,11 @@ The loop:
 5. Findings go back to the **same builder session** to fix.
 6. The **same verifier session** re-runs the gates.
 7. A fix round starts a **new set of three reviewers** on the new diff. Close the previous three.
-8. The verifier prepares the UAT cases; a **fresh UAT Runner session** runs them.
-9. A failed case goes to the **verifier**, which fixes the case or harness, then a **new UAT Runner session** reruns the failed cases. Close the previous runner session.
+8. After the last passing round, a **fresh red team** attacks the whole Story diff (`## Red-team brief`). A reproduced high or product medium goes back to step 5 as a counted round.
+9. The verifier prepares the UAT cases; a **fresh UAT Runner session** runs them.
+10. A failed case goes to the **verifier**, which fixes the case or harness, then a **new UAT Runner session** reruns the failed cases. Close the previous runner session.
 
-Repeat 5–9 until the Story passes. Close all remaining sessions when it does.
+Repeat 5–10 under the round rules in `SKILL.md` Verify and close step 6: at most three rounds, and after a stall only one more. Close all remaining sessions when the Story passes.
 
 Rules:
 

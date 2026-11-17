@@ -3,8 +3,8 @@
 ## Contents
 
 - Status and setup: [Current situation note](#current-situation-note), [Test level confirmation](#test-level-confirmation), [Common rules block](#common-rules-block)
-- Briefs: [Subagent brief](#subagent-brief), [Builder brief (Full build)](#builder-brief-full-build), [Builder brief (Phase split)](#builder-brief-phase-split), [Planner brief](#planner-brief), [Verifier brief](#verifier-brief), [UAT Runner brief](#uat-runner-brief), [Reviewer brief](#reviewer-brief), [Research brief](#research-brief), [Retrospective brief](#retrospective-brief), [Correct-course brief](#correct-course-brief)
-- Round records: [Defect report](#defect-report), [Triage file](#triage-file), [Deferred work at Story start](#deferred-work-at-story-start)
+- Briefs: [Subagent brief](#subagent-brief), [Builder brief (Full build)](#builder-brief-full-build), [Builder brief (Phase split)](#builder-brief-phase-split), [Planner brief](#planner-brief), [Verifier brief](#verifier-brief), [UAT Runner brief](#uat-runner-brief), [Reviewer brief](#reviewer-brief), [Red-team brief](#red-team-brief), [Research brief](#research-brief), [Retrospective brief](#retrospective-brief), [Correct-course brief](#correct-course-brief)
+- Round records: [Quality bar](#quality-bar), [Findings ledger](#findings-ledger), [Defect report](#defect-report), [Triage file](#triage-file), [Deferred work at Story start](#deferred-work-at-story-start)
 - Contracts and routing: [Build run contract](#build-run-contract), [Skills to name in a brief](#skills-to-name-in-a-brief), [Report contract](#report-contract)
 - Epic records: [Decision log](#decision-log), [Epic close checklist](#epic-close-checklist)
 
@@ -315,18 +315,59 @@ The verifier writes this when the product is wrong. The leader routes it to the 
 - Severity: <blocker | major | minor>
 ```
 
+## Quality bar
+
+The leader writes this once per Story, when it approves the plan, and passes its path to every reviewer, the verifier and the red team. It is the "pass" every round is judged against.
+
+```markdown
+# Story <id>: quality bar
+
+Base: <sha>. Plan: <path>.
+
+| Q | Criterion | Source | Checked by |
+| --- | --- | --- | --- |
+| Q1 | <one AC, contract clause, error code or convention, stated as a testable fact> | <AC-n, FR-n, AD-n, design file:line, AGENTS.md:line> | <test name, gate command, or UAT case> |
+
+Levels marked RUN: <from the marked pyramid>.
+```
+
+One row per acceptance criterion, plus one per contract or design clause the Story touches. A row with no "Checked by" is a gap: the plan adds a test for it, or the row says `NOT RUN` and why.
+
+## Findings ledger
+
+One file per Story, `review-ledger-<story>.md`, beside the triage files. The leader keeps it; every round adds rows and one delta line. Rows stay sorted: high, then medium, then low.
+
+```markdown
+# Story <id>: findings ledger
+
+Quality bar: <path>.
+
+| Id | Q | Severity | Source | Status | Proof |
+| --- | --- | --- | --- | --- | --- |
+| <round prefix><n> | <Q row, or "outside the bar"> | high / medium / low | <lens, round, session id> | open / fixed-proven / fixed-unproven / regressed / rejected / deferred | <test red then green, or mutant killed, with path; for rejected or deferred, the reason> |
+
+## Rounds
+| Round | Head | Lenses (session ids) | Open high + product medium: before → after | Closed with proof | New | Regressed |
+| --- | --- | --- | --- | --- | --- | --- |
+```
+
+`fixed-unproven` counts as open. A round that ran fewer lenses than the rule requires says `review partial: <lens> skipped, <reason>` in its Lenses cell. Every review number in a report (rounds, lenses, session ids, findings) comes from this file.
+
 ## Reviewer brief
+
+Write the brief from this template only. Fill the slots; add nothing about the fixes or where defects may be. A leader guess in the brief points every reviewer at the same place, and the defect elsewhere escapes. The reviewer reads the old findings from the ledger.
 
 ```markdown
 You are the <Lens> reviewer for Story <id>, round <n>.
 Fresh context: you have not reviewed this Story before.
 Load and follow `bmad-code-review` on the Story diff: <base>...<head>.
 Review only through your lens:
-- Blind Hunter: find any 10 things to fix.
+- Blind Hunter: find what is wrong in the diff. No quota: report what you can prove, or nothing.
 - Edge Cases Hunter: find forgotten corner cases.
 - Verification Gap Finder: is this covered by tests?
 
-Context: Story AC, cited design files, decision log <path>.
+Quality bar: <path>. Judge the diff against it.
+Context: Story AC, cited design files, decision log <path>, findings ledger <path>.
 Do not edit product code.
 Do not review unrelated pre-existing code unless the diff touches it.
 Read files at <head> (for example `git show <head>:<path>`); the working tree may
@@ -335,14 +376,48 @@ In round 2 or later, review the fix diff <previous head>...<head>; repeat an old
 finding only when its fix is wrong or incomplete.
 
 Severity:
-- high: breaks an acceptance criterion or the contract.
+- high: breaks a quality-bar row that comes from an acceptance criterion or the contract.
 - medium: a product defect, or a test that gives a false pass of a product check.
-- low: everything else (test-helper robustness, wording, ids, plan text).
+- low: everything else (test-helper robustness, wording, ids, plan text), and any finding outside the quality bar.
+
+Proof: every high or medium finding carries one of: a test or command that fails, with
+its output; the contract line it breaks, quoted with file:line; or a concrete input and
+the wrong output it gives. A finding without proof is low.
 
 Return:
-- Findings: severity, file:line, quoted line, what is wrong, suggested fix.
+- Findings: id, severity, Q row (or "outside the bar"), file:line, quoted line, what is wrong, proof, suggested fix.
 - Which findings block the Story and which can be deferred, with a blocker.
 - Verdict: PASS or FAIL.
+```
+
+## Red-team brief
+
+Once per Story, after the last passing round and before UAT. A fresh session; never reused.
+
+```markdown
+You are the red team for Story <id>. Fresh context: you have not seen this Story before.
+Your job is to break it. Load `bmad-code-review` for its method, then attack the whole
+Story diff <base>...<head>, not only the last fix.
+
+Quality bar: <path>. Findings ledger: <path> (what is already known; do not re-report it).
+Context: Story AC, cited design files.
+Do not edit product code. Read files at <head>. Work only in your own exported copy at <path>.
+
+Attack, in this order:
+1. The last fix batch <previous head>...<head>: no reviewer has seen it.
+2. Every quality-bar row: find an input, state or order that breaks it.
+3. Test doubles: compare every fake, stub or mock that an AC test uses with the real
+   interface it stands for (validation, required fields, error shapes, identity). A fake
+   that skips a real check is a medium.
+4. The regressions the ledger records: is the neighbouring behaviour still covered?
+
+A claim counts only with a reproduction: a failing test or command you ran, with its output.
+Without one, list it as low under "Not reproduced".
+
+Return:
+- Reproduced: id (prefix RT), severity by the Reviewer brief rubric, Q row, file:line, reproduction, output.
+- Not reproduced: one line each.
+- Verdict: PASS (no reproduced high or product medium) or FAIL.
 ```
 
 ## Triage file
@@ -365,6 +440,8 @@ Each non-doc fix needs a test that fails first, or a mutant that the new test ki
 ## After the fixes
 <gates to re-run; whether a new review round follows (see the convergence rule)>
 ```
+
+After the round, add its rows and its delta line to the findings ledger. The triage file names ledger ids; it does not describe the findings again.
 
 Use a new id prefix per round, so a row id names its round.
 

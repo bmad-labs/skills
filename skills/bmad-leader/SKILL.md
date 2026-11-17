@@ -51,7 +51,7 @@ Ask for exactly three things if the user did not say: **scope**, **document loca
 
 ## Agent config
 
-`./.leader.json` in the project root sets `model`, `effort` and `contextWindow` for each of the 9 roles, plus optional entries for the three `bmad-build` review lenses (`blind-hunter`, `edge-cases-hunter`, `verification-gap-finder`). A lens entry overrides `reviewer` for that lens; without it, the lens uses `reviewer`. Read it at every Activate, before any dispatch. Schema, validation and harness mapping: `references/agent-config.md`.
+`./.leader.json` in the project root sets `model`, `effort` and `contextWindow` for each of the 9 roles, plus optional entries for the three `bmad-build` review lenses (`blind-hunter`, `edge-cases-hunter`, `verification-gap-finder`) and the `red-team`. Such an entry overrides `reviewer` for that agent; without it, the agent uses `reviewer`. Read it at every Activate, before any dispatch. Schema, validation and harness mapping: `references/agent-config.md`.
 
 | State | Action |
 | --- | --- |
@@ -222,6 +222,8 @@ The same builder session fixes review, verifier and UAT findings.
 
 **Reviewer subagents (three per round):** on a Phase split harness, and on a Full build harness only when the builder's `bmad-build` review did not run its lenses in fresh subagents. Each loads `bmad-code-review` with one lens: Blind Hunter, Edge Cases Hunter, or Verification Gap Finder. Every review round gets three fresh sessions; reviewers are never reused. They do not edit product code. Each lens dispatches with its lens entry from `.leader.json`, else the `reviewer` entry.
 
+**Red-team subagent (one per Story):** on every harness, after the last passing round. It attacks the whole Story diff from `## Red-team brief` in `references/briefs.md`, and counts a claim only with a reproduction. Fresh, never reused; it does not edit product code. It uses the `red-team` entry from `.leader.json`, else `reviewer`.
+
 **Research subagent:** loads `bmad-deep-recon` for a decision the evidence cannot settle. Returns cited findings.
 
 **Retrospective subagent:** loads `bmad-retrospective` at epic close. Returns sourced findings and action items.
@@ -274,8 +276,9 @@ Write the Story id with hyphens in a session name: `builder-2-3`, not `builder-2
 | Reviewers (3 per round) | `review-<lens>-r<n>-s<story>` | **No. Fresh every round** |
 | Verifier | `verifier-<story>` | Yes |
 | UAT Runner | `uat-r<n>-<story>` | **No. Fresh every run** |
+| Red team | `redteam-<story>` | **No. Once per Story** |
 
-Reuse is deliberate for the planner, builder and verifier: each keeps its decisions or commands. Reviewers and the UAT Runner are deliberately fresh: each run is judged on the current artifact, not on an earlier judgment.
+Reuse is deliberate for the planner, builder and verifier: each keeps its decisions or commands. Reviewers, the red team and the UAT Runner are deliberately fresh: each run is judged on the current artifact, not on an earlier judgment.
 
 Start a fresh session mid-Story only when:
 
@@ -408,15 +411,18 @@ Patching code to satisfy a wrong spec hides the defect.
 
 Per Story:
 
-1. **Plan approved** — for a planned Story, the plan `bmad-build` writes; for an unplanned requirement, the `bmad-spec` file first. It names files, tasks, tests, AC mapping and open questions answered. Apply the `Approve a plan` checks against intent, PRD, spine and design before approving. Before approving, read the deferred-work file. Include every item this Story unlocks; keep the rest deferred with a one-line reason.
+1. **Plan approved** — for a planned Story, the plan `bmad-build` writes; for an unplanned requirement, the `bmad-spec` file first. It names files, tasks, tests, AC mapping and open questions answered. Apply the `Approve a plan` checks against intent, PRD, spine and design before approving. Before approving, read the deferred-work file. Include every item this Story unlocks; keep the rest deferred with a one-line reason. Then write the Story's quality bar and an empty findings ledger (`references/briefs.md`); every review, verify and red-team brief names both paths.
 2. **Build complete** — one subagent, one Story, no shared tree.
 3. **Gates run by the verifier subagent** — independent of the builder. It pastes counts, not exit codes, and falsifies: remove a guard or delete the tests and confirm red. It runs its own mutants in an exported copy or a separate worktree, and its report names that location. Treat the builder's mutant and coverage claims as hypotheses: builders overstate them often.
 4. **AC check by the verifier** — every criterion maps to a named test. The leader reads the mapping and spot-checks one row.
 5. **Review ran** — on a Full build harness this happens inside the builder, before the verifier's gates. Three fresh reviewers, one lens each: Blind Hunter, Edge Cases Hunter, Verification Gap Finder. On a Full build harness they are the lenses `bmad-build` spawned, with their session ids in the builder's report. On a Phase split harness, or when `bmad-build` ran fewer than three lenses or ran them in its own context, the leader dispatches three fresh reviewer subagents in parallel (`bmad-code-review`). No review means no close. If no independent review is possible, label it `review unavailable`; do not call it reviewed.
-   Severity rubric for every lens: **high** breaks an acceptance criterion or the contract; **medium** is a product defect, or a test that gives a false pass of a product check; **low** is everything else, such as test-helper robustness, wording, ids and plan text.
+   Every lens judges against the quality bar with the rubric and proof rule in `## Reviewer brief`: **high** breaks an AC or contract row, **medium** is a product defect or a false-pass test, **low** is everything else. A high or medium finding without proof is triaged low. Write each reviewer brief from the template alone: no list of the fixes, no guess where defects are, no "blockers only", no cap on findings.
 6. **Fix loop** — findings go back to the same builder session. The same verifier re-runs gates. After a fix, the review runs again with **new reviewers**: `bmad-build`'s lenses on a Full build harness, leader-dispatched on a Phase split harness. The second review round earns its cost: fixes often bring new defects.
+   - **Every round proves its effect.** It ends with a delta line in the findings ledger: open high plus product medium before and after, closed with proof, new, regressed. A fix without proof stays open.
    - **A round passes** when it has no high finding and no medium finding in product code.
-   - **After a passing round**, the last fix batch gets no new reviewers. The verifier re-runs the gates and the mutants, and the leader reads the diff.
+   - **Stall:** a round that does not lower the open high plus product-medium count, or regresses as many findings as it closes with proof. Change what produced it before the next fix: when the new and regressed findings share one cause, send it back as `bad_plan`; otherwise hand off to a fresh builder with the ledger. The fix still gets its review round, and that round is the last one for this Story, whatever the count. If it does not pass, stop and ask the user.
+   - **After a passing round**, the last fix batch gets no new lens round. The verifier re-runs the gates and the mutants; then the red team runs.
+   - **Red team, once per Story:** a fresh `redteam-<story>` attacks the whole diff, the unreviewed last batch first, and the test doubles against the real interfaces. A reproduced high or product medium reopens the loop as a counted round; anything not reproduced goes to the ledger as low. If it cannot run, write `red team unavailable` in the report.
    - **A new round starts only for** a high finding, a medium finding in product code, or a final fix batch whose product-code change is larger than a small patch (about 60 changed lines).
    - **Lens choice:** in round 2 and later, when the fix diff touches only tests or docs, run the Verification Gap Finder plus one other lens. Run all three when product code changed.
    - **No pass after three rounds:** stop. Start a fresh builder with a handoff, or ask the user. Without this rule, each fix adds test code, the next round reviews that new code, and the loop feeds itself.
@@ -454,7 +460,7 @@ These survive every deadline and every "no process theater":
 1. Commit and merge into the integration branch only after gates, AC check and review pass, under the Activate contract. A merge to `main`, a push and a history rewrite need separate approval.
 2. Plan, build, verify, retrospective, correct-course and research run in subagents. The leader approves and commits.
 3. One writer per tree; one Story per subagent.
-4. Independent review, or an explicit `review unavailable`.
+4. Independent review and one red-team pass per Story, or an explicit `review unavailable` / `red team unavailable`.
 5. Retrospective, or a recorded waiver.
 6. Falsifiable gates with counts. Exit 0 alone proves nothing.
 7. No approval-tier edit without a correct-course proposal and the user's approval; a detail edit needs the proposal and its boundary citation, not approval.
@@ -475,19 +481,18 @@ These survive every deadline and every "no process theater":
 | "Self-review is enough" | The builder reviews its own assumptions. Use the lenses or say unavailable. |
 | "Defer it; a later Story can fix it" | Deferred work compounds. Fix what this Story can prove now; name a real blocker before deferring. |
 | "The tests pass" | Zero tests also exit 0. Require counts and one mutation that goes red. |
+| "Loop until it is perfect" | Perfect has no test. Stop when the quality bar passes or a round fails to improve: at most 3 rounds, then one red-team pass. |
+| "The last batch is small; the round already passed" | Nobody has reviewed that batch. The red team attacks it before UAT. |
 
 ## Report
 
-Every report is a table plus three lines: what is verified, what is unverified, what needs the user.
+Every report is a table plus three lines: what is verified, what is unverified, what needs the user. Take review numbers (rounds, lenses, session ids, findings) from the findings ledger, never from memory.
 
 ## References
 
-- Planning, Epic and Story breakdown: `bmad-prd`, `bmad-create-epics-and-stories`, `bmad-spec`
-- Order and status: `bmad-sprint-planning`
-- Build run: `bmad-build`, `bmad-build-auto`
-- Close: `bmad-retrospective`, `bmad-correct-course`
+Skills: planning `bmad-prd`, `bmad-create-epics-and-stories`, `bmad-spec`; order `bmad-sprint-planning`; build `bmad-build`, `bmad-build-auto`; close `bmad-retrospective`, `bmad-correct-course`.
 
-Brief, report and decision-log templates: `references/briefs.md`.
+Brief, report, quality-bar, findings-ledger and decision-log templates: `references/briefs.md`.
 Harness and build-mode details: `references/harnesses.md`.
 Agent config: presets `assets/leader-presets.json`; schema and harness mapping `references/agent-config.md`.
 Why the rules exist: `references/improvements.md`, a log of past runs (what went well, what did not, what changed, and why). Read it before you remove or relax a rule. A leader retrospective adds an entry.
