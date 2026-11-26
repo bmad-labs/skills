@@ -1,0 +1,165 @@
+{
+  "title": "Customer contact details: where the data goes",
+  "height": 500,
+  "zones": [
+    {
+      "x": 130,
+      "y": 200,
+      "w": 540,
+      "h": 190,
+      "label": "Main cloud account",
+      "kind": "boundary"
+    },
+    {
+      "x": 795,
+      "y": 16,
+      "w": 430,
+      "h": 164,
+      "label": "Vendor",
+      "kind": "external"
+    },
+    {
+      "x": 795,
+      "y": 200,
+      "w": 430,
+      "h": 190,
+      "label": "Data-platform account",
+      "kind": "boundary"
+    }
+  ],
+  "nodes": [
+    {
+      "key": "C",
+      "x": 70,
+      "y": 280,
+      "icon": "user",
+      "kind": "person",
+      "label": "Customer",
+      "sub": "booking form"
+    },
+    {
+      "key": "S",
+      "x": 370,
+      "y": 280,
+      "icon": "server",
+      "kind": "system",
+      "label": "Booking service",
+      "sub": "web app and API"
+    },
+    {
+      "key": "D",
+      "x": 590,
+      "y": 280,
+      "icon": "database",
+      "kind": "link",
+      "label": "Bookings database",
+      "sub": "name, email, phone"
+    },
+    {
+      "key": "V",
+      "x": 870,
+      "y": 85,
+      "icon": "mail",
+      "kind": "system",
+      "label": "Email vendor",
+      "sub": "logs kept 30 days"
+    },
+    {
+      "key": "W",
+      "x": 895,
+      "y": 280,
+      "icon": "warehouse",
+      "kind": "system",
+      "label": "Analytics warehouse",
+      "sub": "name, email"
+    },
+    {
+      "key": "A",
+      "x": 1120,
+      "y": 280,
+      "icon": "users",
+      "kind": "person",
+      "label": "Analysts",
+      "sub": "query access"
+    }
+  ],
+  "arrows": [
+    {
+      "from": "C",
+      "to": "S",
+      "kind": "link",
+      "label": "name, email, phone"
+    },
+    {
+      "from": "S",
+      "to": "D",
+      "kind": "link",
+      "label": "name, email, phone"
+    },
+    {
+      "from": "S",
+      "to": "V",
+      "kind": "link",
+      "label": "email, booking no.",
+      "bow": -40
+    },
+    {
+      "from": "D",
+      "to": "W",
+      "kind": "link",
+      "label": "name, email"
+    },
+    {
+      "from": "A",
+      "to": "W",
+      "kind": "normal",
+      "label": "queries"
+    }
+  ],
+  "notes": [
+    {
+      "n": 1,
+      "x": 20,
+      "y": 16,
+      "title": "Details entered",
+      "text": "The customer types name, email and phone in the web app."
+    },
+    {
+      "n": 2,
+      "x": 310,
+      "y": 16,
+      "title": "Stored inside",
+      "text": "All three fields are saved in the bookings database."
+    },
+    {
+      "n": 3,
+      "x": 948,
+      "y": 40,
+      "title": "Sent to vendor",
+      "text": "Email and booking number only, to send the confirmation."
+    },
+    {
+      "n": 4,
+      "x": 600,
+      "y": 400,
+      "title": "Nightly export",
+      "text": "Name and email only. The account has its own access rules."
+    },
+    {
+      "n": 5,
+      "x": 950,
+      "y": 400,
+      "title": "Analyst queries",
+      "text": "Analysts query name and email in the warehouse."
+    },
+    {
+      "n": null,
+      "kind": "safe",
+      "x": 300,
+      "y": 400,
+      "title": "Phone stays here",
+      "text": "Phone numbers never leave the bookings database."
+    }
+  ],
+  "textScale": 1.15
+}

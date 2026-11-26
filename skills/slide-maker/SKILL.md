@@ -153,6 +153,7 @@ do. Method, canonical bounds, and layout recipes (no magic-pixel heights;
 | [tailwind-theme.md](references/tailwind-theme.md) | Drop-in `tailwind.config.js` theme block + the chart-series palette |
 | [validation.md](references/validation.md) | `check-slop.mjs`: what each check means + the AI-slop tells to self-catch |
 | [diagrams.md](references/diagrams.md) | When to hand-write an SVG diagram vs. generate it, the conventions that make one readable, a worked example |
+| [illustrated-scenes.md](references/illustrated-scenes.md) | Scenes that tell a short story in one picture — a solution idea, a before/after, a user journey, a data or event flow, a hand-off, an incident, an attack: story types and their colours, the `scene.mjs` generator, layout and copy rules, the follow-up slide, landscape plates in a printed companion |
 | [visual-review.md](references/visual-review.md) | LOOK, MEASURE, DIFF — self-reviewing rendered slides, the geometry gate, and reviewing an export against the HTML |
 | [deck-template.md](references/deck-template.md) | The ready-made React deck shell: structure, dev, edit mode, HTML/PDF/image export |
 | [edit-mode.md](references/edit-mode.md) | The point-and-comment feedback overlay + programmatic inspect API |
