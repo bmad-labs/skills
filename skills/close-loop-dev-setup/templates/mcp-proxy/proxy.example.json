@@ -1,0 +1,29 @@
+{
+  "servers": {
+    "cua-driver-box": {
+      "transport": "stdio",
+      "command": "docker",
+      "args": ["exec", "-i", "-u", "cua", "<project>-box", "box-cua-mcp"],
+      "probe": { "type": "tcp", "port": 6901 },
+      "start_hint": "docker compose -f tests/close-loop/docker/compose.yaml up -d"
+    },
+    "cua-driver-mac": {
+      "transport": "http",
+      "url": "http://{host}:8011/mcp",
+      "host_command": ["tart", "ip", "<project>-mac", "--resolver", "arp"],
+      "probe": { "type": "tcp", "port": 8011 },
+      "start_hint": "tart-box start"
+    },
+    "app-in-box": {
+      "transport": "http",
+      "url": "http://127.0.0.1:18765/mcp",
+      "probe": {
+        "type": "http-json",
+        "url": "http://{host}:18765/healthz",
+        "ready_field": "pid",
+        "identity_field": "session_id"
+      },
+      "start_hint": "docker exec -u cua <project>-box <app-start-command>"
+    }
+  }
+}

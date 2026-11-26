@@ -1,0 +1,14 @@
+#!/bin/bash
+# Print `export` lines for the desktop session's DISPLAY and D-Bus address.
+# A `docker exec` shell starts outside the XFCE session, and both the app's accessibility tree and
+# cua-driver's reader use the AT-SPI bus that only that session's D-Bus address reaches.
+#   eval "$(box-session-env)"
+set -euo pipefail
+pid="$(pgrep -u cua -x xfce4-session | head -n 1 || true)"
+if [ -z "$pid" ]; then
+    echo "box-session-env: no xfce4-session is running; the desktop has not started" >&2
+    exit 1
+fi
+tr '\0' '\n' <"/proc/$pid/environ" \
+    | grep -E '^(DISPLAY|DBUS_SESSION_BUS_ADDRESS|XDG_RUNTIME_DIR)=' \
+    | sed -E "s/^([A-Z_]+)=(.*)$/export \1='\2'/"

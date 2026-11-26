@@ -1,0 +1,22 @@
+# cua-box for this project. From the repo root:
+#   docker compose -f tests/close-loop/docker/compose.yaml up -d --build
+#   docker compose -f tests/close-loop/docker/compose.yaml stop     # keep the container
+# Every port binds the host loopback only. The VNC server has no password, so 5901 stays
+# unpublished; noVNC on 6901 is the only human view.
+name: <project>-close-loop
+services:
+  desktop:
+    build:
+      context: .
+    image: <project>-box:local
+    container_name: <project>-box
+    shm_size: 2gb
+    environment:
+      VNC_RESOLUTION: 1600x1000
+    ports:
+      - "127.0.0.1:6901:6901"
+      # - "127.0.0.1:<host-port>:<socat-port>"   # an app MCP or HTTP endpoint, through socat
+    # The container sees the repo read-only, and only the evidence folder writable.
+    volumes:
+      - "../../..:/repo:ro"
+      - "../evidence:/repo/tests/close-loop/evidence"

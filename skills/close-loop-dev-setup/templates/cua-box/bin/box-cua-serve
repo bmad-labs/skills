@@ -1,0 +1,7 @@
+#!/bin/bash
+# The cua-driver daemon that `cua-driver call` talks to, started by supervisord. It waits for the
+# XFCE session, because the daemon reads windows through that session's X display and D-Bus.
+set -euo pipefail
+until env_lines="$(box-session-env 2>/dev/null)"; do sleep 1; done
+eval "$env_lines"
+exec /usr/local/bin/cua-driver serve

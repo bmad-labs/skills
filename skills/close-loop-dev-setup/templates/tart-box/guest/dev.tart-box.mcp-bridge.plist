@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Guest-only LaunchAgent: exposes the guest's stdio `cua-driver mcp` as streamable HTTP on port 8011,
+  inside the logged-in GUI session, so cua-driver sees the desktop and holds its permission grants.
+  Install in the guest, never on the host:
+    cp dev.tart-box.mcp-bridge.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.tart-box.mcp-bridge.plist
+  `tart-box start` kicks it after each boot. No RunAtLoad and no KeepAlive: it runs when asked.
+  Replace <guest-ip> with the guest address (`tart-box ip`); mcp-proxy refuses Host headers it
+  was not told to trust. The port is reachable only on Tart's host-only network.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>dev.tart-box.mcp-bridge</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/admin/.local/bin/mcp-proxy</string>
+    <string>--host</string>
+    <string>0.0.0.0</string>
+    <string>--port</string>
+    <string>8011</string>
+    <string>--allowed-host</string>
+    <string>&lt;guest-ip&gt;:8011</string>
+    <string>--</string>
+    <string>/Users/admin/.local/bin/cua-driver</string>
+    <string>mcp</string>
+  </array>
+  <key>StandardOutPath</key>
+  <string>/Users/admin/Library/Logs/tart-box-mcp.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/admin/Library/Logs/tart-box-mcp.log</string>
+</dict>
+</plist>

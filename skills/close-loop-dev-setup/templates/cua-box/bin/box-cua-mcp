@@ -1,0 +1,22 @@
+#!/bin/bash
+# The stdio cua-driver MCP server, inside the desktop session. The host runs it as
+#   docker exec -i -u cua <project>-box box-cua-mcp
+# usually through the cache proxy (templates/mcp-proxy). cua-driver serves MCP over stdio, so
+# `docker exec -i` is the transport and no port opens.
+set -euo pipefail
+# Wait for the XFCE session, because cua-driver reads the D-Bus address once, at start. A bare
+# `eval "$(box-session-env)"` succeeds on empty output, so a start before the session would run
+# the server with no AT-SPI bus. Give up after BOX_SESSION_WAIT_S instead of starting it blind.
+BOX_SESSION_WAIT_S="${BOX_SESSION_WAIT_S:-120}"
+deadline=$((SECONDS + BOX_SESSION_WAIT_S))
+until env_lines="$(box-session-env 2>/dev/null)"; do
+    if [ "$SECONDS" -ge "$deadline" ]; then
+        echo "box-cua-mcp: no desktop session after ${BOX_SESSION_WAIT_S} s; not starting cua-driver without the AT-SPI bus" >&2
+        exit 1
+    fi
+    sleep 1
+done
+eval "$env_lines"
+# /usr/local/bin/cua-driver is the pinned release binary; /opt/venv/bin/cua-driver is the base
+# image's older Python wrapper.
+exec /usr/local/bin/cua-driver mcp "$@"

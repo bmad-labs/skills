@@ -1,0 +1,172 @@
+#!/bin/sh
+# tart-box: control this project's macOS test VM (Tart).
+#
+#   tart-box start     boot headless and wait for the guest and its MCP bridge
+#   tart-box gui       boot with the VM window (a visible screen for cua-driver)
+#   tart-box vnc       boot with Screen Sharing (for clicking macOS permission dialogs)
+#   tart-box stop      shut the guest down; the VM and its disk are kept
+#   tart-box status    run state, guest IP, guest bridge, Tart list
+#   tart-box ip        the guest IP
+#   tart-box ssh       shell into the guest
+#   tart-box logs [n]  the run log
+#   tart-box delete    remove the VM and its disk (only when the user asks)
+#
+# cua-driver and the MCP bridge run inside the guest, never on this Mac. The host reaches the
+# bridge through the cache proxy (templates/mcp-proxy), so the tool list stays stable while the
+# VM is off. Nothing here starts at login: run it by hand, and it stops when you stop it.
+
+set -u
+VM="${TART_BOX_VM:-<project>-mac}"
+DIR="${TART_BOX_DIR:-$HOME/.tart-box}"
+LOG="$DIR/$VM.log"
+PID="$DIR/$VM.pid"
+TART="${TART_BIN:-$(command -v tart || echo /opt/homebrew/bin/tart)}"
+GUEST_USER="${TART_BOX_USER:-admin}"
+SSH_KEY="${TART_BOX_SSH_KEY:-$HOME/.ssh/$VM}"
+MCP_PORT="${TART_BOX_MCP_PORT:-8011}"
+MCP_LABEL="${TART_BOX_MCP_LABEL:-dev.tart-box.mcp-bridge}"
+VM_IP="${TART_BOX_IP:-}"
+
+mkdir -p "$DIR"
+
+running() {
+    if [ -f "$PID" ] && kill -0 "$(cat "$PID")" 2>/dev/null; then
+        return 0
+    fi
+    # A stopped or crashed run leaves its pid file behind; a reused pid must not look like a VM.
+    rm -f "$PID"
+    return 1
+}
+
+# The guest may hold a DHCP lease; ask Tart instead of assuming.
+detect_ip() {
+    [ -n "${TART_BOX_IP:-}" ] && return 0
+    VM_IP=$("$TART" ip "$VM" --resolver arp 2>/dev/null | grep -Eo '^[0-9]{1,3}(\.[0-9]{1,3}){3}$' | head -n 1)
+}
+
+guest_up() {
+    [ -n "$VM_IP" ] || return 1
+    nc -z -G 2 "$VM_IP" 22 >/dev/null 2>&1
+}
+
+wait_guest() {
+    i=0
+    while [ "$i" -lt 180 ]; do
+        detect_ip
+        guest_up && return 0
+        sleep 1
+        i=$((i + 1))
+    done
+    return 1
+}
+
+bridge_up() {
+    [ -n "$VM_IP" ] || return 1
+    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 2 \
+        -X POST "http://$VM_IP:$MCP_PORT/mcp" \
+        -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
+        -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"tart-box","version":"0"}}}' 2>/dev/null)
+    [ "$code" = "200" ]
+}
+
+ssh_guest() {
+    ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
+        -o UserKnownHostsFile="$DIR/known_hosts" -o ConnectTimeout=5 "$GUEST_USER@$VM_IP" "$@"
+}
+
+# The bridge is a LaunchAgent in the guest's GUI domain, so cua-driver sees the desktop session.
+wake_bridge() {
+    uid=$(ssh_guest 'id -u' 2>/dev/null || true)
+    [ -n "$uid" ] || return 0
+    ssh_guest "launchctl kickstart gui/$uid/$MCP_LABEL 2>/dev/null || launchctl bootstrap gui/$uid ~/Library/LaunchAgents/$MCP_LABEL.plist 2>/dev/null" >/dev/null 2>&1
+    i=0
+    while [ "$i" -lt 30 ]; do
+        bridge_up && return 0
+        sleep 0.5
+        i=$((i + 1))
+    done
+    return 0
+}
+
+start_with() {
+    if running; then
+        echo "tart-box: $VM is already running (pid $(cat "$PID"))"
+        exit 0
+    fi
+    : >"$LOG"
+    nohup "$TART" run "$VM" "$@" >>"$LOG" 2>&1 &
+    echo $! >"$PID"
+    if wait_guest; then
+        echo "tart-box: $VM is up at $VM_IP"
+        wake_bridge
+        if bridge_up; then
+            echo "  bridge: ready on http://$VM_IP:$MCP_PORT/mcp"
+        else
+            echo "  bridge: not answering; check ~/Library/Logs/tart-box-mcp.log in the guest"
+        fi
+        echo "  stop:   tart-box stop"
+    else
+        echo "tart-box: $VM started (pid $(cat "$PID")) but SSH does not answer; see $LOG"
+        exit 1
+    fi
+}
+
+case "${1:-status}" in
+start) start_with --no-graphics ;;
+gui) start_with ;;
+vnc)
+    start_with --vnc
+    echo "tart-box: open Screen Sharing to vnc://$VM_IP"
+    ;;
+stop)
+    "$TART" stop "$VM" >/dev/null 2>&1 || true
+    i=0
+    while running && [ "$i" -lt 30 ]; do
+        sleep 1
+        i=$((i + 1))
+    done
+    if running; then
+        echo "tart-box: $VM is still running; retry, or close its window"
+        exit 1
+    fi
+    rm -f "$PID"
+    echo "tart-box: $VM is off"
+    ;;
+status)
+    detect_ip
+    if running; then
+        echo "tart-box: $VM is running (pid $(cat "$PID")) at $VM_IP"
+    else
+        echo "tart-box: $VM is off"
+    fi
+    if bridge_up; then
+        echo "tart-box: guest bridge on http://$VM_IP:$MCP_PORT/mcp"
+    else
+        echo "tart-box: guest bridge off"
+    fi
+    # A VM started another way has no pid file here; trust the Tart list.
+    "$TART" list 2>/dev/null | sed -n '1,20p'
+    ;;
+ip)
+    detect_ip
+    echo "$VM_IP"
+    ;;
+ssh)
+    detect_ip
+    exec ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
+        -o UserKnownHostsFile="$DIR/known_hosts" "$GUEST_USER@$VM_IP"
+    ;;
+logs) tail -n "${2:-40}" "$LOG" ;;
+delete)
+    if running; then
+        echo "tart-box: stop it first"
+        exit 1
+    fi
+    "$TART" delete "$VM"
+    rm -f "$PID"
+    ;;
+*)
+    sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+    exit 2
+    ;;
+esac
