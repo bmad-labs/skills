@@ -23,7 +23,8 @@
  *   "nodes":  [{ "key": "A", "x": 100, "y": 190, "icon": "venetian-mask", "kind": "attacker",
  *                "label": "Attacker", "sub": "phishing kit", "badge": "danger" }],
  *   "arrows": [{ "from": "A", "to": "P", "kind": "attack", "label": "controls",
- *                "bow": 0, "dashed": false, "width": 2.2, "labelColor": "link", "labelDy": -9 }],
+ *                "bow": 0, "dashed": false, "width": 2.2, "labelColor": "link", "labelDy": -9,
+ *                "labelT": 0.5 }],                  // labelT: where along the arrow the label sits, 0..1
  *   "notes":  [{ "n": 1, "x": 30, "y": 16, "title": "Fake sign-in page",
  *                "text": "The page passes the password and the code on to the real site.",
  *                "kind": "note" }]
@@ -34,12 +35,29 @@
  *   badge       danger | ok
  *   "text" is wrapped to the note width; "lines" sets the breaks by hand.
  *
+ *   "zones":  [{ "x": 300, "y": 120, "w": 620, "h": 250, "label": "Internal network", "kind": "boundary" }],
+ *   "lanes":  [{ "y": 160, "h": 140, "label": "Customer" }],
+ *   zone kinds  boundary | new | external
+ *
+ * Script form, for what JSON cannot express: write <name>.scene.mjs next to the specs and
+ * run it with the same command. It imports this file, adds parts, and exports the scene:
+ *
+ *   import { Scene } from '<relative path to>/scripts/scene.mjs';
+ *   const s = new Scene({ title: 'Order flow: how it works', height: 460 });
+ *   s.zone({ x: 300, y: 120, w: 620, h: 250, label: 'Internal network' });
+ *   s.node({ key: 'A', x: 100, y: 230, icon: 'user', kind: 'person', label: 'Customer' });
+ *   s.raw({ svg: '<path d="…"/>', box: { x: 980, y: 300, w: 120, h: 60 }, what: 'timeline' });
+ *   export default s;
+ *
+ * raw() takes any SVG; its box is what the layout check sees, so give every raw drawing
+ * one. Arrow geometry, label placement and the check stay in this file for every scene.
+ *
  * Icons are lucide icons (kebab-case file names), read from node_modules/lucide-react.
  * Exit code 1 when a lint ERROR is found (overlap, off-canvas, unknown icon or key).
  */
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, basename, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DS_DIR = existsSync(join(ROOT, 'design-system')) ? join(ROOT, 'design-system') : join(ROOT, '..', 'design-system');
@@ -140,6 +158,33 @@ export function buildScene(spec) {
   const err = (m) => issues.push(['ERROR', m]); const warn = (m) => issues.push(['WARN', m]);
   const nodes = {};
 
+  // ---- lanes and zones: drawn behind everything --------------------------
+  for (const ln of spec.lanes || []) {
+    const { y, h, label = '' } = ln;
+    back.push(`<!-- lane ${label} -->`,
+      `<rect x="0" y="${y}" width="${W}" height="${h}" fill="var(--surface-muted)" fill-opacity="0.55"/>`,
+      `<text x="14" y="${f(y + 18 * k)}" font-size="${f(11 * k)}" font-weight="bold" letter-spacing="1.2" fill="var(--text-muted)">${esc(label.toUpperCase())}</text>`);
+    boxes.push({ what: `lane "${label}" label`, x0: 8, x1: 18 + label.length * 8.2 * k, y0: y + 4, y1: y + 24 * k });
+    if (y < 0 || y + h > H) err(`lane "${label}": leaves the canvas`);
+  }
+  const ZONE = {   // fill, stroke, label colour
+    boundary: [null, 'var(--border-default)', 'var(--text-muted)'],
+    new:      ['var(--color-accent-soft)', 'var(--color-accent)', 'var(--color-accent)'],
+    external: ['var(--surface-muted)', 'var(--border-default)', 'var(--text-muted)'],
+  };
+  const zones = [];
+  for (const z of spec.zones || []) {
+    const { x, y, w, h, label = '', kind = 'boundary' } = z;
+    if (!ZONE[kind]) { err(`zone "${label}": unknown kind "${kind}"`); continue; }
+    const [fill, stroke, lc] = ZONE[kind];
+    back.push(`<!-- zone ${label} -->`,
+      `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="${fill || 'none'}"${fill ? ' fill-opacity="0.45"' : ''} stroke="${stroke}" stroke-width="1.5" stroke-dasharray="7 5"/>`,
+      `<text x="${x + 14}" y="${f(y + 20 * k)}" font-size="${f(11 * k)}" font-weight="bold" letter-spacing="1.2" fill="${lc}">${esc(label.toUpperCase())}</text>`);
+    boxes.push({ what: `zone "${label}" label`, x0: x + 8, x1: x + 18 + label.length * 8.2 * k, y0: y + 6, y1: y + 26 * k });
+    zones.push({ label, x0: x, x1: x + w, y0: y, y1: y + h });
+    if (x < 0 || y < 0 || x + w > W || y + h > H) err(`zone "${label}": leaves the canvas`);
+  }
+
   // ---- actors -------------------------------------------------------------
   for (const nd of spec.nodes || []) {
     const { key, x, y, kind = 'system', label = '', sub, badge } = nd;
@@ -198,8 +243,19 @@ export function buildScene(spec) {
   if (sorted.some((n, i) => n !== i + 1)) warn(`note numbers are ${sorted.join(',')}; number them 1..${sorted.length}, in the order of the story`);
   if (impacts > 1) warn(`${impacts} impact notes; keep one, on the harm`);
 
+  // ---- raw drawings: anything the spec cannot express ---------------------
+  for (const r of spec.raw || []) {
+    const what = r.what || 'raw drawing';
+    (r.layer === 'back' ? back : front).push(`<!-- raw ${what} -->`, r.svg);
+    if (r.layer === 'back') continue;   // a background shape is not an obstacle
+    if (!r.box) { warn(`${what}: no box, so the layout check cannot see it`); continue; }
+    const { x, y, w, h } = r.box;
+    boxes.push({ what, x0: x, x1: x + w, y0: y, y1: y + h, note: true });
+    if (x < 0 || y < 0 || x + w > W || y + h > H) err(`${what}: leaves the canvas`);
+  }
+
   // ---- arrows -------------------------------------------------------------
-  const pathPts = [], pairCount = {};
+  const pathPts = [], pairCount = {}, labelBoxes = [];
   for (const ar of spec.arrows || []) {
     const a = nodes[ar.from], b = nodes[ar.to];
     if (!a || !b) { err(`arrow ${ar.from}-${ar.to}: unknown node key`); continue; }
@@ -229,22 +285,30 @@ export function buildScene(spec) {
         x: it * it * sx + 2 * it * t * qx + t * t * bx, y: it * it * sy + 2 * it * t * qy + t * t * by });
     }
     if (ar.label) {
-      const mx2 = 0.25 * sx + 0.5 * qx + 0.25 * bx, my2 = 0.25 * sy + 0.5 * qy + 0.25 * by;  // curve midpoint
+      const t = Math.min(0.9, Math.max(0.1, ar.labelT ?? 0.5)), it = 1 - t;
+      const mx2 = it * it * sx + 2 * it * t * qx + t * t * bx, my2 = it * it * sy + 2 * it * t * qy + t * t * by;  // point on the curve
       const hw = ar.label.length * LABEL_CHAR_W * k / 2, hh = 7 * k;
-      const tl = Math.hypot(bx - sx, by - sy), tdx = (bx - sx) / tl, tdy = (by - sy) / tl;     // tangent at t = 0.5
+      const gx = 2 * it * (qx - sx) + 2 * t * (bx - qx), gy = 2 * it * (qy - sy) + 2 * t * (by - qy);
+      const tl = Math.hypot(gx, gy), tdx = gx / tl, tdy = gy / tl;                              // tangent there
       let lx, ly;
       if (hw * Math.abs(tdy) / Math.max(Math.abs(tdx), 0.01) < 3) {   // the line rises < 3px under half the label: keep it level above (or below with labelDy > 0)
         lx = mx2; ly = my2 + (ar.labelDy ?? -9) * k;
-      } else {                             // slanted: push the label off the line along its normal
+      } else {                             // slanted: pushed off the line; a steep arrow may take the place beside it
+        const below = (ar.labelDy ?? -9) > 0;
         let nx = -tdy, ny = tdx;
-        if ((ny > 0) !== ((ar.labelDy ?? -9) > 0)) { nx = -nx; ny = -ny; }   // above unless labelDy > 0
-        const d = hw * Math.abs(nx) + hh * Math.abs(ny) + 9;   // clear of the line, halo included
-        lx = mx2 + nx * d; ly = my2 + ny * d + 3.5 * k;   // baseline sits ~3.5px under the text centre
+        if ((ny > 0) !== below) { nx = -nx; ny = -ny; }          // a: pushed off along the normal
+        const d = hw * Math.abs(nx) + hh * Math.abs(ny) + 9;    //    clear of the line, halo included
+        const side = below ? -1 : 1;                             // b: level with the point, beside the line
+        const off = (hh + 9) * Math.abs(tdx / tdy) + hw;         //    centre offset so the near edge clears it
+        const db = Math.abs(off * tdy);                          //    its distance from the line
+        if (Math.abs(tdy) > 0.7 && db < d) { lx = mx2 + side * off; ly = my2 + 3.5 * k; }   // steep arrows only
+        else { lx = mx2 + nx * d; ly = my2 + ny * d + 3.5 * k; } // baseline sits ~3.5px under the text centre
       }
       const lc = ar.labelColor ? (LINE[ar.labelColor] || ar.labelColor) : col;
       front.push(`<text x="${f(lx)}" y="${f(ly)}" font-size="${f(11.5 * k)}" font-weight="bold" fill="${lc}" text-anchor="middle" `
         + `stroke="var(--surface-card)" stroke-width="4" paint-order="stroke">${esc(ar.label)}</text>`);
       boxes.push({ what: `label "${ar.label}"`, x0: lx - hw, x1: lx + hw, y0: ly - 11 * k, y1: ly + 3 * k, label: aid });
+      labelBoxes.push({ aid, label: ar.label, x0: lx - hw, x1: lx + hw, y0: ly - 11 * k, y1: ly + 3 * k });
     }
   }
 
@@ -267,6 +331,28 @@ export function buildScene(spec) {
     if (bx.label === pt.id) warn(`${bx.what} sits on its own arrow; give it a labelDy or shorten it`);
     else (bx.note ? err : warn)(`arrow ${pt.id} runs through ${bx.what} near (${f(pt.x)}, ${f(pt.y)})`);
   }
+  for (const lb of labelBoxes) {    // a gap between a label and its arrow makes it read as another arrow's
+    let dmin = Infinity;
+    for (const pt of pathPts) if (pt.id === lb.aid) {
+      const dx = Math.max(lb.x0 - pt.x, 0, pt.x - lb.x1), dy = Math.max(lb.y0 - pt.y, 0, pt.y - lb.y1);
+      dmin = Math.min(dmin, Math.hypot(dx, dy));
+    }
+    if (dmin > 20 * k) warn(`label "${lb.label}" floats ${Math.round(dmin)}px from its arrow; check labelDy, or move it with labelT (0..1)`);
+  }
+  for (const z of zones) for (const lb of labelBoxes) {   // touching a border from inside or outside
+    const g = 4;
+    const near = (v, e) => Math.abs(v - e) < g;
+    const overlapsX = lb.x0 < z.x1 && z.x0 < lb.x1, overlapsY = lb.y0 < z.y1 && z.y0 < lb.y1;
+    if ((overlapsX && (near(lb.y0, z.y0) || near(lb.y1, z.y0) || near(lb.y0, z.y1) || near(lb.y1, z.y1)))
+      || (overlapsY && (near(lb.x0, z.x0) || near(lb.x1, z.x0) || near(lb.x0, z.x1) || near(lb.x1, z.x1))))
+      warn(`label "${lb.label}" touches the border of zone "${z.label}"`);
+  }
+  for (const z of zones) for (const bx of boxes) {
+    if (!(bx.node || bx.note || bx.label) || bx.what.endsWith(' label')) continue;
+    const inter = bx.x0 < z.x1 && z.x0 < bx.x1 && bx.y0 < z.y1 && z.y0 < bx.y1;
+    const inside = bx.x0 >= z.x0 && bx.x1 <= z.x1 && bx.y0 >= z.y0 && bx.y1 <= z.y1;
+    if (inter && !inside) warn(`${bx.what} straddles the border of zone "${z.label}"${bx.label ? '; move the label or the border' : ''}`);
+  }
   const seen = new Set();
   const uniq = issues.filter(([s, m]) => (seen.has(m) ? false : seen.add(m)));
 
@@ -275,6 +361,26 @@ export function buildScene(spec) {
     `<rect width="${W}" height="${H}" fill="var(--surface-card)"/>`,
     ...back, ...front, '</svg>', ''].join('\n');
   return { svg, issues: uniq };
+}
+
+/** Builder for the script form. Each method takes the same object as one JSON entry. */
+export class Scene {
+  constructor(opts = {}) { this.spec = { ...opts, nodes: [], arrows: [], notes: [], zones: [], lanes: [], raw: [] }; }
+  node(n) { this.spec.nodes.push(n); return this; }
+  arrow(a) { this.spec.arrows.push(a); return this; }
+  note(n) { this.spec.notes.push(n); return this; }
+  zone(z) { this.spec.zones.push(z); return this; }
+  lane(l) { this.spec.lanes.push(l); return this; }
+  raw(r) { this.spec.raw.push(r); return this; }
+  build() { return buildScene(this.spec); }
+}
+
+async function loadSpec(p) {
+  if (!p.endsWith('.mjs')) return JSON.parse(readFileSync(p, 'utf8'));
+  const mod = await import(pathToFileURL(resolve(p)).href);
+  const d = typeof mod.default === 'function' && !(mod.default instanceof Scene) ? await mod.default() : mod.default;
+  if (!d) throw new Error(`${p}: export default a Scene`);
+  return d instanceof Scene ? d.spec : d;
 }
 
 // ---- CLI ------------------------------------------------------------------
@@ -290,7 +396,9 @@ async function preview(svgFile, pngFile) {
 }
 
 const args = process.argv.slice(2);
-if (import.meta.url === `file://${process.argv[1]}`) {
+// The command runs inside main() so this module finishes loading first: a .scene.mjs file
+// imports it back, and a top-level await here would leave both waiting on each other.
+async function main() {
   if (args.includes('--icons')) {
     console.log(readdirSync(ICON_DIR).filter((n) => n.endsWith('.js') && n !== 'index.js').map((n) => n.slice(0, -3)).join(' '));
     process.exit(0);
@@ -302,9 +410,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (!specs.length) { console.error('usage: node scripts/scene.mjs <spec.scene.json...> [--out file.svg] [--png] [--tokens] | --icons'); process.exit(2); }
   let errors = 0;
   for (const p of specs) {
-    const spec = JSON.parse(readFileSync(p, 'utf8'));
+    const spec = await loadSpec(p);
     const { svg, issues } = buildScene(spec);
-    const name = basename(p).replace(/\.scene\.json$/, '').replace(/\.json$/, '');
+    const name = basename(p).replace(/\.scene\.(json|mjs)$/, '').replace(/\.json$/, '');
     const target = out || join(ROOT, 'public', 'diagrams', `${name}.svg`);
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, keepTokens ? svg : resolveTokens(svg));
@@ -318,4 +426,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
   }
   if (errors) { console.log(`${errors} error(s). Move the note or bow the arrow, then run again.`); process.exit(1); }
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((e) => { console.error(e.message || e); process.exit(1); });
 }
