@@ -15,7 +15,7 @@ generates that for you, which is why this file exists.
 |---|---|---|
 | a sequence / interaction over time | **PlantUML** | lifelines and activation bars are fiddly by hand, and PlantUML gets them right |
 | a state machine, or a graph past ~10 nodes | **PlantUML** | auto-layout beats manual placement at that size |
-| how an attack, a fraud, an incident or a leak happens: actors, a path, a harm | **scene** — `scripts/scene.mjs` from a JSON spec; read [illustrated-scenes.md](illustrated-scenes.md) | actors, coloured paths and numbered notes read in one look; the script computes every arrow and lints the layout |
+| a short story with actors and an order of events: a solution idea, a before/after, a user journey, a data or event flow, a hand-off, an incident, an attack | **scene** — `scripts/scene.mjs` from a JSON spec; read [illustrated-scenes.md](illustrated-scenes.md) | actors, coloured paths and numbered notes read in one look; the script computes every arrow and lints the layout |
 | a concept, an architecture, a timeline, a workflow | **hand-written SVG** | the layout carries the meaning; auto-layout cannot express it, and fighting it costs more than drawing |
 | numbers | **neither — build it as data** | see [wow-guide.md](wow-guide.md) "Which chart (decision rules)" |
 

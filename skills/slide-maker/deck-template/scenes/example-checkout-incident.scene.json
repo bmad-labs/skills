@@ -1,0 +1,156 @@
+{
+  "title": "Checkout outage: what happened",
+  "height": 460,
+  "nodes": [
+    {
+      "key": "D",
+      "x": 110,
+      "y": 220,
+      "icon": "database",
+      "kind": "cause",
+      "label": "Orders database pool",
+      "sub": "cut from 50 to 5"
+    },
+    {
+      "key": "O",
+      "x": 380,
+      "y": 220,
+      "icon": "server",
+      "kind": "system",
+      "label": "Orders service",
+      "sub": "requests time out"
+    },
+    {
+      "key": "C",
+      "x": 640,
+      "y": 220,
+      "icon": "shopping-cart",
+      "kind": "system",
+      "label": "Checkout page",
+      "sub": "fails for everyone",
+      "badge": "danger"
+    },
+    {
+      "key": "P",
+      "x": 500,
+      "y": 370,
+      "icon": "credit-card",
+      "kind": "system",
+      "label": "Payment service",
+      "sub": "healthy, never called"
+    },
+    {
+      "key": "U",
+      "x": 900,
+      "y": 220,
+      "icon": "users",
+      "kind": "person",
+      "label": "Customers",
+      "sub": "evening peak"
+    },
+    {
+      "key": "S",
+      "x": 1130,
+      "y": 220,
+      "icon": "search",
+      "kind": "safe",
+      "label": "Catalog and Search",
+      "sub": "worked normally",
+      "badge": "ok"
+    }
+  ],
+  "arrows": [
+    {
+      "from": "D",
+      "to": "O",
+      "kind": "failure",
+      "label": "only 5 connections"
+    },
+    {
+      "from": "O",
+      "to": "C",
+      "kind": "failure",
+      "label": "timeouts"
+    },
+    {
+      "from": "C",
+      "to": "U",
+      "kind": "failure",
+      "label": "checkout fails",
+      "bow": 40
+    },
+    {
+      "from": "U",
+      "to": "C",
+      "kind": "normal",
+      "label": "place order",
+      "bow": 40,
+      "labelDy": 18
+    },
+    {
+      "from": "C",
+      "to": "P",
+      "kind": "neutral",
+      "dashed": true,
+      "bow": 40
+    },
+    {
+      "from": "U",
+      "to": "S",
+      "kind": "normal",
+      "label": "browse"
+    }
+  ],
+  "notes": [
+    {
+      "n": 1,
+      "x": 16,
+      "y": 16,
+      "title": "Pool cut",
+      "lines": [
+        "A config change cut the Orders",
+        "database pool from 50 to 5."
+      ]
+    },
+    {
+      "n": 2,
+      "x": 262,
+      "y": 16,
+      "title": "Requests time out",
+      "text": "At the evening peak, Orders requests waited for a connection and timed out."
+    },
+    {
+      "n": 3,
+      "x": 522,
+      "y": 16,
+      "title": "Checkout down",
+      "kind": "impact",
+      "lines": [
+        "Checkout needs Orders, so every",
+        "customer's checkout failed."
+      ]
+    },
+    {
+      "n": 4,
+      "x": 190,
+      "y": 320,
+      "title": "No payments",
+      "lines": [
+        "Payment was healthy, but checkout",
+        "failed before any payment started."
+      ]
+    },
+    {
+      "n": 5,
+      "x": 980,
+      "y": 320,
+      "title": "Rolled back",
+      "kind": "safe",
+      "lines": [
+        "300 support tickets came in.",
+        "On-call rolled back the change",
+        "after 40 minutes."
+      ]
+    }
+  ]
+}

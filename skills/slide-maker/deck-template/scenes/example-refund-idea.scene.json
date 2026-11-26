@@ -1,0 +1,131 @@
+{
+  "title": "Automatic refund decisions: how it works",
+  "height": 430,
+  "nodes": [
+    {
+      "key": "C",
+      "x": 100,
+      "y": 200,
+      "icon": "user",
+      "kind": "person",
+      "label": "Customer",
+      "sub": "starts a return"
+    },
+    {
+      "key": "P",
+      "x": 340,
+      "y": 200,
+      "icon": "globe",
+      "kind": "system",
+      "label": "Returns portal",
+      "sub": "existing"
+    },
+    {
+      "key": "N",
+      "x": 600,
+      "y": 200,
+      "icon": "zap",
+      "kind": "new",
+      "label": "Refund engine",
+      "sub": "new"
+    },
+    {
+      "key": "Y",
+      "x": 860,
+      "y": 200,
+      "icon": "server",
+      "kind": "system",
+      "label": "Payment service",
+      "sub": "existing"
+    },
+    {
+      "key": "B",
+      "x": 1120,
+      "y": 200,
+      "icon": "banknote",
+      "kind": "safe",
+      "label": "Customer's bank",
+      "badge": "ok"
+    },
+    {
+      "key": "S",
+      "x": 860,
+      "y": 330,
+      "icon": "headset",
+      "kind": "person",
+      "label": "Support agent",
+      "sub": "unclear cases"
+    }
+  ],
+  "arrows": [
+    {
+      "from": "C",
+      "to": "P",
+      "kind": "normal",
+      "label": "return request"
+    },
+    {
+      "from": "P",
+      "to": "N",
+      "kind": "neutral",
+      "label": "order + photo"
+    },
+    {
+      "from": "N",
+      "to": "Y",
+      "kind": "link",
+      "label": "approved refund"
+    },
+    {
+      "from": "Y",
+      "to": "B",
+      "kind": "safe",
+      "label": "paid same day"
+    },
+    {
+      "from": "N",
+      "to": "S",
+      "kind": "neutral",
+      "dashed": true,
+      "bow": 0
+    }
+  ],
+  "notes": [
+    {
+      "n": 1,
+      "x": 30,
+      "y": 16,
+      "title": "Return started",
+      "text": "The customer picks the order and adds a photo."
+    },
+    {
+      "n": 2,
+      "x": 290,
+      "y": 16,
+      "title": "Order checked",
+      "text": "The portal sends the order and the photo to the engine."
+    },
+    {
+      "n": 3,
+      "x": 550,
+      "y": 16,
+      "title": "Decision in seconds",
+      "text": "Rules approve clear cases. Nobody waits for a person."
+    },
+    {
+      "n": 4,
+      "x": 810,
+      "y": 16,
+      "title": "Refund paid",
+      "text": "The payment service sends the money the same day.",
+      "kind": "safe"
+    },
+    {
+      "n": 5,
+      "x": 470,
+      "y": 330,
+      "title": "Unclear cases",
+      "text": "About 1 in 10 goes to a support agent, as today."
+    }
+  ]
+}

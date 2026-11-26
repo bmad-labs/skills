@@ -19,6 +19,7 @@
  * {
  *   "title": "Account takeover: attack scene",       // <title> of the SVG, for screen readers
  *   "width": 1240, "height": 500,                     // optional; this is the default canvas
+ *   "textScale": 1.15,                                 // optional; all text and notes 15% larger
  *   "nodes":  [{ "key": "A", "x": 100, "y": 190, "icon": "venetian-mask", "kind": "attacker",
  *                "label": "Attacker", "sub": "phishing kit", "badge": "danger" }],
  *   "arrows": [{ "from": "A", "to": "P", "kind": "attack", "label": "controls",
@@ -27,8 +28,8 @@
  *                "text": "The page passes the password and the code on to the real site.",
  *                "kind": "note" }]
  * }
- *   node kinds  attacker | evil | system | person | link | safe
- *   arrow kinds attack | normal | neutral | link | safe
+ *   node kinds  person | system | new | link | safe | cause | attacker | evil
+ *   arrow kinds normal | neutral | link | safe | failure | attack   (failure = attack, red)
  *   note kinds  note | impact | safe        ("n": null on a safe note draws a check)
  *   badge       danger | ok
  *   "text" is wrapped to the note width; "lines" sets the breaks by hand.
@@ -57,10 +58,12 @@ const NODE = {   // fill, stroke, icon colour
   system:   ['var(--surface-muted)', 'var(--border-default)', 'var(--ink-700)'],
   person:   ['var(--surface-card)', 'var(--status-info)', 'var(--status-info)'],
   link:     ['var(--color-accent-soft)', 'var(--color-accent)', 'var(--color-accent)'],
+  new:      ['var(--color-accent)', 'var(--color-accent)', 'var(--text-inverse)'],   // the part we build
   safe:     ['var(--surface-card)', 'var(--status-positive)', 'var(--status-positive)'],
+  cause:    ['var(--surface-card)', 'var(--status-danger)', 'var(--status-danger)'],   // root cause of an incident
 };
 const LINE = {
-  attack: 'var(--status-danger)', normal: 'var(--status-info)', neutral: 'var(--ink-500)',
+  attack: 'var(--status-danger)', failure: 'var(--status-danger)', normal: 'var(--status-info)', neutral: 'var(--ink-500)',
   link: 'var(--color-accent)', safe: 'var(--status-positive)',
 };
 const NOTE = {   // fill, stroke, number badge
@@ -131,6 +134,8 @@ function wrap(text, maxPx, charW) {
 
 export function buildScene(spec) {
   const W = spec.width || 1240, H = spec.height || 500;
+  const k = spec.textScale || 1;                  // text size multiplier
+  const NW = Math.round(NOTE_W * k), LH = LINE_H * k;
   const back = [], front = [], issues = [], boxes = [];
   const err = (m) => issues.push(['ERROR', m]); const warn = (m) => issues.push(['WARN', m]);
   const nodes = {};
@@ -153,13 +158,14 @@ export function buildScene(spec) {
         ? `<text x="${bx}" y="${by + 5}" font-size="14" font-weight="bold" fill="var(--text-inverse)" text-anchor="middle">!</text>`
         : icon('check', bx, by, 14, 'var(--text-inverse)', 3));
     }
-    g.push(`<text x="${x}" y="${y + R + 20}" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">${esc(label)}</text>`);
-    if (sub) g.push(`<text x="${x}" y="${y + R + 36}" font-size="11.5" fill="var(--text-secondary)" text-anchor="middle">${esc(sub)}</text>`);
+    g.push(`<text x="${x}" y="${f(y + R + 20 * k)}" font-size="${f(13 * k)}" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">${esc(label)}</text>`);
+    if (sub) g.push(`<text x="${x}" y="${f(y + R + 36 * k)}" font-size="${f(11.5 * k)}" fill="var(--text-secondary)" text-anchor="middle">${esc(sub)}</text>`);
     front.push(...g);
-    const half = Math.max(label.length * NODE_CHAR_W, (sub || '').length * CHAR_W) / 2;
+    const half = Math.max(label.length * NODE_CHAR_W, (sub || '').length * CHAR_W) * k / 2;
+    const below = R + (sub ? 40 : 25) * k;
     boxes.push({ what: `node ${key}`, x0: x - R, x1: x + R, y0: y - R, y1: y + R, node: key });
-    boxes.push({ what: `node ${key} label`, x0: x - half, x1: x + half, y0: y + R + 8, y1: y + R + (sub ? 40 : 25), node: key });
-    if (x - half < 0 || x + half > W || y - R < 0 || y + R + (sub ? 40 : 25) > H) err(`node ${key}: tile or label leaves the canvas`);
+    boxes.push({ what: `node ${key} label`, x0: x - half, x1: x + half, y0: y + R + 8, y1: y + below, node: key });
+    if (x - half < 0 || x + half > W || y - R < 0 || y + below > H) err(`node ${key}: tile or label leaves the canvas`);
   }
 
   // ---- notes --------------------------------------------------------------
@@ -167,23 +173,23 @@ export function buildScene(spec) {
   for (const nt of spec.notes || []) {
     const kind = nt.kind || 'note';
     if (!NOTE[kind]) { err(`note ${nt.n}: unknown kind "${kind}"`); continue; }
-    const lines = nt.lines || wrap(nt.text || '', NOTE_W - 32, CHAR_W);
-    const h = 50 + LINE_H * lines.length;
+    const lines = nt.lines || wrap(nt.text || '', NW - 32 * k, CHAR_W * k);
+    const h = f(50 * k + LH * lines.length);
     const { x, y } = nt; const [fill, stroke, badge] = NOTE[kind];
     const tag = nt.n == null ? 'safe' : nt.n;
     const g = [`<!-- note ${tag} -->`,
-      `<rect x="${x}" y="${y}" width="${NOTE_W}" height="${h}" rx="8" fill="${fill}"${stroke ? ` stroke="${stroke}" stroke-width="1.6"` : ''}/>`];
-    const cx = x + 25, cy = y + 25;
-    if (nt.n == null) g.push(`<circle cx="${cx}" cy="${cy}" r="12" fill="var(--status-positive)"/>`, icon('check', cx, cy, 15, 'var(--text-inverse)', 3));
-    else g.push(`<circle cx="${cx}" cy="${cy}" r="12" fill="${badge}"/>`,
-      `<text x="${cx}" y="${cy + 4.5}" font-size="12.5" font-weight="bold" fill="var(--text-inverse)" text-anchor="middle">${nt.n}</text>`);
-    g.push(`<text x="${x + 46}" y="${y + 30}" font-size="13.5" font-weight="bold" fill="var(--text-primary)">${esc(nt.title)}</text>`);
-    lines.forEach((t, i) => g.push(`<text x="${x + 16}" y="${y + 56 + LINE_H * i}" font-size="12" fill="var(--text-secondary)">${esc(t)}</text>`));
+      `<rect x="${x}" y="${y}" width="${NW}" height="${h}" rx="8" fill="${fill}"${stroke ? ` stroke="${stroke}" stroke-width="1.6"` : ''}/>`];
+    const cx = f(x + 25 * k), cy = f(y + 25 * k), r = f(12 * k);
+    if (nt.n == null) g.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--status-positive)"/>`, icon('check', cx, cy, 15 * k, 'var(--text-inverse)', 3));
+    else g.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${badge}"/>`,
+      `<text x="${cx}" y="${f(cy + 4.5 * k)}" font-size="${f(12.5 * k)}" font-weight="bold" fill="var(--text-inverse)" text-anchor="middle">${nt.n}</text>`);
+    g.push(`<text x="${f(x + 46 * k)}" y="${f(y + 30 * k)}" font-size="${f(13.5 * k)}" font-weight="bold" fill="var(--text-primary)">${esc(nt.title)}</text>`);
+    lines.forEach((t, i) => g.push(`<text x="${f(x + 16 * k)}" y="${f(y + 56 * k + LH * i)}" font-size="${f(12 * k)}" fill="var(--text-secondary)">${esc(t)}</text>`));
     front.push(...g);
-    boxes.push({ what: `note ${tag}`, x0: x, x1: x + NOTE_W, y0: y, y1: y + h, note: true });
-    if (x < 0 || y < 0 || x + NOTE_W > W || y + h > H) err(`note ${tag}: leaves the canvas (${x},${y} ${NOTE_W}x${h})`);
-    if (nt.title.length * 7.4 > NOTE_W - 52) warn(`note ${tag}: title "${nt.title}" may overrun; keep it to 2-4 words`);
-    lines.forEach((t) => { if (t.length * CHAR_W > NOTE_W - 20) warn(`note ${tag}: line "${t}" may overrun the note`); });
+    boxes.push({ what: `note ${tag}`, x0: x, x1: x + NW, y0: y, y1: y + h, note: true });
+    if (x < 0 || y < 0 || x + NW > W || y + h > H) err(`note ${tag}: leaves the canvas (${x},${y} ${NW}x${h})`);
+    if (nt.title.length * 7.4 * k > NW - 52 * k) warn(`note ${tag}: title "${nt.title}" may overrun; keep it to 2-4 words`);
+    lines.forEach((t) => { if (t.length * CHAR_W * k > NW - 20 * k) warn(`note ${tag}: line "${t}" may overrun the note`); });
     if (lines.length > 3) warn(`note ${tag}: ${lines.length} lines; a note holds one idea in 3 lines or fewer`);
     if (nt.n != null) numbers.push(nt.n);
     if (kind === 'impact') impacts++;
@@ -193,7 +199,7 @@ export function buildScene(spec) {
   if (impacts > 1) warn(`${impacts} impact notes; keep one, on the harm`);
 
   // ---- arrows -------------------------------------------------------------
-  const pathPts = [];
+  const pathPts = [], pairCount = {};
   for (const ar of spec.arrows || []) {
     const a = nodes[ar.from], b = nodes[ar.to];
     if (!a || !b) { err(`arrow ${ar.from}-${ar.to}: unknown node key`); continue; }
@@ -211,21 +217,34 @@ export function buildScene(spec) {
     const tx = b.x - ux * (R + 2), ty = b.y - uy * (R + 2);  // tip: 2px off the tile edge
     const bx = tx - ux * 12, by = ty - uy * 12;              // head base: the stroke ends here
     const dash = ar.dashed ? ' stroke-dasharray="6 5"' : '';
-    back.push(`<!-- arrow ${ar.from}-${ar.to}${bow ? ` bow ${bow}` : ''} -->`,
+    const pair = `${ar.from}-${ar.to}`; pairCount[pair] = (pairCount[pair] || 0) + 1;
+    const aid = pairCount[pair] > 1 ? `${pair} ${pairCount[pair]}` : pair;   // one id per arrow
+    // a stable name for edit mode: the nth arrow between the same two actors, not its bow
+    back.push(`<!-- arrow ${pair}${pairCount[pair] > 1 ? ` ${pairCount[pair]}` : ''} -->`,
       `<path d="M ${f(sx)} ${f(sy)} Q ${f(qx)} ${f(qy)} ${f(bx)} ${f(by)}" fill="none" stroke="${col}" stroke-width="${width}"${dash} stroke-linecap="round"/>`,
       `<polygon points="${f(tx)},${f(ty)} ${f(bx - uy * 5.5)},${f(by + ux * 5.5)} ${f(bx + uy * 5.5)},${f(by - ux * 5.5)}" fill="${col}"/>`);
     for (let t = 0.04; t <= 0.96; t += 0.04) {
       const it = 1 - t;
-      pathPts.push({ id: `${ar.from}-${ar.to}`, from: ar.from, to: ar.to,
+      pathPts.push({ id: aid, from: ar.from, to: ar.to,
         x: it * it * sx + 2 * it * t * qx + t * t * bx, y: it * it * sy + 2 * it * t * qy + t * t * by });
     }
     if (ar.label) {
-      const lx = 0.25 * sx + 0.5 * qx + 0.25 * bx, ly = 0.25 * sy + 0.5 * qy + 0.25 * by + (ar.labelDy ?? -9);
+      const mx2 = 0.25 * sx + 0.5 * qx + 0.25 * bx, my2 = 0.25 * sy + 0.5 * qy + 0.25 * by;  // curve midpoint
+      const hw = ar.label.length * LABEL_CHAR_W * k / 2, hh = 7 * k;
+      const tl = Math.hypot(bx - sx, by - sy), tdx = (bx - sx) / tl, tdy = (by - sy) / tl;     // tangent at t = 0.5
+      let lx, ly;
+      if (hw * Math.abs(tdy) / Math.max(Math.abs(tdx), 0.01) < 3) {   // the line rises < 3px under half the label: keep it level above (or below with labelDy > 0)
+        lx = mx2; ly = my2 + (ar.labelDy ?? -9) * k;
+      } else {                             // slanted: push the label off the line along its normal
+        let nx = -tdy, ny = tdx;
+        if ((ny > 0) !== ((ar.labelDy ?? -9) > 0)) { nx = -nx; ny = -ny; }   // above unless labelDy > 0
+        const d = hw * Math.abs(nx) + hh * Math.abs(ny) + 9;   // clear of the line, halo included
+        lx = mx2 + nx * d; ly = my2 + ny * d + 3.5 * k;   // baseline sits ~3.5px under the text centre
+      }
       const lc = ar.labelColor ? (LINE[ar.labelColor] || ar.labelColor) : col;
-      front.push(`<text x="${f(lx)}" y="${f(ly)}" font-size="11.5" font-weight="bold" fill="${lc}" text-anchor="middle" `
+      front.push(`<text x="${f(lx)}" y="${f(ly)}" font-size="${f(11.5 * k)}" font-weight="bold" fill="${lc}" text-anchor="middle" `
         + `stroke="var(--surface-card)" stroke-width="4" paint-order="stroke">${esc(ar.label)}</text>`);
-      const hw = ar.label.length * LABEL_CHAR_W / 2;
-      boxes.push({ what: `label "${ar.label}"`, x0: lx - hw, x1: lx + hw, y0: ly - 11, y1: ly + 3, label: `${ar.from}-${ar.to}` });
+      boxes.push({ what: `label "${ar.label}"`, x0: lx - hw, x1: lx + hw, y0: ly - 11 * k, y1: ly + 3 * k, label: aid });
     }
   }
 
@@ -241,11 +260,12 @@ export function buildScene(spec) {
   const crossed = new Set();
   for (const pt of pathPts) for (const bx of boxes) {
     const ownTile = (bx.node === pt.from || bx.node === pt.to) && !bx.what.endsWith(' label');
-    if (bx.label === pt.id || ownTile) continue;
+    if (ownTile) continue;
     const pair = `${pt.id}|${bx.what}`;
     if (crossed.has(pair) || !(pt.x > bx.x0 && pt.x < bx.x1 && pt.y > bx.y0 && pt.y < bx.y1)) continue;
     crossed.add(pair);
-    (bx.note ? err : warn)(`arrow ${pt.id} runs through ${bx.what} near (${f(pt.x)}, ${f(pt.y)})`);
+    if (bx.label === pt.id) warn(`${bx.what} sits on its own arrow; give it a labelDy or shorten it`);
+    else (bx.note ? err : warn)(`arrow ${pt.id} runs through ${bx.what} near (${f(pt.x)}, ${f(pt.y)})`);
   }
   const seen = new Set();
   const uniq = issues.filter(([s, m]) => (seen.has(m) ? false : seen.add(m)));

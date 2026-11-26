@@ -1,7 +1,7 @@
-# Illustrated scenes — show how something happens, in one picture
+# Illustrated scenes — show how something happens or works, in one picture
 
-A **scene** tells a short story with actors: who acts, what moves between them, where
-the harm lands. Actors are round icon tiles, the story moves left to right as curved
+A **scene** tells a short story with actors: who acts, what moves between them, and
+where it ends — a result, a pain point, or a harm. Actors are round icon tiles, the story moves left to right as curved
 coloured arrows, and **numbered notes** sit next to the part of the picture they
 explain. A mixed room (product, engineering, security) reads it in one look; the
 numbers give the presenter a path to walk.
@@ -11,19 +11,28 @@ JSON spec into the SVG, computes every arrow and arrowhead, and lints the layout
 general diagram rules in [diagrams.md](diagrams.md) still apply; this file adds what is
 specific to scenes.
 
-## When a scene is the right picture
+## Story types
 
-| The slide explains | Use |
-|---|---|
-| how an attack, a fraud, an incident or a failure unfolds | **scene** |
-| how a request, a message or a leaked item travels through people and systems | **scene** |
-| what the system is made of, and who owns which part | architecture diagram ([diagrams.md](diagrams.md)) |
-| the exact order of calls between services | sequence diagram |
-| the steps of a process with no actors to show | flow |
+A scene fits any slide whose content is a short story: **actors, an order of events,
+and one thing to follow**. Pick the story type first; it decides what the accent and
+red mean, and which slide pairs with the scene.
+
+| Story type | The slide explains | Focus (accent) | Red means | Pairs with |
+|---|---|---|---|---|
+| **Idea** | a proposed solution: who uses it, what the new part does, the result | the `new` actor and its output | not used | a details or decision slide |
+| **Before / after** | today's process against the proposed one | the `new` actor in the after scene | the slow or failing step of today | — (two scenes, side by side or on two slides) |
+| **Journey** | what a person goes through, step by step | the thing they are trying to get done (`link`) | the worst pain point (`impact` note) | a list of fixes |
+| **Data flow** | where a piece of data travels, is stored, and who can read it | the data (`link`) | an exposure | a controls slide |
+| **Hand-off / approval** | who passes work to whom, and where it waits | the request (`link`) | where it gets stuck | an owners table |
+| **Event flow** | which service publishes an event and who reacts | the event (`link`) | a lost or duplicated event | the contract or schema |
+| **Incident** | what failed, how it spread, what stopped | — | the `cause` actor, the failure path (`failure` arrows) and the stopped service (`danger` badge) | timeline and actions |
+| **Attack or fraud** | how an attacker gets in and what they take | the asset taken (`link`) | the attack path (`attack` arrows) | impact and mitigation |
 
 A scene replaces a row of numbered step cards. Step cards read as a list; a scene shows
-*where* each step happens and *who* does it, which is what the audience is trying to
-picture. Use one scene per story; a deck of six risks gets six scenes in one style.
+*where* each step happens and *who* does it. Use something else when the slide is a
+structure (architecture, C4), the exact order of calls (sequence diagram), or steps with
+no actors (flow) — see [diagrams.md](diagrams.md). Keep one story type per deck section,
+so the colours mean the same thing on every scene the audience sees in a row.
 
 ## Anatomy
 
@@ -32,50 +41,60 @@ optional grey sub-label. The `kind` decides the colours:
 
 | `kind` | Means | Look |
 |---|---|---|
+| `person` | a person doing their work (a user, a customer, staff) | white tile, blue ring and icon |
+| `system` | an existing system or third-party platform | grey tile, grey ring |
+| `new` | **the part we build or propose** (idea and before/after stories) | solid accent tile, white icon |
+| `link` | **the one thing the story follows**: the data, the request, the event, the money; in a risk story, the asset the attacker is after | accent-soft tile, accent ring |
+| `safe` | an actor that ends well, or stays safe | white tile, green ring |
+| `cause` | the root cause of an incident: a bad config, a full disk, an expired certificate | white tile, red ring and icon |
 | `attacker` | the bad actor | dark ink tile, white icon |
 | `evil` | the attacker's tool or foothold: a fake page, a stolen or leaked key, a taken-over mailbox, a public list | white tile, red ring and icon |
-| `system` | your own systems and third-party platforms | grey tile, grey ring |
-| `person` | a legitimate user doing normal work | white tile, blue ring and icon |
-| `link` | **the one asset the attacker is after**: the data, the money, the token | accent-soft tile, accent ring |
-| `safe` | an actor that stays safe | white tile, green ring |
 
 A leaked key is the attacker's tool (`evil`); the records it opens are the asset
-(`link`). One `link` actor per scene.
+(`link`). One accent focus per scene: a `new` actor, or a `link` actor — not both.
 
-Badges: `"badge": "danger"` puts a red `!` on the actor that gets harmed;
-`"badge": "ok"` puts a green check on one that stays safe.
+Badges: `"badge": "danger"` puts a red `!` on the actor that is harmed or stopped;
+`"badge": "ok"` puts a green check on the one that ends well.
 
 **Arrows** — quadratic curves between actor centres. The tip lands 2px off the target
 tile; the head is a polygon at the curve's end tangent.
 
 | `kind` | Colour | Means |
 |---|---|---|
-| `attack` | red | the attack path |
-| `normal` | blue | normal use by legitimate people |
-| `neutral` | grey | plumbing that is neither (a lookup, a scan) |
-| `link` | accent | the asset moving on its own |
-| `safe` | green | a path that is safe |
+| `normal` | blue | what people do: a request, a click, normal use |
+| `neutral` | grey | system-to-system plumbing (a lookup, a call, a scan) |
+| `link` | accent | the focus moving: the output of the `new` part, or the thing the story follows |
+| `safe` | green | the good outcome, or a path that is safe |
+| `failure` | red | where it goes wrong: a failure spreading, a step that breaks |
+| `attack` | red | the attack path (same colour as `failure`; the name reads better in a risk spec) |
 
 `bow` bends an arrow (positive and negative bend to opposite sides); `dashed` marks
-control rather than flow ("controls", "buys"); `label` is a 1–3 word verb phrase drawn
-with a white halo; `labelDy` moves it (default −9, above the line; use about +18 to put
-it below).
+control rather than flow ("controls", "buys") or a call that never happens; `label` is
+a 1–3 word verb phrase drawn with a white halo. The script places the label: above a
+level arrow, and pushed clear of a slanted one on its upper side. A positive `labelDy`
+(about +18) moves it to the lower side. In a bundle of parallel arrows, label the
+outermost one, so the label does not sit on its neighbour.
 
 **Notes** — 236px-wide rounded cards. `note` is grey with a dark number; `impact` is
-white with a red border and red number, for **the harm**; `safe` is white with a green
-border, and `"n": null` gives it a check instead of a number.
+white with a red border and red number, for **the harm or the worst pain**; `safe` is white
+with a green border, for **the result** — numbered when it is a step of the story,
+`"n": null` (a check instead of a number) when it sits outside it.
 
 ## Colour meaning is the code — keep it identical across the deck
 
-Red, blue and green are status colours used as a **semantic code**; the brand accent
-marks one thing only:
+Blue, grey, green and red are status colours used as a **semantic code**; the brand accent
+marks the focus of the story and nothing else:
 
-- **The accent appears on exactly one actor kind, `link`** — the asset the story is
-  about. It is the "selected" item of the picture, not decoration.
-- Your own systems stay grey. A red system tile means "the attacker controls this".
-- Every scene in a deck uses the same code, and the slide footer states it once:
-  `Red: attack path. Blue: normal use. Accent: the customer records. Green: safe. Numbers follow the order of the attack.`
-  Name the asset in the legend.
+- **One accent focus per scene**: the `new` actor (with its `link` output arrow) in an
+  idea story, or the `link` actor in a story that follows a thing. It is the
+  "selected" item of the picture, not decoration.
+- Existing systems stay grey. People are blue. The good result is green.
+- **Red appears only for failure, harm or attack.** An idea scene has no red. A red
+  system tile in a risk story means "the attacker controls this".
+- The slide footer states the code once, in the words of the story type:
+  - risk: `Red: attack path. Blue: normal use. Accent: the customer records. Green: safe. Numbers follow the order of the attack.`
+  - incident: `Red: failure path. Blue: normal use. Grey dashed: never reached. Green: kept working. Numbers follow the order of the incident.`
+  - idea: `Accent: the new refund engine. Blue: people. Grey: existing systems. Green: the result. Numbers follow the order of the story.`
 
 ## Layout recipe
 
@@ -83,27 +102,38 @@ The canvas is **1240 × 500** (the default). Under a scene-slide header it rende
 about 0.85×, so 12px note text lands near 10px — small for a projected room. Set
 `"height": 460` whenever the bottom notes still fit (each note is `50 + 16 × lines`
 tall); the scale rises to about 0.9×. Keep the header to the eyebrow, title and facts.
+For a large room, add `"textScale": 1.15` — every text and note grows 15% — and cut
+each note to two lines. Notes are then 271px wide, so space them about 290px apart.
 
-1. **Actors on the middle band**, y ≈ 190–430, the story running left to right. A
-   victim or a legitimate user goes bottom-left, the attacker top-left; the harmed
-   system goes far right with the `danger` badge.
+1. **Actors on the middle band**, y ≈ 190–430, the story running left to right: the
+   person who starts it on the left, the result on the right. In a risk story the
+   attacker goes top-left, the victim or legitimate user bottom-left, and the harmed
+   system far right with the `danger` badge. A side path (an exception, a hand-off to
+   a person) drops below the main line, offset 150–180px sideways from the actor above
+   it, so its arrow does not cross that actor's label. In an incident, follow the
+   failure from the `cause` on the left to the people it hit; parts that kept working
+   are `safe` actors with the `ok` badge on the far right, and a healthy part that was
+   never reached is a `system` fed by a grey dashed `neutral` arrow, its sub-label saying
+   so (`healthy, never called`).
 2. **Notes in two bands**: the top band at y = 16, the bottom band at y ≈ 360–400.
    Alternate top and bottom along the story so each note sits next to its actor or
    arrow, never on the path between them. Six actors and five numbered notes is the
    ceiling; past that, fold two steps into one note or split the story over two slides.
 3. **Number the notes 1..n in the order of the story**, not the order of placement.
-   Exactly **one `impact` note**, on the harm.
-4. **Show the normal case as a blue `normal` arrow** next to the attack path — the
-   contrast is the point (genuine invoices from the same mailbox as the fake one).
+   At most **one `impact` note** (the harm, or the worst pain point) and one numbered
+   `safe` note (the result).
+4. **In a risk story, show the normal case as a blue `normal` arrow** next to the attack
+   path — the contrast is the point (genuine invoices from the same mailbox as the fake one).
    Use an unnumbered `safe` note only for a separate path that stays safe ("Every
    forward is safe"); it sits outside the five.
-5. **Controls are drawn by what they do**:
+5. **Controls and checks are drawn by what they do**:
    - a control that partly works narrows the fan: six red arrows in, three out;
    - a control that fails is a grey dashed arrow to an actor whose sub-label says why
      (`nobody reads it`);
    - a control that works is a green `safe` arrow or note.
 6. **Volume is shown, not written**: a flood is six red arrows with bows from −110 to
-   +120 into one tile; a few getting through is two thin red arrows beside one blue.
+   +120 into one tile; a few getting through is two thin red arrows beside one blue; in
+   an idea story, "1 in 10 goes to a person" is a thin dashed grey arrow to a `person`.
 7. **Parallel paths** between the same two actors get bows of about ±40, or a fan of
    three labelled paths (bows −170, 0, +170) for "three ways to do it".
 8. **Route around actors with `bow`, then move a note** — never shrink text to make
@@ -111,7 +141,7 @@ tall); the scale rises to about 0.9×. Keep the header to the eyebrow, title and
 
 ### Copy
 
-- Note title: 2–4 words, naming the step (`Session taken`, `Links copied`).
+- Note title: 2–4 words, naming the step (`Order checked`, `Decision in seconds`, `Session taken`).
 - Note body: one idea, three lines or fewer. Write `"text"` and the script wraps it;
   use `"lines"` only to force a break.
 - Actor labels name the thing (`Customer mailbox`), sub-labels add the one fact the
@@ -120,11 +150,13 @@ tall); the scale rises to about 0.9×. Keep the header to the eyebrow, title and
 
 ## Build one
 
-1. **Write the story first**: the actors, the order of events, the harm, the safe
-   path. If you cannot write it as five numbered sentences, the scene will not read.
-2. **Write the spec** in `scenes/<name>.scene.json` at the deck root. Start from
-   `deck-template/scenes/example-refund-fraud.scene.json`; the full field list is in
-   the header of `scripts/scene.mjs`.
+1. **Pick the story type and write the story first**: the actors, the order of
+   events, and how it ends (the result, the pain, or the harm). If you cannot write it as five numbered sentences, the scene will not read.
+2. **Write the spec** in `scenes/<name>.scene.json` at the deck root. Start from the example
+   that matches the story type in `deck-template/scenes/` —
+   `example-refund-idea.scene.json` (idea), `example-checkout-incident.scene.json`
+   (incident) or `example-refund-fraud.scene.json` (attack or fraud); the full field list is
+   in the header of `scripts/scene.mjs`.
 3. **Generate until no ERROR**, with a preview:
    ```bash
    node scripts/scene.mjs scenes/<name>.scene.json --png   # public/diagrams/<name>.svg + review/<name>.png (3x)
@@ -147,11 +179,14 @@ is loaded through `<img>` and cannot read the page's CSS. Change the theme, then
 generate again. Pass `--tokens` only when you inline the SVG into the JSX, where
 `var(--token)` resolves.
 
-## On the slide: a two-slide pair
+## On the slide
 
-Each story gets a pair. **Slide A** shows the scene; **Slide B** carries impact and
-mitigation as text panels. The frame below is Slide A's layout, so skip the catalog
-layout pick for it. Slide A:
+The scene gets its own slide, and the slide after it carries what the audience asks
+next — the "Pairs with" column of the story-type table: impact and mitigation for a
+risk, a details or decision slide for an idea, the actions for an incident.
+
+The frame below is the scene slide's layout, so skip the catalog layout pick for it.
+A risk scene:
 
 ```jsx
 import Diagram from '@/components/Diagram';
@@ -182,8 +217,12 @@ import { AccentRule } from '@/components/SlideTransition';
 </div>
 ```
 
-The title stays the same on every Slide A (`How the attack happens`); the eyebrow
-carries which story it is. The facts block holds up to three one-line facts taken from
+`check-slop` reports "no clear focal point" on every scene slide: the scene is the
+focus by layout, so leave that warning. Do not enlarge the title to clear it.
+
+Keep one title across a deck section (`How the attack happens`, `How it works`); the
+eyebrow carries which story it is. An idea scene drops the facts block or uses it for
+the two or three numbers the idea promises. The facts block holds up to three one-line facts taken from
 the source: `Risk` (only when the source rates it), `Attacker`, `Needs`, or the
 `Control bypassed`. A rating the source does not give stays off the slide.
 

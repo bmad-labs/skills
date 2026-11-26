@@ -76,9 +76,10 @@ For every slide in the skeleton, write `src/slides/NN-name.jsx`:
   realize them with the house patterns ([house-style.md](../house-style.md)).
 - Make it **wow**, not just on-theme: one hero, eyebrow→title→accent-rule→body rhythm,
   calm motion, ≥35% whitespace. Full craft guide: [wow-guide.md](../wow-guide.md).
-- Slide explains **how something happens** — an attack, a fraud, an incident, a leak?
-  Draw a scene: read [illustrated-scenes.md](../illustrated-scenes.md) and generate it
-  with `scripts/scene.mjs`. Pair it with an impact-and-mitigation slide.
+- Slide tells **a short story with actors** — how a proposed solution works, a
+  before/after, a user journey, a data or event flow, a hand-off, an incident, an
+  attack? Draw a scene: read [illustrated-scenes.md](../illustrated-scenes.md), pick the
+  story type, and generate it with `scripts/scene.mjs`.
 - Slide needs a **diagram** (a concept, an architecture, a workflow, a timeline)? Read
   [diagrams.md](../diagrams.md) BEFORE generating one — it decides hand-written SVG vs.
   a generator, and a wrong first choice is usually two rejections deep before it shows.

@@ -1,27 +1,147 @@
 {
   "title": "Refund fraud through a taken-over account: attack scene",
   "nodes": [
-    { "key": "A", "x": 100, "y": 190, "icon": "venetian-mask", "kind": "attacker", "label": "Attacker", "sub": "bought logins" },
-    { "key": "C", "x": 100, "y": 400, "icon": "user", "kind": "person", "label": "Customer", "sub": "real account owner" },
-    { "key": "K", "x": 360, "y": 300, "icon": "key-round", "kind": "evil", "label": "Reused password" },
-    { "key": "P", "x": 620, "y": 300, "icon": "globe", "kind": "system", "label": "Returns portal", "sub": "accepts the claim" },
-    { "key": "R", "x": 860, "y": 190, "icon": "banknote", "kind": "link", "label": "Refund", "sub": "to a new card" },
-    { "key": "B", "x": 1120, "y": 300, "icon": "server", "kind": "system", "label": "Payment service", "sub": "pays out", "badge": "danger" }
+    {
+      "key": "A",
+      "x": 100,
+      "y": 190,
+      "icon": "venetian-mask",
+      "kind": "attacker",
+      "label": "Attacker",
+      "sub": "bought logins"
+    },
+    {
+      "key": "C",
+      "x": 100,
+      "y": 400,
+      "icon": "user",
+      "kind": "person",
+      "label": "Customer",
+      "sub": "real account owner"
+    },
+    {
+      "key": "K",
+      "x": 360,
+      "y": 300,
+      "icon": "key-round",
+      "kind": "evil",
+      "label": "Reused password"
+    },
+    {
+      "key": "P",
+      "x": 620,
+      "y": 300,
+      "icon": "globe",
+      "kind": "system",
+      "label": "Returns portal",
+      "sub": "accepts the claim"
+    },
+    {
+      "key": "R",
+      "x": 860,
+      "y": 190,
+      "icon": "banknote",
+      "kind": "link",
+      "label": "Refund",
+      "sub": "to a new card"
+    },
+    {
+      "key": "B",
+      "x": 1120,
+      "y": 300,
+      "icon": "server",
+      "kind": "system",
+      "label": "Payment service",
+      "sub": "pays out",
+      "badge": "danger"
+    }
   ],
   "arrows": [
-    { "from": "A", "to": "K", "kind": "attack", "label": "buys", "dashed": true },
-    { "from": "C", "to": "P", "kind": "normal", "label": "normal returns", "bow": 60, "labelDy": 20 },
-    { "from": "K", "to": "P", "kind": "attack", "label": "signs in" },
-    { "from": "P", "to": "R", "kind": "attack", "label": "claim approved" },
-    { "from": "R", "to": "B", "kind": "attack", "bow": -40, "width": 1.8 },
-    { "from": "R", "to": "B", "kind": "attack", "label": "paid out", "width": 1.8 },
-    { "from": "R", "to": "B", "kind": "attack", "bow": 40, "width": 1.8 }
+    {
+      "from": "A",
+      "to": "K",
+      "kind": "attack",
+      "label": "buys",
+      "dashed": true
+    },
+    {
+      "from": "C",
+      "to": "P",
+      "kind": "normal",
+      "label": "normal returns",
+      "bow": 60,
+      "labelDy": 20
+    },
+    {
+      "from": "K",
+      "to": "P",
+      "kind": "attack",
+      "label": "signs in"
+    },
+    {
+      "from": "P",
+      "to": "R",
+      "kind": "attack",
+      "label": "claim approved"
+    },
+    {
+      "from": "R",
+      "to": "B",
+      "kind": "attack",
+      "bow": -40,
+      "width": 1.8,
+      "label": "paid out"
+    },
+    {
+      "from": "R",
+      "to": "B",
+      "kind": "attack",
+      "width": 1.8
+    },
+    {
+      "from": "R",
+      "to": "B",
+      "kind": "attack",
+      "bow": 40,
+      "width": 1.8
+    }
   ],
   "notes": [
-    { "n": 1, "x": 30, "y": 16, "title": "Login bought", "text": "A password leaked from another site also opens this account." },
-    { "n": 2, "x": 300, "y": 16, "title": "Claim filed", "text": "Returns are filed for orders the customer already kept." },
-    { "n": 3, "x": 680, "y": 16, "title": "Refund redirected", "text": "The refund card is changed to one the attacker holds." },
-    { "n": 4, "x": 990, "y": 384, "title": "Money lost", "text": "Every refund is paid out before anyone checks.", "kind": "impact" },
-    { "n": 5, "x": 500, "y": 384, "title": "Customer notices", "text": "The password is reset. Refunds already paid stay lost." }
+    {
+      "n": 1,
+      "x": 30,
+      "y": 16,
+      "title": "Login bought",
+      "text": "A password leaked from another site also opens this account."
+    },
+    {
+      "n": 2,
+      "x": 300,
+      "y": 16,
+      "title": "Claim filed",
+      "text": "Returns are filed for orders the customer already kept."
+    },
+    {
+      "n": 3,
+      "x": 680,
+      "y": 16,
+      "title": "Refund redirected",
+      "text": "The refund card is changed to one the attacker holds."
+    },
+    {
+      "n": 4,
+      "x": 990,
+      "y": 384,
+      "title": "Money lost",
+      "text": "Every refund is paid out before anyone checks.",
+      "kind": "impact"
+    },
+    {
+      "n": 5,
+      "x": 500,
+      "y": 384,
+      "title": "Customer notices",
+      "text": "The password is reset. Refunds already paid stay lost."
+    }
   ]
 }
