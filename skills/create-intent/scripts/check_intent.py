@@ -79,6 +79,7 @@ def check_ids(docs, prefix, owner):
     if owner_text is None:
         return
     defined = {row[0] for row in table_rows(owner_text, prefix + r"\d+")}
+    defined |= set(re.findall(r"^> \*\*(" + prefix + r"\d+) ·", owner_text, re.MULTILINE))
     used = set(re.findall(r"\((" + prefix + r"\d+)\)", fr_text))
     for item in sorted(used - defined, key=lambda x: int(x[1:])):
         find(f"fr.md links {item} but {owner} does not define it")

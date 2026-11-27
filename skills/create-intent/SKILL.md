@@ -82,6 +82,8 @@ The questions are the main value. Each question:
 
 Where to find questions — check every source for: [references/question-craft.md](references/question-craft.md).
 
+How a PO item looks in `confirm-po.md` — a card (Topic, Source, Today, Why it matters, Question, Options, Our recommendation, Your answer) under a summary of what the PO must do: [references/po-question-card.md](references/po-question-card.md).
+
 ## Source tags
 
 Anything not copied from a story gets a tag: **S** story text, **D** decision (answer or comment), **P** our proposal waiting for approval, **?** open. Never write an inferred rule as if a story said it. Never invent an AC; write it as a proposal or a question.
@@ -102,6 +104,7 @@ Anything not copied from a story gets a tag: **S** story text, **D** decision (a
 - [ ] No inferred rule without a tag; no invented AC
 - [ ] Answers moved into tables; Decision lines under the AC they change
 - [ ] `confirm-po.md` has no technical words; stands alone for a PO
+- [ ] `confirm-po.md` starts with the summary and an "Answer first" line; every Q / G item is a card with all parts of `references/po-question-card.md`; no empty section
 - [ ] Every G# / T# defined once and linked from `fr.md`
 - [ ] `check_intent.py` passes
 
